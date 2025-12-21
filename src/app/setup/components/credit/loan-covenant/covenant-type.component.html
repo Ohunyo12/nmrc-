@@ -1,0 +1,126 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Covenant Types
+                                <!--{{ covenantTypes | json }}-->
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showCovenantTypeForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="covenantTypes" [paginator]="true" [rows]="20">
+                        
+                        <p-column field="covenantTypeName" header="Covenant Type Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="requireAmount" header="Require Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="requireFrequency" header="Require Frequency" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="isCleanupCycle" header="Is Cleanup Cycle" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}"> <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editConvenantType(i)" href="javascript:void(0)"> Edit </a>
+                            </ng-template>
+                        </p-column>
+                        
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+                                                <!--forms-->
+
+<!--title modal-->
+<p-dialog [responsive]=true [(visible)]="displayCovenantTypeForm" id="ct-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Covenant Type
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="covenantTypeForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <!-- <div class="form-group">
+                        <label for="isFinancial" class="control-label col-md-4">Is Covenant Financial</label>
+                        <div class="col-md-8">
+                            <input type="text" name="isFinancial" formControlName="isFinancial" id="isFinancial" class="form-control" [ngClass]="!covenantTypeForm.controls['isFinancial'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div> -->
+
+                    <div class="form-group">
+                        <label for="covenantTypeName" class="control-label col-md-4">Covenant Type</label>
+                        <div class="col-md-8">
+                            <input type="text" name="covenantTypeName" formControlName="covenantTypeName" id="covenantTypeName" class="form-control" [ngClass]="!covenantTypeForm.controls['covenantTypeName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="isFinancial" class="control-label col-md-4">Covenant Is Financial</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" name="isFinancial" formControlName="isFinancial" id="isFinancial" [ngClass]="!covenantTypeForm.controls['isFinancial'].valid ? 'required-input' : 'valid-input'" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requireFrequency" class="control-label col-md-4">Frequency Required</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" name="requireFrequency" formControlName="requireFrequency" id="requireFrequency" [ngClass]="!covenantTypeForm.controls['requireFrequency'].valid ? 'required-input' : 'valid-input'" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="isCleanupCycle" class="control-label col-md-4">Cleanup Cycle</label>
+                        <div class="col-md-8">
+                            <input (change)="onCleanupCycleChange(1)" type="checkbox" name="isCleanupCycle" formControlName="isCleanupCycle" id="isCleanupCycle" [ngClass]="!covenantTypeForm.controls['isCleanupCycle'].valid ? 'required-input' : 'valid-input'" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requireAmount" class="control-label col-md-4">Amount Required</label>
+                        <div class="col-md-8">
+                            <input (change)="onCleanupCycleChange(2)" type="checkbox" name="requireAmount" formControlName="requireAmount" id="requireAmount" [ngClass]="!covenantTypeForm.controls['requireAmount'].valid ? 'required-input' : 'valid-input'" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(covenantTypeForm)" [disabled]="covenantTypeForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayCovenantTypeForm=false"  style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

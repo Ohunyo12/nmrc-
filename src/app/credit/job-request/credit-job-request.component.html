@@ -1,0 +1,263 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Central Job Request Management
+                        </h2>
+                        
+                        <div *ngIf="displayResponseForm" class="pull-right">
+                            <button (click)="backToList()" pButton type="button" label="Back To List" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+        <div id="jobreply" *ngIf="displayResponseForm" >
+                <job-reply-template [dynamicJobRequestId]=dynamicJobRequestId [jobData]=jobRequests (saveCompleted)="getResponse($event)" [viewOnly]=viewOnly (displayOption)="CallRequestClose($event)" >
+                </job-reply-template>
+            </div>
+        <div  class="panel panel-default">
+            <div *ngIf="!displayResponseForm" class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Request List <small> {{ operationTitle }}</small>
+                        </h2>
+                        <div class="pull-right dropdown">
+                            <button pButton class="dropdown-toggle btn btn-success" data-toggle="dropdown" >Fetch By Status 
+                                <i class="fa fa-caret-down"></i>
+                              </button>
+                                <ul class="dropdown-menu">
+                                    <li><a (click)="GetJobRequestByStatus('all')" href="javascript:void(0)">Default..............(1st 20 Records)</a></li>
+                                    <li><a (click)="GetJobRequestByStatus('completed')" href="javascript:void(0)">Completed........(100 Records)</a></li>
+                                    <li><a (click)="GetJobRequestByStatus('pending')" href="javascript:void(0)">Pending............(100 Records)</a></li>
+                                    <li><a (click)="GetJobRequestByStatus('in-progress')" href="javascript:void(0)">In progress........(100 Records)</a></li>
+                                    <li><a (click)="GetJobRequestByStatus('cancelled')" href="javascript:void(0)">Cancelled..........(100 Records)</a></li>
+                                    <hr>
+                                    <!-- <li><a (click)="GetJobRequestByStatus('assigned')" href="javascript:void(0)">Assigned</a></li>
+                                    <li><a (click)="GetJobRequestByStatus('unassigned')" href="javascript:void(0)">UnAssigned</a></li> -->
+                                </ul>
+                        </div>
+                        <div class="pull-right">
+                            <button (click)="showRequestForm()" pButton type="button" label="Create New" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="jobRequests != null && jobRequests != undefined"  style="margin-top:8px;margin-left:15px;">
+                <a (click)="viewfilteredJobRequest('all')" href="javascript:void(0)" title="All">All ({{ allCount}})</a>
+                <span >
+                    <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('pending')" title="Pending">Pending ({{pendingCount}})</a>
+                    <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('completed')" title="Completed">Completed ({{finishedCount }})</a>
+                    <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('in-progress')" title="In-progress">in-progress ({{inProgresCount}})</a>
+                    <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('cancelled')" title="Cancelled">Cancelled ({{cancelledCount}})</a>
+                    <!-- <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('assigned')" title="Assigned">Assigned ({{jobCount ? jobCount.assignedCount : 0 }})</a>
+                    <span style="padding:3px;">|</span>
+                    <a  href="javascript:void(0)" (click)="viewfilteredJobRequest('unassigned')" title="Unassigned">Unassigned ({{jobCount ? jobCount.unAssignedCount : 0 }})</a>
+                     -->
+                    <span style="padding:3px;" >
+                        <input  type="search" [(ngModel)]="searchString" id="searchString" name="searchString" placeholder="Job Request Code/Reference Number"
+                            aria-label="Search" size="40" minlength="5" maxlength="80">
+                        <button  (click)="getJobRequestsByQueryString()">Search</button>
+                        </span>
+                        <span>
+                                <input type="checkbox" (change)="showSourceBranch()" name="sourceBranch">
+                                <label for="sourceBranch"> Show Source Branch </label>
+                        </span>
+                    
+                </span>
+                <span *ngIf="jobRequests == null || jobRequests == undefined">loading...</span>
+            </div>
+
+            <div class="panel-body" style="overflow-x: scroll; ">
+                <p-dataTable *ngIf="displayRequestGrid && visible" [responsive]="true" [value]="jobRequests" [paginator]="true" [rows]="10"  selection="true" selectionMode="single"
+                [rowsPerPageOptions]="[10,20,30]" [lazy]="false" [totalRecords]="itemTotal" (onLazyLoad)="loadData($event)" [loading]="showLoadIcon">
+                     <p-column field="systemArrivalDate" [style]="{'width':'83px'}" header="Date" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            {{ row.systemArrivalDate | date }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="jobRequestCode" [style]="{'width':'73px'}" header="Code" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="refNo" [style]="{'width':'95px'}" header="Reference" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="jobSubTypeName" [style]="{'width':'100px'}" header="Job Type" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="fromSender" header="Sent By" [style]="{'width':'125px'}" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column *ngIf="displaySourceBranch" [style]="{'width':'150px'}" field="sourceBranchName" header="Source Branch" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                {{ row.sourceBranchName }}-({{row.sourceBranchCode}})
+                            </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'182px'}" field="customerName" header="Customer" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'125px'}" field="operationName" header="Required for" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'135px'}" field="assignee" header="Assigned To" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            <a (click)="reasignJobRequest(row)" href="javascript:void(0)" title="Reassign this task to somebody">{{ row.assignee }}</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'78px'}">
+                        <ng-template pTemplate type="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate type="body">
+                            <a (click)="startJobRequest(d)" href="javascript:void(0)">Take Action</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'40px'}" header="View">
+                        <ng-template pTemplate type="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate type="body">
+                            <a (click)="ViewJobRequest(d)" href="javascript:void(0)">View</a>
+                        </ng-template>
+                    </p-column>
+
+                    <p-column field="requestStatusId" header="" [style]="{'width':'68px','text-align':'center'}">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                <!-- {{row.requestStatusname}} -->
+                            <span [innerHTML]="getStatus(row.requestStatusId)" ></span>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+        
+                <p-dataTable *ngIf="!displayRequestGrid && visible" [responsive]="true" [value]="jobRequests" [paginator]="true" [rows]="10">
+                    <p-column field="systemArrivalDate" [style]="{'width':'83px'}" header="Date" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            {{ row.systemArrivalDate | date }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="jobRequestCode" [style]="{'width':'73px'}" header="Code" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="refNo" [style]="{'width':'95px'}" header="Reference" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="jobSubTypeName" [style]="{'width':'100px'}" header="Job Type" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="fromSender" header="Sent By" [style]="{'width':'125px'}" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column *ngIf="displaySourceBranch" [style]="{'width':'150px'}" field="sourceBranchName" header="Source Branch" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                {{ row.sourceBranchName }}-({{row.sourceBranchCode}})
+                            </ng-template>
+                        </p-column>
+                    <p-column [style]="{'width':'182px'}" field="customerName" header="Customer" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'125px'}" field="operationName" header="Required for" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'135px'}" field="assignee" header="Assigned To" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            <a (click)="reasignJobRequest(row)" href="javascript:void(0)" title="Reassign this task to somebody">{{ row.assignee }}</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'78px'}">
+                        <ng-template pTemplate type="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate type="body">
+                            <a (click)="startJobRequest(d)" href="javascript:void(0)">Take Action</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'40px'}" header="View">
+                        <ng-template pTemplate type="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate type="body">
+                            <a (click)="ViewJobRequest(d)" href="javascript:void(0)">View</a>
+                        </ng-template>
+                    </p-column>
+
+                    <p-column field="requestStatusId" header="" [style]="{'width':'68px','text-align':'center'}">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                <!-- {{row.requestStatusname}} -->
+                            <span [innerHTML]="getStatus(row.requestStatusId)" ></span>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--job request form modal-->
+<p-dialog [paginator]="true" 
+[responsive]="true" [(visible)]="displayRequestForm" id="add-modal" modal="modal" [rows]="5" showEffect="fade" width="870">
+    <job-request-template 
+        [pageHeaderTitle]=requestPageHeaderTitle 
+        [isReassigned]=isRequestReassigned 
+        [isAcknowledged]=isRequestAcknowledged 
+        [targetId]=requestTargetId 
+        [jobSourceId]= jobSourceId
+        [operationsId]=requestOperationsId 
+        [requestStatusId]=requestStatusId 
+        (notify)="getRequestData($event)"
+        (displayOption)="CallRequestClose($event)" 
+        (displayOptionNoRefresh)="CallRequestCloseNoRefresh($event)">
+    </job-request-template>
+</p-dialog>
+<!--end of form modal-->
+
+<!--job alternate reasign form modal-->
+<p-dialog [responsive]=true [(visible)]="displayJobViewForm" [closable]="true" id="add-modal" modal="modal" showEffect="fade" width="750">
+    <div style="margin-bottom:0" class="panel panel-default overflow-y: scroll ">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Job Request View
+            </h2>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:300px">
+            <footer>Sent By:</footer> <cite>{{fromSender}} ({{branch}})</cite>
+            <div class="form-group">
+                <div class="col-md-12 ">
+                    <div class="panel-body col-md-12" style="min-height:200px;">
+                        <div [innerHTML]="senderComment" class="paper" style="overflow:auto;height:180px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="form-group col-md-12">
+
+                    <footer>Response By:</footer>
+                    <cite>{{to}} ({{toBranch}})</cite>
+
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 ">
+                        <div class="panel-body col-md-12" style="min-height:180px;">
+                            <div [innerHTML]="responseComment" class="paper" style="overflow:auto;height:180px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="to === null || to === 'n/a'" class="panel-body col-md-12">
+                <cite>This Request has not been responded to</cite>
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="closeDialog()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!--job reasign form modal-->
+<p-dialog [responsive]=true [(visible)]="displayReasignForm" id="add-modal" modal="modal" showEffect="fade" width="750">
+    <job-reasign-template 
+    [dynamicJobRequestId]=dynamicJobRequestId 
+    [assigned]=assigned 
+    [jobData]=jobRequests  
+    (displayOption)="CallRequestClose($event)" 
+    (showAssignmentStatus)="showAssignmentStatus($event)"
+    (displayOptionNoRefresh)="CallRequestCloseNoRefresh($event)">
+    </job-reasign-template>
+</p-dialog>
+<!--end of form modal-->
+
+<!--job reasign form modal-->
+<!-- <p-dialog [responsive]=true [(visible)]="displayResponseForm" [closable]="true" id="add-modal" showEffect="fade" width="950"  [minHeight]="250">
+    <job-reply-template [dynamicJobRequestId]=dynamicJobRequestId [jobData]=jobRequests (displayOption)="CallRequestClose()" (displayOptionNoRefresh)="CallRequestCloseNoRefresh()">
+    </job-reply-template>
+</p-dialog> -->
+<!--end of form modal-->
+
+<!-- <pre>{{jobRequests | json }}</pre> -->

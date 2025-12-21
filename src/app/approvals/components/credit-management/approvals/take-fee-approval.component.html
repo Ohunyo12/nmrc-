@@ -1,0 +1,553 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Fee Change Awaiting Approval
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="loanTakFeeApprovalData" [responsive]=true selectionMode="single" [(selection)]="loanSelection">
+                        <p-column field="loanReferenceNumber" header="Ref.Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="relationshipManagerName" header="Relationship Manager" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="divisionShortCode" header="Unit" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="chargeFeeName" header="Charge Fee" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="effectiveDate" header="Effictive Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-ln="rowData" pTemplate="body">
+                                {{ln[col.field] | date : 'dd/MM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="approvalStatusName" header="Approval Status " sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-ln="rowData" pTemplate="body">
+                                <span class="label label-info"> {{ln[col.field] | uppercase }}</span>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'80px', 'text-align':'center'}">
+                            <ng-template pTemplate="header">
+                                View
+                            </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <button type="button" (click)="viewLoanDetails(row, $event)">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </button>
+                                <!--a ng-show="row.approvalStatusId==2 ? true : false" (click)="viewLoanDetails(i, $event)" style="display: block" href="#">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </a-->
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p-dialog [responsive]=true [(visible)]="displayManualFeeApprovalModal" widgetVar="ajaxDialog" [contentStyle]="{'overflow':'scroll','max-height':'600px'}" modal="modal" showEffect="fade" width="949">
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <p-tabView>
+                <p-tabPanel header="Basic Information">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Customer Group Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerGroupName ? loanSelectedData.customerGroupName : 'N/A'}}</td>
+                                <td>
+                                    <strong>Customer Branch</strong>
+                                </td>
+                                <td>{{ loanSelectedData.branchName ? loanSelectedData.branchName : 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Customer Code</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerCode ? loanSelectedData.customerCode : 'N/A' }}</td>
+                                <td>
+                                    <strong>Customer Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerName ? loanSelectedData.customerName : 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Application Reference Number</strong>
+                                </td>
+                                <td>{{ loanSelectedData.applicationReferenceNumber }}</td>
+                                <td>
+                                    <strong>Loan Reference Number</strong>
+                                </td>
+                                <td>{{ loanSelectedData.loanReferenceNumber }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Type of Loan</strong>
+                                </td>
+                                <td>{{ loanSelectedData.loanTypeName }}</td>
+                                <td>
+                                    <strong>Product Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productName }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>CASA Account Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productAccountName }}</td>
+                                <td>
+                                    <strong>CASA Account Number</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productAccountNumber }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Relationship Manager</strong>
+                                </td>
+                                <td>{{ loanSelectedData.relationshipManagerName }}</td>
+                                <td>
+                                    <strong>Relationship officer</strong>
+                                </td>
+                                <td>{{ loanSelectedData.relationshipOfficerName }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Sector/SubSector</strong>
+                                </td>
+                                <td>{{ loanSelectedData.sectorName}} / {{loanSelectedData.subSectorName }}</td>
+                                <td>
+                                    <strong>Customer Sensitivity Level</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerSensitivityLevelName }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>MIS Code</strong>
+                                </td>
+                                <td>{{ loanSelectedData.misCode}} </td>
+                                <td>
+                                    <strong>Team MIS Code Loan</strong>
+                                </td>
+                                <td>{{ loanSelectedData.teamMiscode }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Profile Loan</strong>
+                                </td>
+                                <td>{{ loanSelectedData.profileLoan}} </td>
+                                <!-- <td><strong>Team MIS Code Loan</strong></td> <td>{{ loanSelectedData.teamMiscode }}</td> -->
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+                <p-tabPanel header="Contingent Information" *ngIf="contingentFacility">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Facility Reference No:</strong>
+                                </td>
+                                <td>{{ loanSelectedData.loanReferenceNumber ? loanSelectedData.loanReferenceNumber : 'N/A'}}</td>
+                                <td>
+                                    <strong>Application Reference No:</strong>
+                                </td>
+                                <td>{{ loanSelectedData.applicationReferenceNumber ? loanSelectedData.applicationReferenceNumber : 'N/A'}}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Customer Code</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerCode }}</td>
+                                <td>
+                                    <strong>Customer Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.customerName ? loanSelectedData.customerName : 'N/A'}}</td>
+
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong> Product Account Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productAccountName }}</td>
+                                <td>
+                                    <strong>Product Type</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productTypeName }}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong> product Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productName }}</td>
+                                <td>
+                                    <strong>Branch Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.branchName }}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong> Relationship Manager</strong>
+                                </td>
+                                <td>{{ loanSelectedData.relationshipOfficerName ? loanSelectedData.relationshipOfficerName : 'N/A' }}</td>
+                                <td>
+                                    <strong>Business Manager</strong>
+                                </td>
+                                <td>{{ loanSelectedData.relationshipManagerName }}</td>
+
+                            </tr>
+                            <tr>
+                                <!-- <td>
+                                  <strong> Booking Date</strong>
+                                </td>
+                                <td>{{ loanSelectedData.bookingDate | date }}</td> -->
+                                <td>
+                                    <strong>Effective Date</strong>
+                                </td>
+                                <td>{{ loanSelectedData.effectiveDate | date }}</td>
+                                <td>
+                                    <strong> Maturity Date</strong>
+                                </td>
+                                <td>{{ loanSelectedData.maturityDate | date }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong> Contingent Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.principalAmount | number:'1.2' }}</td>
+
+
+                                <td>
+                                    <strong> Currency</strong>
+                                </td>
+                                <td>{{ loanSelectedData.currency}}</td>
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    <strong> Date Approved</strong>
+                                </td>
+                                <td>{{ loanSelectedData.dateApproved | date }}</td>
+
+                            </tr>
+                            <tr width="100%">
+                                <td>
+                                    <strong><h5>Changes Made For Take Fee</h5></strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Charge Fee</strong>
+                                </td>
+                                <td>{{ loanSelectedData.chargeFeeName }}</td>
+                                <td>
+                                    <strong>Fee Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.feeAmount | number:'1.2' }}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Description</strong>
+                                </td>
+                                <td>{{ loanSelectedData.description }}</td>
+                                <td>
+                                    <strong>CASA Account</strong>
+                                </td>
+                                <td>{{ loanSelectedData.takeFeeCasaAccountName}}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Comment</strong>
+                                </td>
+                                <td>
+                                    <textarea [ngClass]="!loanSelectedData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="loanSelectedData.comment" name="comment" cols="15" rows="3"></textarea>
+                                </td>
+                                <td>
+                                    <strong>Status</strong>
+                                </td>
+                                <td>
+                                    <select name="approvalStatusId" id="approvalStatusId" class="form-control" [(ngModel)]="loanSelectedData.approvalStatusId" [ngClass]="!loanSelectedData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select Approval Status ---</option>
+                                        <option value="2">Approved</option>
+                                        <option value="3">Disapproved</option>
+
+                                        <!-- <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option> -->
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+                <p-tabPanel header="Schedule Information" *ngIf="!contingentFacility">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>GL Account Name</strong>
+                                </td>
+                                <td>{{ loanSelectedData.productAccountName }}</td>
+                                <td>
+                                    <strong>Principal Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.principalAmount | number: '1.2'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Effective Date</strong>
+                                </td>
+                                <td>{{ loanSelectedData.effectiveDate | date: 'dd-MM-yyyy'}}</td>
+                                <td>
+                                    <strong>Booked On</strong>
+                                </td>
+                                <td>{{ loanSelectedData.bookingDate | date: 'dd-MM-yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Booked By</strong>
+                                </td>
+                                <td>{{ loanSelectedData.creatorName}}</td>
+                                <td>
+                                    <strong>Maturity Date</strong>
+                                </td>
+                                <td>{{ loanSelectedData.maturityDate | date: 'dd-MM-yyyy'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Approved Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.approvedAmount | number: '1.2'}}</td>
+                                <td>
+                                    <strong>Outstanding Principal</strong>
+                                </td>
+                                <td>{{ loanSelectedData.outstandingPrincipal | number: '1.2'}}</td>
+                            </tr>
+                            <tr *ngIf="!isOverDraft">
+                                <td>
+                                    <strong>First Interest PaymentDate</strong>
+                                </td>
+                                <td>{{ loanSelectedData.firstInterestPaymentDate | date: 'dd-MM-yyyy'}}</td>
+                                <td>
+                                    <strong>First Principal PaymentDate</strong>
+                                </td>
+                                <td>{{ loanSelectedData.firstPrincipalPaymentDate | date: 'dd-MM-yyyy'}}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Interest Rate</strong>
+                                </td>
+                                <td>{{ loanSelectedData.interestRate}}</td>
+                                <td *ngIf="!isOverDraft">
+                                    <strong>Principal Frequency Type</strong>
+                                </td>
+                                <td *ngIf="!isOverDraft">{{ loanSelectedData.pricipalFrequencyTypeName }}</td>
+                            </tr>
+                            <tr>
+                                <td *ngIf="!isOverDraft">
+                                    <strong>Interest Frequency Type</strong>
+                                </td>
+                                <td *ngIf="!isOverDraft">{{ loanSelectedData.interestFrequencyTypeName }}</td>
+                                <td>
+                                    <strong>Integral Fee Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.integralFeeAmount | number: '1.2'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Tenor</strong>
+                                </td>
+                                <td>{{ loanSelectedData.tenor }}</td>
+                                <td *ngIf="!isOverDraft">
+                                    <strong>Scheduled Prepayment Date</strong>
+                                </td>
+                                <td *ngIf="!isOverDraft"> {{ loanSelectedData.scheduledPrepaymentDate | date: 'dd-MM-yyyy'}}</td>
+                            </tr>
+                            <tr width="100%">
+                                <td>
+                                    <strong><h5>Changes Made For Take Fee</h5></strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Charge Fee</strong>
+                                </td>
+                                <td>{{ loanSelectedData.chargeFeeName }}</td>
+                                <td>
+                                    <strong>Fee Amount</strong>
+                                </td>
+                                <td>{{ loanSelectedData.feeAmount | number:'1.2' }}</td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Description</strong>
+                                </td>
+                                <td>{{ loanSelectedData.description }}</td>
+                                <td>
+                                    <strong>CASA Account</strong>
+                                </td>
+                                <td>{{ loanSelectedData.takeFeeCasaAccountName}}</td>
+
+                            </tr>
+                            <tr>
+                                <tr>
+                                    <td>
+                                        <strong>Comment</strong>
+                                    </td>
+                                    <td>
+                                        <textarea [ngClass]="!comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="comment" name="comment" cols="15" rows="3"></textarea>
+
+                                        <!-- <textarea [ngClass]="!loanSelectedData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="loanSelectedData.comment"
+                                        name="comment" cols="15" rows="3"></textarea> -->
+                                    </td>
+                                    <td>
+                                        <strong>Status</strong>
+                                    </td>
+                                    <td>
+                                        <select name="approvalStatusId" id="approvalStatusId" class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="!approvalStatusId ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select Approval Status ---</option>
+                                        <option value="2">Approved</option>
+                                        <option value="3">Disapproved</option>
+                                        </select>
+
+                                        <!-- 
+                                    <select name="approvalStatusId" id="approvalStatusId" class="form-control" [(ngModel)]="loanSelectedData.approvalStatusId"
+                                        [ngClass]="!loanSelectedData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select Approval Status ---</option>
+                                        <option value="2">Approved</option>
+                                        <option value="3">Disapproved</option>
+                                    </select> -->
+
+                                    </td>
+                                </tr>
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+
+            </p-tabView>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group pull-right">
+                            <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                            <!-- <button [disabled]="!loanSelectedData.comment || !loanSelectedData.approvalStatusId" type="button" (click)="showConfirmDialog()" class="btn btn-success">Submit For Approval</button> -->
+                            <button type="button" [disabled]="!comment || !approvalStatusId" (click)="promptToGoForApproval()" class="btn btn-success">Submit For Approval</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Authentication Token
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                    <div class="col-md-12">
+                        <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                    <div class="col-md-12">
+                        <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer ">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="form-group text-center">
+                        <div class="col-md-12">
+                            <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="goForApproval()" style="margin-right:5px " class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!--modal for all documentation -->
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Appraisal Documentation for REFERENCE:
+                <strong>{{ loanSelectedData?.applicationReferenceNumber }}</strong> of OBLIGOR:
+                <strong>{{ loanSelectedData?.customerName }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="closeDocumentation()">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+            <div *ngFor="let x of documentations">
+                <p><strong>{{x.title}}</strong></p>
+                <span [innerHtml]="x.templateDocument"></span>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<!--modal ends-->

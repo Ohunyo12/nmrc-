@@ -1,0 +1,132 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Accredited Principal
+              </h2>
+              <div class="pull-right">
+                <button (click)="showForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+
+          <p-dataTable [value]="principals">
+            <p-column field="principalsRegNumber" header="Principal Reg Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="name" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="address" header="Solicitor Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="emailAddress" header="Solicitor Email" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="editPrincipal(i)" href="javascript:void(0)">Edit</a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+
+      </div>
+      <!--end of panel-->
+
+
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayForm" id="add-modal" modal="modal" showEffect="fade" width="850">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{ entityName }}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="principalsForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="name" class="control-label col-md-2">Name</label>
+            <div class="col-md-4">
+              <input type="text" name="name" formControlName="name" id="name" class="form-control" [ngClass]="!principalsForm.controls['name'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="principalsRegNumber" class="control-label col-md-2">Principal Reg. Number</label>
+            <div class="col-md-4">
+              <input type="text" name="principalsRegNumber" formControlName="principalsRegNumber" id="principalsRegNumber" class="form-control"
+                [ngClass]="!principalsForm.controls['principalsRegNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <!-- <div class="form-group">
+            <label for="cityId" class="control-label col-md-2">Principal City</label>
+            <div class="col-md-4">
+              <select name="cityId" formControlName="cityId" id="cityId" class="form-control" [ngClass]="!principalsForm.controls['cityId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select City --</option>
+                                <option *ngFor="let ci of cities" [value]="ci.cityId">{{ ci.cityName }}</option>
+                            </select>
+            </div>
+            <label for="countryId" class="control-label col-md-2">Principal Country</label>
+            <div class="col-md-4">
+              <select name="countryId" formControlName="countryId" id="countryId" class="form-control" [ngClass]="!principalsForm.controls['countryId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Principal Country --</option>
+                                <option *ngFor="let c of countries" [value]="c.countryId">{{ c.countryName }}</option>
+                            </select>
+            </div>
+          </div> -->
+          <div class="form-group">
+            <label for="accountNumber" class="control-label col-md-2">Account Number</label>
+            <div class="col-md-4">
+              <input type="text" name="accountNumber" formControlName="accountNumber" id="accountNumber" class="form-control" [ngClass]="!principalsForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="phoneNumber" class="control-label col-md-2">Phone Number</label>
+            <div class="col-md-4">
+              <input type="text" name="phoneNumber" formControlName="phoneNumber" id="phoneNumber" class="form-control" [ngClass]="!principalsForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <!-- <label for="valuerBVN" class="control-label col-md-2">Principal BVN</label>
+            <div class="col-md-4">
+              <input type="text" name="principalsBVN" formControlName="principalsBVN" id="principalsBVN" class="form-control" [ngClass]="!principalsForm.controls['principalsBVN'].valid ? 'required-input' : 'valid-input'">
+            </div> -->
+          </div>
+          <div class="form-group">
+            <label for="emailAddress" class="control-label col-md-2">Emaill Address</label>
+            <div class="col-md-4">
+              <input type="text" name="emailAddress" formControlName="emailAddress" id="emailAddress" class="form-control" [ngClass]="!principalsForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="address" class="control-label col-md-2">Address</label>
+            <div class="col-md-4">
+              <textarea rows="3" name="address" id="address" class="form-control" formControlName="address" [ngClass]="principalsForm.controls['address'].valid ? 'valid-input' : 'required-input'"></textarea>
+            </div>
+            <!-- <label for="phoneNumber" class="control-label col-md-2">Phone Number</label>
+            <div class="col-md-4">
+              <input type="text" name="phoneNumber" formControlName="phoneNumber" id="phoneNumber" class="form-control" [ngClass]="!principalsForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'">
+            </div> -->
+          </div>
+          <div class="form-group">
+            
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="submitForm(principalsForm)" [disabled]="principalsForm.invalid" class="btn btn-success pull-right">Save</button>
+          <button type="button" (click)="displayForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!--</form>-->
+
+  </div>
+</p-dialog>
+<!--end of form modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

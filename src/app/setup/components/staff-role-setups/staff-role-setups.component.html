@@ -1,0 +1,217 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Staff Role Setups
+              </h2>
+              <div class="pull-right">
+                <button (click)="showAddStaffRolwModal()" pButton type="button" label="Add Staff Role" icon="fa-plus"></button>
+                <button (click)="showAddJobTitleModal()" pButton type="button" label="Add Job Title" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <p-tabView>
+            <p-tabPanel header="Staff Role Setup" [selected]="true">
+              <p-dataTable [value]="staffRoles" [responsive]="true" [paginator]="true" [rows]="15">
+                <p-column field="staffRoleName" header="Staff Role" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="staffRoleCode" header="Staff Role Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="staffRoleShortCode" header="Staff Role Short Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="useRoundRublin" header="Round Rublin In Use" sortable="true" [filter]="true"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.useRoundRublin==true">Yes</span>
+                    <span *ngIf="d.useRoundRublin==false">No</span>
+                  </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"></ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="editStaffRole(d, $event)" href="javascript:void(0)"> 
+                      Edit
+                    </a>
+                  </ng-template>
+                </p-column>
+
+              </p-dataTable>
+            </p-tabPanel>
+            <p-tabPanel header="Job Title Setup">
+              <p-dataTable [value]="jobTitles" [responsive]="true" [paginator]="true" [rows]="15">
+                <p-column field="jobTitle" header="Job Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"></ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="editJobTitle(d, $event)" href="javascript:void(0)">
+                      Edit
+                    </a>
+                  </ng-template>
+                </p-column>
+
+              </p-dataTable>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+
+      </div>
+      <!--end of panel-->
+
+
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayStaffRoleModal" [contentStyle]="{'overflow':'auto','max-height':'600px'}" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="staffRoleForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <p-tabView [activeIndex]="activeIndex" (change)="handleChange($event)">
+
+            <p-tabPanel header="Staff Role">
+              <div class="form-group">
+                <label for="staffRoleName" class="control-label col-md-2">Staff Role </label>
+                <div class="col-md-8">
+                  <input type="text" name="staffRoleName" formControlName="staffRoleName" id="staffRoleName" class="form-control" [ngClass]="!staffRoleForm.controls['staffRoleName'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="staffRoleCode" class="control-label col-md-2">Staff Role Code</label>
+                <div class="col-md-8">
+                  <input type="text" name="staffRoleCode" formControlName="staffRoleCode" id="staffRoleCode" class="form-control" [ngClass]="!staffRoleForm.controls['staffRoleCode'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="staffRoleShortCode" class="control-label col-md-2">Staff Role Short Code</label>
+                <div class="col-md-8">
+                  <input type="text" name="staffRoleShortCode" formControlName="staffRoleShortCode" id="staffRoleShortCode" class="form-control" 
+                    [attr.disabled]="onEdit" [ngClass]="!staffRoleForm.controls['staffRoleShortCode'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="workStartDuration" class="control-label col-md-2">Resumption Time(24hrs)</label>
+                <div class="col-md-8">
+                  <input type="text" name="workStartDuration" formControlName="workStartDuration" id="workStartDuration" class="form-control"
+                    [ngClass]="!staffRoleForm.controls['workStartDuration'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="workEndDuration" class="control-label col-md-2">Closing Time(24hrs)</label>
+                <div class="col-md-8">
+                  <input type="text" name="workEndDuration" formControlName="workEndDuration" id="workEndDuration" class="form-control" [ngClass]="!staffRoleForm.controls['workEndDuration'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Approval Flow Type
+                </label>
+                <div class="col-md-8">
+                  <select class="form-control" id="approvalFlowTypeId" name="approvalFlowTypeId"
+                    formControlName="approvalFlowTypeId"
+                    [ngClass]="!staffRoleForm.controls['approvalFlowTypeId'].valid ? 'required-input' : 'valid-input'">
+                    <option value=""> Select Flow Type</option>
+                    <option *ngFor="let item of approvalFlowTypes" value="{{item.approvalFlowTypeId}}">
+                      {{item.flowTypeName}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <!-- <div class="form-group">
+                <label for="useRoundRublin" class="control-label col-md-2">Use Round Robin</label>
+                <div class="col-md-4">
+                  <input type="checkbox" name="useRoundRublin" id="useRoundRublin" formControlName="useRoundRublin" />
+                </div>
+                <div class="col-md-4">
+                  <label class="checkbox">Use SBU Routing</label>
+                  <div class="checkbox-container">
+                      <input formControlName="useSbuRouting" id="useSbuRouting" type="checkbox">
+                  </div>
+              </div> 
+              </div>-->
+            </p-tabPanel>
+
+            <p-tabPanel header="User Groups">
+              <div class="form-group">
+                <div class="col-md-12">
+                  <div *ngFor="let group of groups; let i = index" class="col-md-3">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" formControlName="userGroup" asList name="groupname" id="group-{{i}}" value="{{group.groupId}}">{{group.groupName}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+
+            <p-tabPanel header="Additional Activities">
+              <p-accordion>
+                <p-accordionTab *ngFor="let actP of allActivities; let idx = index" [selected]="idx==0" header="{{actP.activityParentName}}">
+                  <div class="row">
+                    <div *ngFor="let activity of actP.activities; let i = index" class="col-md-4">
+                      <label class="checkbox-inline actCheckBox">
+                        <input type="checkbox" formControlName="activities" asList name="activityName" id="activity-{{i}}" value="{{activity.activityId}}">{{activity.activityName}}
+                      </label>
+                    </div>
+                  </div>
+                </p-accordionTab>
+              </p-accordion>
+            </p-tabPanel>
+
+          </p-tabView>
+        </div> 
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitStaffRoleForm(staffRoleForm)" [disabled]="staffRoleForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayStaffRoleModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+</p-dialog>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayJobTitleModal" id="add-modal" modal="modal" showEffect="fade" width="600">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="jobTitleForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="jobTitle" class="control-label col-md-2">Job Title </label>
+            <div class="col-md-8">
+              <input type="text" name="jobTitle" formControlName="jobTitle" id="staffRoleName" class="form-control" [ngClass]="!jobTitleForm.controls['jobTitle'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitJobTitleForm(jobTitleForm)" [disabled]="jobTitleForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayJobTitleModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>

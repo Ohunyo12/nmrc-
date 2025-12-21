@@ -1,0 +1,165 @@
+<div *ngIf="displaySearch" class="ui-g">
+    <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="panel-title pull-left"> 
+                  Commercial Loans - Sub Allocation
+                </h2>
+                
+                <!-- <div  class="pull-right">
+                    <button (click)="showPreviousInstructionsOrAddNew()" pButton type="button" label="{{maturityCommandText}}" icon="fa-plus"></button>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div >
+            <div class="form-horizontal">
+              <form *ngIf="!displayPreviousInstructions" [formGroup]="subAllocationForm" autocomplete="off">
+                  <div class="form-group">
+                    <div class="col-md-12 ">
+                        <p-accordion>
+                            <p-accordionTab [selected]="true" header="Source Data" class="panel-body" style="overflow:auto; height:250px">
+                                <div *ngIf="showFirstGrid">
+                                    <p-dataTable  [paginator]="true" [value]="sourceValues" [rows]="5"  >
+                                        <!-- <p-header>Source Tranche Details</p-header> -->
+                                        <p-column field="loanReferenceNumber" header="Loan Reference No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="principalAmount" header="Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-col let-row="rowData" pTemplate="body">
+                                            <span [style]="{'width':'150px','text-align':'right'}">{{row.principalAmount | currency:row.currencyCode:true:'1.2-2'}}</span>
+                                        </ng-template>
+                                        </p-column>
+                                        
+                                    </p-dataTable>
+                                </div>
+                                <div *ngIf="!showFirstGrid">
+                                    <p-dataTable  [paginator]="true" [value]="sourceValues" [rows]="5"  >
+                                        <!-- <p-header>Source Tranche Details</p-header> -->
+                                        <p-column field="loanReferenceNumber" header="Loan Reference No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="principalAmount" header="Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-col let-row="rowData" pTemplate="body">
+                                            <span [style]="{'width':'150px','text-align':'right'}">{{row.principalAmount | currency:row.currencyCode:true:'1.2-2'}}</span>
+                                        </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </div>
+                            </p-accordionTab>
+                        </p-accordion>
+                    </div>
+                    </div>
+                    <hr>
+                    <div class="panel-body">
+                        <fieldset>
+                            <legend>Sub Allocation Process</legend>
+                            <div *ngIf="orignalLoanRecord != undefined && orignalLoanRecord != null" class="form-group">
+                                <label for="outstandingPrincipal" class="control-label col-md-2">Source Tranche</label>
+                                <div class="col-md-4 ">
+                                    <label for="outstandingPrincipal" class="control-label">{{orignalLoanRecord.loanReferenceNumber}}({{orignalLoanRecord.principalAmount | currency:orignalLoanRecord.currencyCode:true:'1.2-2'}})</label>
+                                </div>
+                                <label for="toTranche" class="control-label col-md-2">Destination Tranche</label>
+                                <div class="col-md-4">
+                                    <select name="toTranche" id="toTranche" (change)="compareWithSourceTranche($event.target.value)" formControlName="toTranche"  class="form-control" [ngClass]="!subAllocationForm.controls['toTranche'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""></option>
+                                        <option *ngFor="let b of loanTrancheSelection" value="{{b.loanId}}">
+                                            {{b.loanReferenceNumber}}({{b.principalAmount | currency:b.currencyCode:true:'1.2-2'}})
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div *ngIf="orignalLoanRecord != undefined && orignalLoanRecord != null" class="form-group">
+                                <label for="outstandingPrincipal" class="control-label col-md-2">Amount</label>
+                                <div class="col-md-2 ">
+                                    <input type="text" name="amountDifference" formatM formControlName="amountDifference" id="amountDifference" class="form-control"
+                                        [ngClass]="!subAllocationForm.controls['amountDifference'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div  class="col-md-2">
+                                    <button type="button" (click)="saveSubAllocations(subAllocationForm)" [disabled]="subAllocationForm.invalid" class="btn btn-success "> Sub Allocate</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    
+                    <p-accordion>
+                        <p-accordionTab [selected]="true" header="New Tranche Information" class="panel-body" style="overflow:auto; height:250px">
+                        <div class="form-group">
+                            <div class="col-md-12 ">
+                                <div *ngIf="showFirstGrid">
+                                    <p-dataTable [paginator]="true" [value]="loanTrancheSelection" [rows]="5"  >
+                                        <!-- <p-header> Sub-Allocated Tranche Details </p-header> -->
+                                        <p-column field="loanReferenceNumber" header="Loan Reference No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="principalAmount" header="Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-col let-row="rowData" pTemplate="body">
+                                            <span [style]="{'width':'150px','text-align':'right'}">{{row.principalAmount | currency:row.currencyCode:true:'1.2-2'}}</span>
+                                        </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </div>
+                                <div *ngIf="!showFirstGrid">
+                                    <p-dataTable [paginator]="false" [value]="loanTrancheSelection" [rows]="5"  >
+                                        <p-header> Sub-Allocated Tranche Details </p-header>
+                                        <p-column field="loanReferenceNumber" header="Loan Reference No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="principalAmount" header="Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-col let-row="rowData" pTemplate="body">
+                                            <span [style]="{'width':'150px','text-align':'right'}">{{row.principalAmount | currency:row.currencyCode:true:'1.2-2'}}</span>
+                                        </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </div>
+                            </div>
+                        </div>
+                        </p-accordionTab>
+                    </p-accordion>
+              </form>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  
+  <p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search For Source Loan
+                </h2>
+                <a href="" (click)="displaySearchModal = false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                    </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <!-- <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter"> -->
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan Reference No</th>
+                                <th>Customer Name</th>
+                                <th>Loan Principal Amount</th>
+                            </tr>
+                        </thead>
+                        <!-- <tbody>
+                            <tr (click)="pickSearchData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.loanReferenceNumber}}</td>
+                                <td>{{res.customerName}}</td>
+                                <td>{{res.principalAmount}}</td>
+                            </tr>
+                        </tbody> -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+  
+ <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

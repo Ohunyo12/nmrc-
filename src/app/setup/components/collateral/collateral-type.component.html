@@ -1,0 +1,236 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Collateral Type
+                            </h2>
+                            <div class="pull-right">
+                                <!--<button (click)="showForm()" pButton type="button" label="Add New" icon="fa-plus"></button>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="collateralTypes">
+                        <p-column field="collateralTypeName" header="Collateral Type Name" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="details" header="Details" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="requireInsurancePolicy" header="Require Insurance Policy" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'120px'}" [filter]="true" filterMatchMode="contains">
+                            <ng-template pTemplate="header">Classification</ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <div class="btn-group"
+                                    [innerHtml]="getClassificationType(row.collateralClassificationId)"></div>
+                            </ng-template>
+                        </p-column>
+
+                        <!--<p-column field="chargeGLAccountId" header="Charge GLAccount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>    -->
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editCollateralType(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column>
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="getDocumentTypes(d)" href="javascript:void(0)">Document Types</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="collateralTypeForm" *ngIf="showCollateralTypeForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="collateralTypeName" class="control-label col-md-4">Collateral Type Name</label>
+                        <div class="col-md-8">
+                            <input type="text" name="collateralTypeName" formControlName="collateralTypeName"
+                                id="collateralTypeName" class="form-control"
+                                [ngClass]="!collateralTypeForm.controls['collateralTypeName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="collateralClassificationId" class="control-label col-md-4">Collateral
+                            Classification</label>
+                        <div class="col-md-8">
+                            <select name="collateralClassificationId" formControlName="collateralClassificationId"
+                                id="collateralClassificationId" class="form-control"
+                                [ngClass]="!collateralTypeForm.controls['collateralClassificationId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Classification --</option>
+                                <option value="1">Tangible Related</option>
+                                <option value="2">Comfort Related</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="chargeGLAccountId" class="control-label col-md-4">Charge GL Account</label>
+                        <div class="col-md-8">
+                            <select name="chargeGLAccountId" formControlName="chargeGLAccountId" id="chargeGLAccountId"
+                                class="form-control"
+                                [ngClass]="!collateralTypeForm.controls['chargeGLAccountId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select GL Account --</option>
+                                <option *ngFor="let x of accounts" [value]="x.accountId">{{ x.accountName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="details" class="control-label col-md-4">Details</label>
+                        <div class="col-md-8">
+                            <input type="text" name="details" formControlName="details" id="details"
+                                class="form-control"
+                                [ngClass]="!collateralTypeForm.controls['details'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-8">
+                            <div class="checkbox-container">
+                                <input formControlName="requireInsurancePolicy" id="requireInsurancePolicy"
+                                    type="checkbox">
+                            </div><label class="checkbox">Require Insurance Policy</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-8">
+                            <div class="checkbox-container">
+                                <input formControlName="requireVisitation" id="requireVisitation" type="checkbox">
+                            </div><label class="checkbox">Require Visitation</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(collateralTypeForm)"
+                        [disabled]="collateralTypeForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button> </div>
+            </div>
+        </div>
+
+        <!--</form>-->
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="displayModalDocumentType" id="add-modal" modal="modal" showEffect="fade"
+    width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Types -- {{collateralTypeName}}
+            </h2>
+            <div class="pull-right">
+                <button (click)="showAdddocumentTypeModal()" pButton type="button" label="Add New"
+                    icon="fa-plus"></button>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="collateralDocumentTypes" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="documentType" header="Document Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editDocumentTypes(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <!-- <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a (click)="removeDocumentSection(d)" href="javascript:void(0)">                                           
+                                                <i class="glyphicon glyphicon-remove"></i>
+                                                </a>
+                                            </ng-template>
+                                        </p-column> -->
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button> -->
+                    <button type="button" (click)="displayModalDocumentType=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displaydocumentTypeFormModal" id="add-modal" modal="modal" showEffect="fade"
+    width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Add / Edit Document Type
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentTypeForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="documentTypeName" class="control-label col-md-4">Document Type Name</label>
+                        <div class="col-md-8">
+                            <input type="text" name="documentTypeName" formControlName="documentTypeName"
+                                id="documentTypeName" class="form-control"
+                                [ngClass]="!documentTypeForm.controls['documentTypeName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitdocumentTypeForm(documentTypeForm)"
+                        [disabled]="documentTypeForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displaydocumentTypeFormModal=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!--</form>-->
+
+    </div>
+</p-dialog>

@@ -1,0 +1,550 @@
+<div class="panel panel-default">
+    <div class="panel-heading" *ngIf="isHeaderInfoBased">
+        <h2 class="panel-title">Collateral Item Policy Approval</h2>
+    </div>
+    <div class="panel-body">
+
+        <div *ngIf="useSearch" class="row">
+            <p-dataTable [value]="itemPolicy" [paginator]="true" [rows]="5">
+                <p-column field="arrivalTime" header="Arrival Time" sortable="true">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.arrivalTime | date:'medium' }}
+                        </ng-template>
+                </p-column>
+                <p-column field="requestNumber" header="Insurance Request No." sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="requestReason" header="Reason" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="requestComment" header="Comment" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="collateralCode" header="Collateral Ref. No." sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="collateralType" header="Collateral Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="collateralSubType" header="Sub Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.collateralValue | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="approvalStatusName" header="Approval Status" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column [style]="{'width':'150px'}">
+                    <ng-template pTemplate="header">
+                        <div style="text-align:center">
+                            <!-- <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                        </div>
+                    </ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <div style="text-align:center">
+                            <!-- <a (click)="getPolicyInformation(d.policyId)" href="javascript:void(0)">View</a> -->
+                            <a (click)="getPolicyInformation(d)" href="javascript:void(0)">View</a>
+                            <span style="padding:3px;" *ngIf="makeAddInsuranceButtonVisible == true">|</span>
+                            <a (click)="addInsurance(d)" href="javascript:void(0)"
+                                *ngIf="makeAddInsuranceButtonVisible == true">Add Insurance</a>
+                        </div>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+    </div>
+
+    <p-tabView [activeIndex]="0" *ngIf="mainCollateralView">
+        <p-tabPanel header="Collateral Details">
+            <div>
+                <div class="panel-body">
+                    <div *ngIf="mainCollateralDetail != null" class="row" style="padding:0 15px 0 15px;">
+                        <h4>Main Collateral Detail</h4>
+                        <table *ngIf="mainCollateralView" class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Customer Name:</strong>
+                                    </td>
+                                    <td colspan="2" style="text-align:left">{{mainCollateralDetail.customerName}}</td>
+                                    <td>
+                                        <strong>Date Created:</strong>
+                                    </td>
+                                    <td>{{ mainCollateralDetail.dateTimeCreated | date:"dd-MM-yyyy" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Reference Number:</strong>
+                                    </td>
+                                    <td>{{ mainCollateralDetail.collateralCode }}</td>
+                                    <td>
+                                        <strong>Collateral Type:</strong>
+                                    </td>
+                                    <td>{{ mainCollateralDetail.collateralSubType }}</td>
+                                    <td>
+                                        <strong>Collateral Sub Type:</strong>
+                                    </td>
+                                    <td>{{ mainCollateralDetail.collateralSubType  }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Collateral Value:</strong>
+                                    </td>
+                                    <td>{{ mainCollateralDetail.collateralValue | number:'1.2' }}</td>
+                                    <td>
+                                        <strong></strong>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <strong>:</strong>
+                                    </td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <h4>Insurance Policy Detail</h4>
+                        <table class="table table-casa-information">
+                            <tbody>
+
+                                <tr>
+
+                                    <td>
+                                        <strong>Policy Ref. No.:</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.referenceNumber }}</td>
+                                    <td>
+                                        <strong>Insurance Type:</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.insuranceType}}</td>
+                                    <td>
+                                        <strong>Insurance Company:</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.insuranceCompany }}</td>
+                                </tr>
+                                <tr>
+
+                                    <td>
+                                        <strong>Insured Amount:</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.sumInsured | number:'1.2' }}
+                                    </td>
+                                    <td>
+                                        <strong>Start Date</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{insurancePolicy.startDate | date}}</td>
+                                    <td>
+                                        <strong>Expiry Date</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{insurancePolicy.expiryDate | date }}</td>
+                                </tr>
+                                <tr>
+
+                                    <td>
+                                        <strong>Description:</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.description }}</td>
+                                    <td>
+                                        <strong>Premium Amount</strong>
+                                    </td>
+                                    <td *ngIf="insurancePolicy!= null">
+                                        {{insurancePolicy.inSurPremiumAmount | number:'1.2'}}</td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <br>
+                        <h4>Request Details</h4>
+                        <table class="table table-casa-information" *ngIf="mainCollateralView == true">
+                            <tbody>
+
+                                <tr>
+
+                                    <td>
+                                        <strong>Reason:</strong>
+                                    </td>
+                                    <td colspan="1" style="text-align:left">{{requestReason}}</td>
+                                    <td>
+                                        <strong>Comment:</strong>
+                                    </td>
+                                    <td colspan="1" style="text-align:left">{{requestComment}}</td>
+                                </tr>
+                                <h4>Previous Comments</h4>
+
+                                <tr>
+                                    <td>
+                                        <strong>Comment:</strong>
+                                    </td>
+                                    <td colspan="1" style="text-align:left">{{lastApprovalComment}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header=" Insurance Policy History">
+            <div class="row" style="padding:0 15px 0 15px;">
+                <h6><strong>Insurance Information</strong></h6>
+                <p-dataTable [responsive]="true" [value]="insurancePolicies">
+                    <p-column field="referenceNumber" header="Reference Number"></p-column>
+                    <p-column field="insuranceType" header="insurance Type"></p-column>
+                    <p-column field="insuranceCompany" header="Insurance Comapny"></p-column>
+                    <p-column field="sumInsured" header="Sum Amount"></p-column>
+                    <p-column field="startDate" header="Start Date" sortable="true" [filter]="true"
+                        filterMatchMode="contains" [style]="{'width':'100px'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.startDate | date }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="expiryDate" header="Expiry Date" sortable="true" [filter]="true"
+                        filterMatchMode="contains" [style]="{'width':'100px'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.expiryDate | date }}
+                        </ng-template>
+                         
+                    </p-column>
+                    <p-column field="hasExpired" header="Has Expired"></p-column>
+
+                    <!-- <p-column [style]="{'width':'100px'}" header="View">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            <div style="text-align:center">
+                                <a (click)="deleteInsurance(d)" href="javascript:void(0)">Remove</a>
+                                <span style="padding:3px;">|</span>
+                                <a (click)="editInsurance(d)" href="javascript:void(0)">Edit</a>
+                            </div>
+                        </ng-template>
+                    </p-column> -->
+
+                </p-dataTable>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Approval Comments">
+            <approval-comment-tab [operationId]="operationId" [target]="targetId">
+            </approval-comment-tab>
+        </p-tabPanel>
+    </p-tabView>
+
+
+    <div class="well" *ngIf="!useSearch">
+        <hr />
+        <div class="row">
+            <div class="col-md-9">
+                <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment"
+                    [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" [(ngModel)]="approvalStatusId" name="approvalStatus"
+                    [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+                    <option value="0">--- Select Approval ---</option>
+                    <option value="2"> Approve </option>
+                    <option value="3"> Decline </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!useSearch" class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-danger" (click)="showCommentForm()" style="margin-right:5px">
+                        <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group pull-right">
+                    <button type="button" (click)="turnOnSearch()" style="margin-right:5px" class="btn btn-danger"
+                        style="margin-right:5px">Back to List</button>
+                    <button type="button" (click)="forwardForApproval()" class="btn btn-success"
+                        [disabled]="(comment == null || comment =='' || (approvalStatusId != 2 && approvalStatusId != 3))">
+                        Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title: <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right"><a class="close" (click)="displayDocument=false">&times;</a></div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="600">
+    <div style="margin-bottom:0" class="panel panel-default" *ngIf="rowSelected == true">
+        <app-refer-back [referBackTargetId]="targetId" [referBackOperationId]="operationId"
+            (notify)="modalControl($event)" (notifyAfterReferBack)="referBackResultControl($event)">
+        </app-refer-back>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="insuranceForm" id="ct-modal" modal="modal" showEffect="fade" width="800">
+    <div class="panel-heading">
+        <h2 class="panel-title">Insurance Information</h2>
+    </div>
+    <form novalidate [formGroup]="insuranceFormGroup" *ngIf="true" autocomplete="off">
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="policyStateId" class="control-label col-md-2">Policy State</label>
+                    <div class="col-md-4">
+                        <select id="policyStateId" formControlName="policyStateId" name="policyStateId"
+                            (change)="GetInsuranceDetail($event.target.value)" class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['policyStateId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="0">Select Type</option>
+                            <option value="1">New</option>
+                            <option value="2">Renewal</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label col-md-2">Upload Policy Document</label>
+                    <div class="col-md-2">
+                        <a (click)="setShowInsuranceUpload()" href="javascript:void(0)"> Upload</a>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="prevoiusInsuranceId" class="control-label col-md-2">Previous Insurer</label>
+                    <div class="col-md-4">
+                        <select id="prevoiusInsuranceId" formControlName="prevoiusInsuranceId"
+                            name="prevoiusInsuranceId" class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['prevoiusInsuranceId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="0">Select Previous Insurance</option>
+                            <option *ngFor="let x of insurancePolicies" [value]="x.insuranceCompanyId">
+                                {{ x.insuranceCompany }}</option>
+                        </select>
+                    </div>
+                    <label for="insuranceTypeId" class="control-label col-md-2">Insurance Type</label>
+                    <div class="col-md-4">
+                        <select id="insuranceTypeId" formControlName="insuranceTypeId" name="insuranceTypeId"
+                            class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['insuranceTypeId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="0">Select Insurance Type</option>
+                            <option *ngFor="let x of insuranceType" [value]="x.insuranceTypeId">
+                                {{ x.insuranceType }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="insuranceCompanyId" class="control-label col-md-2">Insurer</label>
+                    <div class="col-md-4">
+                        <select id="insuranceCompanyId" (change)="getInsurerAddress($event.target.value)"
+                            formControlName="insuranceCompanyId" name="insuranceCompanyId" class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['insuranceCompanyId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="0">Select Insurance Company</option>
+                            <option *ngFor="let x of insuranceCompany" [value]="x.insuranceCompanyId">
+                                {{x.companyName }}</option>
+                        </select>
+                    </div>
+                    <label for="companyAddress" class="control-label col-md-2">Insurer Address</label>
+                    <div class="col-md-4">
+                        <textarea type="text" name="companyAddress" maxlength="200" formControlName="companyAddress"
+                            id="companyAddress" class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['companyAddress'].valid ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="referenceNumber" class="control-label col-md-2">Reference Number</label>
+                    <div class="col-md-4">
+                        <input type="text" name="referenceNumber" formControlName="referenceNumber" id="referenceNumber"
+                            class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['referenceNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+
+                    <label for="description" class="control-label col-md-2">Policy Description</label>
+                    <div class="col-md-4">
+                        <textarea type="text" name="description" formControlName="description" id="description"
+                            class="form-control"
+                            [ngClass]="!insuranceFormGroup.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate" class="control-label col-md-2">Policy Start Date</label>
+                    <div class="col-md-4">
+                        <p-calendar id="startDate" [maxDate]='currentDate' formControlName="startDate"
+                            [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"
+                            [inputStyle]="!insuranceFormGroup.controls['startDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                            [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                    </div>
+                    <label for="expiryDate" class="control-label col-md-2">Policy Expiry Date</label>
+                    <div class="col-md-4">
+                        <p-calendar id="expiryDate" [minDate]='currentDate' formControlName="expiryDate"
+                            [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"
+                            [inputStyle]="!insuranceFormGroup.controls['expiryDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                            [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label for="sumInsured" class="control-label col-md-2">Coverage Amount</label>
+                    <div class="col-md-4">
+                        <input type="text" name="sumInsured" formControlName="sumInsured" formatM id="sumInsured"
+                            class="numeric form-control"
+                            [ngClass]="!insuranceFormGroup.controls['sumInsured'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                    <label for="inSurPremiumAmount" class="control-label col-md-2">Premium Amount</label>
+                    <div class="col-md-4">
+                        <input type="text" name="inSurPremiumAmount" maxlength="20" formControlName="inSurPremiumAmount"
+                            id="inSurPremiumAmount" class="form-control numeric" formatM
+                            [ngClass]="!insuranceFormGroup.controls['inSurPremiumAmount'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="SaveInsuranceForm(insuranceFormGroup)"
+                                [disabled]="insuranceFormGroup.invalid" class="btn btn-success pull-right">Save</button>
+                            <button type="button" (click)="insuranceForm=false" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Cancel</button>                    
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="showInsuranceUpload" id="ct-modal" modal="modal" showEffect="fade"
+    width="1200">
+
+    <document-upload *ngIf="selection" [reload]="selection.requestNumber" [autoZIndex]="false" [operationId]="61"
+        [customerId]="selection.customerId" [targetId]="selection.insuranceRequestId"
+        [targetReferenceNumber]="selection.requestNumber">
+    </document-upload>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="showInsuranceUpload=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="PolicyForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="500" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{formState}} Policy</h2>
+        </div>
+        <form novalidate [formGroup]="policyFormGroup" (ngSubmit)="savePolicy(policyFormGroup)" autocomplete="off">
+            <div class="panel-body">
+                 <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="referenceNumber" class="control-label col-md-12">Reference Number</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="referenceNumber" maxlength="50" formControlName="referenceNumber"
+                                id="referenceNumber" class="form-control"
+                                [ngClass]="policyFormGroup.controls['referenceNumber'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="insuranceType" class="control-label col-md-12">Insurance Type</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="insuranceType" maxlength="50" formControlName="insuranceType"
+                                id="insuranceType" class="form-control"
+                                [ngClass]="policyFormGroup.controls['insuranceType'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="insuranceCompany" class="control-label col-md-12">Insurance Company</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="insuranceCompany" maxlength="50" formControlName="insuranceCompany"
+                                id="insuranceCompany" class="form-control"
+                                [ngClass]="policyFormGroup.controls['insuranceCompany'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="sumInsured" class="control-label col-md-12">Sum Amount</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="sumInsured" maxlength="50" formControlName="sumInsured"
+                                id="sumInsured" class="form-control"
+                                [ngClass]="policyFormGroup.controls['sumInsured'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="startDate" class="control-label col-md-12">Start Date</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="startDate" maxlength="50" formControlName="startDate"
+                                id="startDate" class="form-control"
+                                [ngClass]="policyFormGroup.controls['startDate'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <label for="expiryDate" class="control-label col-md-12">Expiry Date</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" name="expiryDate" maxlength="50" formControlName="expiryDate"
+                                id="expiryDate" class="form-control"
+                                [ngClass]="policyFormGroup.controls['expiryDate'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+                </div> -->
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="savePolicy(policyFormGroup)"
+                            [disabled]="policyFormGroup.invalid" class="btn btn-success pull-right">Save and
+                            Close</button>
+                        <button type="button" (click)="PolicyForm=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)">
+</fintrakbanking-message>

@@ -1,0 +1,76 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Schedule
+                            </h2>
+                            <div class="pull-right">
+                                <button class="btn btn-primary" type="button" (click)="goBack()">
+                                     Back
+                                    </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <fieldset>
+                        <legend style="width: 45%">
+                            Details
+                        </legend>
+                        <table style="margin-bottom: 20px">
+                            <tr>
+                                <td style="font-size: 12px;font-weight: bold;padding: 4px">Granted Amount</td>
+                                <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.principalAmount}}</td>
+                                <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Interest Rate</td>
+                                <td style="text-align: right;padding: 4px">{{scheduleHeader?.interestRate}} %</td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 12px;font-weight: bold;padding: 4px">Effective Date</td>
+                                <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.effectiveDate | date}}</td>
+                                <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Maturity Date</td>
+                                <td style="text-align: right;padding: 4px">{{scheduleHeader?.maturityDate}}</td>
+                            </tr>
+                        </table>
+
+                    </fieldset>
+
+
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="schedules" [responsive]=true selectionMode="single">
+                        <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No"></p-column>
+                        <p-column field="startPrincipalAmount" header="Start Principal"></p-column>
+                        <p-column field="paymentDate" header="Payment Date">
+                            <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                <span>{{schedule[col.field] | date}}</span>
+                            </ng-template>
+                        </p-column>
+                        <p-column field="periodPaymentAmount" header="Periodic Amount">
+                            <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                            </ng-template>
+                        </p-column>
+                        <p-column field="periodPrincipalAmount" header="Principal Amount">
+                            <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                            </ng-template>
+                        </p-column>
+                        <p-column field="periodInterestAmount" header="Interest Amount">
+                            <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                            </ng-template>
+                        </p-column>
+                        <p-column field="endPrincipalAmount" header="Balance">
+                            <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

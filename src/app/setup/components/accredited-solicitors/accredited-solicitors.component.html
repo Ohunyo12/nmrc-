@@ -1,0 +1,273 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Accredited Consultants
+              </h2>
+              <div class="pull-right">
+                <button  (click)="showconsultantTypeForm()" pButton type="button" label="Add Consultant Type" icon="fa-plus"></button>
+                <button (click)="showForm()" pButton type="button" label="Add New Accredited Consultants" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui-g ui-fluid">
+
+          <div class="form-group" style="margin-left:30px">
+            <label for="searchItem" class="control-label col=md-3 ">
+              Consultant Type
+            </label>
+
+            <div class="col=md-9">
+              <select name="accreditedConsultantType" (change)="getAllSolicitor()" [(ngModel)]="accreditedConsultantType" id="accreditedConsultantType"
+                class="form-control">
+                <option value="">-- Select Consultant --</option>
+                <option *ngFor="let ci of consultants" [value]="ci.accreditedConsultantTypeId">{{ ci.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- <div class="form-group" style="margin-right:30px">
+                <label for="searchItem" class="control-label col=md-3">
+                  .
+                </label>
+                <div class="col=md-9">
+                        <button pButton type="button" (click)="GetDailyInterestAccrual()" label="Get Accrual"></button>
+                    </div>
+            </div> -->
+        </div>
+
+        <div class="panel-body">
+          <p-dataTable [value]="solicitors" [rows]="15" [paginator]=true>
+            <p-column field="registrationNumber" header="Registration Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="name" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="firmName" header="Firm Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="accreditedConsultantName" header="Accredited Consultant" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="address" header="Office Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="editSolicitor(d)" href="javascript:void(0)">
+                  Edit
+                </a>
+                <span style="padding:3px;">|</span>
+                <a (click)="deleteSolicitor(d.accreditedConsultantId)" href="javascript:void(0)">
+                  Delete
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+      <!--end of panel-->
+
+
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayForm" id="add-modal" modal="modal" showEffect="fade" width="850">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{ entityName }}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="solicitorForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="registrationNumber" class="control-label col-md-2">Consultant Type</label>
+            <div class="col-md-4">
+              <select name="accreditedConsultantTypeId" (change)="getConsultantType($event.target.value)" formControlName="accreditedConsultantTypeId" id="accreditedConsultantTypeId" class="form-control"
+                [ngClass]="!solicitorForm.controls['accreditedConsultantTypeId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Consultant --</option>
+                <option *ngFor="let ci of consultants" [value]="ci.accreditedConsultantTypeId">{{ ci.name }}</option>
+              </select>
+            </div>           
+            <label for="registrationNumber" class="control-label col-md-2">Registration Number</label>
+            <div class="col-md-4">
+              <input type="text" name="registrationNumber" formControlName="registrationNumber" id="registrationNumber" class="form-control"
+                [ngClass]="!solicitorForm.controls['registrationNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="name" class="control-label col-md-2">Firm Name</label>
+            <div class="col-md-4">
+              <input type="text" name="firmName" formControlName="firmName" id="firmName" class="form-control" [ngClass]="!solicitorForm.controls['firmName'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="name" class="control-label col-md-2">Contact Name</label>
+            <div class="col-md-4">
+              <input type="text" name="name" formControlName="name" id="name" class="form-control" [ngClass]="!solicitorForm.controls['name'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="accountNumber" class="control-label col-md-2">Account Number</label>
+            <div class="col-md-4">
+              <input type="text" name="accountNumber" formControlName="accountNumber" id="accountNumber" class="form-control" [ngClass]="!solicitorForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="valuerBVN" class="control-label col-md-2">Contact BVN</label>
+            <div class="col-md-4">
+              <input type="text" name="solicitorBVN" formControlName="solicitorBVN" id="solicitorBVN" class="form-control" [ngClass]="!solicitorForm.controls['solicitorBVN'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="emailAddress" class="control-label col-md-2">Emaill Address</label>
+            <div class="col-md-4">
+              <input type="text" name="emailAddress" formControlName="emailAddress" id="emailAddress" class="form-control" [ngClass]="!solicitorForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label for="phoneNumber" class="control-label col-md-2">Phone Number</label>
+            <div class="col-md-4">
+              <input type="text" name="phoneNumber" formControlName="phoneNumber" id="phoneNumber" class="form-control" [ngClass]="!solicitorForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="address" class="control-label col-md-2">Address</label>
+            <div class="col-md-4">
+              <textarea rows="3" name="address" id="address" class="form-control" formControlName="address" [ngClass]="solicitorForm.controls['address'].valid ? 'valid-input' : 'required-input'"></textarea>
+            </div>
+            <label for="address" class="control-label col-md-2">Core Competence</label>
+            <div class="col-md-4">
+              <textarea rows="3" name="coreCompetence" id="coreCompetence" class="form-control" formControlName="coreCompetence" [ngClass]="solicitorForm.controls['coreCompetence'].valid ? 'valid-input' : 'required-input'"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dateOfEngagement" class="control-label col-md-2">Date Of Engagement</label>
+            <div class="col-md-4">
+              <p-calendar id="dateOfEngagement" 
+              formControlName="dateOfEngagement" [monthNavigator]="true" 
+              [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" 
+              [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+              [style]="{'width': '100%', 'z-index': '999'}"
+              [ngClass]="!solicitorForm.controls['dateOfEngagement'].valid ? 'required-input' : 'valid-input'">
+          </p-calendar>
+            </div>
+            <label *ngIf="displayCategory==true" for="category" class="control-label col-md-2">Internal/External</label>
+            <div class="col-md-4"*ngIf="displayCategory==true">
+              <select name="category" formControlName="category" (change)="getCategoryType($event.target.value)" id="category" class="form-control"
+              [ngClass]="!solicitorForm.controls['category'].valid ? 'required-input' : 'valid-input'">
+              <option value="">-- Select Category --</option>
+              <option value="internal">Internal</option>
+              <option value="external">External</option>
+            </select>
+            </div>
+          </div>
+          <div class="form-group" >
+            <label *ngIf="displayStaffId" for="staffId" class="control-label col-md-2">Staff Code</label>
+            <div class="col-md-4" *ngIf="displayStaffId">
+              <input type="text" name="staffId" formControlName="staffId" id="staffId" class="form-control" [ngClass]="!solicitorForm.controls['staffId'].valid ? 'required-input' : 'valid-input'">
+            </div>
+            <label *ngIf="displayCategory==true" for="agentCategory" class="control-label col-md-2">Agent Category</label>
+            <div class="col-md-4"*ngIf="displayCategory==true">
+              <select name="agentCategory" formControlName="agentCategory" id="agentCategory" class="form-control"
+              [ngClass]="!solicitorForm.controls['agentCategory'].valid ? 'required-input' : 'valid-input'">
+              <option value="">-- Select Category Category --</option>
+              <option value="REMEDIAL">Remedial</option>
+              <option value="RETAIL">Retail</option>
+            </select>
+            </div>
+          </div>
+          <!--div *ngIf="displayAddButton" class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-4">
+              <button (click)="addStateCovered()" pButton type="button" label="Add More States Covered" icon="fa-plus"></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <div formArrayName="accreditedConsultantStates" *ngFor="let consultant of accreditedConsultantStates.controls; let i=index">
+              <div [formGroupName]="i">
+                <label for="stateId" class="control-label col-md-2">State Covered {{i + 1}} </label>
+                <div class="col-md-3">
+                  <select (change)="ShowAddMoreStates()" name="stateId" formControlName="stateId" [ngClass]="'valid-input'" id="stateId" class="form-control">
+                                        <option value="">--- Select State ---</option>
+                                        <option *ngFor="let state of states" value="{{state.stateId}}">
+                                            {{state.stateName}}
+                                        </option>   
+			                            </select>
+                </div>
+                <div class="col-md-1">
+                  <a (click)="removeItem($event, i)" style="color:#ff0000" href="#"><i class="fa fa-times" aria-hidden="true"></i>X</a>
+                </div>
+
+              </div>
+            </div>
+          </div-->
+          <div class="form-group">
+            <label for="address" class="control-label col-md-2">State Covered</label>
+            <div class="col-md-10">
+              <p-pickList [source]="states" [target]="statesTarget" sourceHeader="Select State covered" targetHeader="Selected State Covered"
+                [responsive]="true" filterBy="stateName" dragdrop="true" sourceFilterPlaceholder="Search by State" targetFilterPlaceholder="Search by State"
+                [sourceStyle]="{'height':'100px'}" [targetStyle]="{'height':'100px'}" [showSourceControls]="false" [showTargetControls]="false">
+                <ng-template let-states pTemplate="item">
+                  <div class="ui-helper-clearfix">
+                    <div style="font-size:14px;float:left;margin:0">{{states.stateName}}</div>
+                  </div>
+                </ng-template>
+              </p-pickList>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="submitForm(solicitorForm)" [disabled]="solicitorForm.invalid" class="btn btn-success pull-right">Save</button>
+          <button type="button" (click)="displayForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!--</form>-->
+
+  </div>
+</p-dialog>
+<!--end of form modal-->
+<p-dialog [responsive]=true [(visible)]="displayconsultantTypeForm" id="add-modal" modal="modal" showEffect="fade" width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">
+          Add Consultant Type
+        </h2>
+      </div>
+  
+      <form novalidate [formGroup]="consultantTypeForm" autocomplete="off">
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="consultantType" class="control-label col-md-4">Consultant Type</label>
+              <div class="col-md-8">
+                  <input type="text" name="consultantType" formControlName="consultantType" id="consultantType" class="form-control"
+                  [ngClass]="!consultantTypeForm.controls['consultantType'].valid ? 'required-input' : 'valid-input'">
+             
+              </div>
+             </div>            
+          </div>
+        </div>
+      </form>
+  
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitconsultantTypeForm(consultantTypeForm)" [disabled]="consultantTypeForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayconsultantTypeForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+  
+      <!--</form>-->
+  
+    </div>
+  </p-dialog>
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

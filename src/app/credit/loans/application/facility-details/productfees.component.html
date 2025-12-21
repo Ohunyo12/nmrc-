@@ -1,0 +1,29 @@
+<!--<div class="form-group" *ngFor="let i of inputRows">
+     <div *ngFor="let x of fees | slice:(i*2):(i+1)*2; let n=index">
+        <div [fees]="n">
+            <label class="control-label col-md-2">{{ x.feeName }}</label>
+            <div class="col-md-4">
+                <input type="text" formControlName="labelValue" class="form-control" id="controlName" name="controlName">
+            </div>
+        </div>
+    </div> 
+</div>-->
+
+
+<form [formGroup]="productFeesForms" autocomplete="off" *ngIf="this.fees != null && this.fees != undefined">
+
+        <div formArrayName="fees">
+            <!-- <div class="form-group" *ngFor="let r of rows | slice:(r*2):(r+1)*2"> -->
+            <div class="form-group">
+                <div *ngFor="let ctrl of getControls(); let i=index">
+                    <div [formGroupName]="i">
+                        <label class="control-label col-md-2">{{ctrl.value.feeName}} <span>{{ctrl.value.feeDisplay}}</span> </label>
+                        <div class="col-md-4">
+                            <input class="form-control" [readonly]="disableRateField" (keyup)="ClickDone()" type="number" formControlName="rate">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</form>

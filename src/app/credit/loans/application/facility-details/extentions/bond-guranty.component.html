@@ -1,0 +1,111 @@
+<form [formGroup]="bondDetailForm" autocomplete="off">
+        
+    <div class="form-group">
+        <label class="col-md-2" for="principalId">Principal</label>
+        <div class="col-md-4">
+            <select class="form-control" name="" formControlName="principalId" (select)="CheckFormValidity()" (change)="onSelectPrincipal($event.target.value)"
+                [ngClass]="!bondDetailForm.controls['principalId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">Select principal</option>
+                <option value="-1">Others</option>
+                <option *ngFor="let i of principal" value="{{i.principalId}}">
+                    {{i.name}}</option>
+            </select>
+        </div>
+
+        <div *ngIf="showOtherPrincipal">
+            <label class="col-md-2">Principal Name</label>
+            <div class="col-md-4">
+                <input type="text" formControlName="principalName" (select)="CheckFormValidity()" (blur)="CheckFormValidity()"
+                    [ngClass]="!bondDetailForm.controls['principalName'].valid ? 'required-input' : 'valid-input'" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div *ngIf="showCustomerCasa">
+            <label class="col-md-2">Customer Account</label>
+            <div class="col-md-4">
+                <select class="form-control" id="casaAccountId" name="casaAccountId" formControlName="casaAccountId"
+                    (change)="CheckFormValidity()" [ngClass]="!bondDetailForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                    <option value=""> Select Customer Account</option>
+                    <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">{{item.productAccountNumber}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2">Contract Date</label>
+        <div class="col-md-4">
+            <p-calendar [(ngModel)]="startDate" (select)="CheckFormValidity()" formControlName="contractStartDate"
+                [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [ngClass]="!bondDetailForm.controls['contractEndDate'].valid ? 'required-input' : 'valid-input'"
+                (onSelect)="CheckFormValidity()" (onSelect)="validateContratDate2()" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                [style]="{'width': '100%','z-index': '999'}"></p-calendar>
+        </div>
+
+        <label class="col-md-2"> Contract Expiry Date</label>
+        <div class="col-md-4">
+            <p-calendar [(ngModel)]="endDate" formControlName="contractEndDate" (select)="CheckFormValidity()"
+                [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [ngClass]="!bondDetailForm.controls['contractEndDate'].valid ? 'required-input' : 'valid-input'"
+                (onSelect)="CheckFormValidity()" (onSelect)="validateContratDate2()" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                [style]="{'width': '100%','z-index': '999'}"></p-calendar>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="" class="control-label col-md-2">Is the principal willing to accept
+            <b>Bank Format</b>
+        </label>
+        <div class="col-md-2">
+            <select formControlName="isBankFormat" (change)="onIsBankFormatChanged($event.target.value)" [ngClass]="!bondDetailForm.controls['isBankFormat'].valid ? 'required-input' : 'valid-input'"
+                (change)="CheckFormValidity()" (select)="CheckFormValidity()"  class="form-control">
+                <option value="0">NO </option>
+                <option value="1">YES </option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button *ngIf="showUploadBGInvoice" type="button" pButton (click)="uploadBonsAndGuaranteeDocuments()" label="Upload Document"
+                style="margin-right:5px">
+            </button>
+        </div>
+        <label for="" class="control-label col-md-2">Tenored? </label>
+        <div class="col-md-4">
+            <select formControlName="isTenored" [ngClass]="!bondDetailForm.controls['isTenored'].valid ? 'required-input' : 'valid-input'"
+            (select)="CheckFormValidity()" (change)="CheckFormValidity()" class="form-control">
+                <option value="0">NO </option>
+                <option value="1">YES </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="" class="control-label col-md-2">Contract Value</label>
+        <div class="col-md-4">
+            <input type="text"  formatM name="bondAmount" formControlName="bondAmount" [ngClass]="!bondDetailForm.controls['bondAmount'].valid ? 'required-input' : 'valid-input'"
+                (blur)="CheckFormValidity()" class="form-control">
+        </div>
+        <label for="" class="control-label col-md-2">Contract Currency</label>
+        <div class="col-md-4">
+            <select id="bondCurrencyId" formControlName="bondCurrencyId" (change)="getExchangeRateBond($event.target.value)" (select)="CheckFormValidity()"
+                [ngClass]="!bondDetailForm.controls['bondCurrencyId'].valid ? 'required-input' : 'valid-input'" class="form-control">
+                <option value=""> Select Currency</option>
+                <option *ngFor="let curr of allowedCurrencies" value="{{curr.currencyId}}"> {{curr.currencyCodeName}}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="" class="control-label col-md-2"> Invoice Exchange Rate </label>
+        <div class="col-md-4">
+            <input type="text" (select)="CheckFormValidity()" formatM formControlName="bondfcyRate" [attr.disabled]="true" [ngClass]="!bondDetailForm.controls['bondfcyRate'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+        </div>
+        <label for="" class="control-label col-md-2"> Naira Equivalent </label>
+        <div class="col-md-4">
+            <input type="text" formatM formControlName="bondfcyAmount" (select)="CheckFormValidity()" [ngClass]="!bondDetailForm.controls['bondfcyAmount'].valid ? 'required-input' : 'valid-input'"
+                [attr.disabled]="true" class="form-control">
+        </div>
+    </div>
+
+</form>

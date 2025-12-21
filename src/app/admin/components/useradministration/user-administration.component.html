@@ -1,0 +1,92 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-7">
+                                <h2 class="panel-title pull-left">
+                                    User Account Management
+                                </h2>
+                            </div>
+                            <!--div class="col-md-5">
+                                    <input type="text" [(ngModel)]="searchBox" #globalSearch class="form-control">
+                                </div-->
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+
+
+
+
+                    <!-- (onEditCancel)="onEditCancel($event)" (onEditComplete)="onEditComplete($event)" (onEditInit)="onEditInit($event)" (onEdit)="onEdit($event)" -->
+                    <!-- <p-dataTable [value]="activeUsers" [rowsPerPageOptions]="[10,20,30]" [lazy]="true" [rows]="10" [paginator]="true" [totalRecords]="itemTotal"
+                            (onLazyLoad)="loadData($event)" [responsive]=true 
+                            #dt [globalFilter]="tableSearch">
+                            <p-header>
+                                <label for="search" class="control-label">Search</label>
+                                <input type="text" pInputText name="search" id="search" class="form-control" placeholder="Search through table..." #tableSearch>
+                            </p-header>
+                            <p-column field="auditType" header="Audit Action" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="staffName" header="Action by" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="username" header="Logged In Username" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="details" header="Action in Detail" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        </p-dataTable> -->
+                    <p-dataTable [value]="activeUsers" selectionMode="single" (onRowSelect)="activeSelectedItem()" [rowsPerPageOptions]="[10,20,30]"
+                     [rows]="10" [paginator]="true" [responsive]=true  #dt [globalFilter]="tableSearch">
+                        <p-header>
+                            <label for="search" class="control-label">Search</label>
+                            <input type="text" pInputText name="search" id="search" class="form-control" placeholder="Search through table..." #tableSearch>
+                        </p-header>
+                        <p-column field="staffName" header="Staff Name" sortable="true"></p-column>
+                        <p-column field="username" header="Username" sortable="true"></p-column>
+                        <p-column field="branchName" header="Branch" sortable="true"></p-column>
+                        <p-column field="lastLoginDate" header="Last Login" sortable="true">
+                            <ng-template let-col let-loan="rowData" pTemplate="body">
+                                {{loan[col.field] | date : 'dd/MMM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="lastLockedOutDate" header="Lockout Date" sortable="true">
+                            <ng-template let-col let-loan="rowData" pTemplate="body">
+                                {{loan[col.field] | date : 'dd/MMM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="failedLogonAttempt" header="Failed Attempt" sortable="true"></p-column>
+                        <!-- <p-column field="isLocked" header="Locked Status" sortable="true"></p-column>
+                        <p-column field="isActive" header="Active Status" sortable="true"></p-column> -->
+                        <p-column header="Active Status" styleClass="col-button">
+                            <ng-template let-status="rowData" pTemplate="body">
+                                <div class="col-md-12" >
+                                        <div class="pull-right">{{status.isActive ? "Enabled":"Disabled"}}</div>
+                                       <div class="pull-left"> <p-inputSwitch [(ngModel)]="status.isActive" (onChange)="activeState($event)"></p-inputSwitch> </div>
+                                </div>
+                               
+                            </ng-template>
+                        </p-column> 
+                        <p-column header="Locked Status" styleClass="col-button">
+                            <ng-template let-status="rowData" pTemplate="body">
+                                    <div class="col-md-12" >
+                                        <div class="pull-right">{{status.isLocked ? "Locked":"Unlocked"}}</div>
+                                        <div class="pull-left"><p-inputSwitch (onChange)="lockState($event)"    [(ngModel)]="status.isLocked"></p-inputSwitch></div>
+                                    </div> 
+                                </ng-template>
+                        </p-column>
+                        <p-column  styleClass="col-button">
+                            <ng-template let-status="rowData" pTemplate="body"   >
+                                    <div class="col-md-12">
+                                        <button (click)="saveChanges($event, status)" >Save </button>
+                                    </div> 
+                                </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                    <!-- (click)="selectCar(car)"  -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

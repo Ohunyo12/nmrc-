@@ -1,0 +1,330 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                 Approval Workflow Setup <!-- {{disableProductSelect}} -->
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <form novalidate [formGroup]="operationSelectForm" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="operationTypeId" class="control-label col-md-1">Operation</label>
+                                    <div class="col-md-2" style="padding-right:3px;">
+                                        <select (change)="onOperationTypeChange($event.target.value)" name="operationTypeId" formControlName="operationTypeId" id="operationTypeId" class="form-control" [ngClass]="!operationSelectForm.controls['operationTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">{{ selectedOperationPlaceholder }}</option>
+                                        <option *ngFor="let x of operationTypes" [value]="x.lookupId">
+                                            {{ x.lookupName }}
+                                        </option>
+                                    </select>
+                                    </div>
+                                    <!--<label for="operationId" class="control-label col-md-1">Operation</label>-->
+                                    <div class="col-md-3" style="padding-left:3px;">
+                                        <select (change)="onOperationChange($event.target.value)" name="operationId" formControlName="operationId" id="operationId" class="form-control" [ngClass]="!operationSelectForm.controls['operationId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Operation --</option>
+                                        <option *ngFor="let x of filteredOperations" [value]="x.lookupId">
+                                            {{ x.lookupName }}
+                                        </option>
+                                    </select>
+                                    </div>
+                                    <label for="productClassId" class="control-label col-md-1">Product</label>
+                                    <div class="col-md-2" style="padding-right:3px;">
+                                        <select (change)="onProductClassChange($event.target.value)" name="productClassId" formControlName="productClassId" id="productClassId" class="form-control" [ngClass]="!operationSelectForm.controls['productClassId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Class --</option>
+                                        <option *ngFor="let x of productClasses" [value]="x.lookupId">
+                                            {{ x.lookupName }}
+                                        </option>
+                                    </select>
+                                    </div>
+                                    <div class="col-md-3" style="padding-left:3px;">
+                                        <select (change)="onProductChange($event.target.value)" name="productId" formControlName="productId" id="productId" class="form-control" [ngClass]="!operationSelectForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Product --</option>
+                                        <option *ngFor="let x of filteredProducts" [value]="x.productId">
+                                            {{ x.productName }}
+                                        </option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <!--
+        <div class="panel-footer">
+            <div class="row">productName
+            </div>
+        </div>-->
+            </div>
+            <!--end of panel-->
+        </div>
+        <!--end of card-->
+
+
+
+        <div *ngIf="displayTabs" class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{ selectedOperationName | uppercase }} approval setup <span *ngIf="selectedProductClassId > 0"> for {{ selectedProductClassName | uppercase }}</span>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- tabs here -->
+                <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                    <!-- OG Mapping list -->
+                    <p-tabPanel header="Selected Operation Approval Groups">
+
+                        <p-dataTable [value]="operationGroups" [paginator]="true" [rows]="5" [(selection)]="operationGroupSelection" dataKey="groupOperationMappingId" (onRowSelect)="onSelectedOperationGroupChange($event)">
+
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+
+                            <p-column field="groupName" header="Group" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            
+                            <p-column field="allowMultipleInitiator" header="Multi Initiator" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+                            <p-column field="position" header="Position" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                            
+                            <p-column [style]="{'width':'103px'}">
+                                <ng-template pTemplate="header">
+                                    <button (click)="showOperationGroupForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="deleteMapping(d.groupOperationMappingId)" href="javascript:void(0)" title="Remove Group"><i class="glyphicon glyphicon-remove"></i></a>
+                                        <span style="padding:3px;">|</span>
+                                    <a (click)="editOperationGroup(d.groupOperationMappingId)" href="javascript:void(0)" title="Edit Group">Edit</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+
+                    </p-tabPanel>
+
+                    <!-- LEVEL list -->
+                    <p-tabPanel header="Group Approval Levels" [disabled]="approvalLevels.length <= 0">
+                    
+                        <p-dataTable [value]="approvalLevels" [paginator]="true" [rows]="10">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column field="levelName" header="Approval Level Name" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="position" header="Position" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column>
+                            <!-- <p-column field="isActive" header="Active" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column> -->
+                    
+                            <p-column [style]="{'width':'220px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <button (click)="showNotificationsForm(d)" pButton type="button" label="Specify Notifications"></button>
+                                </ng-template>
+                            </p-column>
+                    
+                        </p-dataTable>
+                    
+                    </p-tabPanel>
+
+                </p-tabView>
+                <!-- end tabs here -->
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel2-->
+
+        </div>
+        <!--end of card2-->
+
+
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal forms starts here-->
+
+
+<!--operation-group modal form-->
+<p-dialog [responsive]=true [(visible)]="displayOperationGroupModal" id="operation-group-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Operation Group
+                <!--{{ selectedId }}-->
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="operationGroupForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="groupId" class="control-label col-md-4">Approval Group</label>
+                        <div class="col-md-8">
+                            <select type="text" name="groupId" formControlName="groupId" id="groupId" class="form-control" [ngClass]="!operationGroupForm.controls['groupId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Approval Group --</option>
+                                <option *ngFor="let x of groups" [value]="x.groupId">{{ x.groupName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position" class="control-label col-md-4">Position</label>
+                        <div class="col-md-8">
+                            <select type="text" name="position" formControlName="position" id="position" 
+                            class="form-control" [ngClass]="!operationGroupForm.controls['position'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Position--</option>
+                                <option *ngFor="let x of positions" [value]="x.id">{{ x.name }}</option>
+                            </select>
+                        </div>
+                    </div>  
+
+                    <div class="form-group">
+                        <label for="position" class="control-label col-md-4">Position</label>
+                        <div class="col-md-8">
+                            <p-checkbox label="Allow Multiple Initiator" (onChange)="setMultiInitiatorStatus($event)"></p-checkbox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitOperationGroupForm(operationGroupForm)" [disabled]="operationGroupForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayOperationGroupModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--END operation-group modal form-->
+
+<!--notifications modal form-->
+<p-dialog [responsive]=true [(visible)]="displayNotificationsModal" id="approval-level-modal" modal="modal"
+    showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Workflow Notifications
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="notificationsForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input (click)="toggleNotifyOfPendingApprovals($event)"
+                                    formControlName="notifyOfPendingApprovals" id="notifyOfPendingApprovals"
+                                    type="checkbox">
+                            </div>
+                            <label for="notifyOfPendingApprovals" class="checkbox">Notify Level Of Pending Approvals</label>
+                        </div>
+                        <label for="pendingApprovalAlertTitleId" class="control-label col-md-1">Alert Title</label>
+                        <div class="col-md-5">
+                            <select formControlName="pendingApprovalAlertTitleId" id="pendingApprovalAlertTitleId" class="form-control"
+                                [attr.disabled]="isNotifyOfPendingApprovalsToggled() ? null : true"
+                                [ngClass]="!notificationsForm.controls['pendingApprovalAlertTitleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value=null>--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of alerts" value="{{alert.alertTitleId}}">{{alert.title}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="isNotifyOfPendingApprovalsToggled()">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="includePoolInNotification" id="includePoolInNotification"
+                                    (click)="toggleIncludePoolInNotification($event)" type="checkbox">
+                            </div>
+                            <label for="includePoolInNotification" class="checkbox">Include Pool In Pending Approvals Notification (If request is pre-assigned)</label>
+                        </div>
+                        <label for="poolAlertTitleId" class="control-label col-md-1">Alert Title</label>
+                        <div class="col-md-5">
+                            <select formControlName="poolAlertTitleId" id="poolAlertTitleId" class="form-control"
+                                [attr.disabled]="isIncludePoolInNotificationToggled() ? null : true"
+                                [ngClass]="!notificationsForm.controls['poolAlertTitleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value=null>--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of alerts" value="{{alert.alertTitleId}}">{{alert.title}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input (click)="toggleNotifyOfProceedingWorkflowActions($event)" formControlName="notifyOfProceedingWorkflowActions" 
+                                id="notifyOfProceedingWorkflowActions" type="checkbox">
+                            </div>
+                            <label for="notifyOfProceedingWorkflowActions" class="checkbox">Notify Level Of Proceeding Workflow Actions</label>
+                        </div>
+                        <label for="proceedingActionsAlertTitleId" class="control-label col-md-1">Alert Title</label>
+                        <div class="col-md-5">
+                            <select formControlName="proceedingActionsAlertTitleId" 
+                                id="proceedingActionsAlertTitleId" class="form-control" [attr.disabled]="isNotifyOfProceedingWorkflowActionsToggled() ? null : true"
+                                [ngClass]="!notificationsForm.controls['proceedingActionsAlertTitleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value=null>--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of alerts" value="{{alert.alertTitleId}}">{{alert.title}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="notifyOnwer" id="notifyOnwer" 
+                                (click)="toggleNotifyOnwer($event)" type="checkbox">
+                            </div>
+                            <label for="notifyOnwer" class="checkbox">notifyOnwer</label>
+                        </div>
+                        <label for="ownerAlertTitleId" class="control-label col-md-1">ownerAlertTitleId</label>
+                        <div class="col-md-5">
+                            <select formControlName="ownerAlertTitleId" id="ownerAlertTitleId" class="form-control"
+                                [attr.disabled]="isNotifyOnwerToggled() ? null : true"
+                                [ngClass]="!notificationsForm.controls['ownerAlertTitleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value=null>--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of alerts" value="{{alert.alertTitleId}}">{{alert.title}}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitNotificationsForm(notificationsForm)"
+                            [disabled]="notificationsForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayNotificationsModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+

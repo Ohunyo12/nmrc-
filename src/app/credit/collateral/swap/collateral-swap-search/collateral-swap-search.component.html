@@ -1,0 +1,115 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Collateral Swap Search
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<div class="card no-padding">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-md-12">
+							<h2 class="panel-title pull-left">
+								Collateral Swap Request(s)
+							</h2>
+	
+							<div class="pull-right">
+								<button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel-body">
+					<p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+						<p-tabPanel header="Collateral Swap Requests" *ngIf="displaySearchTable == true">
+							<p-dataTable [style]="{'overflow':'auto'}" [value]="collateralSwapRequests" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+
+							<p-column field="systemArrivalDateTime" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+								<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+									{{ d.systemArrivalDateTime | date: 'medium' }}
+								</ng-template>
+							</p-column>
+
+							<p-column field="applicationReferenceNumber" header="Loan Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column field="swapRef" header="SwapReference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column field="customerName" header="Customer Name/Group" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							
+							<p-column field="productName" header="Facility" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}"></p-column>
+							<!-- <p-column field="collateralSwapStatus" header="Issuance Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+							<p-column field="approvalStatus" header="Issuance Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column field="fromLevel" header="Sent from" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column field="currentApprovalLevel" header="Currently with" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column field="responsiblePerson" header="Person" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column>
+								<ng-template pTemplate="header"></ng-template>
+								<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+									<a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+								</ng-template>
+							</p-column>  
+							</p-dataTable>
+						</p-tabPanel>
+						<p-tabPanel header="Collateral Swap Information" *ngIf="displaySwapDetails == true && collateralSwapId > 0">
+							<div class="panel-body" *ngIf="collateralSwapDetailSearch != null && collateralSwapDetailSearch != undefined">
+								<app-collateral-swap-approval
+									[collateralSwapDetailSearch]="collateralSwapDetailSearch"
+									[isCollateralSwapSearch]=true
+									[collateralSwapId]="collateralSwapId"
+									[reload]="collateralSwapId">
+								</app-collateral-swap-approval>
+							</div>
+							
+						</p-tabPanel>
+					</p-tabView>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search LC
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="searchForm" autocomplete="off" (ngSubmit)="submitForm(searchForm)">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">Collateral Swap Reference Number/ Application Reference Number / Customer Name</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+

@@ -1,0 +1,338 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">{{ panelLabel }}</h2>
+    </div>
+    <div class="panel-body">
+
+        <h4 *ngIf="currentSelection?.toStaffId != null">
+            <strong>WITH: </strong>{{ currentSelection?.responsiblePerson }}
+            <strong>AT LEVEL: </strong>{{ currentSelection?.currentApprovalLevel }}
+        </h4>
+
+        <button *ngIf="enableRoute == true" (click)="showRouteForm()" class="btn btn-default">
+            <span class="glyphicon glyphicon-share-alt"></span>
+            Route
+        </button>
+
+        <button *ngIf="enableReroute == true" (click)="showRerouteForm()" class="btn btn-default">
+            <span class="glyphicon glyphicon-share-alt"></span>
+            Re-route
+        </button>
+        
+        <button *ngIf="enableRoutePreset == true" (click)="showPresetRouteForm()" class="btn btn-default">
+            <span class="glyphicon glyphicon-cog"></span>
+            Preset Route
+        </button>
+        
+        <button *ngIf="enableRouteOperation == true" (click)="showOperationRouteForm()" class="btn btn-default">
+            <span class="glyphicon glyphicon-cog"></span>
+            Re-Route Workflow
+        </button>
+
+    </div>
+</div>
+
+
+
+
+<!-- example modal dialog -->
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" modal="modal" showEffect="fade" width="450">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Re-route {{ referenceNumber }}
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="cancelForm()">&times;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <form novalidate [formGroup]="rerouteForm" autocomplete="off">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-6">Staff</label>
+                    <div class="col-md-6" style="text-align:right">
+                        <i class="glyphicon glyphicon-search"></i>
+                        <a href="javascript:void(0)" (click)="openSearchBox()">Search</a>
+                    </div>
+                    <div class="col-md-12">
+                        <select data-live-search="true" name="staffId" formControlName="staffId" id="staffId" class="form-control" [ngClass]="rerouteForm.controls['staffId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">-- Select Staff --</option>
+                            <option *ngFor="let x of allStaff" [value]="x.staffId">{{ x.staffName }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-12">Comment</label>
+                    <div class="col-md-12">
+                        <textarea style="height:60px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="rerouteForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="padding:15;">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error: </span>{{ errorMessage }}
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12" style="text-align:right">
+                    <button type="button" (click)="cancelForm()" class="btn btn-danger">Cancel</button>
+                    <button type="button" (click)="reroute(rerouteForm)" [disabled]="rerouteForm.invalid" class="btn btn-success">
+                        <span class="glyphicon glyphicon-send"></span> Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayRouteCommentForm" modal="modal" showEffect="fade" width="450">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Route {{ referenceNumber }}
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="cancelForm()">&times;</a>
+                </div>
+            </div>
+        </div>
+    
+        <div class="panel-body">
+            <form novalidate [formGroup]="rerouteForm" autocomplete="off">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-md-6">Staff</label>
+                        <div class="col-md-6" style="text-align:right">
+                            <i class="glyphicon glyphicon-search"></i>
+                            <a href="javascript:void(0)" (click)="openSearchBox()">Search</a>
+                        </div>
+                        <div class="col-md-12">
+                            <select data-live-search="true" name="staffId" formControlName="staffId" id="staffId" class="form-control" [ngClass]="rerouteForm.controls['staffId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Staff --</option>
+                                <option *ngFor="let x of allStaff" [value]="x.staffId">{{ x.staffName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-12">Comment</label>
+                        <div class="col-md-12">
+                            <textarea style="height:60px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="rerouteForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="padding:15;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error: </span>{{ errorMessage }}
+            </div>
+        </div>
+    
+        <div class="panel-footer">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12" style="text-align:right">
+                        <button type="button" (click)="cancelForm()" class="btn btn-danger">Cancel</button>
+                        <button type="button" (click)="route(rerouteForm)" [disabled]="rerouteForm.invalid" class="btn btn-success">
+                            <span class="glyphicon glyphicon-send"></span> Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </p-dialog>
+
+
+<!--real time search form-->
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displaySearchModal=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+
+<!-- example modal dialog -->
+
+<p-dialog [responsive]=true [(visible)]="displayPresetForm" modal="modal" showEffect="fade" width="450">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Preset-route {{ referenceNumber }}
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayPresetForm = false">&times;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <form novalidate [formGroup]="presetForm" autocomplete="off">
+            <div class="form-horizontal">
+
+                <!-- form -->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Next Process</label>
+                    </div>
+                    <div class="col-md-12">
+                        <select [attr.disabled]="true" name="nextApplicationStatusId" formControlName="nextApplicationStatusId" id="nextApplicationStatusId"
+                            class="form-control" [ngClass]="!presetForm.controls['nextApplicationStatusId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="null">-- Select Process --</option>
+                            <option *ngFor="let x of presetCollection.applicationStatus" [value]="x.id">{{ x.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label>Final Approval Level</label>
+                    </div>
+                    <div class="col-md-12">
+                        <select name="finalApprovalLevelId" formControlName="finalApprovalLevelId" id="finalApprovalLevelId" class="form-control"
+                            [ngClass]="!presetForm.controls['finalApprovalLevelId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="null">-- Select Approval Level --</option>
+                            <option *ngFor="let x of presetCollection.approvalLevels" [value]="x.id">{{ x.name }}</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="padding:15;">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error: </span>{{ errorMessage }}
+        </div>
+    </div>
+    <!-- {{ presetForm.value | json }} -->
+    <div class="panel-footer">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12" style="text-align:right">
+                    <button type="button" (click)="displayPresetForm = false" class="btn btn-danger">Cancel</button>
+                    <button type="button" (click)="presetRoute(presetForm)" [disabled]="presetForm.invalid" class="btn btn-success">
+                        Save Preset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+
+
+<!-- example modal dialog -->
+
+<p-dialog [responsive]=true [(visible)]="displayOperationRouteCommentForm" modal="modal" showEffect="fade" width="450">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Re-route
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="cancelForm()">&times;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <form novalidate [formGroup]="operationForm" autocomplete="off">
+            <div class="form-horizontal">
+                                
+                <div class="form-group">
+                    <label class="control-label col-md-6">Operation</label>
+                    <div class="col-md-12">
+                        <select (change)="onOperationChange($event.target.value)" name="operationId" formControlName="operationId" id="operationId" class="form-control" [ngClass]="operationForm.controls['operationId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">-- Select Operation --</option>
+                            <option *ngFor="let x of routeableOperations" [value]="x.id">{{ x.name }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-6">Approval Level</label>
+                    <div class="col-md-12">
+                        <select name="approvalLevelId" formControlName="approvalLevelId" id="approvalLevelId" class="form-control" [ngClass]="operationForm.controls['approvalLevelId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">-- Select Approval Level --</option>
+                            <option *ngFor="let x of approvalLevels" [value]="x.approvalLevelId">{{ x.approvalLevelAndRoleName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-12">Comment</label>
+                    <div class="col-md-12">
+                        <textarea style="height:60px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="operationForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="padding:15;">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error: </span>{{ errorMessage }}
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12" style="text-align:right">
+                    <button type="button" (click)="cancelForm()" class="btn btn-danger">Cancel</button>
+                    <button type="button" (click)="rerouteOperation(operationForm)" [disabled]="operationForm.invalid" class="btn btn-success">
+                        <span class="glyphicon glyphicon-send"></span> Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>

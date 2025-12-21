@@ -1,0 +1,661 @@
+<div *ngIf="display">
+    <div class="ui-g">
+        <!--*ngIf="!isGlobal" -->
+        <div class="ui-g-12 no-padding">
+            <div class="card no-padding">
+                <div style="margin-bottom:0" class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Credit Bureau Search
+                                </h2>
+                                <div class="pull-right">
+                                    <button *ngIf="isGlobal==true" (click)="showCustomerSearch()" pButton
+                                    type="button" label="Search Customer" icon="fa-search"></button>
+                                    <button *ngIf="isGlobal==false" pButton (click)="goBack()" type="button" label="Back" icon="fa fa-angle-double-left"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="padding:3px" class="panel-body">
+                        <p-dataTable [value]="customerData" [(selection)]="selectedCustomerIndex" selection="true" selectionMode="single" [responsive]="true" (onRowSelect)="showCustomerCreditBureauInfo($event.data,false)">
+                            <p-header>Loan Customer</p-header>
+                            <p-column field="customerName" header="Name" [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column field="customerTypeName" header="Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="item.customerTypeName === 'Corporate'">{{item.customerTypeName}} </span>
+                                    <span *ngIf="item.customerTypeName != 'Corporate' && item.companyDirectorTypeName === 'Board Member'">Director({{item.companyDirectorTypeName}})</span>
+                                    <span *ngIf="item.customerTypeName === 'Individual Entity'">{{item.customerTypeName}}</span>
+                                </ng-template>
+                                <!-- <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="item.customerTypeName === 'Corporate'">{{item.customerTypeName}} </span>
+                                    <span *ngIf="item.customerTypeName != 'Corporate'">Director({{item.companyDirectorTypeName}}) </span>
+                                </ng-template> -->
+                            </p-column>
+                            <p-column field="dateOfBirth" header="Date of Birth/Incorporation" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.dateOfBirth | date: 'dd-MM-yyyy'}}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="customerBVN" header="BVN/RC Number" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="item.customerTypeName === 'Corporate'">{{item.rcNumber}} </span>
+                                    <span *ngIf="item.customerTypeName != 'Corporate'">{{item.customerBVN}} </span>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="phoneNumber" header="Phone" [filter]="true" filterMatchMode="contains"></p-column> 
+                            <p-column header="Code">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="item.customerCode != null">{{item.customerCode}}</span>
+                                    <span *ngIf="item.customerCode == null">n/a</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column header="Branch Name">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="item.branchName != null">{{item.branchName}}</span>
+                                    <span *ngIf="item.branchName == null">n/a</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}" header="Uploads">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <i *ngIf="item.creditBureauCount >= 3" class="fa fa-check" style="color:green"></i>
+                                    <span *ngIf="item.creditBureauCount < 3">{{item.creditBureauCount}}</span> 
+                                </ng-template>
+                            </p-column>
+
+                            <p-column [style]="{'width':'50px'}" header="Search">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <i *ngIf="item.isSearched" class="fa fa-check" style="color:black"></i>
+                                    <i *ngIf="!item.isSearched && !item.isUploaded" class="glyphicon glyphicon-search"></i>
+                                    <i *ngIf="!item.isSearched && item.isUploaded" class="fa fa-minus"></i>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        <div *ngIf="displayCustomerBureauInfo && displayBureauGrid" class="col-md-6">
+                            <form novalidate [formGroup]="statusForm" autocomplete="off">
+                                    <div class="panel-body"><strong>{{selectedCustomerBureauData.customerName.toUpperCase()}}</strong></div>
+                                    <table class="table table-striped table-hover">
+        
+                                        <tbody>
+                                            <tr *ngFor="let res of customerBureauInfo; let i = index; ">
+                                                <td>
+                                                    {{res.creditBureauName}}
+                                                </td>
+                                                <td>
+                                                    <button *ngIf="!res.appliedSearchForLoan && res.useIntegration" (click)="initiateSearch(res)" type="button" class="btn btn-primary" style="margin-right:5px">
+                                                                                                        <i class="glyphicon glyphicon-search"></i> Search</button>
+        
+                                                    <button *ngIf="res.appliedSearchForLoan && res.useIntegration" [attr.disabled]="true" type="button" class="btn btn-primary" style="margin-right:5px">
+                                                                                                                <i class="glyphicon glyphicon-ok"></i> Search</button>
+        
+                                                    <i *ngIf="!res.useIntegration" class="fa fa-minus" style="color:red"></i>
+                                                </td>
+                                                <td>
+                                                    <button *ngIf="!res.appliedSearchForLoan" (click)="startUpload(res)" type="button" class="btn btn-link" style="margin-right:5px">
+                                                                                                            <i class="glyphicon glyphicon-upload"></i> Upload</button>
+                                                    <button *ngIf="res.appliedSearchForLoan" [attr.disabled]="true" type="button" class="btn btn-link" style="margin-right:5px">
+                                                                                                                    <i class="glyphicon glyphicon-ok"></i> Upload</button>
+                                                </td>
+                                                <td>
+                                                    <button *ngIf="res.hasFile" (click)="startDownload(res)" type="button" class="btn btn-link" style="margin-right:5px">
+                                                                            <i class="glyphicon glyphicon-download-alt"></i> </button>
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" [disabled]="(!res.appliedSearchForLoan)" [(checked)]=res.isReportOkay (change)="updateReportStatus(res, $event.target.checked)" name="creditBureauItemReportCheck">
+                                                    <label for="creditBureauItemReportCheck">Is Positive?</label>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div *ngIf="!isGlobal">
+                                    <button *ngIf="showProceedToApplication && maxBureauSearchReached " style="margin-right:5px" type="button" class="btn btn-primary pull-right" (disabled)="statusForm.invalid" (click)="proceedToApplication()">Proceed To Application</button>
+                                    <button *ngIf="!maxBureauSearchReached" pButton (click)="validateCreditBureauChecks(true)" type="button" class="btn btn-default pull-right" label="Proceed" icon="fa fa-check"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCustomerBureauInfo && displayUploadPanel" modal="modal" id="searchModal" showEffect="fade" width="470">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    {{uploadFileTitle}}
+                </h2>
+                <a href="" (click)="displayUploadPanel = false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                        </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div *ngIf="displayCustomerBureauInfo && displayUploadPanel" class="col-md-12">
+                <!-- <div class="panel panel-default"> -->
+                <form novalidate [formGroup]="uploadForm" autocomplete="off">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <strong> {{selectedCreditBureauActionTitle}} UPLOAD</strong>
+                        </h2>
+                        <!-- <div class="pull-right">
+                                <a class="close" (click)="displayUploadPanel=false">&times;</a>
+                            </div> -->
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="documentTitle" class="control-label col-md-4">Document Title</label>
+                                <div class="col-md-8 no-data-div">
+                                    <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="docDescription" formControlName="docDescription" [ngClass]="uploadForm.controls['docDescription'].valid ? 'valid-input' : 'required-input'" placeholder="">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="document" class="control-label col-md-4">Select Document</label>
+                                <div class="col-md-8">
+                                    <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.xml" #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="document" class="control-label col-md-4"></label>
+                                <div class="col-md-4">
+                                    <button (click)="uploadBureauReport(selectedCustomerBureauData, selectBureaData)" class="btn btn-sm btn-primary" [disabled]="(uploadFileTitle==null || file==undefined || uploadForm.invalid) "><span class="glyphicon glyphicon-upload"></span> Upload {{selectedCreditBureauName}} </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div *ngIf="displayCustomerBureauInfo && displayXdsSearchModal" class="col-md-12">
+                <form novalidate [formGroup]="uploadForm" autocomplete="off">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <strong>{{selectedCreditBureauActionTitle}} SEARCH</strong>
+                        </h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="documentTitle" class="control-label col-md-4">Document Title</label>
+                                <div class="col-md-8 no-data-div">
+                                    <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="docDescription" formControlName="docDescription" [ngClass]="uploadForm.controls['docDescription'].valid ? 'valid-input' : 'required-input'" placeholder="">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="document" class="control-label col-md-4">Select Document</label>
+                                <div class="col-md-8">
+                                    <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                                    <app-common-hint [supportedFiles]="acceptedExtention"></app-common-hint>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="document" class="control-label col-md-4"></label>
+                                <div class="col-md-4">
+                                    <button (click)="uploadBureauReport(selectedCustomerBureauData, selectBureaData)" class="btn btn-sm btn-primary" [disabled]="(uploadFileTitle==null || file==undefined || uploadForm.invalid) "><span class="glyphicon glyphicon-upload"></span> Upload {{selectedCreditBureauName}} </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayXdsSearchModal" modal="modal" id="searchModal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    {{searchTitle}}
+                </h2>
+                <a (click)="CloseSearchDialog()" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign"></i>
+                </a>
+            </div>
+        </div>
+
+        <div style="padding:3px" class="panel-body">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <p-accordion #accordion>
+                        <p-accordionTab [selected]="creditBureauSearchResult.length < 0" header="First Central Search Options">
+                            <div class="form-group">
+                                <div *ngIf="!isCorporate" class=" col-md-3">
+                                    <p-checkbox [attr.checked]="true" name="fname" (onChange)="setXDSSearchParameterValues('FNAME',$event)" value="FNAME" label="First Name"></p-checkbox>
+                                </div>
+                                <div *ngIf="!isCorporate" class=" col-md-3">
+                                    <p-checkbox [attr.checked]="true" name="lname" (onChange)="setXDSSearchParameterValues('MNAME',$event)" value="MNAME" label="Middle Name"></p-checkbox>
+                                </div>
+                                <div *ngIf="!isCorporate" class=" col-md-3">
+                                    <p-checkbox [attr.checked]="true" name="mname" (onChange)="setXDSSearchParameterValues('LNAME',$event)" value="LNAME" label="Last Name"></p-checkbox>
+                                </div>
+                                <div *ngIf="isCorporate" class=" col-md-3">
+                                    <p-checkbox name="name" [attr.checked]="true" (onChange)="setXDSSearchParameterValues('NAME',$event)" value="NAME" label="Business Name"></p-checkbox>
+                                </div>
+                                <div *ngIf="!isCorporate" class="checkboxes col-md-3">
+                                    <span>{{choiceName}}</span>
+                                </div>
+                                <div *ngIf="isCorporate" class=" col-md-3">
+                                    <p-checkbox name="REGISTRATION" (onChange)="setXDSSearchParameterValues('REGISTRATION',$event)" value="REGISTRATION" label="Registration Number"></p-checkbox>
+                                </div>
+                            </div>
+                            <div *ngIf="!isCorporate" class="form-group">
+                                <div *ngIf="!isCorporate" class="checkboxes col-md-3">
+                                    <p-checkbox name="dob" [attr.checked]="true" (onChange)="setXDSSearchParameterValues('DOB',$event)" value="DOB" label="Date of birth"></p-checkbox>
+                                </div>
+                                <div *ngIf="!isCorporate" class="checkboxes col-md-3">
+                                    <p-checkbox name="rcNumber" (onChange)="setXDSSearchParameterValues('BVN',$event)" value="bvn" label="BVN"></p-checkbox>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-md-12">
+                                        <button class="btn btn-primary  btn-block btn-sm col-md-12" type="button" (click)="beginXdsSearchProcess()" [disabled]="searchButtonDisabled"> Start Search</button>
+                                </div>
+                            </div>
+                        </p-accordionTab>
+                    </p-accordion>
+                    
+                    <div *ngIf="creditBureauSearchResult.length > 0" class="form-group col-md-12" style="overflow:auto;height:270px">
+                        <p-dataTable [value]="creditBureauSearchResult" [(selection)]="selectedbureauSearch" (onRowSelect)="addSelectedXDSSearchItem($event.data)" (onRowUnselect)="removeSelectedSearchItem($event.data)" selection="true" selectionMode="multiple" [responsive]="true">
+                            <p-header>Credit Bureau Search Result</p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple">
+
+                            </p-column> 
+                            <p-column field="AccountNo" header="Account No." sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                             <p-column field="ConsumerID" header="Consumer ID." sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <!-- <p-column field="EnquiryID" header="Enquiry ID." sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="MatchingEngineID" header="MatchingEngine ID." sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                            <p-column field="Surname" header="Surname" [filter]="true" filterMatchMo de="contains">
+                                <ng-template pTemplate="header">
+                                    <span [style]="{'min-width':'350px'}" *ngIf="isCorporate">Business Name</span>
+                                    <span *ngIf="!isCorporate">Surname</span>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="isCorporate">{{item.BusinessName}}</span>
+                                    <span *ngIf="!isCorporate">{{item.Surname}}</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column *ngIf="isCorporate" field="TradingName" header="Trading Name" [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column *ngIf="isCorporate" field="RegistrationNo" header="Registration No." [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="FirstName" header="FirstName" [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="OtherNames" header="OtherNames" [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column field="BirthDate" header="Date of Birth" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="header">
+                                    <span *ngIf="isCorporate">Date of Incorporation</span>
+                                    <span *ngIf="!isCorporate">Date of Birth</span>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    <span *ngIf="isCorporate">{{item.IncorporationDate | date: 'dd-MM-yyyy'}}</span>
+                                    <span *ngIf="!isCorporate">{{item.BirthDate | date: 'dd-MM-yyyy'}}</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column *ngIf="isCorporate" field="CommencementDate" header="Date of Commencement" [filter]="true" filterMatchMo de="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.CommencementDate | date: 'dd-MM-yyyy'}}
+                                </ng-template>
+                            </p-column>
+                            <p-column *ngIf="isCorporate" field="TelePhoneNumber" header="Phone Number" [filter]="true" filterMatchMo de="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" [style]="{'min-width':'250px'}" field="Address" header="Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="MatchingRate" header="Matching Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.MatchingRate}}%
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                    <form *ngIf="creditBureauSearchResult.length > 0 " novalidate [formGroup]="searchForm" class="form-group col-md-12" autocomplete="off">
+                        <div class="form-group col-md-12">
+                            <!-- <div *ngIf="showBusinessChargeControl" class="col-md-6">
+                                <input type="checkbox"  [(checked)]=chargeBusiness (change)="SetChargeableAccount($event.target.checked)" name="chargeBusinessCheck">
+                                    <label for="chargeBusinessCheck">Charge Business</label>
+                            </div> -->
+
+                            <!-- <label  for="" class="control-label col-md-2">Customer Account</label> -->
+                            <!-- <select class="col-md-4" (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId" id="casaAccountId" class="form-group col-md-12" formControlName="casaAccountId" class="form-control" [ngClass]="!searchForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Customer Account --</option>
+                                <option *ngFor="let x of customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                            </select> -->
+                            <!-- <label *ngIf="!chargeBusiness" for="" class="control-label col-md-2">Customer Account</label>
+                            <select *ngIf="!chargeBusiness" class="col-md-4" (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId" id="casaAccountId" class="form-group col-md-12" formControlName="casaAccountId" class="form-control" [ngClass]="!searchForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Customer Account --</option>
+                                <option *ngFor="let x of customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                            </select> -->
+                            
+                            <!-- <label *ngIf="chargeBusiness" for="" class="control-label col-md-2">Business Account</label>
+                                <select *ngIf="chargeBusiness" class="col-md-4" (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId" id="casaAccountId" class="form-group col-md-12" formControlName="casaAccountId" class="form-control" [ngClass]="!searchForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Business Account --</option>
+                                    <option *ngFor="let x of businessAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                </select> -->
+                        </div>
+                    </form>
+                    <div *ngIf="creditBureauSearchResult.length > 0" class="form-group col-md-12">
+                        <button type="button" (click)="downloadReport()" [disabled]="selectedbureauSearch.length <= 0" class="btn btn-warning btn-sm col-md-12"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Download Report </button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+
+            </div>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCrcSearchModal" modal="modal" id="searchModal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    {{searchTitle}}
+                </h2>
+                <a (click)="CloseSearchDialog()" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                        </i>
+                </a>
+            </div>
+        </div>
+
+        <div style="padding:3px" class="panel-body">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group col-md-12">
+                        <form novalidate [formGroup]="crcSearchForm" autocomplete="off">
+                            <p-accordion #accordion>
+                                <p-accordionTab [selected]="true" header="CRC Search Options">
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group">
+                                                <label for="" class="control-label col-md-2">Choose search option</label>
+                                                <div class="col-md-4">
+                                                    <select class="col-md-4" (change)="onCrcSearchParameterChange($event.target.value)" name="searchParameterId" id="searchParameterId" formControlName="searchParameterId" class="form-control" [ngClass]="!crcSearchForm.controls['searchParameterId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Search Option --</option>
+                                                        <option *ngIf="!isCorporate" [value]="0">(name, gender, dob)</option>
+                                                        <option *ngIf="isCorporate" [value]="0">Business Name</option>
+                                                        <option *ngIf="isCorporate" [value]="3">Registration No</option> 
+                                                        <option *ngIf="!isCorporate" [value]="4">BVN</option> 
+                                                        <option *ngIf="!isCorporate" [value]="5">Telephone</option>
+                                                        <option *ngIf="!isCorporate" [value]="6">All Parameters</option>
+                                                    </select>
+                                                </div>
+                                                <div *ngIf="showBusinessChargeControl" class="col-md-6">
+                                                    <input type="checkbox"  [(checked)]=chargeBusiness (change)="SetChargeableAccount($event.target.checked)" name="chargeBusinessCheck">
+                                                    <label for="chargeBusinessCheck">Charge Business</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="" class="control-label col-md-2">CRC Loan Facility</label>
+                                                <div class="col-md-4">
+                                                    <select class="col-md-4" (change)="onLoanFacilityChange($event.target.value)" name="productId" id="productId" formControlName="productId" class="form-control" [ngClass]="!crcSearchForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Facility --</option>
+                                                        <option *ngFor="let x of crcLoanFacilities" [value]="x.productCode">{{ x.productName }}</option>
+                                                    </select>
+                                                </div>
+                                                <!-- <label for="" class="control-label col-md-2">Customer Account</label> -->
+                                                <!-- <label *ngIf="chargeBusiness" for="" class="control-label col-md-2">Business Account</label> -->
+                                                <div class="col-md-4 ">
+                                                    <!-- <select  class="col-md-4" (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId" class="form-control" [ngClass]="!crcSearchForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Customer Account --</option>
+                                                        <option *ngFor="let x of customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                    </select> -->
+                                                    <!-- <select *ngIf="chargeBusiness"  class="col-md-4" (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId" class="form-control" [ngClass]="!crcSearchForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Business Account --</option>
+                                                        <option *ngFor="let x of businessAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                    </select> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-accordionTab>
+                            </p-accordion>
+
+                        </form>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <button class="btn btn-primary  btn-block btn-sm col-md-12" type="button" (click)="beginCrcSearchProcess()" [disabled]="crcSearchForm.invalid"> Start Search</button>
+                    </div>
+                    <!-- <div class="form-group col-md-12">
+                        <p-progressBar class="col-md-12" [value]="progressInitialValue"></p-progressBar>
+                    </div> -->
+                    <div *ngIf="creditCRCBureauSearchResult.length > 0" class="form-group col-md-12" style="overflow:auto;height:200px">
+                        <p-dataTable [value]="creditCRCBureauSearchResult" [(selection)]="selectedCrcbureauSearch" (onRowSelect)="addSelectedCRCSearchItem($event.data)" (onRowUnselect)="removeSelectedSearchItem($event.data)" selection="true" selectionMode="multiple" [responsive]="true" >
+                            <p-header>Credit Bureau Search Result</p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column field="@BUREAU-ID" header="Result Item ID" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="@NAME" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="@GENDER" header="Gender" sortable="true" [style]="{'min-width':'50px'}" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="@DATE-OF-BIRTH" header="Date of birth" sortable="true" [style]="{'min-width':'80px'}" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="!isCorporate" field="@PHONE-NUMBER" header="Phone" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="@ADDRESSES" header="Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="@CONFIDENCE-SCORE" header="Confidence Score" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="isCorporate" field="@IDENTIFIERS" header="Identifier" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="isCorporate" field="@SURROGATES" header="SURROGATES" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        </p-dataTable>
+                    </div>
+
+                    <div *ngIf="creditCRCBureauSearchResult.length > 0" class="form-group col-md-12">
+                        <button type="button" (click)="downloadCRCReport()" [disabled]="selectedCrcbureauSearch.length <= 0 " class="btn btn-warning btn-sm col-md-12"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Download Report </button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+
+            </div>
+            <!-- </form> -->
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCrmsSearchModal" modal="modal" id="searchModal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    {{searchTitle}}
+                </h2>
+                <a (click)="CloseSearchDialog()" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign"></i>
+                </a>
+            </div>
+        </div>
+
+        <div style="padding:3px" class="panel-body">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    
+                    <div class="form-group col-md-12" style="overflow:auto;height:270px">
+                        <p-dataTable [value]="crmsCredits" [(selection)]="selectedbureauSearch" (onRowSelect)="addSelectedXDSSearchItem($event.data)" (onRowUnselect)="removeSelectedSearchItem($event.data)" selection="true" selectionMode="multiple" [responsive]="true">
+                            <p-header>CRMS Credit Bureau Search Result</p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column> 
+                            <p-column field="crmsRefNumber" header="CRMS RefNumber" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="creditType" header="Credit Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                           
+                            <p-column field="creditLimit" header="Credit Limit" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.creditLimit | number : '1.2'}}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="outstandingAmount" header="Outstanding Amount" [filter]="true" filterMatchMode="contains">
+                                <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.outstandingAmount | number : '1.2'}}
+                                </ng-template>
+                            </p-column>
+                            
+                            <p-column field="effectiveDate" header="Effective Date" [filter]="true" filterMatchMode="contains">
+                                <!-- <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.effectiveDate | date: 'dd MMM yyyy'}}
+                                </ng-template> -->
+                            </p-column>
+
+                            <p-column field="tenor" header="Tenor" [filter]="true" filterMatchMode="contains"></p-column>
+                            
+                            <p-column field="expiryDate" header="Expiry Date" [filter]="true" filterMatchMode="contains">
+                                <!-- <ng-template pTemplate="body" let-item="rowData">
+                                    {{item.expiryDate | date: 'dd MMM yyyy'}}
+                                </ng-template> -->
+                            </p-column>
+
+                            <p-column field="grantingInstitution" header="Granting Institution" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="performanceStatus" header="Performance Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                           
+                        </p-dataTable>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="panel-footer">
+            </div>
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Authentication Token
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div *ngIf="!userSpecific" class="form-group">
+                    <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                    <div class="col-md-12">
+                        <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                    <div class="col-md-12">
+                        <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="form-group text-center">
+                        <div class="col-md-12">
+                            <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="beginCrcSearchProcess()" style="margin-right:5px "
+                                class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuthForXDS" id="auth-token" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Authentication Token
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayTwoFactorAuthForXDS=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div *ngIf="!userSpecific" class="form-group">
+                    <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                    <div class="col-md-12">
+                        <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                    <div class="col-md-12">
+                        <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="form-group text-center">
+                        <div class="col-md-12">
+                            <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="downloadReport()" style="margin-right:5px "
+                                class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!--end of append modal-->
+<p-dialog [responsive]=true [(visible)]="displayCustomerSearch" modal="modal" id="searchModal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">Search Customer</h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayCustomerSearch=false">&times;</a>
+            </div>
+        </div>
+
+        <div style="padding:3px" class="panel-body">
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your customer number or name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+
+                    <table *ngIf="customers" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer ID</th>
+                                <th>Customer</th>
+                                <th>Type</th>
+                                <th>Customer Sector</th>
+                                <!-- <th>Customer Name</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickCustomerSearchedData(res)" style="cursor: pointer" *ngFor="let res of customers; let i = index">
+                                <td>{{res.customerId}}</td>
+                                <td>{{res.firstName}}{{res.lastName}}</td>
+                                <td>{{res.customerTypeName}}</td>
+                                <td>{{res.sectorName}}</td>
+                                <!-- <td>{{res.customerName}}</td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

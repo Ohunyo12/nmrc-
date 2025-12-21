@@ -1,0 +1,75 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Application Groups
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [rows]="20" [paginator]="true" [value]="groups" [responsive]=true selectionMode="single">
+                        <p-column field="groupName" header="Group Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'60px'}">
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editGroup(i)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Group
+            </h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="groupName" class="control-label col-md-3">
+                        Group Name
+                    </label>
+                    <div class="col-md-9">
+                        <input type="text" [(ngModel)]="groupName" class="form-control" placeholder="Group Name">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" [disabled]="!groupName" (click)="onSubmit()" class="btn btn-success pull-right">Save</button>
+                    <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="display=false">Close</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>

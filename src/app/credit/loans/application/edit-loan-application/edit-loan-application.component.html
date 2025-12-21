@@ -1,0 +1,781 @@
+<!-- <div *ngIf="!displayFacilityDetaits" class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Loan Applications Number:
+                <strong> {{loanApplicationReferance}}-{{loanApplicationId}}</strong>
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <form novalidate [formGroup]="loanApplication">
+            <div class="form-horizontal">
+
+              <credit-limits [selectedCustomer]="selectedCustomerLimit"> </credit-limits>
+              <p-accordion #accordion>
+                <p-accordionTab [selected]="true" header="Customer Information">
+                  <fieldset>
+                    <legend>Customer Information</legend>
+
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        {{customerLabelName}}
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" name="customerName" formControlName="customerName" [attr.disabled]="true" name="customerName" class="form-control">
+                      </div>
+
+                
+                      <label style="padding-top: 13px" for="" class="control-label col-md-2">Facility Type</label>
+
+                      <div class="col-md-4">
+
+                        <select formControlName="loanTypeId" [ngClass]="!loanApplication.controls['loanTypeId'].valid ? 'required-input' : 'valid-input'"
+                          [attr.disabled]="true" name="loanTypeId" class="form-control" id="loanTypeId">
+
+                          <option value=""></option>
+                          <option *ngFor="let pc of facilityTypes" value="{{pc.lookupId}}">
+                            {{pc.lookupName}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label style="padding-top: 13px" for="" class="control-label col-md-2">Customer Type</label>
+
+                      <div class="col-md-4">
+                        <select [ngClass]="!loanApplication.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'" [attr.disabled]="true"
+                          formControlName="customerTypeId" name="customerTypeId" class="form-control" id="customerTypeId">
+                          <option value=""></option>
+                          <option *ngFor="let pc of customerTypes" value="{{pc.value}}">
+                            {{pc.name}}
+                          </option>
+                        </select>
+                      </div>
+
+                      <label style="padding-top: 13px" for="" class="control-label col-md-2">Customer PEN</label>
+
+                      <div class="col-md-4">
+
+                        <select formControlName="loanPreliminaryEvaluationId" [ngClass]="!loanApplication.controls['loanPreliminaryEvaluationId'].valid ? 'required-input' : 'valid-input'"
+                          name="loanPreliminaryEvaluationId" class="form-control" id="loanPreliminaryEvaluationId">
+                          <option value="">-- Select PEN Code --</option>
+                          <option *ngFor="let pc of penCodeList" value="{{pc.lookupId}}">
+                            {{pc.lookupName}}
+                          </option>
+                        </select>
+                      </div>
+
+
+
+                    </div>
+                    <div class="form-group">
+
+                      <div class="col-md-2 col-md-offset-2 form-check  ">
+                        <label class="form-check-label">
+                          <strong>Backed by Collateral</strong>
+
+                          <input type="checkbox" class="form-check-input" formControlName="requireCollateral" name="requireCollateral " id="requireCollateral"
+                            value="checkedValue">
+
+
+                        </label>
+                      </div>
+                      <div class="col-md-2 form-check ">
+                        <label class="form-check-label">
+                          <b>
+                            <strong>Obligor Rating : {{customerRating}} </strong>
+                          </b>
+                        </label>
+                      </div>
+
+
+                    </div>
+
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">Product Class</label>
+                      <div class="col-md-4">
+                        <select name="productClassId" [(ngModel)]="productClassId" class="form-control" formControlName="productClassId" id="productClassId">
+                          <option value="">--- Select Product Class ---</option>
+                          <option *ngFor="let pc of productClasses" value="{{pc.lookupId}}">
+                            {{pc.lookupName}}
+                          </option>
+                        </select>
+                      </div>
+                      <button pButton type="button" style="margin: 5px" (click)="GetfacilityDetails()" label=" Add Facility Details" class="ui-button-info"></button>
+                    </div>
+                  </fieldset>
+                </p-accordionTab>
+                <p-accordionTab header="List of facility(s)">
+                  <fieldset>
+                    <legend>
+                      <h4>List of facility(s)</h4>
+                    </legend>
+                    <div style="max-height:250px; overflow:auto;" *ngIf="loanApplicationDetails && loanApplicationDetails.length > 0">
+                      <table class="table table-striped" style="margin-right:5px">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Customer Name</th>
+                            <th>Facility</th>
+                            <th>Tenor(Days)</th>
+                            <th>Rate(%)</th>
+                            <th>Currency</th>
+                            <th> Exchange Rate</th>
+
+                            <th>Requested Amount</th>
+                            <th>NGN Equivalent</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                            <td></td>
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{proposedAmount | number : '1.2'}}</td>
+                            <td>{{exchangeAmount | number : '1.2'}}</td>
+                            <td></td>
+                          </tr>
+
+                        </tfoot>
+                        <tbody>
+                          <tr *ngFor="let p of loanApplicationDetails;let indx=index">
+                            <td>
+                              {{indx + 1}}
+                            </td>
+                            <td>
+                              {{p.customerName}}
+                            </td>
+                            <td>{{p.proposedProductName}}</td>
+                            <td> {{p.proposedTenor}} </td>
+                            <td>{{p.proposedInterestRate}}</td>
+                            <td> {{p.currencyName}} </td>
+                            <td>{{p.exchangeRate | number : '1.2'}}</td>
+
+                            <td>{{p.proposedAmount | number : '1.2'}}</td>
+                            <td>{{p.exchangeAmount | number : '1.2'}}</td>
+
+
+
+                            <td style="padding: 0;width:50px">
+                              <a (click)="removeApplicationDetailsItem($event,indx)" style="color:#ff0000" href="javascript:void(0)">Remove</a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </fieldset>
+                </p-accordionTab>
+                <p-accordionTab header="Collateral Detail">
+                  <fieldset>
+                    <legend>
+                      <h4>Collateral Detail</h4>
+                    </legend>
+                    <div class="form-group">
+
+                      <div class="col-md-12">
+                        <textarea formControlName="collateralDetail" name="collateralDetail" rows=5 class="form-control"></textarea>
+                      </div>
+
+                    </div>
+                  </fieldset>
+                </p-accordionTab>
+                <p-accordionTab header="Provide Organisation and Management Profile">
+                  <fieldset>
+                    <legend>
+                      <h4>Provide Organisation and Management Profile</h4>
+                    </legend>
+                    <div class="form-group">
+
+                      <div class="col-md-12">
+                        <p-editor formControlName="loanInformation" name="loanInformation" [style]="{'height':'100px'}"></p-editor>
+                      </div>
+
+                    </div>
+                  </fieldset>
+                </p-accordionTab>
+              </p-accordion>
+            </div>
+          </form>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="panel-footer">
+              <div class="row">
+                <div class="col-md-12">
+                  <button type="submit" style="margin-right:5px" [disabled]="loanApplication.invalid || loanApplicationDetails.length === 0"
+                    class="btn btn-success pull-right" (click)="onSubmit(true)"> Save and Continue </button>
+                  <button type="button" style="margin-right:5px" class="btn btn-danger pull-right" (click)="hideModal()">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+<!-- <div style="margin-bottom:0;" class="panel panel-default">
+  <div class="panel-heading">
+    <div class="panel-title"> {{programmType}} </div>
+    <h2 class="panel-title">
+      <b>Application Number</b> {{ApplicationRef}}
+       <div class="col-md-8">
+        <span class="colorbox-count">Limit {{lsectorLimit | number : '1.2'}}</span>
+        <span class="colorbox-count">Exposure {{osectorLimit | number : '1.2'}}</span>
+      </div>
+    </h2>
+    </div>
+
+  <div style="padding: 2px 15px 2px 15px">
+    <div>
+      <form [formGroup]="editFacilityDetailsForm">
+        <fieldset id="entry">
+          <div class="panel-body" style="overflow: auto;">
+            <div class="form-horizontal">
+              <div class="form-group">
+
+                <label style="padding-top: 13px" for="" class="control-label col-md-2">{{customerNameOrGroup}} </label>
+
+                <div class="col-md-4">
+                 
+                  <select (change)="OnGroupCustomerChange($event.target.value)" name="customerId" class="form-control" formControlName="customerId"
+                    [ngClass]="!facilityDetailsForm.controls['customerId'].valid ? 'required-input' : 'valid-input'" id="customerId">
+                    <option value=""></option>
+                    <option *ngFor="let pc of groupMembers" value="{{pc.customerId}}">
+                      {{pc.customerName}}
+
+                    </option>
+                  </select>
+                
+                </div>
+
+                <label style="padding-top: 13px" for="" class="control-label col-md-2">Sector </label>
+
+                <div class="col-md-4">
+                  <select (change)="onSectorClassChange($event.target.value)" [ngClass]="!facilityDetailsForm.controls['sectorId'].valid ? 'required-input' : 'valid-input'"
+                    name="sectorId" class="form-control" formControlName="sectorId" id="sectorId">
+                    <option value=""></option>
+                    <option *ngFor="let pc of sector" value="{{pc.lookupId}}">
+                      {{pc.lookupName}}
+                    </option>
+                  </select>
+                </div>
+
+              </div>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Product
+                </label>
+                <div class="col-md-4">
+                  <select name="proposedProductId" class="form-control" (change)="onProductChange($event.target.value)" [ngClass]="!facilityDetailsForm.controls['proposedProductId'].valid ? 'required-input' : 'valid-input'"
+                    formControlName="proposedProductId" id="proposedProductId">
+                    <option value=""></option>
+                    <option *ngFor="let pc of filteredProducts" value="{{pc.productId}}">
+                      {{pc.productName}}
+                    </option>
+                  </select>
+                </div>
+
+
+
+                <label style="padding-top: 13px" for="" class="control-label col-md-2">Subsector </label>
+
+                <div class="col-md-4">
+                  <select [ngClass]="!facilityDetailsForm.controls['subSectorId'].valid ? 'required-input' : 'valid-input'" name="subSectorId"
+                    class="form-control" formControlName="subSectorId" id="subSectorId">
+                    <option value="">---Select Subsector---</option>
+                    <option *ngFor="let pc of filteredSubsector" value="{{pc.subSectorId}}">
+                      {{pc.sectorName}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+
+                <label for="" class="control-label col-md-2 pull-left">Proposed Tenor</label>
+                <div>
+                 
+                  <div class="col-md-2">
+                    <p-spinner formControlName="proposedTenor" name="proposedTenor" [ngClass]="!facilityDetailsForm.controls['proposedTenor'].valid ? 'required-input' : 'valid-input'"
+                      class="form-control" thousandSeparator="," decimalSeparator="." [step]="1" size="10" [min]="minimumTenor"
+                      [max]=maximumTenor></p-spinner>
+                  </div>
+                  <div class="col-md-2">
+                    <select class="form-control" formControlName="tenorModeId" (change)="onTenorModeChange($event.target.value)" [ngClass]="!facilityDetailsForm.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
+                      name="" id="">
+                      <option *ngFor="let item of tenorType" value="{{item.tenorModeId}}">{{item.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <label for="" class="control-label col-md-2">Interest Rate</label>
+                <div class="col-md-4">
+                  <input class="form-control" *ngIf="!isProductProgram" type="text" formControlName="proposedInterestRate" [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'">
+                  <input class="form-control" [attr.disabled]="true" *ngIf="isProductProgram" type="text" formControlName="proposedInterestRate"
+                    [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'">
+                 
+                </div>
+              </div>
+
+              <div *ngIf="requireEquityContribution">
+                <div class="form-group">
+                  <label for="" class="control-label col-md-2">
+                    {{projectName}}
+                  </label>
+                  <div class="col-md-4">
+                    <input type="text" formatM formControlName="totalAmountRequired" (blur)="calculateEquityRatio()" [ngClass]="!facilityDetailsForm.controls['totalAmountRequired'].valid ? 'required-input' : 'valid-input'"
+                      class="form-control">
+                  </div>
+                
+                  <label for="" class="control-label col-md-2">
+                    Equity Contribution
+                  </label>
+                  <div class="col-md-4">
+                    <input type="text" formatM formControlName="equityAmount" (blur)="calculateEquityRatio()" [ngClass]="!facilityDetailsForm.controls['equityAmount'].valid ? 'required-input' : 'valid-input'"
+                      class="form-control">
+                    <span *ngIf="showParcentage">
+                      <strong>Equity Contribution {{parcentage}}%</strong>
+                    </span>
+
+                  </div>
+                </div>
+               
+              </div>
+
+              <product-fees [productId]="proposedProductId" (feesCollection)="feesData($event)"> </product-fees>
+
+              <first-trader [resetForm]='resetFirstTraders' (firstTraders)="getFirstTraders($event)" *ngIf="displayFirstTraders"> </first-trader>
+
+              <education-loan *ngIf="displayFirstEdu" (educationLoan)="getEducationLoan($event)" [disableFormControl]="disableControl"></education-loan>
+
+              <bond-guranty [customerId]="selectedCustomerId" [requireCasaAccount]="requireCasaAccount" [resetForm]="resetBondAndGuarantees"
+                (bondDetails)="getBondGuranty($event)" *ngIf="displayBondAndGuarantees" (disableUpload)="uploadBonsAndGuaranteeDocuments($event)"></bond-guranty>
+
+              <div *ngIf="displayInvoiceDiscounting">
+
+                <div class="form-group">
+                  <label class="col-md-2">Contract Date</label>
+                  <div class="col-md-4">
+                    <p-calendar id="contractDate" [(ngModel)]="startdate" formControlName="contractDate" [monthNavigator]="true" [yearNavigator]="true"
+                      yearRange="2000:2050" (onSelect)="validateContratDate()" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                      [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!facilityDetailsForm.controls['contractDate'].valid ? 'required-input' : 'valid-input'"></p-calendar>
+                  </div>
+                  <label class="col-md-2"> Contract Expiry Date</label>
+                  <div class="col-md-4">
+                    <p-calendar id="contractExpiryDate" [(ngModel)]="enddate" formControlName="contractExpiryDate" [monthNavigator]="true" [yearNavigator]="true"
+                      yearRange="2000:2050" [showIcon]="true" (onSelect)="validateContratDate()" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                      [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!facilityDetailsForm.controls['contractExpiryDate'].valid ? 'required-input' : 'valid-input'"></p-calendar>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-md-2" for="principalId">Principal</label>
+                  <div class="col-md-4">
+                    <select class="form-control" name="" formControlName="principalId" [(ngModel)]="principalId" [ngClass]="!facilityDetailsForm.controls['principalId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">Select principal</option>
+                      <option *ngFor="let i of principal" value="{{i.principalId}}">
+                        {{i.name}}</option>
+                    </select>
+                  </div>
+
+                  <label for="" class="control-label col-md-2">
+                    Invoice Currency
+                  </label>
+                  <div class="col-md-4">
+                    <select id="invoiceCurrencyId" formControlName="invoiceCurrencyId" [ngClass]="!facilityDetailsForm.controls['invoiceCurrencyId'].valid ? 'required-input' : 'valid-input'"
+                      (change)="getExchangeRateInvoice($event.target.value)" class="form-control">
+                      <option value=""> Select Currency</option>
+                      <option *ngFor="let curr of allowedCurrencies" value="{{curr.currencyId}}"> {{curr.currencyCodeName}}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+
+                  <div class="col-md-2">
+                    <button pButton type="button" (click)="showInvoiceDetails()" label="Add Invoice" style="margin-right:5px" class="ui-button-primary">
+                    </button>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="" class="form-control col-md-2"> {{productLimit}}% of Invoice ({{productAmount | number : '1.2'}})</label>
+
+                  </div>
+
+                  <label for="" class="control-label col-md-2">
+                    Invoice Total
+                  </label>
+                  <div class="col-md-4">
+                    <input type="text" formatM name="invoiceValue" formControlName="invoiceValue" [ngClass]="!facilityDetailsForm.controls['invoiceValue'].valid ? 'required-input' : 'valid-input'"
+                      [attr.disabled]="true" class="form-control">
+                  </div>
+
+                </div>
+
+                <div class="form-group">
+                  <label for="" class="control-label col-md-2">
+                    Invoice Exchange Rate
+                  </label>
+                  <div class="col-md-4">
+                    <input type="text" formatM formControlName="fcyRate" [attr.disabled]="true" [ngClass]="!facilityDetailsForm.controls['fcyRate'].valid ? 'required-input' : 'valid-input'"
+                      class="form-control">
+                  </div>
+
+
+
+                  <label for="" class="control-label col-md-2">
+                    Naira Equivalent
+                  </label>
+                  <div class="col-md-4">
+                    <input type="text" formatM formControlName="lcyInvoiceValue" [ngClass]="!facilityDetailsForm.controls['lcyInvoiceValue'].valid ? 'required-input' : 'valid-input'"
+                      [attr.disabled]="true" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+
+                <label for="" class="control-label col-md-2">Facility Amount</label>
+                <div class="col-md-4">
+
+                  <input type="text" id="proposedAmount" (blur)="validateDiscountAmount($event.target.value)" formatM name="proposedAmount"
+                    [(ngModel)]="proposedAmount" [ngClass]="!facilityDetailsForm.controls['proposedAmount'].valid ? 'required-input' : 'valid-input'"
+                    formControlName="proposedAmount" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Currency
+                </label>
+                <div class="col-md-4">
+                  <select id="currencyId" formControlName="currencyId" name="currencyId" (change)="getExchangeRate($event.target.value)" [ngClass]="!facilityDetailsForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'"
+                    class="form-control">
+                    <option value=""> Select Currency</option>
+                    <option *ngFor="let curr of currencies" value="{{curr.lookupId}}"> {{curr.lookupName}}</option>
+                  </select>
+                </div>
+
+              </div>
+
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Exchange Rate
+                </label>
+                <div class="col-md-4">
+                  <label class="form-control"> {{exchangeRate}} </label>
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Exchange Amount
+                </label>
+                <div class="col-md-4">
+                  <label class="form-control"> {{exchangeValue| number : '1.2'}} </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Facility Purpose
+                </label>
+                <div class="col-md-4">
+                  <input type="text" id="loanPurpose" formControlName="loanPurpose" [ngClass]="!facilityDetailsForm.controls['loanPurpose'].valid ? 'required-input' : 'valid-input'"
+                    class="form-control">
+                </div>
+                <div *ngIf="displayInvoiceDiscounting">
+                  <label for="" class="control-label col-md-2">
+                    Collection Account
+                  </label>
+                  <div class="col-md-4">
+                    <select class="form-control" id="casaAccountId" name="casaAccountId" formControlName="casaAccountId" [ngClass]="!facilityDetailsForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                      <option value=""> Select Collection Account</option>
+                      <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">{{item.productAccountNumber}} </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                </label>
+                <div class=" col-md-4" *ngIf="invoiceTable.length > 0">
+                  <a (click)="showInvoiceData()" style="color:#ff0000" href="javascript:void(0)">View Invoice details</a>
+                  <i class="glyphicon glyphicon-eject" style="color:#ff0000"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <button type="button" pButton [disabled]="facilityDetailsForm.invalid" (click)="addFacilityDetails()" label=" ADD Facility"
+                style="margin-right:5px" class="pull-right">
+              </button>
+
+            </div>
+
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+
+    <div style="max-height: 200px;" *ngIf="loanApplicationDetails && loanApplicationDetails.length > 0">
+      <table class="table table-striped" style="margin-right:5px">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Customer Name</th>
+            <th>Facility</th>
+            <th>Requested Facility Amount</th>
+            <th>Rate(%)</th>
+            <th>Tenor(Days)</th>
+            <th>Currency</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of loanApplicationDetails;let indx=index">
+            <td>
+              {{indx + 1}}
+            </td>
+            <td>
+              {{p.customerName}}
+            </td>
+            <td>{{p.proposedProductName}}</td>
+            <td>{{p.proposedAmount | number : '1.2'}}</td>
+            <td>{{p.proposedInterestRate}}</td>
+            <td> {{p.proposedTenor}} </td>
+            <td> {{p.currencyName}} </td>
+
+            <td style="padding: 0;width:50px">
+          
+              <a (click)="removeApplicatiionDetailsItem($event,indx)" style="color:#ff0000" href="javascript:void(0)">Remove</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-12">
+
+        <button type="button" [disabled]="loanApplicationDetails.length == 0" (click)="ClickDone()" class="btn btn-success pull-right">
+          Done</button>
+
+        <button type="button" (click)="closeFacilityDetails()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayInvoiceDetails" id="add-modal" modal="modal" showEffect="fade" width="700">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Invoice Details
+      </h2>
+    </div>
+    <div class="panel-body" [formGroup]="invoiceInfo">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="contractNumber" class="control-label col-md-2">Contract Number</label>
+          <div class="col-md-8">
+         
+            <input type="text" formControlName="contractNumber" class="form-control" (blur)="CheckDocumentNoDuplication()" name="contractNumber"
+              [ngClass]="!invoiceInfo.controls['contractNumber'].valid ? 'required-input' : 'valid-input'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="purchaseOrderNumber" class="control-label col-md-2">Purchase Order Number</label>
+          <div class="col-md-8">
+            <input type="text" formControlName="purchaseOrderNumber" class="form-control" (blur)="CheckDocumentNoDuplication()" name="purchaseOrderNumber"
+              [ngClass]="!invoiceInfo.controls['purchaseOrderNumber'].valid ? 'required-input' : 'valid-input'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="certificateNumber" class="control-label col-md-2">Entrysheet Number</label>
+          <div class="col-md-8">
+            <input type="text" formControlName="certificateNumber" class="form-control" name="certificateNumber" [ngClass]="!invoiceInfo.controls['certificateNumber'].valid ? 'required-input' : 'valid-input'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="invoiceNumber" class="control-label col-md-2">Invoice Number</label>
+          <div class="col-md-8">
+            <input type="text" formControlName="invoiceNumber" class="form-control" (blur)="CheckDocumentNoDuplication()" name="invoiceNumber"
+              [ngClass]="!invoiceInfo.controls['invoiceNumber'].valid ? 'required-input' : 'valid-input'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="invoiceDocDate" class="control-label col-md-2">Invoice Date</label>
+          <div class="col-md-8">
+            <p-calendar [monthNavigator]="true" formControlName="invoiceDocDate" [yearNavigator]="true" yearRange="2000:2050" [style]="{'width': '100%', 'z-index': '999'}"
+              [showIcon]="true" (onSelect)=" checkDocumentValidity()" [ngClass]="!invoiceInfo.controls['invoiceDocDate'].valid ? 'required-input' : 'valid-input'">
+            </p-calendar>
+            <span *ngIf="!invoiceStatus" style="color:#ff0000">Invoice Date is more than {{dayInterval}}</span>
+            <span *ngIf="invoicefuturedate" style="color:#ff0000">Invoice Date can not be in the future</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="invoiceAmount" class="control-label col-md-2">Invoice Amount</label>
+          <div class="col-md-8">
+            <input type="text" formatM formControlName="invoiceAmount" class="form-control" name="invoiceAmount" [ngClass]="!invoiceInfo.controls['invoiceAmount'].valid ? 'required-input' : 'valid-input'">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="document" class="control-label col-md-2">Select Document</label>
+          <div class="col-md-8">
+            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png" #fileInput name="fileInput"
+              style="padding-top:2px;" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)=" onAdd()" [disabled]="invoiceInfo.invalid " class="btn btn-success pull-right">
+            <span class="glyphicon glyphicon-upload"></span> Add Invoice</button>
+          <button type="button" (click)="closeInvoiceDetail()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayInvoice" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Invoice Details
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayInvoice = false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body" style="overflow:auto;">
+      <div class="form-horizontal">
+
+        <div class="content-section implementation">
+       
+          <div>
+            <table class="table table-striped" style="margin-right:5px; width: 100%">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Contract No</th>
+                  <th>purchase Order No.</th>
+                  <th>Invoice No</th>
+                  <th>InvoiceValue</th>
+                  <th>Invoice Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>{{totalInvoiceValue | number : '1.2'}}</td>
+                  <td></td>
+
+                  <td></td>
+
+                </tr>
+
+              </tfoot>
+              <tbody>
+                <tr *ngFor="let p of invoiceTable;let indx=index">
+                  <td>{{indx + 1}}</td>
+                  <td>{{p.contractNo}}</td>
+                  <td>{{p.purchaseOrderNumber}} </td>
+                  <td>{{p.invoiceNo}}</td>
+                  <td>{{p.invoiceValue}}</td>
+                  <td> {{p.invoiceDate | date:'longDate'}} </td>
+                  <td style="padding: 0;width:50px">
+                    <a (click)="editInvoice(p)" style="color:#28026e" href="javascript:void(0)" title="Edit">Edit</a>
+                    <span style="padding:3px;">|</span>
+                    <a (click)="removeInvoiceDetails($event,indx)" style="color:#ff0000" href="javascript:void(0)" title="Remove">
+                      <i class="glyphicon glyphicon-remove"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayBGUpload" id="add-modal" modal="modal" showEffect="fade" width="700">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Bonds and Guarantees Document Upload
+      </h2>
+    </div>
+    <div class="panel-body">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+          <div class="col-md-8">
+            <input type="text" [(ngModel)]="documentTitle" class="form-control" name="description" placeholder="Document title...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="physicalFileNumber" class="control-label col-md-2">File Number</label>
+          <div class="col-md-8">
+            <input type="text" [(ngModel)]="physicalFileNumber" class="form-control" name="physicalFileNumber" placeholder="Document File Number...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="physicalLocation" class="control-label col-md-2">Physical Location</label>
+          <div class="col-md-8">
+            <input type="text" [(ngModel)]="physicalLocation" class="form-control" name="physicalLocation" placeholder="Document Physical Location...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="document" class="control-label col-md-2">Select Document</label>
+          <div class="col-md-8">
+            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+              #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)=" uploadFileBandG()" [disabled]="documentTitle==null || file==undefined" class="btn btn-success pull-right">
+            <span class="glyphicon glyphicon-upload"></span>Upload Document</button>
+      
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog> -->

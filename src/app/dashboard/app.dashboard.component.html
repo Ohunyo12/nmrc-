@@ -1,0 +1,501 @@
+<!-- <button (click)="test()">API endpoint test!</button>
+<pre>{{ testData | json }}</pre> -->
+<!--
+<button (click)="test(1)">API endpoint test!</button>
+<button (click)="test(2)">API endpoint test 2!</button> -->
+<!-- <button (click)="test(3)">API endpoint test 3!</button> -->
+<!-- <button (click)="test(4)">API endpoint test 4!</button> -->
+
+<div *ngIf="userInfo?.corrMatrixId > 0" class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default no-padding" style="margin-bottom: 0">
+                <div class="panel-heading">
+                    <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    <!-- CREDIT OFFICER RISK RATING: <b [innerHTML]="getCorr()">{{userInfo?.corrMatrixDescription}}</b> -->
+                                    CREDIT OFFICER RISK RATING: <span class={{corrStyleClass}}><b>{{userInfo?.corrMatrixDescription}}</b></span>
+                                </h2>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default no-padding" style="margin-bottom: 0">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{staffRole}}: <b>Dashboard Record fetched between {{startDate | date : 'dd-MM-yyyy'}} and {{endDate | date : 'dd-MM-yyyy'}}</b>
+                            </h2>
+                            <button pButton type="button" (click)="ShowFilter()" class="pull-right" label="Filter"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+<pre>{{ userInfo | json}}</pre>
+{{corrStyleClass}} -->
+
+<div class="ui-g dashboard">
+    <!--div class="ui-g-12 ui-md-4">
+        <div class="card overview">
+            <div class="overview-content clearfix">
+                <span class="overview-title">New Loans</span>
+                <span class="overview-badge">+%90</span>
+                <span class="overview-detail">500</span>
+            </div>
+            <div class="overview-footer">
+                <img src="assets/layout/images/dashboard/sales.svg" style="width: 100%" />
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-4">
+        <div class="card overview">
+            <div class="overview-content clearfix">
+                <span class="overview-title">Views</span>
+                <span class="overview-badge">+%60</span>
+                <span class="overview-detail">6,520 / day</span>
+            </div>
+            <div class="overview-footer">
+                <img src="assets/layout/images/dashboard/views.svg" style="width: 100%" />
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-4">
+        <div class="card overview">
+            <div class="overview-content clearfix">
+                <span class="overview-title">Users</span>
+                <span class="overview-badge">+%45</span>
+                <span class="overview-detail">5,200 / day</span>
+            </div>
+            <div class="overview-footer">
+                <img src="assets/layout/images/dashboard/progress.svg" style="width: 100%" />
+            </div>
+        </div>
+    </div-->
+
+
+
+    <!--ORIGINAL-->
+    <!-- <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-1">
+            <div class="ui-g-4">
+                <i class="material-icons">check_circle</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name">Approved Loans</span>
+                <span class="colorbox-count">50</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-2">
+            <div class="ui-g-4">
+                <i class="material-icons">shopping_card</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name">Running Loans</span>
+                <span class="colorbox-count">1200</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-3">
+            <div class="ui-g-4">
+                <i class="material-icons">report</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name">Loans in Pipeline</span>
+                <span class="colorbox-count">22</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-4">
+            <div class="ui-g-4">
+                <i class="material-icons">email</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name">Notification</span>
+                <span class="colorbox-count">10</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+<div class="ui-g">
+
+    <p-panel header="Total Exposure Per Month " class="ui-g-12 ui-md-6">
+        <p-chart type="bar" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Anniversary Per Month" class="ui-g-12 ui-md-6">
+        <p-chart type="line" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel>
+
+</div>
+
+<div class="ui-g">
+
+    <p-panel header="Loan Disbursed Per Loan Type" class="ui-g-12 ui-md-6">
+        <p-chart type="pie" [data]="hoursByProjectChartData" [options]="chartOptions"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Disbursed Per Loan Type" class="ui-g-12 ui-md-6">
+        <p-chart type="doughnut" [data]="hoursByProjectChartData"></p-chart>
+    </p-panel>
+</div>
+
+<div class="ui-g">
+
+    <p-panel header="Risk Mitigant Chart" class="ui-g-12 ui-md-6">
+        <p-chart type="radar" height="150" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Accured Principal and Interest" class="ui-g-12 ui-md-6">
+        <p-chart type="bar" [data]="hoursByTeamChartDataMixed" #mixedChart (onDataSelect)="onDataSelect($event)"></p-chart>
+    </p-panel>
+
+</div> -->
+
+
+
+
+
+    <!-- <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-3">
+            <div class="ui-g-4">
+                <i class="material-icons">report</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Loans in Pipeline</span>
+                <span class="colorbox-count-small">23497</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-1">
+            <div class="ui-g-4">
+                <i class="material-icons">check_circle</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Approved Loans</span>
+                <span class="colorbox-count-small">17247</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-2">
+            <div class="ui-g-4">
+                <i class="material-icons">shopping_card</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Running Loans</span>
+                <span class="colorbox-count-small">37140</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-4">
+            <div class="ui-g-4">
+                <i class="material-icons">folder</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Non-Performing Assets</span>
+
+                <span class="colorbox-count-small">1273</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-5">
+            <div class="ui-g-4">
+                <i class="material-icons">monetization_on</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Exposure by Sector</span>
+
+                <span class="colorbox-count-small">N642.541M</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-6">
+            <div class="ui-g-4">
+                <i class="material-icons">details</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Exposure By Credit Rating</span>
+
+                <span class="colorbox-count-small">N34.74B</span>
+            </div>
+        </div>
+    </div> -->
+
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-3">
+            <div class="ui-g-4">
+                <i class="material-icons">report</i>
+            </div>
+            <div class="ui-g-8" (click)="goTo()" style="cursor: pointer;">
+                <span class="colorbox-name-small">No. of Loans In Pipeline</span>
+                <span class="colorbox-count-small">{{loanOnPileCount | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-5">
+            <div class="ui-g-4">
+                <i class="material-icons">report</i>
+            </div>
+            <div class="ui-g-8" (click)="goTo()" style="cursor: pointer;">
+                <span class="colorbox-name-small">No. of Subsidiary Loans In Pipeline</span>
+                <span class="colorbox-count-small">{{subLoanOnPileCount | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-4">
+            <div class="ui-g-4">
+                <i class="material-icons">folder</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Loans In Pipeline (Amount)</span>
+                <span class="colorbox-count-small">N{{loanOnPileSum | number : '1.2' }}B</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-1">
+            <div class="ui-g-4">
+                <i class="material-icons">check_circle</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">No. of Approved Loans </span>
+                <span class="colorbox-count-small">{{approvedLoanCount | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-2">
+            <div class="ui-g-4">
+                <i class="material-icons">shopping_card</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Approved Loans (Amount)</span>
+                <span class="colorbox-count-small">N{{approvedLoanFigure | number : '1.2' }}B</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-5">
+            <div class="ui-g-4">
+                <i class="material-icons">monetization_on</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">No. of Total Risk Exposure</span>
+                <span class="colorbox-count-small">{{riskExposureCount | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 ui-md-6 ui-lg-2">
+        <div class="ui-g card colorbox colorbox-6">
+            <div class="ui-g-4">
+                <i class="material-icons">details</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Total Risk Exposure (Amount)</span>
+                <span class="colorbox-count-small">N{{riskExposureFigure | number : '1.2' }}B</span>
+            </div>
+        </div>
+    </div> -->
+</div>
+
+
+<div class="ui-g dashboard">
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-3">
+            <div class="ui-g-4">
+                <i class="material-icons">report</i>
+            </div>
+            <div class="ui-g-8" (click)="goToLms()" style="cursor: pointer;">
+                <span class="colorbox-name-small">No. of Operations In Pipeline LMS</span>
+                <span class="colorbox-count-small">{{ loanOnPileCountLms | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-4">
+            <div class="ui-g-4">
+                <i class="material-icons">folder</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Operations In Pipeline LMS (Amount)</span>
+                <span class="colorbox-count-small">N{{ loanOnPileSumLms | number : '1.2' }}B</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-1">
+            <div class="ui-g-4">
+                <i class="material-icons">check_circle</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">No. of Approved Operations LMS</span>
+                <span class="colorbox-count-small">{{ approvedLoansCountLms | number : '1.0' }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ui-g-12 ui-md-6 ui-lg-3">
+        <div class="ui-g card colorbox colorbox-2">
+            <div class="ui-g-4">
+                <i class="material-icons">shopping_card</i>
+            </div>
+            <div class="ui-g-8">
+                <span class="colorbox-name-small">Approved Operations LMS (Amount)</span>
+                <span class="colorbox-count-small">N{{ approvedLoansSumLms | number : '1.2' }}B</span>
+            </div>
+        </div>
+    </div>    
+
+</div>
+
+<div class="ui-g">
+
+    <!-- <p-panel header="Risk Mitigant Chart" class="ui-g-12 ui-md-4">
+        <p-chart type="radar" height="150" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel> -->
+
+    <!-- <p-panel header="Loan Disbursed Per Loan Type" class="ui-g-12 ui-md-6">
+        <p-chart type="doughnut" [data]="pieChartDisbursedLoanList"></p-chart>
+    </p-panel> -->
+
+    <!-- <p-panel header="Facility Performance Status" class="ui-g-12 ui-md-6">
+        <p-chart type="pie" [data]="pieChartDataList" [options]="chartOptions"></p-chart>
+    </p-panel> -->
+
+    <!-- <p-panel header="Accure Principal and Interest" class="ui-g-12 ui-md-4">
+        <p-chart type="bar" [data]="hoursByTeamChartDataMixed" #mixedChart (onDataSelect)="onDataSelect($event)"></p-chart>
+    </p-panel> -->
+
+</div>
+
+<!-- <div class="ui-g">
+
+    <p-panel header="Exposure By Sector" class="ui-g-12">
+        <p-chart type="bar" [data]="totalExposureData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Anniversary Per Month" class="ui-g-12 ui-md-4">
+        <p-chart type="line" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Disbursed Per Loan Type" class="ui-g-12 ui-md-4">
+        <p-chart type="pie" [data]="hoursByProjectChartData" [options]="chartOptions"></p-chart>
+    </p-panel>
+</div> -->
+
+<!-- <div class="ui-g">
+
+    <p-panel header="Exposure By Credit Rating" class="ui-g-12">
+        <p-chart type="bar" [data]="ratingExposureData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Anniversary Per Month" class="ui-g-12 ui-md-4">
+        <p-chart type="line" [data]="hoursByTeamChartData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Loan Disbursed Per Loan Type" class="ui-g-12 ui-md-4">
+        <p-chart type="pie" [data]="hoursByProjectChartData" [options]="chartOptions"></p-chart>
+    </p-panel>
+</div> -->
+
+<p-dialog [responsive]=true [(visible)]="showFilter" id="add-modal" modal="modal" showEffect="fade"  width="400">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Dashboard Data Filter
+            </h2>
+        </div>
+
+        <br/>  <br/>  <br/>  <br/>
+        <div class="panel-body">
+            <div class="form-horizontal">
+
+                <div class="form-group">
+                    <label for="startDate" class="control-label col-md-4">Start Date</label>
+                    <div class="col-md-8">
+                        <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate" class="control-label col-md-4">End Date</label>
+                    <div class="col-md-8">
+                        <p-calendar [(ngModel)]="endDate"  dateFormat="dd-MM-yy"  [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <br/>  <br/>  <br/>  <br/>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="GetFilterRecord()" class="btn btn-success pull-right">Filter</button>
+                    <button type="button" (click)="showFilter=false"  style="margin-right:5px"class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</p-dialog>
+<!-- 
+<p-dialog [responsive]=true [(visible)]="showAMC" id="add-modal" modal="modal" showEffect="fade"  width="400">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Credit Risk 360 AMC 
+            </h2>
+        </div>
+
+        <br/>  <br/>  <br/>  <br/>
+        <div class="panel-body">
+            Credit Risk 360 AMC is due
+        </div>
+        <br/>  <br/>  <br/>  <br/>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="showAMC=false"  style="margin-right:5px"class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog> -->

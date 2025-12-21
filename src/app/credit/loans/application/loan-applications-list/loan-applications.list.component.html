@@ -1,0 +1,83 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Application List
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+
+            <p-dataTable [value]="applications" selectionMode="single" [(selection)]="application" (onRowSelect)="onRowSelect($event)"
+                [rows]="20" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]">
+
+                <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column>
+                <!-- for row selection -->
+
+                <!-- <p-column [style]="{'width':'40px'}" field="loanApplicationId" header="ID"></p-column> -->
+
+                <p-column field="applicationDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains"
+                    [style]="{'width':'40px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                    </ng-template>
+                </p-column>
+
+                <p-column [style]="{'width':'40px'}" field="applicationReferenceNumber" header="Reference" sortable="true"
+                    [filter]="true" filterMatchMode="contains"></p-column>
+                <!-- <p-column field="applicantName" header="Obligor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                <p-column [style]="{'width':'110px'}" field="customerName" header="Obligor Name" sortable="true"
+                    [filter]="true" filterMatchMode="contains"></p-column>
+
+                <p-column field="applicationAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                    [style]="{'width':'60px','text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.applicationAmount | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+
+                <!-- <p-column field="interestRate" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'40px','text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.applicationTenor | number : '1.0' }}
+                    </ng-template>
+                
+                 <p-column field="applicationTenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'40px','text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.applicationTenor | number : '1.2' }}
+                    </ng-template>
+                </p-column> -->
+
+                <p-column [style]="{'width':'40px'}">
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <div class="btn-group" [innerHtml]="getApplicationStatus(row.submittedForAppraisal,row.approvalStatusId)"></div>
+                    </ng-template>
+                </p-column>
+
+                <p-column [style]="{'width':'40px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editLoanApplication(row)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'40px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="deleteLoanApplication(row)" href="javascript:void(0)">Delete</a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class=" no-padding">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{pagetitle}}
+                            </h2>
+                            <div class="pull-right">
+                                <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)" pButton
+                                    type="button" label="Collapse upload" icon="fa-arrow-up"></button>
+                                <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)" pButton
+                                    type="button" label="Bulk upload" icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="collapseForm==false" class="panel-body">
+                    <div class="form-group col-md-12">
+                        <div class="col-md-12">
+                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                                [accept]="'.xslx, .xlsx,.xls, .xltx'" #fileInput name="fileInput" style="padding-top:2px;"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <div class="col-md-6" *ngIf="collapseForm==false">
+                            <button class="btn btn-sm btn-primary pull-left" (click)="requestInsuranceBulk(); fileInput.value=''"
+                                [disabled]="file==undefined">
+                                <span class="glyphicon glyphicon-upload"></span> Upload </button>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                                    <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                            <a href="./../../../../assets/files/BulkInsuranceSampleDocument.xlsx" target="_blank"
+                                class="btn btn-sm btn-primary pull-right">
+                                <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="collapseForm==false && (uploadedData != null && uploadedData.length > 0)">
+                    <div class="panel-body">
+                        <p-dataTable [value]="uploadedData" [responsive]="true" [paginator]="true" [rows]="10"
+                            [(selection)]="uploadSelection" dataKey="customerId" [rowsPerPageOptions]="[10,20,30]">
+                            <!-- <p-column [style]="{'width':'50px'}" selectionMode="multiple"
+                                suppressRowClickSelection="false"></p-column> -->
+                            <p-column field="customerId" header="#" [style]="{width:'5%','text-align':'left'}">
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{i+1}}
+                                </ng-template>
+                            </p-column>
+
+                            <p-column field="isCollateral" header="Is Collateral" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="customerId" header="Customer Code" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="collateralCode" header="Collateral Code" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="referenceNumber" header="Policy Number" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="policyType" header="Policy Type" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="insuranceCompany" header="Insurance Company" sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="startDate" header="Policy Start Date" sortable="true"
+                                filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.startDate | date: 'dd-MM-yyyy' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="expiryDate" header="Policy Expiry Date" sortable="true"
+                                filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.expiryDate | date: 'dd-MM-yyyy' }}
+                                </ng-template>
+                            </p-column>
+
+                            <p-column field="sumInsured" header="Sum Insured" sortable="true"
+                                filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.sumInsured | number: '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="premiumAmount" header="Premium Paid" sortable="true"
+                                filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.premiumAmount | number: '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="validityStatus" header="Validity Status" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+
+                        </p-dataTable>
+                    </div>
+                    <div class="col-md-12">
+                        <button class="btn btn-sm btn-primary pull-right" (click)="saveRecords()">Save Records </button>
+                    </div>
+                </div>
+
+
+
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <button type="button" (click)="submitCustomerSearchForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                                        <button type="button" (click)="clearCustomerSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button> -->
+                        </div>
+                    </div>
+                </div>
+                <br>
+
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="collapseForm==false && (uploadedFailedError != null && uploadedFailedError.length > 0)">
+                    <div class="panel-body">
+                        <p-dataTable [value]="uploadedFailedError" [responsive]="true" [paginator]="true" [rows]="10"
+                            [(selection)]="failedErrorSelection" dataKey="customerId" [rowsPerPageOptions]="[10,20,30]">
+                            <p-column field="customerId" header="#"
+                                [style]="{width:'5%','text-align':'left','background-color': 'red !important'}">
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{i+1}}
+                                </ng-template>
+                            </p-column>
+
+                            <p-column field="errorMessages" header="Error" sortable="true" filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body" >
+                                    <div [style]="{color: 'red', overflow:'auto'}" [innerHTML]="d.errorMessages"></div>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+                    </div>
+                    <div class="col-md-12">
+                        <!--  -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)">
+</fintrakbanking-message> -->

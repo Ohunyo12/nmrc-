@@ -1,0 +1,124 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                User Account Status Change Approval
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="usersAccountStatusApprovalData" [responsive]=true selectionMode="single">
+                        <p-column field="companyName" header="Company " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="staffName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="username" header="Username" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="email" header="Email" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'220px'}"></p-column>
+                        <p-column [style]="{'width':'60px'}">
+
+                            <ng-template pTemplate="header">
+                                View
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewUserDetails(i, $event)" style="display: block" href="#">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayUsersModal" id="approvalModal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                User Approval
+            </h2>
+        </div>
+
+        <div class="panel-body">
+
+            <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                <p-tabPanel header="User Account Info">
+                    <div class="form-horizontal">
+                        <table class="table table-customer-information">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Company</strong></td>
+                                    <td>{{selectedUserData.companyName}}</td>
+                                    <td><strong>Branch</strong></td>
+                                    <td>{{selectedUserData.branchName}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Staff Name</strong></td>
+                                    <td>{{selectedUserData.staffName}}</td>
+                                    <td><strong>Username</strong></td>
+                                    <td>{{selectedUserData.username}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email</strong></td>
+                                    <td>{{selectedUserData.email}}</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Comment</strong></td>
+                                    <td><textarea [ngClass]="!selectedUserData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="selectedUserData.comment" name="comment" cols="30" rows="3"></textarea></td>
+                                    <td><strong>Status</strong></td>
+                                    <td>
+                                        <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="selectedUserData.approvalStatusId" [ngClass]="!selectedUserData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                            <option value="">--- Select Approval Status ---</option>
+                                            <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="View Approval Workflow">
+                    <p-dataTable [value]="approvalWorkflowData" [responsive]="true">
+                        <p-column field="requestStaffName" header="Intiated From"></p-column>
+                        <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
+                        <p-column field="responseStaffName" header="Directed To"></p-column>
+                        <p-column field="responseApprovalLevel" header="Response Approval Level"></p-column>
+                        <p-column field="approvalStatus" header="Approval Status"></p-column>
+                        <p-column field="comment" header="Comment"></p-column>
+                        <p-column field="systemArrivalDate" header="Date of Arrival">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="systemResponseDate" header="Date of Response">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium' }}
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                        <button [disabled]="!selectedUserData.comment || !selectedUserData.approvalStatusId" type="button" (click)="goForApproval(selectedUserData, $event)" class="btn btn-success">Submit For Approval</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message" (approveEvent)="goForApproval(selectedUserData, $event)" (closeEvent)="cancelApproval($event)"></app-fintrakbanking-dialog>

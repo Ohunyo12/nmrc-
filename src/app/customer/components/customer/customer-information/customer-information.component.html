@@ -1,0 +1,2904 @@
+<div class="ui-g" *ngIf="display">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Information
+
+                            </h2>
+                            <div class="pull-right" >
+                                <!-- <button pButton (click)="showAddNew()" type="button" label="Add New Customer" icon="fa-plus"></button> -->
+                                <div class="btn-group dropdown" *ngIf="canCreateCustomer == true">
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                        <span class="caret"></span> Add New Customer
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="javascript:void(0)" (click)="showAddNew()">Existing Customer</a>
+                                            <div role="separator" class="divider"></div>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)"
+                                                (click)="showAddNewProspectiveCustomer()">Prospective
+                                                Customer
+                                            </a>
+                                            <div role="separator" class="divider"></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-md-4 pull-left" style="padding-bottom: 9px">
+                            <div class="checkbox-container">
+                                <input name="iblRequest" [(ngModel)]="iblRequest" (change)="toggleIBL($event.target.checked)" type="checkbox">
+                            </div>
+                            <label class="checkbox">IBL Request (Check this box if request is an IBL request)</label>
+                        </div>
+                        <div class="col-md-4 pull-right" style="padding-bottom: 9px">
+                            <input type="text" id="search" (keyup)="searchDB($event.target.value)" (input)="lookupEvent.emit({search:'yes'})" class="form-control"
+                                placeholder="Type in your search parameter ...">
+                        </div>
+                    </div>
+
+                    <p-dataTable [value]="customers" [responsive]=true [paginator]="true" [rows]="10" [(selection)]="customerSelection" dataKey="customerId"
+                        (onRowSelect)="onSelectedCustomerDetailsChanged()" [rowsPerPageOptions]="[10,20,30]">
+                        <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+                        <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="customerAccountNo" header="Customer Account No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="customerTypeName" header="Customer Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Customer Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="" *ngIf="iblRequest" header=""><ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            <a (click)="searchEligibility(d)" href="javascript:void(0)">
+                                Eligibility Search
+                            </a>
+                        </ng-template></p-column>
+                    </p-dataTable>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-customer-information-detail [showCustomerInfo]="displayCustomerInfoDetails" (proceedEvent)="proceedToApplication($event)"
+    (hideCustomerInfo)="closeModal()" [showRefreshAccount]="true"></app-customer-information-detail>
+<!--p-dialog [responsive]=true [(visible)]="displayCustomerDetails" modal="modal" showEffect="fade" width="900"-->
+<div *ngIf="displayCustomerDetails" class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{entityTitle}}
+                                <strong>{{ customerFullName }}</strong>
+                            </h2>
+                            <!--button type="button" class="btn btn-primary pull-right" (click)="proceedEvent.emit({continue: 'true'})">Proceed To Application</button-->
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                            <p-tabPanel header="General">
+                                <form novalidate [formGroup]="editCustomerForm" autocomplete="off">
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Customer Type
+                                        </label>
+
+                                        <div class="col-md-4">
+                                            <select type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" (change)="customerTypeChanged($event.target.value)"
+                                                class="form-control" [ngClass]="!editCustomerForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Type --</option>
+                                                <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                                                    {{ type.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Customer Code
+                                        </label>
+                                        <div class="col-md-2">
+                                            <input type="text" formControlName="customerCode" [ngClass]="!editCustomerForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'"
+                                                [attr.disabled]="true" name="customerCode" class="form-control">
+                                        </div>
+                                        <div class="col-md-2" *ngIf="canRefreshAccount == true">
+                                                <button pButton type="button" 
+                                                (click)="fetchAndAddCustomerAccounts()" label="Refresh Customer Accounts" class="ui-button-info">                                                
+                                                </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Crms Legal Status
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select name="crmsLegalStatusId" formControlName="crmsLegalStatusId"
+                                                class="form-control"
+                                                [ngClass]="!editCustomerForm.controls['crmsLegalStatusId'].valid ? 'required-input' : 'valid-input'"
+                                                id="crmsLegalStatusId">
+                                                <option value="">--- Select Legal Status ---</option>
+                                                <option *ngFor="let p of crmsLegalStatuses" value="{{p.lookupId}}">
+                                                    {{p.lookupName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Crms Relationship Type
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select name="crmsRelationshipTypeId"
+                                                formControlName="crmsRelationshipTypeId" class="form-control"
+                                                [ngClass]="!editCustomerForm.controls['crmsRelationshipTypeId'].valid ? 'required-input' : 'valid-input'"
+                                                id="crmsRelationshipTypeId">
+                                                <option value="">--- Select Relationship Type ---</option>
+                                                <option *ngFor="let p of crmsRelationshipTypes" value="{{p.lookupId}}">
+                                                    {{p.lookupName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div *ngIf="!isIndividualCustomer">
+                                            <label for="" class="control-label col-md-2">
+                                                Crms Company Size
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select name="crmsCompanySizeId" formControlName="crmsCompanySizeId" class="form-control" [ngClass]="!editCustomerForm.controls['crmsCompanySizeId'].valid ? 'required-input' : 'valid-input'"
+                                                    id="crmsCompanySizeId">
+                                                    <option value="">--- Select Company Size ---</option>
+                                                    <option *ngFor="let p of crmsCompanySizes" value="{{p.lookupId}}">
+                                                        {{p.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Account Officer
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select name="relationshipOfficerId" formControlName="relationshipOfficerId" class="form-control" [ngClass]="!editCustomerForm.controls['relationshipOfficerId'].valid ? 'required-input' : 'valid-input'"
+                                                id="relationshipOfficerId">
+                                                <option value="">--- Select Account Officer ---</option>
+                                                <option *ngFor="let p of officers" value="{{p.staffId}}">
+                                                    {{p.fullName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!isCorperateCustomer">
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Title
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select name="title" formControlName="title" [ngClass]="!editCustomerForm.controls['title'].valid ? 'required-input' : 'valid-input'"
+                                                    id="title" class="form-control">
+                                                    <option value="">--- Select Title ---</option>
+                                                    <option *ngFor="let title of titleList" value="{{title.TitleName}}">
+                                                        {{title.TitleName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Gender
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select name="gender" formControlName="gender" [ngClass]="!editCustomerForm.controls['gender'].valid ? 'required-input' : 'valid-input'"
+                                                    id="gender" (change)="genderChanged($event.target.value)" class="form-control" [attr.disabled]="flexcube">
+                                                    <option value="">--- Select Gender ---</option>
+                                                    <option *ngFor="let gender of genderList" value="{{gender.GenderName}}">
+                                                        {{gender.GenderName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            {{firstNameLabel}}
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="firstName" [ngClass]="!editCustomerForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                                                name="firstName" class="form-control" [attr.disabled]="flexcube">
+                                        </div>
+
+                                        <label for="" class="control-label col-md-2">
+                                            {{dateOfBirthLabel}}
+                                        </label>
+                                        <div class="col-md-4">
+                                            <p-calendar id="dateOfBirth" formControlName="dateOfBirth" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                                [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!editCustomerForm.controls['dateOfBirth'].valid ? 'required-input' : 'valid-input'"
+                                                [disabled]="flexcube"></p-calendar>
+                                        </div>
+                                    </div>
+                                        <div class="form-group">
+                                            <div *ngIf="!isCorperateCustomer">
+                                                <label for="" class="control-label col-md-2">
+                                                    Middle Name
+                                                </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" formControlName="middleName"
+                                                        [ngClass]="!editCustomerForm.controls['middleName'].valid ? 'required-input' : 'valid-input'"
+                                                        name="middleName" class="form-control" [attr.disabled]="flexcubeMiddleName" >
+                                                </div>
+                                            </div>
+                                            <label for="" class="control-label col-md-2">
+                                                Customer BVN
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text"  formControlName="customerBVN" [ngClass]="!editCustomerForm.controls['customerBVN'].valid ? 'required-input' : 'valid-input'"
+                                                    name="customerBVN" class="form-control" [attr.disabled]="flexcubeBVN" >
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group" *ngIf="!isCorperateCustomer">
+                                            <label for="" class="control-label col-md-2">
+                                                Last Name
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="lastName" [ngClass]="!editCustomerForm.controls['lastName'].valid ? 'required-input' : 'valid-input'"
+                                                    name="lastName" class="form-control" [attr.disabled]="flexcube">
+                                            </div>
+                                            <label for="" class="control-label col-md-2">
+                                                Place of Birth
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="placeOfBirth" [ngClass]="!editCustomerForm.controls['placeOfBirth'].valid ? 'required-input' : 'valid-input'"
+                                                    name="placeOfBirth" class="form-control">
+                                            </div>
+                                        </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Email Address
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="emailAddress" [ngClass]="!editCustomerForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'"
+                                                name="registrationNumber" class="form-control" > <!--[attr.disabled]="flexcubeEmailAddress"-->
+                                        </div>
+                                        <label *ngIf="isCorperateCustomer" for="" class="control-label col-md-2">
+                                            TIN
+                                        </label>
+                                        <div class="col-md-4" *ngIf="isCorperateCustomer">
+                                            <input type="text" minlength="8" formControlName="taxNumber" [ngClass]="!editCustomerForm.controls['taxNumber'].valid ? 'required-input' : 'valid-input'"
+                                                name="taxNumber" class="form-control" [attr.disabled]="flexcubeTIN">
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!isCorperateCustomer">
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Marital Status
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select name="maritalStatus" formControlName="maritalStatus" [ngClass]="!editCustomerForm.controls['maritalStatus'].valid ? 'required-input' : 'valid-input'"
+                                                    id="maritalStatus" (change)="marritalStatusChanged($event.target.value)"
+                                                    class="form-control">
+                                                    <option value="">--- Select Marital Status ---</option>
+                                                    <option *ngFor="let status of maritalStatusList" value="{{status.MaritalStatusId}}">
+                                                        {{status.MaritalStatus}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <label for="" class="control-label col-md-2">
+                                                {{occupationLabel}}
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" name="occupation" formControlName="occupation" [ngClass]="!editCustomerForm.controls['occupation'].valid ? 'required-input' : 'valid-input'"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                        <div *ngIf="isMarriedOrSingle" class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Spouse
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" name="spouse" formControlName="spouse" [ngClass]="!editCustomerForm.controls['spouse'].valid ? 'required-input' : 'valid-input'"
+                                                    class="form-control">
+                                            </div>
+                                            <div *ngIf="isMaleOrFemale">
+                                                <label for="" class="control-label col-md-2">
+                                                    Maiden Name
+                                                </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" name="maidenName" formControlName="maidenName" [ngClass]="!editCustomerForm.controls['maidenName'].valid ? 'required-input' : 'valid-input'"
+                                                        class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!isCorperateCustomer" class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                        </label>
+                                        <div class="col-md-4">
+                                            <button pButton *ngIf="customerIdExist" (click)="showAddChildren()" type="button" label="Add Child(ren)" icon="fa-plus"></button>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Country Of Origin
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select type="text" name="nationalityId"
+                                                formControlName="nationalityId" id="nationalityId"
+                                                class="form-control"
+                                                [ngClass]="!editCustomerForm.controls['nationalityId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Country --</option>
+                                                <option *ngFor="let country of countries" value="{{country.countryId}}">
+                                                    {{ country.countryName }}
+                                                </option>
+                                            </select>
+                                            <!--<input type="text" formControlName="nationalityId" name="nationalityId"
+                                                [ngClass]="!editCustomerForm.controls['nationalityId'].valid ? 'required-input' : 'valid-input'"
+                                                class="form-control">-->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Business Unit
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select name="businessUnitId" formControlName="businessUnitId"
+                                                [ngClass]="!editCustomerForm.controls['businessUnitId'].valid ? 'required-input' : 'valid-input'"
+                                                id="businessUnitId" class="form-control">
+                                                <option value="">--- Select Business Unit ---</option>
+                                                <option *ngFor="let sbu of businessUnit" value="{{sbu.businessUnitId}}">
+                                                        {{sbu.businessUnitName}}
+                                                    </option>
+                                            </select>
+
+                                        </div>
+                                        <label *ngIf="!isCorperateCustomer" for="" class="control-label col-md-2">
+                                            Past Due Obligations
+                                        </label>
+                                        <div *ngIf="!isCorperateCustomer" class="col-md-4">
+                                            <input type="text" [attr.disabled]="isProspect == true ? true : null" formControlName="pastDueObligations" formatM
+                                                [ngClass]="!editCustomerForm.controls['pastDueObligations'].valid ? 'required-input' : 'valid-input'"
+                                                name="pastDueObligations" class="numeric form-control">
+                                        </div>
+                                        <label *ngIf="isCorperateCustomer" for="ownership" class="control-label col-md-2">
+                                            Ownership
+                                        </label>
+                                        <div *ngIf="isCorperateCustomer" class="col-md-4">
+                                            <input type="text" formControlName="ownership"
+                                                [ngClass]="!editCustomerForm.controls['ownership'].valid ? 'required-input' : 'valid-input'"
+                                                name="ownership" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!isCorperateCustomer" class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Country Of Residence
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select type="text" name="countryOfResidentId"
+                                                formControlName="countryOfResidentId" id="countryOfResidentId"
+                                                class="form-control" (click)="onCountryChange()"
+                                                [ngClass]="!editCustomerForm.controls['countryOfResidentId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Country --</option>
+                                                <option *ngFor="let country of countries" value="{{country.countryId}}">
+                                                    {{ country.countryName }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Number Of Dependents
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="number" formControlName="numberOfDependents" maxlength="5"
+                                                [ngClass]="!editCustomerForm.controls['numberOfDependents'].valid ? 'required-input' : 'valid-input'"
+                                                name="numberOfDependents" class=" form-control">
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!isCorperateCustomer" class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Number Of Loans Taken
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="number" formControlName="numberOfLoansTaken" formatM
+                                                maxlength="20" min="0"
+                                                [ngClass]="!editCustomerForm.controls['numberOfLoansTaken'].valid ? 'required-input' : 'valid-input'"
+                                                name="numberOfLoansTaken" class=" form-control">
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Loan Monthly Repayment From Other Banks
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="loanMonthlyRepaymentFromOtherBanks"
+                                                formatM
+                                                [ngClass]="!editCustomerForm.controls['loanMonthlyRepaymentFromOtherBanks'].valid ? 'required-input' : 'valid-input'"
+                                                name="loanMonthlyRepaymentFromOtherBanks" class="numeric form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2" *ngIf="!isCorperateCustomer">
+                                            Date Of Relationship With The Bank
+                                        </label>
+                                        <div class="col-md-4" *ngIf="!isCorperateCustomer">
+                                            <!-- <p-calendar id="dateOfBirth" formControlName="dateOfBirth" [monthNavigator]="true" [yearNavigator]="true"
+                                                yearRange="1900:2030" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                [style]="{'width': '100%', 'z-index': '999'}"
+                                                [ngClass]="!editCustomerForm.controls['dateOfBirth'].valid ? 'required-input' : 'valid-input'">
+                                            </p-calendar> -->
+
+                                                <!-- <p-calendar id="dateOfRelationshipWithBank" formControlName="dateOfRelationshipWithBank" [monthNavigator]="true"
+                                                [yearNavigator]="true" yearRange="1900:2030" 
+                                                [showIcon]="true"
+                                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                [style]="{'width': '100%', 'z-index': '999'}"> 
+                                            </p-calendar>-->
+                                        </div>
+                                       
+                                        <label for="" class="control-label col-md-2">
+                                            Relationship Type With The Bank
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select name="relationshipTypeId" formControlName="relationshipTypeId"
+                                                [ngClass]="!editCustomerForm.controls['relationshipTypeId'].valid ? 'required-input' : 'valid-input'"
+                                                id="relationshipTypeId" class="form-control">
+                                                <option value="">--- Select Relationship Type ---</option>
+                                                <option value="1"> Borrowing </option>
+                                                <option value="2"> Non borrowing </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Team LDR
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="teamLDP"
+                                                [ngClass]="!editCustomerForm.controls['teamLDP'].valid ? 'required-input' : 'valid-input'"
+                                                name="teamLDP" class="form-control">
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Team NPL
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="teamNPL"
+                                                [ngClass]="!editCustomerForm.controls['teamNPL'].valid ? 'required-input' : 'valid-input'"
+                                                name="teamNPL" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Name Of Signatory
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="nameOfSignatory"
+                                                [ngClass]="!editCustomerForm.controls['nameOfSignatory'].valid ? 'required-input' : 'valid-input'"
+                                                name="nameOfSignatory" class="form-control">
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            BVN Of Signatory
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="bvnNumberOfSignatory"
+                                                [ngClass]="!editCustomerForm.controls['bvnNumberOfSignatory'].valid ? 'required-input' : 'valid-input'"
+                                                name="bvnNumberOfSignatory" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            PhoneNumber Of Signatory
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="phoneNumberOfSignatory"
+                                                [ngClass]="!editCustomerForm.controls['phoneNumberOfSignatory'].valid ? 'required-input' : 'valid-input'"
+                                                name="phoneNumberOfSignatory" class="form-control">
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Email Of Signatory
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="emailOfSignatory"
+                                                [ngClass]="!editCustomerForm.controls['emailOfSignatory'].valid ? 'required-input' : 'valid-input'"
+                                                name="emailOfSignatory" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Address Of Signatory
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="addressOfSignatory"
+                                                [ngClass]="!editCustomerForm.controls['addressOfSignatory'].valid ? 'required-input' : 'valid-input'"
+                                                name="addressOfSignatory" class="form-control">
+                                        </div>
+                                       
+                                    </div>
+                                    <!-- <div class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            CORR
+                                        </label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="corr"
+                                                [ngClass]="!editCustomerForm.controls['corr'].valid ? 'required-input' : 'valid-input'"
+                                                name="corr" class="form-control">
+                                        </div>
+                                    </div> -->
+                                    <div *ngIf="isCorperateCustomer" class="form-group">
+                                        <label for="" class="control-label col-md-2">
+                                            Sector </label>
+                                        <div class="col-md-4">
+                                            <select type="text" name="sectorId" formControlName="sectorId" id="sectorId"
+                                                class="form-control"
+                                                [ngClass]="!editCustomerForm.controls['sectorId'].valid ? 'required-input' : 'valid-input'"
+                                                (change)="getSubSectorBySector($event.target.value)">
+                                                <option value="">-- Select Sector --</option>
+                                                <option *ngFor="let item of sectors" value="{{item.lookupId}}">
+                                                    {{item.lookupName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            Sub-Sector
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select
+                                                [ngClass]="!editCustomerForm.controls['subSectorId'].valid ? 'required-input' : 'valid-input'"
+                                                name="subSectorId" class="form-control" formControlName="subSectorId"
+                                                id="subSectorId">
+                                                <option value="">---Select Subsector---</option>
+                                                <option *ngFor="let pc of filteredSubsector" value="{{pc.subSectorId}}">
+                                                    {{pc.sectorName}}
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <!--label for="" class="control-label col-md-2">
+                                                Sensitivity Level
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select name="customerSensitivityLevelId" formControlName="customerSensitivityLevelId" [ngClass]="!editCustomerForm.controls['customerSensitivityLevelId'].valid ? 'required-input' : 'valid-input'"
+                                                    id="customerSensitivityLevelId" class="form-control">
+                                                    <option value="">--- Select Sensitivity Level ---</option>
+                                                    <option *ngFor="let level of customerSensitivityLevelList" value="{{level.customerSensitivityLevelId}}">
+                                                        {{level.Description}}
+                                                    </option>
+                                                </select>
+                                            </div-->
+                                        <label for="" class="control-label col-md-2">
+                                            Politically Exposed
+                                        </label>
+                                        <div class="col-md-4">
+                                            <!-- <input type="checkbox" [attr.disabled]=true name="isPoliticallyExposed" formControlName="isPoliticallyExposed" [ngClass]="'valid-input'"> -->
+                                            <input type="checkbox" name="isPoliticallyExposed" formControlName="isPoliticallyExposed" [ngClass]="'valid-input'">
+                                        </div>
+                                        <label for="" class="control-label col-md-2">
+                                            </label>
+                                            <div class="col-md-4">
+                                                <button type="button" (click)="fetchAccountBalances(editCustomerForm.controls['customerCode']?.value)"
+                                                    style="margin-right:5px" class="btn btn-default pull-left">Get Account Balance
+                                                </button>
+                                            </div>
+                                    </div>
+                                </form>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && isCorperateCustomer" header="Corporate Information">
+                                <div class="card">
+                                    <form novalidate [formGroup]="companyInfomationForm" autocomplete="off">
+                                        <div class="form-group">                                             
+                                            <label for="" class="control-label col-md-2">
+                                                Registration Number
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="registrationNumber" [ngClass]="!companyInfomationForm.controls['registrationNumber'].valid ? 'required-input' : 'valid-input'"
+                                                    name="registrationNumber" class="form-control">
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Corporate Name
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="companyName" [ngClass]="!companyInfomationForm.controls['companyName'].valid ? 'required-input' : 'valid-input'"
+                                                    [attr.disabled]="true" name="companyName" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Company Website
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="companyWebsite" [ngClass]="!companyInfomationForm.controls['companyWebsite'].valid ? 'required-input' : 'valid-input'"
+                                                    name="companyWebsite" class="form-control">
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Company Email
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="companyEmail" [ngClass]="!companyInfomationForm.controls['companyEmail'].valid ? 'required-input' : 'valid-input'"
+                                                    name="companyEmail" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Registered Office
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formControlName="registeredOffice" [ngClass]="!companyInfomationForm.controls['registeredOffice'].valid ? 'required-input' : 'valid-input'"
+                                                    name="registeredOffice" class="form-control">
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Annual Turn Over
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formatM formControlName="annualTurnOver" [ngClass]="!companyInfomationForm.controls['annualTurnOver'].valid ? 'required-input' : 'valid-input'"
+                                                    name="annualTurnOver" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Paid Up Capital
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formatM formControlName="paidUpCapital" [ngClass]="!companyInfomationForm.controls['paidUpCapital'].valid ? 'required-input' : 'valid-input'"
+                                                    name="paidUpCapital" class="form-control">
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Authorized Capital
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formatM formControlName="authorizedCapital" [ngClass]="!companyInfomationForm.controls['authorizedCapital'].valid ? 'required-input' : 'valid-input'"
+                                                    name="authorizedCapital" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <!--label for="" class="control-label col-md-2">
+                                                Business Sector
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select type="text" name="corporateBusinessCategory" formControlName="corporateBusinessCategory" id="corporateBusinessCategory"
+                                                    class="form-control" [ngClass]="!companyInfomationForm.controls['corporateBusinessCategory'].valid ? 'required-input' : 'valid-input'">
+                                                    <option value="">-- Select Sector --</option>
+                                                    <option *ngFor="let item of sectors" value="{{item.lookupId}}">
+                                                        {{item.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div-->
+                                            <label for="" class="control-label col-md-2">
+                                                Shareholders Fund
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" formatM formControlName="shareholderFund" [ngClass]="!companyInfomationForm.controls['shareholderFund'].valid ? 'required-input' : 'valid-input'"
+                                                    name="shareholderFund" class="form-control">
+                                            </div>
+                                        </div>
+                                        <!-- New form details added for corporate customer -->
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Total No Of Employees
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" numbersOnly (blur)="validateValue($event.target.value)" formControlName="numberOfEmployees" [ngClass]="!companyInfomationForm.controls['numberOfEmployees'].valid ? 'required-input' : 'valid-input'"
+                                                    name="numberOfEmployees" class="form-control">
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                Number Of Female Employees
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" numbersOnly (blur)="validateValue2($event.target.value)" formControlName="noOfFemaleEmployees" [ngClass]="!companyInfomationForm.controls['noOfFemaleEmployees'].valid ? 'required-input' : 'valid-input'"
+                                                    name="noOfFemaleEmployees" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Start Up
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select type="text" formControlName="isStartUp" [ngClass]="!companyInfomationForm.controls['isStartUp'].valid ? 'required-input' : 'valid-input'"
+                                                name="isStartUp" class="form-control" id="isStartUp"> 
+                                                    <!-- <option value=null>--Select--</option> -->
+                                                    <option value=true>Yes</option>
+                                                    <option value=false>No</option>
+                                                </select>
+                                            </div>
+
+                                            <label for="" class="control-label col-md-2">
+                                                First Time To Access Credit
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select type="text" formControlName="isFirstTimeCredit" [ngClass]="!companyInfomationForm.controls['isFirstTimeCredit'].valid ? 'required-input' : 'valid-input'"
+                                                name="isFirstTimeCredit" class="form-control" id="isFirstTimeCredit">
+                                                    <!-- <option value="null">--Select--</option> -->
+                                                    <option value=true>Yes</option>
+                                                    <option value=false>No</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Total Assets
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" numbersOnly formControlName="totalAssets" [ngClass]="!companyInfomationForm.controls['totalAssets'].valid ? 'required-input' : 'valid-input'"
+                                                    name="totalAssets" class="form-control">
+                                            </div>
+
+                                                <label for="" class="control-label col-md-2">
+                                                    Corporate Customer Type
+                                                </label>
+        
+                                                <div class="col-md-4">
+                                                    <select type="text" name="corporateCustomerTypeId" formControlName="corporateCustomerTypeId" id="corporateCustomerTypeId"
+                                                        class="form-control" [ngClass]="!companyInfomationForm.controls['corporateCustomerTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                        <!-- <option value="">-- Select Type --</option> -->
+                                                        <option *ngFor="let type of corporateCustomerType" [value]="type.corporateCustomerTypeId">
+                                                            {{ type.corporateCustomerTypeName }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection" [disabled]="contactTabDisabled" header="Contact">
+                                <div class="card">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewAddresses()" pButton type="button" label="Add Address" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerAddresses" [responsive]="true">
+                                                <p-header>Contact Address Information</p-header>
+                                                <p-column field="address" header="Address"></p-column>
+                                                <p-column field="city" header=" Town/City"></p-column>
+                                                <p-column field="nearestLandmark" header="Nearest Landmark"></p-column>
+                                                <p-column field="active" header="Active">
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <span *ngIf="d.active">Yes</span>
+                                                        <span *ngIf="!d.active">No</span>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editAddresses(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}"> 
+                                                    <ng-template pTemplate="header"> </ng-template>
+                                                    <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                        <a (click)="deleteAddresses(d)" href="javascript:void(0)">Delete</a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewAPhoneContact()" pButton type="button" label="Add Phone Contact" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerPhoneContact" [responsive]="true">
+                                                <p-header>Customer Phone Contact</p-header>
+                                                <p-column field="phone" header="{{phoneNumber}}"></p-column>
+                                                <p-column field="phoneNumber" header="{{MobileNumber}}"></p-column>
+                                                <p-column field="active" header="Active">
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <span *ngIf="d.active">Yes</span>
+                                                        <span *ngIf="!d.active">No</span>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editPhoneContact(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+
+                                                <p-column [style]="{'width':'100px'}"> 
+                                                    <ng-template pTemplate="header"> </ng-template>
+                                                    <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                        <a (click)="deleteContact(d)" href="javascript:void(0)">Delete</a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && isCorperateCustomer" [disabled]="directorTabDisabled" header="Director/Signatory">
+                                <div class="card">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewCompanyDirectors()" pButton type="button" label="Add New Director" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerCompanyDirectors" [responsive]="true">
+                                                <p-header>Directors</p-header>
+                                                <p-column field="firstname" header="Firstname"></p-column>
+                                                <p-column field="surname" header="Surname"></p-column>
+                                                <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                                <p-column field="email" header="Email"></p-column>
+                                                <p-column field="isPoliticallyExposed" header="Politically Exposed">
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <span *ngIf="d.isPoliticallyExposed">Yes</span>
+                                                        <span *ngIf="!d.isPoliticallyExposed">No</span>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column field="isThePromoter" header="The Promoter">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <span *ngIf="d.isThePromoter">Yes</span>
+                                                    <span *ngIf="!d.isThePromoter">No</span>
+                                                </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header">Related Customer(s)</ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="viewDirectorRelatedCustomer(d)" href="javascript:void(0)">
+                                                            View
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editDirectorInformation(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewCompanyAccountSignatory()" pButton type="button" label="Add New Signatory" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerCompanyAccountSignatory" [responsive]="true">
+                                                <p-header>Account Signatory(s)</p-header>
+                                                <p-column field="firstname" header="Firstname"></p-column>
+                                                <p-column field="surname" header="Surname"></p-column>
+                                                <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                                <p-column field="email" header="Email"></p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header">Related Customer(s)</ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="viewDirectorRelatedCustomer(d)" href="javascript:void(0)">
+                                                            View
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editAccountSignatoryInformation(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && isCorperateCustomer" [disabled]="supplierTabDisabled" header="Client/Supplier">
+                                <div class="card">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewSupplier()" pButton type="button" label="Add New Supplier" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerSupplier" [responsive]="true">
+                                                <p-header>Customer Top Supplier(s)</p-header>
+                                                <p-column field="customerTypeName" header="Supplier Type"></p-column>
+                                                <p-column field="clientOrSupplierName" header="Supplier Name"></p-column>
+                                                <p-column field="client_SupplierAddress" header="Address"></p-column>
+                                                <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                                                <p-column field="client_SupplierEmail" header="Email"></p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editSupplier(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="pull-right">
+                                                <button (click)="showAddNewClient()" pButton type="button" label="Add New Client" icon="fa-plus"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerClient" [responsive]="true">
+                                                <p-header>Customer Top Client(s)</p-header>
+                                                <p-column field="customerTypeName" header="Client Type"></p-column>
+                                                <p-column field="clientOrSupplierName" header="Client Name"></p-column>
+                                                <p-column field="client_SupplierAddress" header="Address"></p-column>
+                                                <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                                                <p-column field="client_SupplierEmail" header="Email"></p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <a (click)="editClient(i)" href="javascript:void(0)">
+                                                            Edit
+                                                        </a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && isCorperateCustomer" [disabled]="shareholderTabDisabled" header="Shareholder">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showAddNewCompanyShareholder()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p-dataTable [value]="customerCompanyShareholderIndividual" [responsive]="true">
+                                            <p-header>INDIVIDUAL - Significant Shareholder (1.5% and above)</p-header>
+                                            <p-column field="firstname" header="Firstname"></p-column>
+                                            <p-column field="surname" header="Surname"></p-column>
+                                            <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                            <p-column field="email" header="Email"></p-column>
+                                            <p-column field="numberOfShares" header="% Holding"></p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header">Related Customer(s)</ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="viewDirectorRelatedCustomer(d)" href="javascript:void(0)">
+                                                        View
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"></ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="editShareholderInformation(i)" href="javascript:void(0)">
+                                                        Edit
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="customerCompanyShareholderCorporate" class="form-group">
+                                    <div class="col-md-12">
+                                        <p-dataTable [value]="customerCompanyShareholderCorporate" [responsive]="true">
+                                            <p-header> CORPORATE - Significant Shareholder (1.5% and above)</p-header>
+                                            <p-column field="firstname" header="Corporate Name"></p-column>
+                                            <p-column field="rcNumber" header="RC Number"></p-column>
+                                            <p-column field="numberOfShares" header="% Holding"></p-column>
+                                            <p-column field="email" header="Email"></p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header">Ultimate Beneficial</ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="viewShareholderUltimateBeneficial(i)" href="javascript:void(0)">
+                                                        View
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"></ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="editShareholderCorporate(i)" href="javascript:void(0)">
+                                                        Edit
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && !isCorperateCustomer" [disabled]="employmentTabDisabled" header="Employment History">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showAddNewEmploymentHistory()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p-dataTable [value]="customerEmploymentHistory" [responsive]="true">
+                                            <p-header>Customer Employment History</p-header>
+                                            <p-column field="employerName" header="Employer Name"></p-column>
+                                            <p-column field="employerAddress" header="Employer Address"></p-column>
+                                            <p-column field="officePhone" header="Office Phone"></p-column>
+                                            <p-column field="employDate" header="Employment Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    {{ d.employDate | date: 'dd MMM yyyy' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"></ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="editEmploymentHistory(i)" href="javascript:void(0)">
+                                                        Edit
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column [style]="{'width':'100px'}"> 
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                    <a (click)="deleteEmploymentHistory(d)" href="javascript:void(0)">Delete</a>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection && !isCorperateCustomer" [disabled]="nextOfKinTabDisabled" header="Next of Kin">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showAddNewNextOfKin()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p-dataTable [value]="customerNextOfKin" [responsive]="true">
+                                            <p-header>Customer Next of Kin</p-header>
+                                            <p-column field="firstName" header="First Name"></p-column>
+                                            <p-column field="lastName" header="Last Name"></p-column>
+                                            <p-column field="gender" header="Gender"></p-column>
+                                            <p-column field="relationship" header="Relationship"></p-column>
+                                            <p-column field="dateOfBirth" header="Date Of Birth" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    {{ d.dateOfBirth | date: 'dd-MM-yyyy' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"></ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="editNextOfKin(d)" href="javascript:void(0)">
+                                                        Edit
+                                                    </a>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'100px'}"> 
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                    <a (click)="deleteNextOfKin(d)" href="javascript:void(0)">Delete</a>
+                                                </ng-template>
+                                                </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection" [disabled]="relatedPartyTabDisabled" header="Insider Related Party">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showAddNewRelatedParty()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p-dataTable [value]="customerRelatedParties" [paginator]="true" [rows]="5">
+                                    <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="directorName" header="Director Name" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="relationshipType" header="Relationship Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                            <a (click)="editRelatedParty(d)" href="javascript:void(0)">Edit</a>
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px'}"> 
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                            <a (click)="deleteRelatedParty(d)" href="javascript:void(0)">Delete</a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="customerSelection" [disabled]="uploadTabDisabled" header="Uploads">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showAddNewMandate()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p-dataTable [value]="kycDocumentUploadList" [paginator]="true" [rows]="5">
+                                    <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                    <p-column field="physicalFileNumber" header="File Number" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}"></p-column>
+                                    <p-column field="physicalLocation" header="Physical Location" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                                            <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d.documentId)"
+                                                href="javascript:void(0)">Download</a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <button type="submit" [disabled]="editCustomerForm.invalid" *ngIf="ShowSaveButton" (click)="submitNewCustomerDetails(editCustomerForm)"
+                                class="btn btn-success pull-right">Save</button>
+                            <button type="submit" [disabled]="companyInfomationForm.invalid" *ngIf="ShowSaveCompanyButton" (click)="submitCustomerCompanyInformation(companyInfomationForm)"
+                                class="btn btn-success pull-right">Save</button> -->
+                            <button type="submit" [disabled]="editCustomerForm.invalid" *ngIf="ShowSaveButton" (click)="submitNewCustomerDetails(editCustomerForm)"
+                                class="btn btn-primary pull-right">Next</button>
+                            <button type="submit" [disabled]="companyInfomationForm.invalid" *ngIf="ShowSaveCompanyButton" (click)="submitCustomerCompanyInformation(companyInfomationForm)"
+                                class="btn btn-primary pull-right">Next</button>
+                            <button type="submit" *ngIf="showNextTabs" (click)="showNextTab()"
+                                class="btn btn-primary pull-right">Next</button>
+                            <!-- <button style="margin-right:5px" type="button" *ngIf="ShowNextButton" class="btn btn-primary pull-right" style="margin-right:5px"
+                                (click)="goForPenApplication($event)">Preliminary Evaluation</button> -->
+                            <!-- <button style="margin-right:5px" *ngIf="ShowNextButton" type="button" class="btn btn-primary pull-right" (click)="proceedToApplication()">Upload
+                                Credit Bureau Report</button> -->
+
+                                <button type="button" style="margin-right:5px" *ngIf="ShowNextButton"  class="btn btn-primary pull-right" (click)="proceedToApplication()"><span [innerHTML]="getButtonLabel()"></span></button>
+
+                            <!-- <button style="margin-right:5px" type="button" *ngIf="activeIndex !=7" (click)="handleChange($event)" class="btn btn-primary pull-right">Next</button> -->
+                            <button style="margin-left:5px" type="button" *ngIf="activeIndex > 0" class="btn btn-primary pull-left" (click)="prev()">Previous</button>
+
+                            <button type="button" (click)="updateCustomerInformation()" style="margin-right:5px"
+                                class="btn btn-default pull-left">Update Customer Information
+                            </button>
+
+                            <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger pull-right">Back
+                                To Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/p-dialog-->
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displaySupplier" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerClientOrSupplierForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            {{ clientSupplierType}}
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" (change)="onClientSupplierTypeChanged($event.target.value)"
+                                class="form-control" [ngClass]="!customerClientOrSupplierForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Type --</option>
+                                <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                                    {{ type.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div *ngIf="individualClientSupplier" class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            First Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstName" [ngClass]="!customerClientOrSupplierForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                                name="firstName" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                            Last Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="lastName" [ngClass]="!customerClientOrSupplierForm.controls['lastName'].valid ? 'required-input' : 'valid-input'"
+                                name="lastName" class="form-control">
+                        </div>
+                    </div>
+                    <div *ngIf="corporateClientSupplier" class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Corporate Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstName" [ngClass]="!customerClientOrSupplierForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                                name="firstName" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                            RC Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="rcNumber" [ngClass]="!customerClientOrSupplierForm.controls['rcNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="rcNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div *ngIf="individualClientSupplier">
+                            <label for="" class="control-label col-md-2">
+                                Other Names
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" formControlName="middleName" [ngClass]="!customerClientOrSupplierForm.controls['middleName'].valid ? 'required-input' : 'valid-input'"
+                                    name="middleName" class="form-control">
+                            </div>
+                        </div>
+                        <div *ngIf="corporateClientSupplier">
+                            <label for="" class="control-label col-md-2">
+                                Contact Person
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" formControlName="contactPerson" [ngClass]="!customerClientOrSupplierForm.controls['contactPerson'].valid ? 'required-input' : 'valid-input'"
+                                    name="contactPerson" class="form-control">
+                            </div>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Is Bank Customer
+                        </label>
+                        <div class="col-md-4">
+                            <input (change)="isBankCustomerChanged($event.target.checked)" type="checkbox" formControlName="hasCASAAccount" [ngClass]="!customerClientOrSupplierForm.controls['hasCASAAccount'].valid ? 'required-input' : 'valid-input'"
+                                name="hasCASAAccount">
+                        </div>
+
+                    </div>
+                    <!-- *ngIf="corporateClientSupplier" -->
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Bank Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="bankName" [ngClass]="'valid-input'"
+                                name="bankName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Account Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="number" placeholder="Enter Account Number" formControlName="casaAccountNumber" [ngClass]="!customerClientOrSupplierForm.controls['casaAccountNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="casaAccountNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            TIN
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" minlength="8" formControlName="taxNumber" [ngClass]="!customerClientOrSupplierForm.controls['taxNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="taxNumber" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="client_SupplierPhoneNumber" [ngClass]="!customerClientOrSupplierForm.controls['client_SupplierPhoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="client_SupplierPhoneNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Email
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="client_SupplierEmail" [ngClass]="!customerClientOrSupplierForm.controls['client_SupplierEmail'].valid ? 'required-input' : 'valid-input'"
+                                name="client_SupplierEmail" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Nature Of Business
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="natureOfBusiness" [ngClass]="!customerClientOrSupplierForm.controls['natureOfBusiness'].valid ? 'required-input' : 'valid-input'"
+                                name="natureOfBusiness" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Address
+                        </label>
+                        <div class="col-md-4">
+                            <textarea rows="3" formControlName="client_SupplierAddress" name="client_SupplierAddress" id="client_SupplierAddress" class="form-control"
+                                [ngClass]="!customerClientOrSupplierForm.controls['client_SupplierAddress'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    <!--buttons-->
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerClientOrSupplierForm.invalid" (click)="submitClientOrSupplier(customerClientOrSupplierForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="closeSupplierModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayIdentification" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerIdentificationForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Identification No
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="identificationNo" formControlName="identificationNo" [ngClass]="'valid-input'" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Identification Mode
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" name="identificationModeId" formControlName="identificationModeId" id="identificationModeId" class="form-control"
+                                [ngClass]="'valid-input'">
+                                <option value="">-- Select Identification Mode --</option>
+                                <option *ngFor="let type of identificationModeTypes" [value]="type.identificationModeId">
+                                    {{ type.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Issuing Office
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="issuePlace" formControlName="issuePlace" [ngClass]="'valid-input'" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Issuing Authority
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="issueAuthority" [ngClass]="'valid-input'" name="issueAuthority" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <!--buttons-->
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerIdentificationForm.invalid" (click)="submitCustomerIdentification(customerIdentificationForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayIdentification=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayBVN" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerBvnForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Surname
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="identificationNo" formControlName="surname" [ngClass]="!customerBvnForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Firstname
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstname" [ngClass]="!customerBvnForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                                name="firstname" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Bank Verification Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="bankVerificationNumber" formControlName="bankVerificationNumber" [ngClass]="!customerBvnForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Validity
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" formControlName="isValidBvn" [ngClass]="!customerBvnForm.controls['isValidBvn'].valid ? 'required-input' : 'valid-input'"
+                                name="isValidBvn">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Politically Exposed
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" formControlName="isPoliticallyExposed" [ngClass]="!customerBvnForm.controls['isPoliticallyExposed'].valid ? 'required-input' : 'valid-input'"
+                                name="isPoliticallyExposed">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerBvnForm.invalid" (click)="submitCustomerBVN(customerBvnForm)" class="btn btn-success pull-right">Save
+                        </button>
+                        <button type="button" (click)="displayBVN=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayEmploymentHistory" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerEmploymentHistoryForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <br/>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Is Employer Related?
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isEmployerRelated" formControlName="isEmployerRelated" 
+                                (change)="isEmployerRelated($event.target.checked)" [ngClass]="'valid-input'">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Approved Employers
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" [attr.disabled]="disableEmployerControl" name="approvedEmployerId" formControlName="approvedEmployerId" id="approvedEmployerId" class="form-control"
+                            (click)="onApprovedEmployerChange()"  [ngClass]="!customerEmploymentHistoryForm.controls['approvedEmployerId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Employer --</option>
+                                <option *ngFor="let approvedEmployer of approvedEmployers" value="{{approvedEmployer.employerId}}">
+                                    {{ approvedEmployer.employerName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <br/>
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Employer Name
+                        </label>
+                        <div class="col-md-4">
+                            <input *ngIf="selfEmployed" [attr.disabled]="disableControls" name="employerName" formControlName="employerName" type="text" class="form-control"
+                                [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'">
+                            <input *ngIf="otherEmployer" [attr.disabled]="disableControls" name="employerName" formControlName="employerName" type="text" class="form-control" 
+                                [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'">
+                            <!-- <select *ngIf="!otherEmployer && !selfEmployed" type="text" name="employerName" formControlName="employerName" id="employerName"
+                                class="form-control" [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Employer --</option>
+                                <option *ngFor="let emp of employerlist" value="{{emp.employerName}}">
+                                    {{ emp.employerName }}
+                                </option>
+                            </select> -->
+                            <label class="radio-inline">
+                                <input type="radio" name="employmentType" (change)="onSelfEmployedChecked($event.target.checked)"
+                                    [checked]="selfEmployedCheck == true">Self Employed
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="employmentType" (change)="onOtherEmployerChecked($event.target.checked)"
+                                [checked]="selfEmployedCheck == false">Other Employer
+                            </label>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Employer Address
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="employerAddress" [ngClass]="!customerEmploymentHistoryForm.controls['employerAddress'].valid ? 'required-input' : 'valid-input'"
+                            [attr.disabled]="disableControls" name="employerAddress" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Employer Country
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" name="employerCountryId" formControlName="employerCountryId" id="employerCountryId" class="form-control"
+                            (click)="onEmploymentCountryChange()"  [attr.disabled]="disableControls"
+                            [ngClass]="!customerEmploymentHistoryForm.controls['employerCountryId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Country --</option>
+                                <option *ngFor="let country of countries" value="{{country.countryId}}">
+                                    {{ country.countryName }}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Employer State
+                        </label>
+                        <div class="col-md-4" *ngIf="activeCountry">
+                            <select name="state" formControlName="employerStateId" [ngClass]="!customerEmploymentHistoryForm.controls['employerStateId'].valid ? 'required-input' : 'valid-input'"
+                                [attr.disabled]="disableControls" id="employerStateId" class="form-control">
+                                <option value="">--- Select State ---</option>
+                                <option *ngFor="let state of states" value="{{state.stateId}}">
+                                    {{state.stateName}}
+                                </option>
+                            </select>
+                        </div>
+                         <div class="col-md-4" *ngIf="!activeCountry">
+                                <input  name="employerState" formControlName="employerState" type="text" [attr.disabled]="disableControls"
+                                    class="form-control" [ngClass]="!customerEmploymentHistoryForm.controls['employerState'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Office Phone
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="officePhone" formControlName="officePhone" [ngClass]="!customerEmploymentHistoryForm.controls['officePhone'].valid ? 'required-input' : 'valid-input'"
+                                [attr.disabled]="disableControls" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Employment Date
+                        </label>
+                        <div class="col-md-4">
+                            <p-calendar id="employDate" formControlName="employDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                [disabled]="disableControls" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" 
+                                [style]="{'width': '100%', 'overflow': 'visible', 'z-index': '120000'}"></p-calendar>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Previous Employer
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="previousEmployer" formControlName="previousEmployer" [ngClass]="!customerEmploymentHistoryForm.controls['previousEmployer'].valid ? 'required-input' : 'valid-input'"
+                                [attr.disabled]="disableControls" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Active
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="active" formControlName="active" [ngClass]="'valid-input'">
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerEmploymentHistoryForm.invalid" (click)="submitCustomerEmploymentHistory(customerEmploymentHistoryForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayEmploymentHistory=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayCompanyDirectors" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerCompanyDirectorsForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            First Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstname" [ngClass]="!customerCompanyDirectorsForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                                name="firstname" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Last Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="surname" formControlName="surname" [ngClass]="!customerCompanyDirectorsForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Other Names
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="surname" formControlName="middlename" [ngClass]="!customerCompanyDirectorsForm.controls['middlename'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Email
+                        </label>
+                        <div class="col-md-4">
+                            <input type="email" name="email" formControlName="email" [ngClass]="!customerCompanyDirectorsForm.controls['email'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            BVN
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="bankVerificationNumber" formControlName="bankVerificationNumber" [ngClass]="!customerCompanyDirectorsForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control" numbersOnly>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                           Any Valid ID
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="customerNIN" formControlName="customerNIN" [ngClass]="!customerCompanyDirectorsForm.controls['customerNIN'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="phoneNumber" formControlName="phoneNumber" [ngClass]="!customerCompanyDirectorsForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Address
+                        </label>
+                        <div class="col-md-4">
+                            <textarea rows="3" formControlName="address" name="address" id="address" class="form-control" [ngClass]="!customerCompanyDirectorsForm.controls['address'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Date Of Birth
+                        </label>
+                        <div class="col-md-4">
+                            <p-calendar id="dateOfBirth" formControlName="dateOfBirth" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!customerCompanyDirectorsForm.controls['dateOfBirth'].valid ? 'required-input' : 'valid-input'"
+                                [maxDate]="today"></p-calendar>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Gender
+                        </label>
+                        <div class="col-md-4">
+                            <select name="gender" formControlName="gender" [ngClass]="!customerCompanyDirectorsForm.controls['gender'].valid ? 'required-input' : 'valid-input'"
+                                id="gender" class="form-control">
+                                <option value="">--- Select Gender ---</option>
+                                <option *ngFor="let gender of genderList" value="{{gender.GenderName}}">
+                                    {{gender.GenderName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Politically Exposed
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isPoliticallyExposed" formControlName="isPoliticallyExposed" [ngClass]="'valid-input'">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Is the Promoter
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isThePromoter" formControlName="isThePromoter" [ngClass]="!customerCompanyDirectorsForm.controls['isThePromoter'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerCompanyDirectorsForm.invalid" (click)="submitDirectorInformation(customerCompanyDirectorsForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayCompanyDirectors=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayCompanyShareholder" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerCompanyShareholderForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Shareholder Type
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" class="form-control" (change)="onShareholderTypeChanged($event.target.value)"
+                                [ngClass]="!customerCompanyShareholderForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'" [attr.disabled]="editShareholder">
+                                <option value="">-- Select Shareholder Type --</option>
+                                <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                                    {{ type.name }}
+                                </option>
+                            </select>
+                        </div> 
+                    </div>
+                    <hr/>
+                    <div *ngIf="individualShareholder" class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            First Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstname" [ngClass]="!customerCompanyShareholderForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                                name="firstname" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Last Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="surname" formControlName="surname" [ngClass]="!customerCompanyShareholderForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div *ngIf="individualShareholder" class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Other Names
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="middlename" [ngClass]="!customerCompanyShareholderForm.controls['middlename'].valid ? 'required-input' : 'valid-input'"
+                                name="middlename" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Any Valid ID
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="customerNIN" formControlName="customerNIN" [ngClass]="!customerCompanyShareholderForm.controls['customerNIN'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div *ngIf="corporateShareholder" class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Corporate Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstname" [ngClass]="!customerCompanyShareholderForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                                name="firstname" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            RC Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="rcNumber" [ngClass]="!customerCompanyShareholderForm.controls['rcNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="rcNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div *ngIf="individualShareholder">
+                            <label for="" class="control-label col-md-2">
+                                Bank Verification Number
+                            </label>
+                            <div class="col-md-4">
+                                <input type="text" name="bankVerificationNumber" formControlName="bankVerificationNumber" [ngClass]="!customerCompanyShareholderForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            % Shareholding
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="numberOfShares" formControlName="numberOfShares" [ngClass]="!customerCompanyShareholderForm.controls['numberOfShares'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <div *ngIf="ultimateBeneficiary">
+                            <label for="" class="control-label col-md-2">
+                            </label>
+                            <div class="col-md-4">
+                                <button type="submit" (click)="showAddUltimateBeneficiary()" class="btn btn-primary pull-left">Add
+                                    Ultimate Beneficial Owner(s) </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            TIN
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" minlength="8" name="taxNumber" formControlName="taxNumber" [ngClass]="!customerCompanyShareholderForm.controls['taxNumber'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="phoneNumber" formControlName="phoneNumber" [ngClass]="!customerCompanyShareholderForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Email
+                        </label>
+                        <div class="col-md-4">
+                            <input type="email" name="email" formControlName="email" [ngClass]="!customerCompanyShareholderForm.controls['email'].valid ? 'required-input' : 'valid-input'"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Address
+                        </label>
+                        <div class="col-md-4">
+                            <textarea rows="3" formControlName="address" name="address" id="address" class="form-control" [ngClass]="!customerCompanyShareholderForm.controls['address'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Politically Exposed
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isPoliticallyExposed" formControlName="isPoliticallyExposed" [ngClass]="'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerCompanyShareholderForm.invalid" (click)="submitShareHolderInformation(customerCompanyShareholderForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="closeShareholderModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayPhoneContact" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerPhoneContactForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            {{phoneNumber}}
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="phone" [ngClass]="!customerPhoneContactForm.controls['phone'].valid ? 'required-input' : 'valid-input'"
+                                name="phone" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                            {{MobileNumber}}
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="phoneNumber" [ngClass]="!customerPhoneContactForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="phoneNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Active
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="active" formControlName="active" [ngClass]="'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerPhoneContactForm.invalid" (click)="submitCustomerPhoneContact(customerPhoneContactForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayPhoneContact=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddresses" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerAddressesForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div *ngIf="!isCorperateCustomer">
+                        <div class="form-group">
+                            <label for="" class="control-label col-md-2">
+                                Address Type
+                            </label>
+                            <div class="col-md-4">
+                                <select type="text" name="addressTypeId" formControlName="addressTypeId" id="addressTypeId" class="form-control" [ngClass]="!customerAddressesForm.controls['addressTypeId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Address Type --</option>
+                                    <option *ngFor="let type of customerAddressType" [value]="type.addressTypeId">
+                                        {{ type.addressTypeName }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <hr/>
+                    </div>
+                    <div class="form-group">
+                        <!-- <label for="" class="control-label col-md-2">
+                            Town/City
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="homeTown" [ngClass]="!customerAddressesForm.controls['homeTown'].valid ? 'required-input' : 'valid-input'"
+                                name="homeTown" class="form-control">
+                        </div> -->
+                        <label for="" class="control-label col-md-2">
+                            State
+                        </label>
+                        <div class="col-md-4">
+                            <select (change)="onChangeSelectedState($event.target.value)" name="stateId" id="stateId" formControlName="stateId" class="form-control"
+                                [ngClass]="!customerAddressesForm.controls['stateId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select State --</option>
+                                <option *ngFor="let x of states" [value]="x.stateId">
+                                    {{x.stateName}}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Local Govt. Area
+                        </label>
+                        <div class="col-md-4">
+                            <select  (change)="onChangeSelectedLGA($event.target.value)" name="localGovernmentId" id="localGovernmentId" formControlName="localGovernmentId" class="form-control" [ngClass]="!customerAddressesForm.controls['localGovernmentId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select LGA --</option>
+                                <option *ngFor="let x of lgas" [value]="x.localGovernmentId">
+                                    {{x.localGovtName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Nearest Landmark
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="nearestLandmark" [ngClass]="!customerAddressesForm.controls['nearestLandmark'].valid ? 'required-input' : 'valid-input'"
+                                name="nearestLandmark" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            City
+                        </label>
+                        <div class="col-md-4">
+                            <select name="cityId" id="cityId" formControlName="cityId" class="form-control" [ngClass]="!customerAddressesForm.controls['cityId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select City --</option>
+                                <option *ngFor="let x of cities" [value]="x.cityId">
+                                    {{x.cityName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Utility Bill Number / AVR
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="electricMeterNumber" [ngClass]="!customerAddressesForm.controls['electricMeterNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="electricMeterNumber" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Mailing Address
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="pobox" name="pobox" id="pobox" class="form-control" [ngClass]="!customerAddressesForm.controls['pobox'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Contact Address
+                        </label>
+                        <div class="col-md-4">
+                            <textarea rows="3" formControlName="address" name="address" id="address" class="form-control" [ngClass]="!customerAddressesForm.controls['address'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Active
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" formControlName="active" [ngClass]="!customerAddressesForm.controls['active'].valid ? 'required-input' : 'valid-input'"
+                                name="active">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--buttons-->
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerAddressesForm.invalid" (click)="submitCustomerAddresses(customerAddressesForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayAddresses=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayNextOfKin" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{PanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerNextOfKinForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            First Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="firstName" [ngClass]="!customerNextOfKinForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                                name="firstName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            State
+                        </label>
+                        <div class="col-md-4">
+                            <select (change)="onChangeSelectedState($event.target.value)" name="stateId" id="stateId" formControlName="stateId" class="form-control"
+                                [ngClass]="!customerNextOfKinForm.controls['stateId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select State --</option>
+                                <option *ngFor="let x of states" [value]="x.stateId">
+                                    {{x.stateName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Last Name
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="lastName" [ngClass]="!customerNextOfKinForm.controls['lastName'].valid ? 'required-input' : 'valid-input'"
+                                name="lastName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Local Govt. Area
+                        </label>
+                        <div class="col-md-4">
+                            <select  (change)="onChangeSelectedLGA($event.target.value)" name="localGovernmentId" id="localGovernmentId" formControlName="localGovernmentId" class="form-control" [ngClass]="!customerNextOfKinForm.controls['localGovernmentId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select LGA --</option>
+                                <option *ngFor="let x of lgas" [value]="x.localGovernmentId">
+                                    {{x.localGovtName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Date of Birth
+                        </label>
+                        <div class="col-md-4">
+                            <p-calendar id="dateOfBirth" [maxDate]="today" formControlName="dateOfBirth" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                [showIcon]="true"
+                                [readonlyInput]="true"
+                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" [style]="{'width': '100%', 'z-index': '999'}"
+                                [ngClass]="!customerNextOfKinForm.controls['dateOfBirth'].valid ? 'required-input' : 'valid-input'"></p-calendar>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            City/Town
+                        </label>
+                        <div class="col-md-4">
+                            <select name="cityId" id="cityId" formControlName="cityId" class="form-control" [ngClass]="!customerNextOfKinForm.controls['cityId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select City --</option>
+                                <option *ngFor="let x of cities" [value]="x.cityId">
+                                    {{x.cityName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Relationship
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="relationship" name="relationship" id="relationship" class="form-control" [ngClass]="!customerNextOfKinForm.controls['relationship'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Gender
+                        </label>
+                        <div class="col-md-4">
+                            <select name="gender" formControlName="gender" [ngClass]="!customerNextOfKinForm.controls['gender'].valid ? 'required-input' : 'valid-input'"
+                                id="gender" class="form-control">
+                                <option value="">--- Select Gender ---</option>
+                                <option *ngFor="let gender of genderList" value="{{gender.GenderName}}">
+                                    {{gender.GenderName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Email
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="email" name="email" id="email" class="form-control" [ngClass]="!customerNextOfKinForm.controls['email'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="phoneNumber" [ngClass]="!customerNextOfKinForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="phoneNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Address
+                        </label>
+                        <div class="col-md-4">
+                            <textarea rows="3" formControlName="address" name="address" id="address" class="form-control" [ngClass]="!customerNextOfKinForm.controls['address'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Nearest Landmark
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="nearestLandmark" [ngClass]="!customerNextOfKinForm.controls['nearestLandmark'].valid ? 'required-input' : 'valid-input'"
+                                name="nearestLandmark" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                       
+                        <label for="" class="control-label col-md-2">
+                            Active
+                        </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" formControlName="active" [ngClass]="!customerNextOfKinForm.controls['active'].valid ? 'required-input' : 'valid-input'"
+                                name="active">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerNextOfKinForm.invalid" (click)="submitCustomerNextOfKin(customerNextOfKinForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayNextOfKin=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+<p-dialog [responsive]=true [(visible)]="displayMandatesUpload" id="add-modal" modal="modal" showEffect="fade"
+    width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Customer Information Uploads
+                <small>- {{ customerCodetitle }}</small>
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="documentTypeId" class="control-label col-md-2">Upload Type</label>
+                    <div class="col-md-8">
+                        <select type="text" name="documentTypeId" [(ngModel)]="documentTypeId" id="documentTypeId"
+                            class="form-control" [ngClass]="'valid-input'">
+                            <option value="">-- Select Upload Type --</option>
+                            <option *ngFor="let type of uploadDocumentType" [value]="type.documentTypeId">
+                                {{ type.documentTypeName }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="description"
+                            placeholder="Document title...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">File Number</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalFileNumber" class="form-control"
+                            name="physicalFileNumber" placeholder="Document File Number...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Physical Location</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalLocation" class="form-control" name="physicalLocation"
+                            placeholder="Document Physical Location...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                            accept=".jpg,.jpeg,.png" #fileInput name="fileInput" style="padding-top:2px;"
+                            class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="uploadFile()" [disabled]="uploadFileTitle==null || file==undefined"
+                        class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Upload</button>
+                    <button type="button" (click)="displayMandatesUpload=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayUpload=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+                    class="img-thumbnail">
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayAddChildren" modal="modal" showEffect="fade" width="800">
+    <div *ngIf="displayAddChildren" style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Add Child(ren)
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="closeAddChildrenModal()">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body" style="min-height:120px;">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="" class="control-label col-md-3">
+                        Customer Child Name
+                    </label>
+                    <div class="col-md-7">
+                        <input type="text" [(ngModel)]="data.childName" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+
+                    <label for="" class="control-label col-md-3">
+                        Child Date Of Birth
+                    </label>
+                    <div class="col-md-7">
+                        <p-calendar id="childBirthDate" dateFormat="dd/mm/yy" [(ngModel)]="data.childBirthDate" [monthNavigator]="true" [inputStyle]="{'width': '100%' }"
+                            [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true" [style]="{'width': '100%','z-index': '999'}"></p-calendar>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button [disabled]="!data.childBirthDate" (click)="addToList()" pButton type="button" label="Add To List" icon="fa-plus"></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>S/No</th>
+                                    <th>Child Name</th>
+                                    <th>Date of Birth</th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let p of customerChildren;let indx=index">
+                                    <td>
+                                        {{indx + 1}}
+                                    </td>
+                                    <td>
+                                        {{p.childName}}
+                                    </td>
+                                    <td style="text-align: center;width:120px"> {{p.childBirthDate | date}} </td>
+                                    <td style="padding: 0;width:50px">
+                                        <a (click)="removeChild($event,p)" style="color:#ff0000" href="#">
+                                            Remove</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="text-align: left" class="col-md-2">
+                        Add at least two children
+
+                    </div>
+                    <br/>
+                    <br/>
+                    <div style="text-align: left" class="col-md-2">
+                        <!-- {{childrenCount}} -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" [disabled]="hasChildren" (click)="submitCustomerChildren()" class="btn btn-success pull-right">Save
+                    </button>
+                    <button type="button" (click)="closeAddChildrenModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayAddUltimateBeneficiary" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Add Ultimate Beneficial Owner(s)
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayAddUltimateBeneficiary=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body" style="min-height:120px;">
+            <div class="form-horizontal">
+                <form novalidate [formGroup]="ultimateBeneficiaryForm" autocomplete="off">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Surname
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="surname" [ngClass]="!ultimateBeneficiaryForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                                name="surname" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Firstname
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="firstname" [ngClass]="!ultimateBeneficiaryForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                                name="firstname" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Other Names
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="middlename" [ngClass]="!ultimateBeneficiaryForm.controls['middlename'].valid ? 'required-input' : 'valid-input'"
+                                name="middlename" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2" >
+                           Any Valid ID
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="customerNIN" [ngClass]="!ultimateBeneficiaryForm.controls['customerNIN'].valid ? 'required-input' : 'valid-input'"
+                                name="customerNIN" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Bank Verification Number
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="bankVerificationNumber" [ngClass]="!ultimateBeneficiaryForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="bankVerificationNumber" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            % Shareholding
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="numberOfShares" [ngClass]="!ultimateBeneficiaryForm.controls['numberOfShares'].valid ? 'required-input' : 'valid-input'"
+                                name="numberOfShares" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Email
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="email" [ngClass]="!ultimateBeneficiaryForm.controls['email'].valid ? 'required-input' : 'valid-input'"
+                                name="email" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                        </label>
+                        <div class="col-md-3">
+                            <input type="text" formControlName="phoneNumber" [ngClass]="!ultimateBeneficiaryForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                name="phoneNumber" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Address
+                        </label>
+                        <div class="col-md-3">
+                            <textarea rows="3" formControlName="address" name="address" id="address" class="form-control" [ngClass]="!ultimateBeneficiaryForm.controls['address'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Politically Exposed
+                        </label>
+                        <div class="col-md-3">
+                            <input type="checkbox" formControlName="isPoliticallyExposed" name="isPoliticallyExposed" [ngClass]="'valid-input'">
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>S/No</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>BVN</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let p of ultimateBeneficialList;let indx=index">
+                                    <td>
+                                        {{indx + 1}}
+                                    </td>
+                                    <td>
+                                        {{p.firstname}}
+                                    </td>
+                                    <td> {{p.surname}} </td>
+                                    <td> {{p.bankVerificationNumber}} </td>
+                                    <td> {{p.email}} </td>
+                                    <td style="padding: 0;width:50px">
+                                        <a (click)="removeBeneficalFromlist($event,indx)" style="color:#ff0000" href="#">
+                                            Remove</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-2">
+                        <button [disabled]="ultimateBeneficiaryForm.invalid" (click)="addToUltimateBeneficiary(ultimateBeneficiaryForm)" pButton
+                            type="button" label="Add To List" icon="fa-plus"></button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--button type="submit" [disabled]="hasChildren" (click)="submitCustomerChildren()" class="btn btn-success pull-right">Save </button-->
+                    <button type="button" (click)="displayAddUltimateBeneficiary=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayViewUltimateBeneficial" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Ultimate Beneficial owner(s) of
+                <strong>{{corporateShareholderName}}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayViewUltimateBeneficial=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body" style="min-height:120px;">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p-dataTable [value]="customerCompanyUltimateBeneficial" [responsive]="true">
+                        <p-header>Ultimate Beneficial Owners </p-header>
+                        <p-column field="firstname" header="Firstname"></p-column>
+                        <p-column field="surname" header="Surname"></p-column>
+                        <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                        <p-column field="email" header="Email"></p-column>
+                        <p-column field="numberOfShares" header="% Holding"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="removeUltimateBeneficial(d)" style="color: red" href="javascript:void(0)">
+                                    Remove
+                                </a>
+                            </ng-template>
+                        </p-column>
+                        <!--p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editShareholderInformation(i)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column-->
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayViewUltimateBeneficial=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0; position: relative; z-index: 30000;" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search Customer from Flexcube
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="colseSearchModal()">&times;</a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12 input-group" style="margin-top: 20px">
+                    <input type="text" id="search" [(ngModel)]="stagingSearch" class="form-control" placeholder="Enter Customer Account Number ...">
+                    <span (click)="searchCustomerWithAccountNumber(stagingSearch, isProspectConversion)" class="input-group-addon btn btn-info">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </span>
+                </div>
+
+                <!-- <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchStagingDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div> -->
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12" style="max-height: 500px; overflow: auto">
+                    <p>
+
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer Code</th>
+                                <th>Customer Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="selectedSearchCustomer(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>
+                                    {{res.customerCode}}
+                                </td>
+                                <td>
+                                    {{res.customerName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayRelatedPartyForm" id="add-modal" modal="modal" showEffect="fade" width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{relatedPartyHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerRelatedPartyForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-4">
+                            Company Directors
+                        </label>
+
+                        <div class="col-md-8">
+                            <select type="text" name="companyDirectorId" formControlName="companyDirectorId" id="companyDirectorId" class="form-control"
+                                [ngClass]="!customerRelatedPartyForm.controls['companyDirectorId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Director --</option>
+                                <!-- <option *ngFor="let type of companyDirectors" [value]="type.lookupId">
+                                    {{ type.lookupName }}
+                                </option> -->
+                          
+                                <option value="1">Funke Akindele</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="relationshipType" class="control-label col-md-4">
+                            Relationship Type
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" formControlName="relationshipType" [ngClass]="!customerRelatedPartyForm.controls['relationshipType'].valid ? 'required-input' : 'valid-input'"
+                                name="relationshipType" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerRelatedPartyForm.invalid" (click)="submitcustomerRelatedParty(customerRelatedPartyForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayRelatedPartyForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="showDirectorRelatedCustomer" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <app-director-related-customer [bvn]="directorBVN" (closeModal)="closeDirectorRelatedCustomer($event)">
+    </app-director-related-customer>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayAccountBalance" modal="modal" showEffect="fade" width="400">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title"> 
+                    Customer Account Balance
+                </h2>
+            </div>
+            <div class="panel-body" style="overflow:scroll; height:250px">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p-dataTable [value]="accountBalances" [responsive]="true">
+                            <p-column field="productAccountNumber" header="Account Number"></p-column>
+                            <p-column field="availableBalance" header="Account Balance"></p-column>
+                            <p-column field="ledgerBalance" header="Ledger Balance"></p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="displayAccountBalance = false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayEligibilityModal" id="eligibility-modal" modal="modal" showEffect="fade" width="1000">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {{PanelHeader}}
+                </h2>
+            </div>
+    
+    
+    
+            <div class="panel-body" style="overflow:scroll; height:250px">
+                <div class="panel-body" style="height:100px">
+                <div class="form-group">
+                    <div class="form-horizontal">
+                        <form novalidate [formGroup]="eligibilitySearchForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-1">
+                                    Account Number
+                                </label>
+                                <div class="col-md-3">
+                                    <select class="form-control" id="accountNumber"
+                                        name="accountNumber" formControlName="accountNumber"
+                                        [ngClass]="!eligibilitySearchForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'"
+                                        name="accountNumber" class="form-control">
+                                        <option value=""> Select Account Number</option>
+                                        <option *ngFor="let item of customerAccount" value="{{item.accountNumber}}">
+                                            {{item.accountNumber}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <label for="" class="control-label col-md-1">
+                                    Phone Number
+                                </label>
+                                <div class="col-md-3">
+                                    <select class="form-control" id="phoneNumber"
+                                        name="phoneNumber" formControlName="phoneNumber"
+                                        [ngClass]="!eligibilitySearchForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                        name="phoneNumber" class="form-control">
+                                        <option value=""> Select Phone Number</option>
+                                        <option *ngFor="let item of customerPhone" value="{{item.phone}}">
+                                            {{item.phone}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <!-- <label for="" class="control-label col-md-2">
+                                    Account Number
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" formControlName="accountNumber"
+                                        [ngClass]="!eligibilitySearchForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'"
+                                        name="accountNumber" class="form-control">
+                                </div> -->
+                                <!-- <label for="" class="control-label col-md-2">
+                                    Phone Number
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" formControlName="phoneNumber"
+                                        [ngClass]="!eligibilitySearchForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                                        name="phoneNumber" class="form-control">
+                                </div> -->
+                                <div class="col-md-2">
+                                    <button type="button" [disabled]="eligibilitySearchForm.invalid" (click)="eligibilitySearch(eligibilitySearchForm)" style="margin-right:4px"
+                                        class="btn btn-success pull-right">Search</button>
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                </div>
+    
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p-dataTable [value]="iblEligibility" [responsive]="true">
+                            <p-column field="customerName" header="Customer Name"></p-column>
+                            <p-column field="account_number" header="Account Number"></p-column>
+                            <p-column field="minimumAmount" header="Minimum Amount"></p-column>
+                            <p-column field="amount" header="Eligible Amount"></p-column>
+                            <p-column field="maximumAmount" header="Maximum Amount"></p-column>
+                            <p-column field="isEligible" header="Eligibility Status"></p-column>
+                            <p-column field="full_description" header="Reason"></p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    
+                    <div class="col-md-12">
+                        <button type="button" style="margin-right:5px"  *ngIf="isIBLEligible" class="btn btn-primary pull-right" (click)="IBLproceedToApplication()"><span>Proceed</span></button>
+                        <button type="button" (click)="closeEligiblity()" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    </p-dialog>

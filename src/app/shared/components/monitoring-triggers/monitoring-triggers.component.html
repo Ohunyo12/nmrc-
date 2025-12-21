@@ -1,0 +1,115 @@
+<!-- monitoring trigger -->
+
+<div class="panel panel-default" *ngIf="isAnalyst == true">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Monitoring Triggers
+                </h2>
+            </div>
+            <div class="pull-right">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <p-dataTable [value]="monitoringTriggerCollection" [responsive]="true" [paginator]="false" [rows]="5">
+            <p-column field="monitoringTrigger" header="Trigger" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="productCustomerName" header="Facility" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column [style]="{'width':'39px'}" header="View">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="removeTrigger(d)" href="javascript:void(0)">
+                        <i class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="left" title=""></i>
+                    </a>
+                </ng-template>
+            </p-column>
+        </p-dataTable>
+
+        <form [formGroup]="monitoringTriggerForm" autocomplete="off">
+
+            <div class="form-horizontal">
+
+                <div class="form-group" style="margin-top:5px">
+                    <div class="col-md-12"></div>
+                    <div class="col-md-6">
+                        <select (change)="onChangeTriggersFacility($event.target.value)" name="loanApplicationDetailId" formControlName="loanApplicationDetailId"
+                            id="loanApplicationDetailId" class="form-control" [ngClass]="!monitoringTriggerForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Facility--</option>
+                            <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <!-- <label for="condition">Trigger</label> -->
+                    </div>
+                    <div class="col-md-6">
+                        <textarea style="height:60px;" name="monitoringTrigger" formControlName="monitoringTrigger" id="monitoringTrigger" class="form-control"
+                            [ngClass]="!monitoringTriggerForm.controls['monitoringTrigger'].valid ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- <div class="panel-footer"> -->
+            <div class="row pull-left">
+                <div class="col-md-12">
+                    <button type="button" (click)="addMonitoringTrigger(monitoringTriggerForm, null)" [disabled]="monitoringTriggerForm.invalid"
+                        class="btn btn-warning"> Add Trigger</button>
+                    <button type="button" (click)="showMonitoringtriggerList()" [disabled]="monitoringTriggerForm.value.loanApplicationDetailId < 1"
+                        class="btn btn-primary"> Add Existing Trigger</button>
+                    <button type="button" (click)="saveApplicationMonitoringTriggers()" [disabled]="monitoringTriggerCollection.length < 1" class="btn btn-success">
+                        Save Monitoring Triggers Changes</button>
+                    <span *ngIf="unsavedTriggers == true" style="margin:6px; font-size:17px; font-weight: 400; color: red; vertical-align: middle;">
+                        Unsaved changes***</span>
+                </div>
+            </div>
+            <!-- </div> -->
+
+        </form>
+
+    </div>
+</div>
+
+<!-- end monitoring trigger -->
+
+<!-- existing triggers -->
+
+<p-dialog [responsive]=true [(visible)]="displayMonitoringTriggerDialog" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Monitoring Trigger
+            </h2>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+            <div class="form-horizontal">
+                <p-dataTable [responsive]="true" [value]="customTriggers" [rows]="5" (onRowSelect)="onSelectedTrigger($event.data)"
+                    (onRowUnselect)="removeTrigger($event.data)" [(selection)]="selectedTriggers">
+                    <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                    <p-column field="monitoringTriggerSetupName" header="Monitoring Triggers" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                </p-dataTable>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayMonitoringTriggerDialog=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    <button type="button" (click)="displayMonitoringTriggerDialog=false" style="margin-right:5px" class="btn btn-success pull-right">Save and Close</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</p-dialog>
+
+<!-- end existing triggers -->

@@ -1,0 +1,301 @@
+<div class="ui-g" *ngIf="displayStartNewLoan">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                START LOAN APPLICATION
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div>
+                            <p>You are about to start a new loan application.</p>
+                            <br>
+                            <p>Please kindly ensure that all Customer Information given are correct and accurate. </p>
+                            <br>
+                            <p>The entry(s) provided on this loan application will be used for analysis, activities and maintenance
+                                of the loan.
+                            </p>
+                            <br>
+                            <p>Select
+                                <strong>Customer Type</strong>
+                            </p>
+                            <br>
+                            <p>Click
+                                <strong>next</strong> to continue.</p>
+                            <br>
+                        </div>
+                        <div class="form-group">
+                            <label style="padding-top: 5px" for="loanTypeId" class="control-label col-md-2">Customer Type</label>
+                            <div class="col-md-4">
+                                <select (change)="onCustomerTypeChange($event.target.value)" name="loanTypeId" class="form-control" 
+                                id="startLoanTypeId" [(ngModel)]="customerSelect" [ngClass]="customerSelect ? 'valid-input' : 'required-input'">
+                                    <option value="">--- Select Customer Type ---</option>
+                                    <option *ngFor="let x of customerType" value="{{x.id}}">
+                                        {{x.type}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" *ngIf="showCorporateCustomerSelect">
+                                <label style="padding-top: 5px" for="loanTypeId" class="control-label col-md-2">Corporate Type</label>
+                            <div class="col-md-4">
+                                <select (change)="onCorporateCustomerTypeChange($event.target.value)" name="loanTypeId" class="form-control" [(ngModel)]="corporateCustomerSelect" id="startLoanTypeId" 
+                                [ngClass]="corporateCustomerSelect ? 'valid-input' : 'required-input'">
+                                    <option value="">---Further select Corporate Type ---</option>
+                                    <option *ngFor="let x of loanTypes" value="{{x.lookupId}}">
+                                        {{x.lookupName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="proceedToNext()" class="btn btn-primary pull-right" [disabled]="!enableCustomerButton">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui-g" *ngIf="displayStartNewGroupLoan">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Group Customer Information
+                            </h2>
+                            <button type="button" class="btn btn-primary pull-right" (click)="goToStartLoanApplication()">Go Back</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="control-label col-md-2">Customer Group</label>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input (focus)="openGroupSearchBox()" type="text" class="form-control" [(ngModel)]="startCustomerGroupName" placeholder="Search customer group"
+                                        name="startCustomerGroupName" [ngClass]="startCustomerGroupName ? 'valid-input' : 'required-input'">
+                                    <div class="input-group-btn">
+                                        <button (click)="openGroupSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <p-dataTable [value]="customerGroupMappings" [responsive]="true">
+                                    <p-column [style]="{'width':'100px'}" field="customerCode" header="Customer Code"></p-column>
+                                    <p-column field="customerName" header="Customer Name"></p-column>
+                                    <p-column [style]="{'width':'100px'}" field="customerType" header="Customer Type"></p-column>
+                                    <p-column field="productAccountNumber" header="Account Number"></p-column>
+                                    <p-column [style]="{'width':'100px'}" field="isBlackListed" header="Blacklisted">
+                                        <ng-template let-col let-loan="rowData" pTemplate="body">
+                                            {{loan[col.field] ? 'Yes' : 'No' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px'}" field="completedInformation" header="Information Completed">
+                                        <ng-template let-col let-loan="rowData" pTemplate="body">
+                                            {{loan[col.field] ? 'Yes' : 'No' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px'}" field="crdeitBureauCompleted" header="Credit Bureau Completed">
+                                        <ng-template let-col let-loan="rowData" pTemplate="body">
+                                            {{loan[col.field] ? 'Yes' : 'No' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'80px', 'text-align': 'center'}">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="editSingleCustomerInfometion(d)" href="javascript:void(0)">
+                                                Edit
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="proceedToGroupLoan()" class="btn btn-primary pull-right" [disabled]="!(customerGroupMappings.length > 0)">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<app-customer-information [canCreateCustomer] = "true" [display]="displayCustInfo" [(searchQuery)]="searchString" (proceedEvent)="proceedToCreditCheck($event)"
+    [modifyCustomerInfo]="true" [editCustomerInfoByDefault]="false" [showProceedButton]="true" [showCustomerInfo]="displayAdditionalModals"
+    (hideCustomerInfo)="closeCustomerInfoModal()" [singleCustomerType]="singleCustomerType">
+</app-customer-information>
+
+
+<credit-bureau-search-component [display]="displayCreditBureau" (reverseEvent)="goBack($event)" (proceedEvent)="proceedToLoanAppl()"
+    [startLoanTypeId]="startLoanTypeId" [isGlobal]=false></credit-bureau-search-component>
+
+<div class="ui-g" *ngIf="displayStartLoanAppl">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Start Loan Application
+                            </h2>
+                            <button type="button" class="btn btn-primary pull-right" (click)="goBack()">Go Back</button>
+                        </div>
+                    </div>
+                </div>
+                <form novalidate [formGroup]="loanApplForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label style="padding-top: 5px" for="productClassProcessId" class="control-label col-md-2">Application Type</label>
+                                <!-- <label style="padding-top: 5px" for="loanTypeId" class="control-label col-md-2">Application Type</label> -->
+                                <div class="col-md-4">
+
+                                    <select name="productClassProcessId" class="form-control" [(ngModel)]="processid" formControlName="productClassProcessId" id="productClassProcessId"
+                                        [ngClass]="loanApplForm.controls['productClassProcessId'].valid ? 'valid-input' : 'required-input'"
+                                        (change)="onProductProcessSelect()">
+                                        <option value="">--- Select Application Type ---</option>
+                                        <option *ngFor="let x of productProcess" value="{{x.productClassProcessId}}">
+                                            {{x.productClassProcessName}}
+                                        </option>
+                                    </select>
+                                    <!-- <span *ngIf="userAmountLimit && maximumAmount > 0">Maximum Amount {{maximumAmount | number :'1.2'}}</span> -->
+                                </div>
+
+                            </div>
+
+
+                            <fieldset>
+                                <legend style="color:#080808">Existing Loans</legend>
+                                <p-accordion #accordion>
+                                    <p-accordionTab [selected]="true" header="List of existing loans"> 
+                                        <expfacility [reload]="1" [customer]="customer" [loanTypeId]="loanTypeId"></expfacility>
+                                    </p-accordionTab>
+                                    <p-accordionTab header="Written-off Facility">
+                                        <expcamsol [reload]="1" [customer]="customer" [loanTypeId]="loanTypeId"></expcamsol>
+                                    </p-accordionTab>
+                                </p-accordion>
+                            </fieldset>
+                            
+                        </div>
+                        <div class="alert alert-warning alert-dismissible" role="alert" *ngIf="displayCamsolMessage">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Warning!</strong> Customer has loans listed as Written-off Accounts. Please confirm before proceeding with
+                            PEN or Loan Application.
+                        </div>
+
+                        <div class="alert alert-danger alert-dismissible" role="alert" *ngIf="displayBlacklistMessage">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Danger!</strong> Customer has been placed on the blacklist. You cannot proceed to PEN or Loan
+                            application.
+                        </div>
+
+                        <div class="alert alert-warning alert-dismissible" role="alert" *ngIf="displayWatchlistMessage">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <strong>Warning!</strong> Customer has been placed on the watchlist. Please confirm before proceeding
+                            with PEN or Loan Application.
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- [disabled]="loanApplForm.invalid || disableBtn == true" *ngIf="allowForLoanApplication" -->
+                                <button type="button" [disabled]="enableOrDisableButton" class="btn btn-primary pull-right" (click)="goForLoanApplication(loanApplForm, $event)">New Loan Application</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<app-edit-group-customer-info [displayEditInfo]="displaySingleCustomerInformation" [customerCode]="groupCustomerCode" [customerId]="groupCustomerId"
+    [showProceedButton]="true" [showCreditBureau]="false" (proceedEvent)="proceedToCreditCheck($event)" (hideCustomerInfo)="closeModal()">
+</app-edit-group-customer-info>
+
+<p-dialog [responsive]=true [(visible)]="displayGroupSearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Customer Groups
+                </h2>
+                <a href="" (click)="closeSearchBox($event)" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+
+                    </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchForCustomerGroup($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="groupSearchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer Group</th>
+                                <th>Group Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedGroupData(res)" style="cursor: pointer" *ngFor="let res of groupSearchResults; let i = index">
+                                <td>
+                                    {{res.customerGroupName}}
+                                </td>
+                                <td>
+                                    {{res.customerGroupCode}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

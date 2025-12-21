@@ -1,0 +1,291 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Grouping
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus" [hidden]="activeIndex > 0"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-tabView (onChange)="handleChange($event)">
+                        <p-tabPanel header="Existing Groups" [selected]="true">
+                            <p-dataTable [value]="custGroups">
+                                <p-column *ngFor="let col of custGroupTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"> </ng-template>
+                                    <ng-template pTemplate="body" let-d="rowData" let-col let-i="rowIndex">
+                                        <a (click)="editCustomerGroup(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </p-tabPanel>
+                        <p-tabPanel header="Group Mapping">
+
+                            <form [formGroup]="groupMappingForm" class="form-horizontal" autocomplete="off">
+                                <div class="form-group">
+                                    <label for="grpName" class="control-label col-sm-2">Customer Group</label>
+                                    <div class="col-sm-4">
+                                        <select name="grpName" id="grpName" class="form-control" formControlName="customerGroupId" (change)="onCustomerGroupChanged($event.target.value)"
+                                            [ngClass]="{'valid-input':this.groupMappingForm.controls['customerGroupId'].valid, 'required-input':this.groupMappingForm.controls['customerGroupId'].invalid}"
+                                            required>
+                                            <option value="">Select Customer Group</option>
+                                            <option *ngFor="let item of custGroups" [value]="item.customerGroupId">{{item.groupName}}</option>
+                                        </select>
+                                    </div>
+                                    <label for="relType" class="control-label col-sm-2">Relationship Type</label>
+                                    <div class="col-sm-4">
+                                        <select name="relType" id="relType" class="form-control" formControlName="relationshipTypeId" (change)="onRelationshipTypeChanged($event.target.value)"
+                                            [ngClass]="{'valid-input': this.groupMappingForm.controls['relationshipTypeId'].valid, 'required-input':this.groupMappingForm.controls['relationshipTypeId'].invalid}"
+                                            required>
+                                            <option value="">Select Relationship Type</option>
+                                            <option *ngFor="let item of custGroupRelTypes" [value]="item.relationshipTypeId">{{item.relationshipTypeName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="searchQuery" class="control-label col-sm-2">Search For Customer</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="searchQuery" [(ngModel)]="searchQuery" class="form-control" [ngModelOptions]="{standalone: true}"
+                                            [ngClass]="{'valid-input':searchQuery, 'required-input':!searchQuery}">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="submit" (click)="searchCustomers(searchQuery)" class="btn btn-sm btn-success">
+                                            <span class="glyphicon glyphicon-search"></span> Search</button>
+                                    </div>
+                                    <!--<div class="col-sm-4"></div>-->
+                                </div>
+                            </form>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <fieldset>
+                                        <legend>Search Results (Unmapped Customers)</legend>
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <td>
+                                                        Customer Code
+                                                    </td>
+                                                    <td>
+                                                        Customer Name
+                                                    </td>
+                                                    <td>
+                                                        Customer Type
+                                                    </td>
+                                                    <td style="width: 15%">
+
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="displaySearchResults">
+                                                <tr *ngFor="let cust of customersNotMapped; let i = index">
+                                                    <td>
+                                                        {{cust.customerCode}}
+                                                    </td>
+                                                    <td>
+                                                        {{cust.customerName}}
+                                                    </td>
+                                                    <td>{{cust.customerTypeName}}</td>
+                                                    <td>
+                                                        <a style="text-decoration: none;" href="#" (click)="mapCustomerMultiple(i,$event)">
+                                                            <i class="glyphicon glyphicon-plus"></i> Map</a>
+                                                        <!--a style="text-decoration: none;" href="#" (click)="mapCustomer(i,$event)"><i class="glyphicon glyphicon-plus"></i> Map</a-->
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6">
+                                    <fieldset>
+                                        <legend>Mapped Customers</legend>
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <td>
+                                                        Customer Code
+                                                    </td>
+                                                    <td>
+                                                        Customer Name
+                                                    </td>
+                                                    <td>
+                                                        Customer Type
+                                                    </td>
+                                                    <td>
+                                                        Customer Relationship
+                                                    </td>
+                                                    <td style="width: 15%">
+
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="displayMappedCustomers">
+                                                <tr *ngFor="let cust of customersMapped; let i = index">
+                                                    <td>
+                                                        {{cust.customerCode}}
+                                                    </td>
+                                                    <td>
+                                                        {{cust.customerName}}
+                                                    </td>
+                                                    <td>{{cust.customerType}}</td>
+                                                    <td>{{cust.relationshipTypeName}}</td>
+                                                    <td>
+
+                                                        <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeCustomerMultiple(i, $event)">
+                                                            <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                        <!--a style="text-decoration: none;color:#ff0000" href="#" (click)="removeCustomerMap(i, $event)"><i class="glyphicon glyphicon-remove"></i> Remove</a-->
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button type="submit" (click)="onFormMultipleSubmitted()" class="btn btn-success pull-right">Map to Group</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <p-confirmDialog width="425"></p-confirmDialog> -->
+
+<p-dialog header="Customer Group" [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade"
+    width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+           {{entityTitle}}    
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="customerGroupForm" (ngSubmit)="submitGroupForm(customerGroupForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="grpName" class="control-label col-md-4">Group Name</label>
+                        <div class="col-md-8">
+                            <input type="text" id="grpName" name="grpName" class="form-control" formControlName="groupName" placeholder="Name of the group"
+                                [ngClass]="{'valid-input':this.customerGroupForm.controls['groupName'].valid, 'required-input':this.customerGroupForm.controls['groupName'].invalid}"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="grpCode" class="control-label col-md-4">Group Code</label>
+                        <div class="col-md-8">
+                            <input type="text" id="grpCode" name="grpCode" class="form-control" formControlName="groupCode" placeholder="GP00" [ngClass]="{'valid-input':this.customerGroupForm.controls['groupCode'].valid, 'required-input':this.customerGroupForm.controls['groupCode'].invalid}"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="grpDesc" class="control-label col-md-4">Group Description</label>
+                        <div class="col-md-8">
+                            <textarea id="grpDesc" name="grpDesc" class="form-control" formControlName="groupDescription" [ngClass]="{'valid-input':this.customerGroupForm.controls['groupDescription'].valid, 'required-input':this.customerGroupForm.controls['groupDescription'].invalid}"
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupContactPerson" class="control-label col-md-4">Contact Person</label>
+                        <div class="col-md-8">
+                            <input type="text" id="groupContactPerson" name="groupContactPerson" class="form-control" formControlName="groupContactPerson" [ngClass]="{'valid-input':this.customerGroupForm.controls['groupContactPerson'].valid, 'required-input':this.customerGroupForm.controls['groupContactPerson'].invalid}"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupAddress" class="control-label col-md-4">Customer Address</label>
+                        <div class="col-md-8">
+                            <textarea id="groupAddress" name="groupAddress" class="form-control" formControlName="groupAddress" [ngClass]="{'valid-input':this.customerGroupForm.controls['groupAddress'].valid, 'required-input':this.customerGroupForm.controls['groupAddress'].invalid}"
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-4">
+                                            Risk Rating </label>
+                                        <div class="col-md-8">
+                                            <select type="text" name="riskRatingId" formControlName="riskRatingId" id="riskRatingId" class="form-control" [ngClass]="!customerGroupForm.controls['riskRatingId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Credit Rating --</option>
+                                                <option *ngFor="let risk of riskRatings" [value]="risk.riskRatingId">
+                                                    {{ risk.riskRating }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="customerGroupForm.invalid" class="btn btn-success pull-right">Save Customer Group</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayGroupMappingForm" id="map-customer-modal" modal="modal" showEffect="fade"
+    width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Map Customer to Group
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="mappingForm" (ngSubmit)="onFormSubmitted()" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="custName" class="control-label col-md-4">Customer Name</label>
+                        <div class="col-md-8">
+                            <input type="text" id="custName" name="custName" class="form-control" formControlName="customerName" placeholder="Name of the group"
+                                [attr.disabled]="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="custGrp" class="control-label col-md-4">Customer Group</label>
+                        <div class="col-md-8">
+                            <input type="text" id="custGrp" name="custGrp" class="form-control" formControlName="customerGroupName" [attr.disabled]="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="relType" class="control-label col-md-4">Relationship Type</label>
+                        <div class="col-md-8">
+                            <input type="text" id="relType" name="relType" class="form-control" formControlName="relationshipTypeName" [attr.disabled]="true">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="mappingForm.invalid" class="btn btn-success pull-right">Map to Group</button>
+                        <button type="button" (click)="displayGroupMappingForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

@@ -1,0 +1,439 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              Lien Removal Awaiting Approval
+                          </h2>
+                      </div>
+                  </div>
+              </div>
+              <div class="panel-body">
+                      <p-dataTable [value]="loanOperationApprovalData" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]"
+                      [responsive]=true selectionMode="single" [(selection)]="loanSelection">
+                      <p-column field="bookingDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              {{ d.bookingDate | date: 'dd-MM-yyyy' }}
+                          </ng-template>
+                      </p-column>
+                      <p-column field="lienDateTimeCreated" header="Lien Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.lienDateTimeCreated | date: 'dd-MM-yyyy' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    
+                      <p-column field="sourceReferenceNumber" header="Loan Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="lienReferenceNumber" header="Lien Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="productAccountNumber" header="Product Account Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      
+                      <p-column field="lienAmount" header="Lien Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              {{ d.lienAmount | number : '1.2' }}
+                          </ng-template>
+                      </p-column>
+
+                      <p-column [style]="{'width':'80px', 'text-align':'center'}">
+                        <ng-template pTemplate="header">
+                            View
+                        </ng-template>
+                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                            <button type="button" (click)="viewLoanDetails(row, $event)">
+                                <i class="glyphicon glyphicon-eye-open"></i>
+                            </button>
+                           
+                        </ng-template>
+                    </p-column>
+                  </p-dataTable>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayRestructuringApprovalModal" widgetVar="ajaxDialog" [contentStyle]="{'overflow':'scroll','max-height':'600px'}"
+  modal="modal" showEffect="fade" width="900">
+  <div class="panel-body">
+      <div class="form-horizontal">
+          <p-tabView>
+             
+            <p-tabPanel header="Lien Approval">
+
+                <table class="table table-customer-information">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Comment</strong>
+                            </td>
+                            <td>
+                                <textarea [ngClass]="!loanSelectedData.comment ? 'required-input' : 'valid-input'"
+                                    class="form-control" [(ngModel)]="loanSelectedData.comment" name="comment" cols="15"
+                                    rows="3"></textarea>
+                            </td>
+                            <td>
+                                <strong>Status</strong>
+                            </td>
+                            <td>
+                                <select name="approvalStatusId" id="approvalStatusId" class="form-control"
+                                    [(ngModel)]="loanSelectedData.approvalStatusId" [ngClass]="!loanSelectedData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                    <option value="">--- Select Approval Status ---</option>
+                                    <option value="2">Approved</option>
+                                    <option value="3">Disapproved</option>
+                                    <option value="5">Referred</option>
+
+                                    <!-- <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option> -->
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p-tabPanel>
+            <p-tabPanel *ngIf="(lienRemovalId>0)" header="Approval Memo">
+                <app-approval-memo
+                    [showControls]="true"
+                    [allowTemplateToLoad]="true"
+                    [referenceNumber]="lienReferenceNumber"
+                    [label]="'Lien Removal'"
+                    [customerId]="customerId"
+                    [OPERATION_ID]="lienRemovalOperationId"
+                    [targetId]="lienRemovalId">
+                </app-approval-memo>
+            </p-tabPanel>
+            
+            <p-tabPanel header="Supporting Documents">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            Supporting Documents
+                            <!-- {{ supportingDocuments.length }} -->
+                        </h2>
+                    </div>
+                    <div class="panel-body">
+                        
+                        <div style="margin-bottom:0" class="panel panel-default">
+                        <div class="panel-heading">
+                            <div style="margin-left:0" class="row">
+                            <h2 class="panel-title pull-left">
+                                LIEN RELEASE DOCUMENT
+                            </h2>
+                            </div>
+                        </div>
+                        <div style="padding:3px" class="panel-body">
+                            <p-dataTable [paginator]="true" [rows]="10" [value]="lienRemovalData" [responsive]=true
+                            >
+                            <p-column field="dateTimeCreated" header="Request Date" sortable="false" [filter]="false"
+                                filterMatchMode="contains">
+                                <ng-template let-col let-ln="rowData" pTemplate="body">
+                                {{ln[col.field] | date : 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column header="Request Letter Name">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                                    <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                                    <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                                    <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                                    <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                                    <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                                    <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                                    <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                                    <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+                                    {{d.fileName}}
+                                </ng-template>
+                            </p-column>
+                            <p-column  [style]="{'width':'120px'}">
+                            <ng-template pTemplate="header">Action </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center" >
+                                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadLienDocument(d,true)" href="javascript:void(0)">View</a>
+                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadLienDocument(d)" href="javascript:void(0)">Download</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                        
+                            </p-dataTable>
+                        </div>
+                
+                        </div>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Comments" > 
+    
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Lien Approval Comments</h3>
+                </div>
+                <div class="panel-body">
+                <p-dataTable resizableColumns="false" [value]="trail23" width="1500" height="100%" [paginator]="true" [rows]="5" scrollable="true">
+                    <p-column [style]="{'width':'100px'}" field="systemArrivalDateTime" header="Date Initiated" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.systemArrivalDateTime | date: 'short' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column  field="fromStaffName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column  field="comment" header="Comment"  sortable="true" [filter]="true" filterMatchMode="contains"></p-column> 
+                    <p-column  field="fromApprovalLevelName" header="Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column  field="approvalStatus" header="Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column  field="approvalState" header="State" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                </p-dataTable>
+                </div>
+                </div>
+    
+            </p-tabPanel>
+
+          </p-tabView>
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="btn-group pull-right">
+                          <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                          <button [disabled]="!loanSelectedData.comment || !loanSelectedData.approvalStatusId" type="button"
+                              (click)="promptToGoForApproval(loanSelectedData)" style="margin-right:5px" class="btn btn-success">Submit For
+                              Approval</button>
+                      </div>
+                      
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+</p-dialog>
+
+
+<app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message"
+  (approveEvent)="goForApproval(loanSelectedData)" (closeEvent)="cancelApproval()"></app-fintrakbanking-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+  <div style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Document Title:
+              <strong>{{ selectedDocument }}</strong>
+          </h2>
+          <div class="pull-right">
+              <a class="close" (click)="displayDocument=false">&times;</a>
+          </div>
+      </div>
+
+      <div class="panel-body" style="overflow:auto;height:450px">
+
+          <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile"
+              alt="" class="img-thumbnail">
+
+      </div>
+
+  </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Authentication Token
+          </h2>
+          <div class="pull-right">
+              <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+          </div>
+      </div>
+      <div class="panel-body">
+          <div class="form-horizontal">
+              <div class="form-group">
+                  <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                  <div class="col-md-12">
+                      <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                  <div class="col-md-12">
+                      <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode"
+                          class="form-control">
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+      <div class="panel-footer ">
+          <div class="row ">
+              <div class="col-md-12 ">
+                  <div class="form-group text-center">
+                      <div class="col-md-12">
+                          <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="goForApproval(loanSelectedData)"
+                              style="margin-right:5px " class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</p-dialog>
+
+<!--modal for all documentation -->
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Appraisal Documentation for REFERENCE:
+              <strong>{{ loanSelectedData?.applicationReferenceNumber }}</strong> of OBLIGOR:
+              <strong>{{ loanSelectedData?.customerName }}</strong>
+          </h2>
+          <div class="pull-right">
+              <a class="close" (click)="closeDocumentation()">&times;</a>
+          </div>
+      </div>
+
+      <div class="panel-body" style="overflow:auto;height:450px">
+          <div *ngFor="let x of documentations">
+              <p><strong>{{x.title}}</strong></p>
+              <span [innerHtml]="x.templateDocument"></span>
+          </div>
+      </div>
+
+  </div>
+</p-dialog>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="comment-modal" modal="modal" showEffect="fade" width="1200">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              {{ commentTitle }}
+              <!-- CHANGED: {{ recommendedItems.length }} -->
+          </h2>
+      </div>
+
+      <div class="row">
+          <div class="col-md-12">
+              <div class="panel-body">
+
+                  <div *ngIf="warningMessage != ''" class="alert alert-danger">
+                      <strong>Warning!</strong> {{ warningMessage }}
+                  </div>
+
+                  <div style="display:inline-block;max-width:100%;margin-bottom:5px;font-weight:700;">Loans -
+                      <small>Select facility to review</small>
+                  </div>
+
+                  <p-dataTable [value]="proposedItems" [paginator]="true" [rows]="5" selectionMode="single" (onRowSelect)="onLineRowSelect($event.data)">
+
+                      <p-column field="obligorName" header="Customer Name"></p-column>
+                      <p-column field="approvedProductName" header="Product Name"></p-column>
+                      <p-column field="operationName" header="Operation"></p-column>
+                      <p-column field="reviewDetails" header="Review Details"></p-column>
+
+                      <p-column *ngIf="canSupport()" field="statusId" header="Status" [style]="{'color':'#555','text-align':'center','width':'150px'}">
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <select (change)="onLineItemChange(5,$event.target.value,d.loanApplicationDetailId)">
+                                  <option *ngIf="d.statusId != 2 && d.statusId != 3" value="">-- Select Status --</option>
+                                  <option *ngIf="d.statusId != 3" value="3">
+                                      <small>Not Supported</small>
+                                  </option>
+                                  <option *ngIf="d.statusId != 2" value="2">
+                                      <small>Supported</small>
+                                  </option>
+                                  <option *ngIf="d.statusId == 3" value="3" selected="selected">
+                                      <small>Not Supported</small>
+                                  </option>
+                                  <option *ngIf="d.statusId == 2" value="2" selected="selected">
+                                      <small>Supported</small>
+                                  </option>
+                              </select>
+                          </ng-template>
+                      </p-column>
+
+                      <p-column field="statusId" header="" [style]="{'text-align':'right','width':'30px'}">
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <span *ngIf="d.statusId == 2">
+                                  <i class="glyphicon glyphicon-ok"></i>
+                              </span>
+                              <span *ngIf="d.statusId == 3">
+                                  <i class="glyphicon glyphicon-remove"></i>
+                              </span>
+                          </ng-template>
+                      </p-column>
+
+
+                      <p-column field="loanApplicationDetailId" header="" [style]="{'text-align':'right','width':'25px'}">
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <span *ngIf="touchedLineItems.indexOf(d.loanApplicationDetailId) > -1">*</span>
+                          </ng-template>
+                      </p-column>
+
+                  </p-dataTable>
+
+              </div>
+          </div>
+      </div>
+
+      <form novalidate [formGroup]="commentForm" autocomplete="off">
+              <div class="col-md-5" style="background-color:#F5F5F5;border-left:solid 1px #ccc;">
+                  <div class="panel-body">
+                      <div class="form-horizontal">
+
+                          <div *ngIf="forwardAction == 5" class="form-group">
+                              <label for="staffName" class="col-md-12">Target Level / Staff</label>
+                              <div class="col-md-12">
+
+                                  <select (change)="onTargetStaffLevelChange($event.target.value)" type="text" name="trailId" formControlName="trailId" id="trailId"
+                                      class="form-control" [ngClass]="!commentForm.controls['trailId'].valid ? 'required-input' : 'valid-input'">
+                                      <option value="">-- Select Staff / Level --</option>
+                                      <option *ngFor="let x of backtrail" [value]="x.approvalTrailId">{{ x.fromApprovalLevelName }} -- {{ x.staffName }}</option>
+                                  </select>
+                              </div>
+                          </div>
+
+                          <div class="form-group">
+                              <div class="col-md-12">
+                                  <label for="comment">Comment/Recommendation</label>
+                              </div>
+                              <div class="col-md-12">
+                                  <textarea style="height:87px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="!commentForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                              </div>
+                          </div>
+
+                          <div class="form-group" *ngIf="isBusiness === false && forwardAction !== 5">
+                              <label for="" class="col-md-12">Decision</label>
+                              <div class="col-md-6">
+                                  <select name="vote" formControlName="vote" [ngClass]="!commentForm.controls['vote'].valid ? 'required-input' : 'valid-input'"
+                                      id="vote" class="form-control">
+                                      <option value="">-- Select Decision --</option>
+                                      <option value="1">No</option>
+                                      <option value="2">Yes</option>
+                                      <option *ngIf="isBoard == true" value="3">No with condition</option>
+                                      <option *ngIf="isBoard == false" value="4">Yes with condition</option>
+                                  </select>
+                              </div>
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          
+      </form>
+
+      <div class="panel-footer">
+          <div class="row">
+              <div class="col-md-12">
+                  <button type="button" (click)="forwardCam(commentForm)" [disabled]="commentForm.invalid" class="btn btn-success pull-right">
+                      <span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Save and Send</button>
+                  <button type="button" (click)="cancelForm()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+</p-dialog>
+<!--modal ends-->
+<!--     
+  <PRE>{{ loanSelection | json }}</PRE>
+  <PRE>{{ loanOperationApprovalData | json }}</PRE> -->

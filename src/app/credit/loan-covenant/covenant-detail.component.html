@@ -1,0 +1,312 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+
+        <!--card 1 loan search-->
+
+
+        <div *ngIf="displaySearchForm" class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Search
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <form novalidate [formGroup]="loanSearchForm" (keydown.enter)="loanSearchForm.valid ? submitLoanSearchForm(loanSearchForm) : $event.preventDefault()" autocomplete="off">
+                            <div class="panel-body">
+            
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <!-- <label for="operationTypeId" class="control-label col-md-3">Loan Performance</label> -->
+                                        <label for="loanSystemTypeId" class="control-label col-md-3">Facility Type</label>
+                                        <label for="searchString" class="control-label col-md-6">Search</label>
+                                        <label class="control-label col-md-3">.</label>
+                                        <!-- <div class="col-md-3">
+                                            <select  (change)="onChangePerformanceType($event.target.value)" name="performanceTypeId" formControlName="performanceTypeId" id="operationTypeId" class="form-control" [ngClass]="loanSearchForm.controls['performanceTypeId'].valid ? 'valid-input' : 'required-input'">
+                                                <option value="">-- Select Performance --</option>
+                                                <option *ngFor="let x of performanceTypes" [value]="x.id">{{ x.name }}</option>
+                                            </select>
+                                        </div> -->
+                                        <div class="col-md-3">
+                                            <select (change)="onChangeFacilityType($event.target.value)" name="loanSystemTypeId" formControlName="loanSystemTypeId" id="operationTypeId" class="form-control" [ngClass]="loanSearchForm.controls['loanSystemTypeId'].valid ? 'valid-input' : 'required-input'">
+                                                <option value="">-- Select Facility Type --</option>
+                                                <option *ngFor="let x of loanSystemTypes" [value]="x.id">{{ x.name }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 input-group" style="padding:0 15px;">
+                                            <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" placeholder="Search by loan / application reference number"
+                                                [ngClass]="!loanSearchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+            
+                                            <span (click)="submitLoanSearchForm(loanSearchForm)" class="input-group-addon btn btn-info">
+                                                <span class="glyphicon glyphicon-search"></span> Search
+                                            </span>
+                                        </div>
+                                        <div class="col-md-3">
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+            
+                            </div>
+                        </form>
+                    
+                </div>
+<!-- 
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitSearchForm(loanSearchForm)" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            <button type="button" (click)="clearSearchForm()" style="margin-right:5px" class="btn btn-default pull-right">Clear</button>
+                        </div>
+                    </div>
+                </div> -->
+
+            </div>
+        </div>
+
+
+        <!--card 2 loan list-->
+
+        <div *ngIf="displayLoanList" class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Search Result
+                                <!--{{ loans | json }}-->
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="loans" [paginator]="true" [rows]="5" [(selection)]="loanSelection" dataKey="loanId" (onRowSelect)="onSelectedLoanChange()">
+                        <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+
+                        <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="principalAmount" header="Principal Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="interestRate" header="Interest Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                    </p-dataTable>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--end of card2-->
+
+
+        <!--card 3 loan covenant list-->
+
+        <div *ngIf="displayCovenantList" class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Covenant
+                                <!--{{ covenantDetails | json }}-->
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showSearchForm()" pButton type="button" label="Loan Search" icon="fa-search"></button>
+                                <button (click)="showCovenantDetailForm()" pButton type="button" label="Add New Covenant" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="covenantDetails" [paginator]="true" [rows]="20">
+
+                        <p-column field="covenantDetail" header="Covenant Detail" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="covenantTypeName" header="Covenant Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="frequencyTypeName" header="Frequency" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column field="covenantAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.covenantAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="covenantDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.covenantDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <!-- <a (click)="editConvenantDetail(d)" href="javascript:void(0)"> Edit </a> -->
+                                <a (click)="deleteSelectedCovenantItem(d)" href="javascript:void(0)">Remove</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+
+        <!--card 3 ends here-->
+
+
+
+
+
+
+    </div>
+</div>
+
+
+
+
+
+<!--forms-->
+
+<p-dialog [responsive]=true [(visible)]="displayCovenantDetailForm" id="ct-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Loan Covenant
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="covenantDetailForm" autocomplete="off">
+                <div class="panel-body">
+                     <div class="form-horizontal">
+     
+                         <!-- <div class="form-group">
+                             <label for="loanApplicationDetailId" class="control-label col-md-4">Facility</label>
+                             <div class="col-md-8">
+                                 <select (change)="onFacilityChange($event.target.value)" name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                     class="form-control" [ngClass]="!covenantDetailForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                     <option value="">-- Select Facility--</option>
+                                     <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                                 </select>
+                             </div>
+                         </div> -->
+     
+                         <div class="form-group">
+                             <label for="covenantTypeId" class="control-label col-md-4">Covenant Type</label>
+                             <div class="col-md-8">
+                                 <select (change)="onCovenantTypeChange($event.target.value)" name="covenantTypeId" id="covenantTypeId" formControlName="covenantTypeId"
+                                     class="form-control" [ngClass]="!covenantDetailForm.controls['covenantTypeId'].valid ? 'required-input' : 'valid-input'">
+                                     <option value="">-- Select Covenant Type --</option>
+                                     <option *ngFor="let x of covenantTypes" [value]="x.covenantTypeId">{{ x.covenantTypeName }}</option>
+                                 </select>
+                             </div>
+                         </div>
+     
+                         <div class="form-group">
+                             <label for="covenantDetail" class="control-label col-md-4">Covenant Detail</label>
+                             <div class="col-md-8">
+                                 <textarea name="covenantDetail" formControlName="covenantDetail" id="covenantDetail" class="form-control" [ngClass]="!covenantDetailForm.controls['covenantDetail'].valid ? 'required-input' : 'valid-input'"></textarea>
+                             </div>
+                         </div>
+     
+                         <div class="form-group">
+                             <label for="covenantDate" class="control-label col-md-4">Covenant Date</label>
+                             <div class="col-md-8">
+                                     <p-calendar id="covenantDate" formControlName="covenantDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                     [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                     [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!covenantDetailForm.controls['covenantDate'].valid ? 'required-input' : 'valid-input'"></p-calendar>
+     <!-- 
+     
+                                 <p-calendar [ngClass]="!covenantDetailForm.controls['covenantDate'].valid ? 'required-input' : 'valid-input'" id="covenantDate"
+                                     formControlName="covenantDate" [inputStyle]="{'width': '266px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"
+                                     [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar> -->
+                             </div>
+                         </div>
+     
+                         <div class="form-group">
+                             <label for="frequencyTypeId" class="control-label col-md-4">Frequency Type</label>
+                             <div class="col-md-8">
+                                 <select (change)="onFrequencyTypeChange($event.target.value)" name="frequencyTypeId"
+                                     [attr.disabled]="disableFrequencyField == true ? true : null" id="frequencyTypeId" formControlName="frequencyTypeId" class="form-control" [ngClass]="covenantDetailForm.controls['frequencyTypeId'].valid || covenantDetailForm.controls['frequencyTypeId'].disabled ? 'valid-input' : 'required-input'">
+                                     <option value="">-- Select Frequency Type --</option>
+                                     <option *ngFor="let x of frequencyTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                 </select>
+                             </div>
+                         </div>
+     
+                         <div class="form-group">
+                             <label for="casaAccountId" class="control-label col-md-4">Customer Account</label>
+                             <div class="col-md-8">
+                                 <select name="casaAccountId" [attr.disabled]="requireCasaAccount == false ? true : null" id="casaAccountId"
+                                     formControlName="casaAccountId" class="form-control" [ngClass]="covenantDetailForm.controls['casaAccountId'].valid || covenantDetailForm.controls['casaAccountId'].disabled ? 'valid-input' : 'required-input'">
+                                     <option value="">-- Select Customer Account --</option>
+                                     <option *ngFor="let x of accountNumbers" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                 </select>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <div class="col-md-4"></div>
+                             <div class="col-md-8">
+                                 <div class="checkbox-container">
+                                     <input formControlName="isPercentage" id="isPercentage" type="checkbox" (change)="changeCovenantAmountRateLabel($event.target.checked)">
+                                 </div>
+                                 <label class="checkbox">Is Percentage Based</label>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label for="covenantAmount" class="control-label col-md-4">Covenant {{ AmountRateLabel }}</label>
+                             <div class="col-md-8">
+                                 <input type="text" name="covenantAmount" formControlName="covenantAmount" id="covenantAmount" class="form-control" [ngClass]="covenantDetailForm.controls['covenantAmount'].valid || covenantDetailForm.controls['covenantAmount'].disabled ? 'valid-input' : 'required-input'">
+                             </div>
+                         </div>
+     
+     
+                     </div>
+                 </div>
+                    <!--  -->
+             </form>
+
+<!-- {{ covenantDetailForm.value | json }} -->
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="addCovenant(covenantDetailForm)" [disabled]="covenantDetailForm.invalid" class="btn btn-success pull-right">Add</button>
+                    <button type="button" (click)="displayCovenantDetailForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+<!-- {{ covenantDetailForm.value | json }} -->
+    </div>
+</p-dialog>
+
+<!-- <pre>loanSelection: {{ loanSelection | json }}</pre>
+<pre>covenantDetails: {{ covenantDetails | json }}</pre>
+<pre>frequencyTypes: {{ frequencyTypes | json }}</pre> -->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

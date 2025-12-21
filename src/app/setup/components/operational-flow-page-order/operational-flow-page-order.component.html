@@ -1,0 +1,132 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default"> 
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+               Operational Flow Page Order
+              </h2>
+              <div class="pull-right"> 
+                <button (click)="showAprovalSetupwModal()" pButton type="button" label="Add Operational Flow Page" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="panel-body">
+          <p-tabView>
+            <p-tabPanel header="Operational Flow Page Order" [selected]="true">
+              <p-dataTable [value]="flowOders" [responsive]="true" [paginator]="true" [rows]="15">
+                <p-column field="operationName" header="Operation"  filterMatchMode="contains">
+                </p-column>
+                <p-column field="requiredAppraisal" header="Required Appraisal"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.requiredAppraisal==true">Yes</span>
+                    <span *ngIf="d.requiredAppraisal==false">No</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="requiredOfferLetter" header="Required Offer Letter"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.requiredOfferLetter==true">Yes</span>
+                    <span *ngIf="d.requiredOfferLetter==false">No</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="requiredAvailment" header="Required Availment"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.requiredAvailment==true">Yes</span>
+                    <span *ngIf="d.requiredAvailment==false">No</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="tag" header="Tag" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                  <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"></ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="editOperationalOrder(d, $event)" href="javascript:void(0)">
+                      Edit
+                    </a>
+                  </ng-template>
+                </p-column>
+
+              </p-dataTable>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+
+      </div>
+      <!--end of panel-->
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayOperationalFlowPage" [contentStyle]="{'overflow':'auto','max-height':'600px'}" id="add-modal" modal="modal" showEffect="fade" width="700">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="operationalFlowPageForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <p-tabView >
+
+            <p-tabPanel header="Operational Flow Order">
+              <div class="form-group">
+                <label for="Operation" class="control-label col-md-2">Operation</label>
+                <div class="col-md-8">
+                  <select name="operationId" id="operationId" formControlName="operationId" class="form-control" [ngClass]="!operationalFlowPageForm.controls['operationId'].valid ? 'required-input' : 'valid-input'">
+                    <option value="">--Select Operation--</option>
+                    <option *ngFor="let x of operations" [value]="x.operationId">{{ x.operationName }}</option>
+                </select>
+                 
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="Tag" class="control-label col-md-2">Tag</label>
+                <div class="col-md-8">
+                  <input type="text" name="tag" formControlName="tag" id="tag" class="form-control" [ngClass]="!operationalFlowPageForm.controls['tag'].valid ? 'required-input' : 'valid-input'">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="requiredAppraisal" class="control-label col-md-2">Required Appraisal</label>
+                <div class="col-md-8">
+                  <input type="checkbox" name="requiredAppraisal" id="requiredAppraisal" formControlName="requiredAppraisal" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="requiredAvailment" class="control-label col-md-2">Required Availment</label>
+                <div class="col-md-8">
+                  <input type="checkbox" name="requiredAvailment" id="requiredAvailment" formControlName="requiredAvailment" />
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="requiredOfferLetter" class="control-label col-md-2">Required Offer Letter</label>
+                <div class="col-md-8">
+                  <input type="checkbox" name="requiredOfferLetter" id="requiredOfferLetter" formControlName="requiredOfferLetter" />
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitOperationFlowForm(operationalFlowPageForm)" [disabled]="operationalFlowPageForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayOperationalFlowPage=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+</p-dialog>
+

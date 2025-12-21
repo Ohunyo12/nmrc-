@@ -1,0 +1,764 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Overdraft Operations
+                            </h2>
+                            <div *ngIf="displayCustomerLoanDetails" class="pull-right">
+                                <button pButton type="button" (click)="showReviewForm()" label="Perform Operation"
+                                    icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div *ngIf="displayLoanSearch">
+                        <div class="form-horizontal">
+                            <!-- <div class="form-group">
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <input (focus)="openSearchBox()" type="text" class="form-control" placeholder="Search for OD" name="loanReferenceNo" [ngClass]="'valid-input'">
+                    <div class="input-group-btn">
+                      <button (click)="openSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                        <i class="glyphicon glyphicon-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div> -->
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="pull-right">
+                                            <button (click)="showSearchForm()" pButton type="button" label="Search"
+                                                icon="fa-search"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-padding">
+                            <p-dataTable [paginator]="true" [value]="overDraftLoanData" [rows]="15"
+                                (onRowSelect)="onSelectedLoanChange($event)">
+                                <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                                <p-column [style]="{'width':'120px'}" field="loanTypeName" header="Type" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'150px'}" field="loanReferenceNumber" header="Loan Ref No"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'150px'}" field="lmsApplicationReferenceNumber"
+                                    header="Application Ref No" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'150px'}" field="customerName" header="Obligor Name"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'200px'}" field="operationName" header="Operation Type"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'70px'}" field="divisionShortCode" header="Unit" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column [style]="{'width':'100px','text-align':'right'}" field="principalAmount"
+                                    header="Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                </p-column>
+                                <p-column [style]="{'width':'100px'}" field="interestRate" header="Interest"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'70px'}" field="tenor" header="Tenor" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                            </p-dataTable>
+                        </div>
+                    </div>
+
+                    <app-disbursed-loan-details [selectedloanReviewApplicationId]="selectedloanReviewApplicationId"
+                        [lmsOperationId]="lmsOperationId" [lmsLoanApplicationId]="selectedloanReviewApplicationId"
+                        [displayDetails]="displayCustomerLoanDetails" [LoadLoanDetails]="termLoanId"
+                        [loanSystemTypeId]="loanSystemTypeId"
+                        [selectedApplicationRefNumber]="selectedApplicationRefNumber"
+                        [appraisalOperationName]="appraisalOperationName" [loanApplicationId]="appraisalApplicationId"
+                        [creditAppraisalLoanApplicationId]="creditAppraisalLoanApplicationId"
+                        [creditAppraisalOperationId]="creditAppraisalOperationId" [operationId]="appraisalOperationId">
+                    </app-disbursed-loan-details>
+
+
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button *ngIf="displayCustomerLoanDetails" type="button"
+                                (click)="displayReferBackForm = true" class="btn btn-primary pull-left"><span
+                                    class="glyphicon glyphicon-chevron-left" style="margin-right:5px"></span>
+                                Refer Back</button>
+                            <button type="button" (click)="backToLoanSearch()" *ngIf="displatBackToSearch"
+                                class="btn btn-primary pull-right">Back</button>
+                            <div class="btn-group">
+                                <button type="button" *ngIf="displatBackToSearch" class="btn btn-default"
+                                    (click)="displayJobrequest=true" style="margin-right:5px">
+                                    <i class="glyphicon glyphicon-check"></i> Initiate Request</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p-dialog [responsive]="true" [(visible)]="displayReviewModal" id="limit-def-modal" modal="modal" showEffect="fade"
+        width="900">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            {{entityName}}
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <form novalidate [formGroup]="LoanReviewForm" (ngSubmit)="submitLoanReviewForm(LoanReviewForm)"
+                autocomplete="off">
+                <p-tabView>
+                    <p-tabPanel header="Operation">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label for="operationTypeId" class="col-md-6 control-label">Expiry Date</label>
+                                        <div class="col-md-6">
+                                            <label for="operationTypeId" class="control-label"> {{maturityDate |
+                                                date}}</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="operationTypeId" class="col-md-6 control-label">Approved
+                                            Limit</label>
+                                        <div class="col-md-6">
+                                            <label for="operationTypeId" class="control-label"> {{principalAmount |
+                                                number:'1.2' }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="operationTypeId" class="col-md-6 control-label">Undrawn
+                                            Amount</label>
+                                        <div class="col-md-6">
+                                            <label for="operationTypeId" class="control-label"> {{overdraftUndrawnAmount
+                                                | number:'1.2' }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="operationTypeId" class="col-md-6 control-label">Drawn Amount</label>
+                                        <div class="col-md-6">
+                                            <label for="operationTypeId" class="control-label"> {{overdraftDrawnAmount |
+                                                number:'1.2' }}</label>
+                                        </div>
+                                    </div>
+                                    <span style="display:block; height: 30px;"></span>
+                                </div>
+                                <div class="form-group">
+
+                                    <label class="col-md-2">Take Fee?</label>
+
+                                    <div class="col-md-4">
+                                        <select name="takeFeeStatus" formControlName="takeFeeStatus"
+                                            [(ngModel)]="takeFeeStatus" class="form-control" [ngClass]="'valid-input'">
+                                            <option value="">--- Select Status ---</option>
+                                            <option value="1"> Take Fee </option>
+                                            <option value="2"> Do Not Take Fee </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="operationTypeId" class="col-md-2 control-label">Operation Type</label>
+                                    <div class="col-md-4">
+                                        <select (change)="OnOperationTypeChange($event.target.value)"
+                                            name="operationTypeId" formControlName="operationTypeId"
+                                            id="operationTypeId" class="form-control" [ngClass]="'valid-input'">
+                                            <option value="">--- Select Operation Type ---</option>
+                                            <option *ngFor="let pc of operationTypes" value="{{pc.operationTypeId}}">
+                                                {{pc.operationTypeName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <label for="proposedEffectiveDate" class="control-label col-md-2">Effective
+                                        Date</label>
+                                    <div class="col-md-4">
+                                        <p-calendar *ngIf="hideEffectiveDate" id="proposedEffectiveDate" disabled="true"
+                                            formControlName="proposedEffectiveDate" dateFormat="dd/mm/yy"
+                                            [ngClass]="!LoanReviewForm.controls['proposedEffectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                            [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+
+                                        <p-calendar *ngIf="!hideEffectiveDate" id="proposedEffectiveDate"
+                                            formControlName="proposedEffectiveDate" dateFormat="dd/mm/yy"
+                                            [ngClass]="!LoanReviewForm.controls['proposedEffectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                            [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="interateRate" class="control-label col-md-2">Interest Rate</label>
+                                    <div *ngIf="TenorExtention" class="col-md-4">
+                                        <input type="text" name="interateRate" formControlName="interateRate"
+                                            disabled="true"
+                                            [ngClass]="!LoanReviewForm.controls['interateRate'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                    <div *ngIf="!TenorExtention" class="col-md-4">
+                                        <input type="text" name="interateRate" formControlName="interateRate"
+                                            [ngClass]="!LoanReviewForm.controls['interateRate'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                    <label for="maturityDate" class="control-label col-md-2">Expiry Date </label>
+                                    <div class="col-md-4">
+                                        <p-calendar *ngIf="hideExpiryDate" id="maturityDate" disabled="hideExpiryDate"
+                                            formControlName="maturityDate" dateFormat="dd/mm/yy"
+                                            [ngClass]="!LoanReviewForm.controls['maturityDate'].valid ? 'required-input' : 'valid-input'"
+                                            [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                                        <p-calendar *ngIf="!hideExpiryDate" (onSelect)="validateExpiryDate($event)"
+                                            id="maturityDate" formControlName="maturityDate" dateFormat="dd/mm/yy"
+                                            [ngClass]="!LoanReviewForm.controls['maturityDate'].valid ? 'required-input' : 'valid-input'"
+                                            [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div *ngIf="SubAllocationOverdraft">
+                                        <label for="accountNumber" class="control-label col-md-2">CASA Account</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="accountNumber" disabled="true"
+                                                formControlName="accountNumber"
+                                                [ngClass]="!LoanReviewForm.controls['cASA_AccountId'].valid ? 'required-input' : 'valid-input'"
+                                                class="form-control">
+                                        </div>
+                                        <label for="overDraftTopup" class="control-label col-md-2">Sub Allocation
+                                            Limit</label>
+                                        <div class="col-md-4">
+                                            <input type="text" formatM name="overDraftTopup"
+                                                formControlName="overDraftTopup"
+                                                [ngClass]="!LoanReviewForm.controls['overDraftTopup'].valid ? 'required-input' : 'valid-input'"
+                                                class="form-control">
+                                        </div>
+
+                                    </div>
+
+                                    <div *ngIf="Overdrafttopup">
+                                        <label for="overDraftTopup" class="control-label col-md-2">Topup Limit</label>
+                                        <div class="col-md-4">
+                                            <input type="text" formatM name="overDraftTopup"
+                                                formControlName="overDraftTopup"
+                                                [ngClass]="!LoanReviewForm.controls['overDraftTopup'].valid ? 'required-input' : 'valid-input'"
+                                                class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="OverdraftTenorExtension" class="form-group">
+                                    <label for="overDraftTopup" class="control-label col-md-2">Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM name="overDraftTopup"
+                                            formControlName="overDraftTopup"
+                                            [ngClass]="!LoanReviewForm.controls['overDraftTopup'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                    <label for="validateDrawnLimit" class="control-label col-md-2">Validate Drawn
+                                        Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="checkbox" name="validateDrawnLimit"
+                                            formControlName="validateDrawnLimit">
+                                    </div>
+                                </div>
+                                <div *ngIf="OverdraftRenewal" class="form-group">
+                                    <label for="overDraftTopup" class="control-label col-md-2">Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM name="overDraftTopup" (blur)="restrictNumber($event)"
+                                            formControlName="overDraftTopup"
+                                            [ngClass]="!LoanReviewForm.controls['overDraftTopup'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="reviewDetails" class="control-label col-md-2"> Operation Details
+                                    </label>
+                                    <div class="col-md-10">
+                                        <textarea type="text" name="reviewDetails" formControlName="reviewDetails"
+                                            [ngClass]="!LoanReviewForm.controls['reviewDetails'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control" rows="5"></textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabPanel>
+                    <p-tabPanel header="Take Fee">
+                        <take-fee-shared [loanSystemTypeId]="loanSystemTypeId" [amount]="overdraftUndrawnAmount"
+                            [selectedLoanId]="termLoanId" [customerId]="customerId" [currencyId]="currencyId"
+                            (takeFees)="takeFees($event)"></take-fee-shared>
+                    </p-tabPanel>
+                    <!-- <p-tabPanel  header="Comments">
+                        <app-approval-comments [operationId]="lmsOperationId" [reviewApplicationId]="selectedloanReviewApplicationId"></app-approval-comments>
+                    </p-tabPanel> -->
+                </p-tabView>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <button type="submit" [disabled]="LoanReviewForm.invalid"
+                                class="btn btn-success pull-right">Save Review</button>
+                            <button type="button" (click)="displayReviewModal=false" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade"
+        width="650">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div style="margin-left:0" class="row">
+                    <h2 class="panel-title pull-left">
+                        Search For OD
+                    </h2>
+                    <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+                        <i class="glyphicon glyphicon-remove-sign">
+                        </i>
+                    </a>
+
+                </div>
+            </div>
+            <div style="padding:3px" class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control"
+                            placeholder="Type in your search parameter">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p>
+                        </p>
+                        <table *ngIf="searchResults" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Loan Reference No</th>
+                                    <th>Customer Name</th>
+                                    <th>Loan Principal Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr (click)="pickSearchedData(res)" style="cursor: pointer"
+                                    *ngFor="let res of searchResults; let i = index">
+                                    <td>
+                                        {{res.loanReferenceNumber}}
+                                    </td>
+                                    <td>
+                                        {{res.customerName}}
+                                    </td>
+                                    <td>
+                                        {{res.principalAmount}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayCASASearchModal" modal="modal" id="searchModal" showEffect="fade"
+        width="650">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div style="margin-left:0" class="row">
+                    <h2 class="panel-title pull-left">
+                        Search For Account
+                    </h2>
+                    <a href="" (click)="displayCASASearchModal=false" class="pull-right remove-btn">
+                        <i class="glyphicon glyphicon-remove-sign">
+                        </i>
+                    </a>
+                </div>
+            </div>
+            <div style="padding:3px" class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-12 input-group" style="margin-top: 20px">
+                        <input type="text" id="search" [(ngModel)]="accountSearch" class="form-control"
+                            placeholder="Enter Account Number ...">
+                        <span (click)="searchForGroupAccount(accountSearch)" class="input-group-addon btn btn-info">
+                            <span class="glyphicon glyphicon-search"></span> Search
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p>
+                        </p>
+                        <table *ngIf="casaSearchResults" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Account Number</th>
+                                    <th>Account Name</th>
+                                    <th>Currency</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr (click)="pickCASASearchedData(res)" style="cursor: pointer"
+                                    *ngFor="let res of casaSearchResults; let i = index">
+                                    <td>
+                                        {{res.customerName}}
+                                    </td>
+                                    <td>
+                                        {{res.productAccountNumber}}
+                                    </td>
+                                    <td>
+                                        {{res.productAccountName}}
+                                    </td>
+                                    <td>
+                                        {{res.currency}}
+                                    </td>
+                                    <td>
+                                        <a (click)="viewCasaDetails(i)" href="javascript:void(0)">View Details</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayCasaDetails" modal="modal" showEffect="fade" width="900">
+        <div *ngIf="displayCasaDetails" style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Account Details For:
+                    <strong>{{ model.customerName }}</strong>
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayCasaDetails=false">&times;</a>
+                </div>
+            </div>
+
+            <div class="panel-body">
+
+                <p-tabView>
+
+                    <p-tabPanel header="Account Information">
+                        <table class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Product Account Number:</strong>
+                                    </td>
+                                    <td>{{ model.productAccountNumber }}</td>
+                                    <td>
+                                        <strong>Product Account Name:</strong>
+                                    </td>
+                                    <td colspan="3" style="text-align:left">{{ model.productAccountName }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Customer Sensitivity Level:</strong>
+                                    </td>
+                                    <td>{{ getCustomerSensitivityLevel(0) }}</td>
+                                    <td>
+                                        <strong>Ledger Balance:</strong>
+                                    </td>
+                                    <td>{{ model.ledgerBalance | number:'1.2' }}</td>
+                                    <td>
+                                        <strong>Available Balance:</strong>
+                                    </td>
+                                    <td>{{ model.availableBalance | number:'1.2' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Product Code:</strong>
+                                    </td>
+                                    <td>{{ model.productCode }}</td>
+                                    <td>
+                                        <strong>Tenor:</strong>
+                                    </td>
+                                    <td>{{ model.tenor }}</td>
+                                    <td>
+                                        <strong>Has Lien:</strong>
+                                    </td>
+                                    <td>{{ model.hasLien ? "Yes" : "No" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Product Name:</strong>
+                                    </td>
+                                    <td>{{ model.productName }}</td>
+                                    <td>
+                                        <strong>Interest Rate:</strong>
+                                    </td>
+                                    <td>{{ model.interestRate | percent:'1.2-2' }}</td>
+                                    <td>
+                                        <strong>Lien Amount:</strong>
+                                    </td>
+                                    <td>{{ model.lienAmount | number:'1.2' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Branch Code:</strong>
+                                    </td>
+                                    <td>{{ model.branchCode }}</td>
+                                    <td>
+                                        <strong>Effective Date:</strong>
+                                    </td>
+                                    <td>{{ model.effectiveDate | date:"dd-MM-yyyy" }}</td>
+                                    <td>
+                                        <strong>Has Overdraft:</strong>
+                                    </td>
+                                    <td>{{ model.hasOverdraft ? "Yes" : "No" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Branch Name:</strong>
+                                    </td>
+                                    <td>{{ model.branchName }}</td>
+                                    <td>
+                                        <strong>Terminal Date:</strong>
+                                    </td>
+                                    <td>{{ model.terminalDate | date:"dd-MM-yyyy" }}</td>
+                                    <td>
+                                        <strong>Overdraft Amount:</strong>
+                                    </td>
+                                    <td>{{ model.overdraftAmount | number:'1.2' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Is Current Account:</strong>
+                                    </td>
+                                    <td>{{ model.isCurrentAccount ? "Yes" : "No" }}</td>
+                                    <td>
+                                        <strong>Action By:</strong>
+                                    </td>
+                                    <td>{{ model.actionBy }}</td>
+                                    <td>
+                                        <strong>Overdraft Interest Rate:</strong>
+                                    </td>
+                                    <td>{{ model.overdraftInterestRate | percent:'1.2-2' }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Account Status:</strong>
+                                    </td>
+                                    <td>{{ getAccountStatus(model.accountStatusId) }}</td>
+                                    <td>
+                                        <strong>Action Date:</strong>
+                                    </td>
+                                    <td>{{ model.actionDate | date:"dd-MM-yyyy" }}</td>
+                                    <td>
+                                        <strong>Overdraft Expiry Date:</strong>
+                                    </td>
+                                    <td>{{ model.overdraftExpiryDate | date:"dd-MM-yyyy" }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>MIS Code:</strong>
+                                    </td>
+                                    <td>{{ model.misCode }}</td>
+                                    <td>
+                                        <strong>Operation:</strong>
+                                    </td>
+                                    <td>{{ getOperation(model.operationId) }}</td>
+                                    <td>
+                                        <strong>Post No Status:</strong>
+                                    </td>
+                                    <td>{{ getPostNoStatus(model.postNoStatusId) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Old Product Account Number:</strong>
+                                    </td>
+                                    <td>{{ model.oldProductAccountNumber1 }}</td>
+                                    <td>
+                                        <strong></strong>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <strong></strong>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </p-tabPanel>
+
+                </p-tabView>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayPaymentPlan" modal="modal" showEffect="fade" width="850">
+        <div *ngIf="displayPaymentPlan" style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Payment Plans
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayPaymentPlan=false">&times;</a>
+                </div>
+            </div>
+            <div class="panel-body" style="min-height:120px;">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">
+                            Date
+                        </label>
+                        <div class="col-md-4">
+                            <p-calendar id="scateredDate" dateFormat="dd/mm/yy" [(ngModel)]="data.scateredDate"
+                                [monthNavigator]="true" [inputStyle]="{'width': '270px' }" [yearNavigator]="true"
+                                yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                        </div>
+                        <label for="" class="control-label col-md-1">
+                            Amount
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" [(ngModel)]="data.amount" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+
+                            <button [disabled]="!data.amount" (click)="addToList()" pButton type="button"
+                                label="Add To List" icon="fa-plus"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>S/No</th>
+                                        <th>Date</th>
+                                        <th style="text-align: right">Amount</th>
+                                        <th></th>
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let p of scatterdPayments;let indx=index">
+                                        <td>
+                                            {{indx + 1}}
+                                        </td>
+                                        <td>
+                                            {{p.paymentDate | date}}
+                                        </td>
+                                        <td style="text-align: right;width:120px">{{p.paymentAmount | number:'1.2'}}
+                                        </td>
+                                        <td style="padding: 0;width:50px">
+                                            <a (click)="removeItem($event,indx)" style="color:#ff0000" href="#">
+                                                <i class="fa fa-times" aria-hidden="true"></i>X</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: left" class="col-md-2">
+                            Balance:
+                            <span style="margin:0;text-align: right">
+                                {{principalValanceString | number:'1.2'}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]=displayJobrequest showHeader="false" id="Job-request-modal" modal="modal"
+        showEffect="fade" width="700">
+        <div *ngIf="selectedloanReviewApplicationId != null">
+            <job-request-template [targetId]=selectedloanReviewApplicationId [jobSourceId]=jobSourceId
+                [operationAvailable]="true" [moduleReferenceNumber]=selectedApplicationRefNumber
+                [operationsId]=lmsOperationId (displayOption)="CallRequestClose()" [isApplicationLevel]="false"
+                [useFacilityDropdownToDetermineTarget]="false">
+            </job-request-template>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayReferBackForm" modal="modal" showEffect="fade" width="700">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <!-- <h2 class="panel-title">Refer back</h2> -->
+            </div>
+            <app-refer-back [referBackOperationId]="lmsOperationId" [isClassified]="true"
+                [forbidExternalNotification]="true" [referBackTargetId]="selectedloanReviewApplicationId"
+                [isLMSCrossWorkflow]="true" (notify)="displayStatus($event)"
+                (notifyAfterReferBack)="afterReferBackSuccess($event)">
+            </app-refer-back>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade"
+        width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Search Application
+                </h2>
+            </div>
+
+            <form novalidate (ngSubmit)="submitForm(searchForm)" [formGroup]="searchForm" autocomplete="off">
+
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="searchString" class="control-label col-md-12">LMS Application Reference Number/
+                                Customer Name</label>
+                            <div class="col-md-12">
+                                <input type="text" name="searchString" formControlName="searchString" id="searchString"
+                                    class="form-control"
+                                    [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid"
+                                class="btn btn-success pull-right">Search</button>
+                            <button type="button" (click)="displaySearchForm=false" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </p-dialog>

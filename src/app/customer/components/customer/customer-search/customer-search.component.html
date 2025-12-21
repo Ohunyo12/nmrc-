@@ -1,0 +1,102 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+<!--customer search-->
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Search
+                            </h2>                            
+                            <div class="pull-right">
+                                <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)" pButton type="button" label="Collapse" icon="fa-arrow-up"></button>
+                                <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)" pButton type="button" label="Search" icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 
+                <div *ngIf="collapseForm==false" class="panel-body">
+
+					<form novalidate [formGroup]="customerSearchForm" (keyup.enter)="submitCustomerSearchForm(customerSearchForm)" autocomplete="off">
+						<div class="panel-body">
+							<div class="form-horizontal">
+								<div class="form-group">
+									<label for="customerName" class="control-label col-md-2">Customer Name / Code</label>
+									<div class="col-md-4">
+										<input type="text" name="customerName" formControlName="customerName" id="customerName" class="form-control" [ngClass]="!customerSearchForm.controls['customerName'].valid ? 'required-input' : 'valid-input'">
+									</div>
+									<label for="phoneNumber" class="control-label col-md-2" *ngIf="showPhoneNumberSearch">Phone Number</label>
+									<div class="col-md-4" *ngIf="showPhoneNumberSearch">
+										<input type="text" name="phoneNumber" formControlName="phoneNumber" id="phoneNumber" class="form-control" [ngClass]="!customerSearchForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'">
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</form>
+                </div>
+
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitCustomerSearchForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            <button type="button" (click)="clearCustomerSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+<!-- end of card (customer search) -->
+
+<!-- customer list -->
+        <div *ngIf="displayCustomerList" class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Search Result
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [value]="customers" [paginator]="true" [rows]="5" [(selection)]="customerSelection" dataKey="customerId" (onRowSelect)="onSelectedCustomerChange()">
+                        <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                        <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="occupation" header="Occupation" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!--
+						<p-column field="customerTypeId" header="Customer Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-model="rowData" pTemplate type="body">
+                                {{ getCustomerType(model.customerTypeId) }}
+                            </ng-template>
+                        </p-column>-->
+
+                        <!--<p-column> 
+                            <ng-template pTemplate="header">Actions</ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewCustomerDetails(i)" href="javascript:void(0)">View Details</a>
+                            </ng-template>
+                        </p-column>-->
+
+                    </p-dataTable>
+
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--end of card (customer list) -->
+
+    </div>
+</div>

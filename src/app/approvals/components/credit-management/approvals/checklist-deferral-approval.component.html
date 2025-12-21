@@ -1,0 +1,355 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Defferal / Waiver Approvals
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="panel-body"> -->
+
+                <!-- Defferal/Waiver Approvals -->
+                <!-- <div style="margin-bottom:0" class="panel panel-default">
+	<div class="panel-heading">
+		<h2 class="panel-title">
+		Checklist Approval
+		</h2>
+		<div class="pull-right">
+		<a class="close" (click)="displayChecklistApprovalModal=false">&times;</a>
+		</div>
+	</div> -->
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                            <p-tabPanel header="Checklist Item Awaiting Approval">
+                                <p-dataTable [paginator]="true" [rows]="15" [value]="checklistAwaitingApproval" [responsive]="true" selectionMode="single" [(selection)]="selectedChecklist">
+                                    <p-column field="applicationReferenceNumber" header="Ref.Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="systemArrivalDateTime" header="Arrival Time" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.systemArrivalDateTime | date: 'medium' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="divisionShortCode" header="Unit" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="condition" header="Deferred Document" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="deferredDate" header="Deferred Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-col let-ln="rowData" pTemplate="body">
+                                            {{ln[col.field] | date : 'dd/MM/yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="checklistStatus" header="Checklist Status " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="approvalStatus" header="Approval Status " sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <!--ng-template let-col let-ln="rowData" pTemplate="body">
+							<span class="label label-info"> {{ln[col.field] | uppercase }}</span>
+							</ng-template-->
+                                    </p-column>
+                                    <p-column field="isLms" header="LMS" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                    <p-column [style]="{'width':'80px', 'text-align':'center'}">
+                                        <ng-template pTemplate="header">
+                                            View
+                                        </ng-template>
+                                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                            <button type="button" (click)="viewChecklistDetails(row, $event)">
+												<i class="glyphicon glyphicon-eye-open"></i>
+											</button>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </p-tabPanel>
+
+                            <p-tabPanel *ngIf="!userIsAccountOfficer2" header="Deferral Memo" [disabled]="itemSelected == false">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Deferral Memo
+                                                </h2>
+                                                <button type="button" (click)="printSelectedSection()" class="btn btn-success pull-right">
+													Print
+												</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="print-section" *ngIf="!userIsAccountOfficer2" class="panel-body" [innerHtml]="ckEditorContent">
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Loan Details" [disabled]="itemSelected == false">
+                                <div style="overflow: auto; max-height: 400px" *ngIf="islms == false">
+                                    <app-loan-application-details-view [loanApplicationDetailId]="loanApplicationDetailId">
+                                    </app-loan-application-details-view>
+                                </div>
+                                <div style="overflow: auto; max-height: 400px" *ngIf="islms == true">
+
+                                    <app-disbursed-facility-detail [displayDetails]="loanSystemTypeId != 0 && loanSystemTypeId != 4" [loanSystemTypeId]="loanSystemTypeId" [LoadLoanDetails]="reloadLoanDetails">
+                                    </app-disbursed-facility-detail>
+                                    <app-loan-application-details-view *ngIf="loanSystemTypeId == 4" [loanApplicationDetailId]="reloadLoanDetails">
+                                    </app-loan-application-details-view>
+
+
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Details and Approval" [disabled]="itemSelected == false">
+
+                                <table class="table table-customer-information">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <strong>Application Reference Number</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.applicationReferenceNumber }}</td>
+                                            <td>
+                                                <strong>Customer Name</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.customerName }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Checklist Item</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.condition }}</td>
+                                            <td>
+                                                <strong>Deferral Date</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.deferredDate | date : 'dd/MM/yyyy' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Checklist Status</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.checklistStatus }}</td>
+                                            <td>
+                                                <strong>Date Deferred/Waived:</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.dateCreated | date : 'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Reason</strong>
+                                            </td>
+                                            <td>{{ selectedChecklistData.reason}}</td>
+                                        </tr>
+                                        <!-- <tr>
+					<td>
+						<strong>Previous Comment</strong>
+					</td>
+					<td>{{ selectedChecklistData.comment}}</td>
+				</tr> -->
+                                        <tr>
+                                            <td>
+                                                <strong>Comment</strong>
+                                            </td>
+                                            <td>
+                                                <textarea [ngClass]="comment ? 'valid-input' : 'required-input'" class="form-control" [(ngModel)]="comment" name="comment" cols="15" rows="3"></textarea>
+                                            </td>
+                                            <td>
+                                                <strong>Status</strong>
+                                            </td>
+                                            <td>
+                                                <select name="approvalStatusId" id="approvalStatusId" class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId ? 'valid-input' : 'required-input'">
+													<option value=null>--- Select Approval Status ---</option>
+													<option *ngFor="let item of approvalStatusData"
+														[value]="item.approvalStatusId">{{item.approvalStatusName}}
+													</option>
+												</select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </p-tabPanel>
+
+                            <!-- CONDITION PRECEDENTt -->
+                            <p-tabPanel header="Conditions" [disabled]="itemSelected == false">
+
+                                <div class="panel panel-default" style="overflow: auto; max-height: 400px">
+                                    <!-- default -->
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Conditions <small>- {{
+														selectedChecklistData.applicationReferenceNumber }}</small>
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- {{ selectedChecklistData | json }} -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h2 class="panel-title pull-left">Recommedation</h2>
+                                        </div>
+                                    </div>
+                                    <!--           
+				<div class="panel-body" *ngFor="let x of proposedItems">
+				Condition Precedent: {{x.approvedProductName}}
+				<br />
+				<span [innerHtml]="x.conditionPrecedent"></span>
+				</div>
+				<div class="panel-body" *ngFor="let x of proposedItems">
+				Condition Subsequent: {{x.approvedProductName}}
+				<br />
+				<span [innerHtml]="x.conditionSubsequent"></span>
+				</div> -->
+
+                                    <app-credit-condition [reload]="reload" [callerId]="callerId" [isAnalyst]="isAnalyst" [applicationId]="selectedChecklistData?.loanApplicationId" [proposedItems]="proposedItems">
+                                    </app-credit-condition>
+
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Supporting Documents" [disabled]="itemSelected == false">
+
+                                <document-upload [reload]="reload" [operationId]="selectedChecklistData?.operationId" [customerId]="selectedChecklistData?.customerId" [targetId]="selectedChecklistData.conditionId" [targetReferenceNumber]="selectedChecklistData?.applicationReferenceNumber">
+                                </document-upload>
+
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Comments" *ngIf="selectedChecklistData">
+                                <div class="panel panel-default">
+                                    <app-approval-comments [operationId]="selectedChecklistData?.operationId" [applicationId]="selectedChecklistData.conditionId"></app-approval-comments>
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel *ngIf="userIsAccountOfficer2" header="Deferral Memo" (click)="getDrawdownDeferralMemo()" [disabled]="itemSelected == false">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Deferral Memo
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="userIsAccountOfficer2" class="panel-body" [innerHtml]="ckEditorContent">
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+
+                        </p-tabView>
+                    </div>
+                </div>
+
+
+
+                <div class="panel-footer" *ngIf="activeTabindex != 0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn-group pull-right">
+                                <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+
+                                <button [disabled]="!approvalStatusId || !comment" type="button" (click)="goForApproval(selectedChecklistData)" class="btn btn-success">Submit</button>
+                            </div>
+                            <div class="btn-group pull-left">
+                                <button (click)="showReferBackForm(false)" type="button" class="btn btn-danger" style="margin-right:5px">refer Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <p-dialog [responsive]=true [(visible)]="displayReferBackForm" id="reccol-modal" modal="modal" showEffect="fade" width="450">
+                <div style="margin-bottom:0" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">Refer back</h2>
+                    </div>
+                    <!-- <form novalidate [formGroup]="referBackForm">
+				<div class="panel-body">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<div class="col-md-12">
+								<label>Comment</label>
+							</div>
+							<div class="col-md-12">
+								<textarea name="comment" formControlName="comment" id="comment" class="form-control"
+									[ngClass]="!referBackForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-12">Approval Level</label>
+							<div class="col-md-12">
+								<select name="approvalLevelId" formControlName="approvalLevelId" id="approvalLevelId" class="form-control" [ngClass]="referBackForm.controls['approvalLevelId'].valid ? 'valid-input' : 'required-input'">
+									<option value="">-- Select Approval Level --</option>
+									<option *ngFor="let x of trailApprovalLevels" [value]="x.fromApprovalLevelId">{{ x.fromApprovalLevelName }}</option>
+								</select>
+							</div>
+						</div>
+						Refer back
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-md-12">
+							<button type="button" [disabled]="referBackForm.invalid" style="margin-right:5px" type="button" (click)="showConfirmDialog()" class="btn btn-success pull-right">Refer</button>
+							<button type="button" (click)="displayReferBackForm=false" class="btn btn-danger">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</form> -->
+                    <app-refer-back *ngIf="selectedChecklistData" [referBackOperationId]="selectedChecklistData.operationId" [referBackTargetId]="selectedChecklistData.conditionId" (notify)="displayStatus($event)" (notifyAfterReferBack)="afterReferBackSuccess()">
+                    </app-refer-back>
+
+                </div>
+            </p-dialog>
+            <app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message" (approveEvent)="decideMovement()" (closeEvent)="cancelApproval()"></app-fintrakbanking-dialog>
+
+            <!-- 
+			</div>
+		</div> -->
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="1200" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Deferral/Waiver Memo
+
+                    </h2>
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1200px" style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- 
+	<p-dialog [responsive]=true [(visible)]="displayChecklistApprovalModal" widgetVar="ajaxDialog" [draggable]="false" appendToBody="true"
+	modal="modal" showEffect="fade" width="1200">
+	
+
+	</p-dialog> -->
+
+<!-- <pre>{{selectedChecklistData | json}}</pre> -->
+<!-- <pre>{{checklistAwaitingApproval | json}}</pre> -->
+<!-- <pre>{{proposedItems | json}}</pre> -->

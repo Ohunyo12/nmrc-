@@ -1,0 +1,81 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Workflow Groups
+                        </h2>
+
+                        <div class="pull-right">
+                            <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus" [hidden]="activeIndex > 0"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <p-dataTable [value]="approvalGroupTableData" [sortMode]="multiple" [rows]="20" [paginator]="true">
+                    <p-column *ngFor="let col of approvalGroupTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                    <p-column [style]="{'width':'50px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                            <a (click)="editApprovalGroup(col)" href="javascript:void(0)">Edit</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{panelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createEditForm" (ngSubmit)="submitGroupForm(createEditForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="grpName" class="control-label col-md-4">Workflow Group Name</label>
+                        <div class="col-md-8">
+                            <input type="text" id="grpName" name="grpName" class="form-control" formControlName="groupName" [ngClass]="this.createEditForm.controls['groupName'].valid ? 'valid-input':'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="roleId" class="control-label col-md-4">Group Role</label>
+                        <div class="col-md-8">
+                            <select name="roleId" formControlName="roleId" id="roleId" class="form-control" [ngClass]="createEditForm.controls['roleId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">--- Group Role ---</option>
+                            <option *ngFor="let x of roles" [value]="x.id">
+                                {{ x.name }}
+                            </option>
+                        </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label class="control-label col-md-4"></label>
+                        <div class="col-md-8">
+                            <div class="checkbox-container">
+                                <input formControlName="branchFilter" id="branchFilter" type="checkbox">
+                            </div><label class="checkbox">Branch Filter</label>
+                        </div>
+                    </div> -->
+                </div>
+
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="createEditForm.invalid" class="btn btn-success pull-right">Save Workflow Group</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

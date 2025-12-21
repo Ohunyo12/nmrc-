@@ -1,0 +1,264 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Add Product Fee / Collateral
+                            </h2>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <p-tabView>
+                                <p-tabPanel header="Fees">
+                                    <div class="row">
+                                        <div style="padding-top:20px" class="col-md-5">
+                                            <fieldset>
+                                                <legend>Unmapped Fees</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Fee Name
+                                                            </td>
+                                                            <td>
+                                                                Target
+                                                            </td>
+                                                            <td>
+                                                                Interval
+                                                            </td>
+                                                            <td>
+                                                                GL Account
+                                                            </td>
+                                                            <td style="width: 12%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let fee of feesNotMapped; let i = index">
+                                                            <td>
+                                                                {{fee.feeName}}
+                                                            </td>
+                                                            <td>
+                                                                {{fee.feeTargetName}}
+                                                            </td>
+                                                            <td>{{fee.feeIntervalName}}</td>
+                                                            <td>{{fee.accountCategoryName}}</td>
+                                                            <td>
+                                                                <a style="text-decoration: none;" href="#" (click)="mapFee(i,$event)"><i class="glyphicon glyphicon-plus"></i> Add</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                        <div style="padding-top:20px" class="col-md-7">
+                                            <fieldset>
+                                                <legend>Mapped Fees</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Fee Name
+                                                            </td>
+                                                            <td>
+                                                                Target
+                                                            </td>
+                                                            <td>
+                                                                Interval
+                                                            </td>
+                                                            <td>
+                                                                GL Account
+                                                            </td>
+                                                            <td>
+                                                                Value
+                                                            </td>
+                                                            <td>
+                                                                Dependent Amount
+                                                            </td>
+                                                            <td style="width: 15%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let fee of feedMapped; let i = index">
+                                                            <td>
+                                                                {{fee.feeName}}
+                                                            </td>
+                                                            <td>
+                                                                {{fee.feeTargetName}}
+                                                            </td>
+                                                            <td>{{fee.feeIntervalName}}</td>
+                                                            <td>{{fee.glAccountName}}</td>
+                                                            <td>{{fee.rateValue}}</td>
+                                                            <td>{{fee.dependentAmount}}</td>
+                                                            <td>
+                                                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeFee(i,$event)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="Security">
+                                    <div class="row">
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Security Not Mapped</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Collateral Security Name</td>
+                                                            <td style="width: 12%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let sec of securityNotMapped; let i = index">
+                                                            <td>
+                                                                {{sec.collateralTypeName}}
+                                                            </td>
+                                                            <td>
+                                                                <a style="text-decoration: none;" href="#" (click)="mapSecurity(i,$event)"><i class="glyphicon glyphicon-plus"></i> Add</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Security Mapped</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Collateral Security Name</td>
+                                                            <td style="width: 16%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let sec of securityMapped; let i = index">
+                                                            <td>
+                                                                {{sec.collateralTypeName}}
+                                                            </td>
+                                                            <td>
+                                                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeSecurity(i,$event)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="750">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Map Fee to Product
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="feeEdit" (ngSubmit)="onFormSubmitted(feeEdit)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="feeName" class="control-label col-md-2">
+                                    Fee Name
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeName" formControlName="feeName" [attr.disabled]="true">
+                        </div>
+
+                        <label for="target" class="control-label col-md-2">
+                                    Target
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeTargetName" formControlName="feeTargetName" [attr.disabled]="true">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="interval" class="control-label col-md-2">
+                                    Interval
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeIntervalName" formControlName="feeIntervalName" [attr.disabled]="true">
+                        </div>
+
+                        <label for="confirmPass" class="control-label col-md-2">
+                                    GL Account
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="accountCategoryName" formControlName="accountCategoryName" [attr.disabled]="true">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="rateValue" class="control-label col-md-2">
+                                    Rate Value
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="rateValue" formControlName="rateValue">
+                        </div>
+
+                        <label for="confirmPass" class="control-label col-md-2">
+                                    Dependent Amount
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="dependentAmount" formControlName="dependentAmount">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--{{ user.value | json }} [disabled]="user.invalid"-->
+                        <button type="submit" [disabled]="feeEdit.invalid" class="btn btn-success pull-right">Map to Product</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="display=false">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

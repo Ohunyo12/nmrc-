@@ -1,0 +1,205 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Risk Scorings
+                                <!--{{ riskRatings | json }}-->
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--list-->
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="riskRatings" [paginator]="true" [rows]="20">
+
+                        <p-column field="rates" header="Rates" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="ratesDescription" header="Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="maxRange" header="Max Range" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="minRange" header="Min Range" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="advicedRate" header="Adviced Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!--<p-column field="productId" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editRow(row)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+<!--form-->
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} {{ entityName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="rating" class="control-label col-md-2">
+                            Rating
+                        </label>
+                        <div class="col-md-4">
+                            <input name="rating" formControlName="rating" id="rating" class="form-control" [ngClass]="!createUpdateForm.controls['rating'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="productId" class="control-label col-md-2">
+                            Product
+                        </label>
+                        <div class="col-md-4">
+                            <select type="text" name="productId" formControlName="productId" id="productId" class="form-control" [ngClass]="!createUpdateForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Product --</option>
+                                <option *ngFor="let x of products" [value]="x.productId">
+                                    {{ x.productName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minRange" class="control-label col-md-2">
+                            Minimum Range
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="minRange" formControlName="minRange" formatM id="minRange" class="form-control" [ngClass]="!createUpdateForm.controls['minRange'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="maxRange" class="control-label col-md-2">
+                            Maximum Range
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="maxRange" formControlName="maxRange" formatM id="maxRange" class="form-control" [ngClass]="!createUpdateForm.controls['maxRange'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="advicedRate" class="control-label col-md-2">
+                            Adviced Rate
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="advicedRate" formControlName="advicedRate" formatM id="advicedRate" class="form-control" [ngClass]="!createUpdateForm.controls['advicedRate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="ratesDescription" class="control-label col-md-2">
+                            Description
+                        </label>
+                        <div class="col-md-4">
+                            <textarea row="4" name="ratesDescription" formControlName="ratesDescription" id="ratesDescription" class="form-control" [ngClass]="!createUpdateForm.controls['ratesDescription'].valid ? 'required-input' : 'valid-input'">
+                            </textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+<!--view details-->
+
+<!--view modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalDetails" id="view-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName }}
+            </h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" style="margin:8px">
+
+                <table *ngIf="displayModalDetails" class="table table-striped">
+                    <tr>
+                        <td>
+                            <strong>Rate</strong>
+                        </td>
+                        <td>{{ model.rates }}</td>
+                        <td>
+                            <strong>Product</strong>
+                        </td>
+                        <td>{{ model.productId }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong>Minimum Range</strong>
+                        </td>
+                        <td>{{ model.minRange }}</td>
+                        <td>
+                            <strong>Maximum Range</strong>
+                        </td>
+                        <td>{{ model.maxRange }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong>Adviced Rate</strong>
+                        </td>
+                        <td>{{ model.advicedRate }}</td>
+                        <td>
+                            <strong>Description</strong>
+                        </td>
+                        <td>{{ model.ratesDescription }}</td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </div>
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayModalDetails=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of view modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!-- <pre>{{products | json}}</pre> -->

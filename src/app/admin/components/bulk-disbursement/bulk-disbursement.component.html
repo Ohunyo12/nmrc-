@@ -1,0 +1,588 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                               {{packageHeader | uppercase}}
+                            </h2>
+                            <div class="pull-right">
+                                <button  (click)="onSelectedDisburseScheme()" pButton
+                                    type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end of panel heading -->
+                
+                <div class="panel-body" *ngIf="displayBulkDisbursementSchemeData==false">
+                    
+                    <!--  DATATABLE  -->
+
+                    <p-dataTable [value]="disbursementSchemeData" [responsive]=true [paginator]="true" [rows]="10"
+                                 [(selection)]="schemeSelection" dataKey="disburseSchemeId"
+                                 (onRowSelect)="disbursePackageChanged($event.data)" [rowsPerPageOptions]="[10,20,30]">
+                        <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+                        <p-column field="applicationReferenceNumber" header="Reference Number" sortable="true" [filter]="true"
+                        filterMatchMode="contains"></p-column>
+                        <p-column field="loanApplicationDetailId" header="Application Detail ID" sortable="true" [filter]="true"
+                                  filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="facilityName" header="Facility Name" sortable="true" [filter]="true"
+                                  filterMatchMode="contains"></p-column>
+                        <p-column field="scheduleName" header="Schedule Name" sortable="true" [filter]="true"
+                                  filterMatchMode="contains"></p-column>
+                        <p-column field="schemeName" header="Scheme Name" sortable="true" [filter]="true"
+                                  filterMatchMode="contains"></p-column>
+                        <p-column field="schemeCode" header="Scheme Code" sortable="true" [filter]="true"
+                                  filterMatchMode="contains"></p-column>
+
+                        <p-column field="dateTimeCreated"  header="Created Date" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.dateTimeCreated | date: 'dd-MM-yyyy'}}
+                                    </ng-template>
+                                </p-column>
+                        
+                        <!-- <p-column [style]="{'width':'150px'}" header="Action">
+                            <ng-template pTemplate="header">Action</ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editBulkDisbursementPackage(d)" href="javascript:void(0)" > Edit</a> 
+                            </ng-template>
+                        </p-column> -->
+                       
+                    </p-dataTable>
+                
+
+                </div><!-- end of panel body -->
+
+              
+<!--FINTRAK SHORT LOAN SCHEME  FORM -->
+<div *ngIf="displayBulkDisbursementScheme==true">
+ <div style="margin-bottom:0" class="panel panel-default">
+     <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- <h2 class="panel-title pull-left">
+                    {{packageText | uppercase}}
+                </h2> -->
+            </div>
+           </div>
+    </div>
+
+     <div class="panel-body">
+       <div class="form-horizontal">
+            <form novalidate [formGroup]="bulkDisbursementSchemeForm" autocomplete="off">
+          
+                    <div class="form-group">
+                        <label for="searchedName" class="control-label col-md-2">Application/Customer Name</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" (click)="displaySearchModal = true" (keyup)="searchLoanAppDB($event.target.value)" [ngClass]="!bulkDisbursementSchemeForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchedName" placeholder="Search Customer" name="searchedName">
+                                <div class="input-group-btn">
+                                    <button  (click)="displaySearchModal = false" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                </div>
+                            </div>
+                            <div *ngIf="searchResults && displaySearchModal" style="overflow-y: scroll; height:100px;" class="form-group">
+                                    <div class="col-md-12 pull-left">
+                                        <table *ngIf="searchResults && displaySearchModal" style="overflow-y: scroll;" class="table table-striped table-hover" >
+                                            <thead>
+                                                <tr>
+                                                    <th>Staff Code</th>
+                                                    <th>Customer Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                                    <td>{{res.customerCode}}</td>
+                                                    <td>{{res.customerName}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div> 
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                                Application Reference 
+                            </label>          
+                        <div class="col-md-4">
+                          <input  type="text" readonly="readonly"  [(ngModel)]="loanApplicationReferenceNumber" id="loanApplicationReferenceNumber" formControlName="loanApplicationReferenceNumber" name="searchString" placeholder="Application Reference Number"
+                                class="form-control"  [(ngModel)]="event.productPriceIndex"  [ngClass]="!bulkDisbursementSchemeForm.controls['loanApplicationReferenceNumber'].valid ? 'required-input' : 'valid-input'" >
+                    
+                        </div>
+                    </div>
+     
+                    
+                                                                 
+                 <div class="form-group">
+                            
+                            <label for="applicationDetail" class="control-label col-md-2">
+                                Facility Line  </label>
+                           
+                            <div class="col-md-4">
+                                    <select [(ngModel)]="applicationDetail" class="form-control" formControlName="applicationDetail">
+                                            <option value="">-- Select Facility Line --</option>
+                                            <option *ngFor="let x of searchResults" [ngValue]="x.loanApplicationDetailId">
+                                                {{ x.customerName }} -- {{ x.approvedProductName }} -- {{ x.proposedAmount }}
+                                            </option>
+                                        </select>
+                            </div>
+                            <label for="schemeName" class="control-label col-md-2">
+                                    Scheme Name
+                                </label>
+                                <div class="col-md-4">
+                                        <div class="input-group">
+                                                <input type="text"   [ngClass]="!bulkDisbursementSchemeForm.controls['schemeName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="schemeName" placeholder="Scheme name" name="schemeName">
+                                                <div class="input-group-btn">
+                                                    <button  (click)="getExistingScheme()" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                                </div>
+                                            </div>
+                                </div>
+                                                                   
+                        </div>
+
+                <div class="form-group">
+                    <label for="facilityName" class="control-label col-md-2">
+                        Facility
+                    </label>
+                    <div class="col-md-4">
+                        <select name="facilityName" id="facilityName" formControlName="facilityName"
+                                class="form-control" [(ngModel)]="event.facilityName" (change)="onChangeFacility($event.target.value)"
+                                [ngClass]="!bulkDisbursementSchemeForm.controls['facilityName'].valid ? 'required-input' : 'valid-input'">
+                            <option value="--- Select Facility ---">--- Select Facility ---</option>
+                            <option *ngFor="let facility of facilities" value="{{facility.productId}}">
+                                {{facility.productName}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <label for="productPriceIndex" class="control-label col-md-2">
+                            Product Price Index
+                        </label>
+                        <div class="col-md-4">
+                            <select name="productPriceIndex" id="productPriceIndex" formControlName="productPriceIndex"
+                                    class="form-control" [(ngModel)]="event.productPriceIndex" (change)="onChangePriceIndex($event.target.value)"  [ngClass]="!bulkDisbursementSchemeForm.controls['productPriceIndex'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="--- Select Product Price Index ---">--- Select Product Price Index ---</option>
+                                    <option value="{{priceIndex}}">{{priceIndexName}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                                   
+                            </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tenor" class="control-label col-md-2">
+                        Tenor
+                    </label>
+                    <div class="col-md-4">
+                        <input type="text" id="tenor" formControlName="tenor"
+                            name="tenor" class="form-control">
+                    </div>
+
+                    <label for="schedule" class="control-label col-md-2">
+                        Schedule
+                    </label>
+                    <div class="col-md-4">
+                        <select name="schedule" id="schedule" formControlName="schedule"
+                                class="form-control" [(ngModel)]="event.schedule" [ngClass]="!bulkDisbursementSchemeForm.controls['schedule'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Schedule ---">--- Select Schedule ---</option>
+                                <option *ngFor="let schedule of periodicSchedule"
+                                    value="{{schedule.lookupId}}"> {{schedule.lookupName}}
+                                </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                                   
+                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interestRate" class="control-label col-md-2">
+                        Interest Rate
+                    </label>
+                    <div class="col-md-4">
+                        <input type="text" id="interestRate" formControlName="interestRate" readonly="readonly"
+                            name="interestRate" class="form-control">
+                    </div>
+                    <label for="basis" class="control-label col-md-2">Accurual Basis</label>
+                    <div class="col-md-4">
+                        <select name="accrualBasis" id="accrualBasis" formControlName="accrualBasis" 
+                            class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['accrualBasis'].valid ? 'required-input' : 'valid-input'">
+                            <option value=""></option>
+                            <option *ngFor="let b of basis" value="{{b.lookupId}}">
+                                {{b.lookupName}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                                   
+                        </div>
+                </div>
+
+                <div class="form-group">
+                        <label for="interestFreq" class="control-label col-md-2">
+                            Interest Frequency
+                        </label>
+                        <div class="col-md-4">
+                                <select name="interestFreq" id="interestFreq" formControlName="interestFreq" 
+                                 class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['interestFreq'].valid ? 'required-input' : 'valid-input'">
+                                <option value=""></option>
+                                <option *ngFor="let b of frequency" value="{{b.lookupId}}">
+                                    {{b.lookupName}}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="principalFreq" class="control-label col-md-2">Principal Frequency</label>
+                        <div class="col-md-4">
+                            <select name="principalFreq" id="principalFreq" formControlName="principalFreq" 
+                                class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['principalFreq'].valid ? 'required-input' : 'valid-input'">
+                                <option value=""></option>
+                                <option *ngFor="let b of frequency" value="{{b.lookupId}}">
+                                    {{b.lookupName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                                   
+                            </div>
+                    </div>
+                    <div class="form-group">
+                            <label for="currencyId" class="control-label col-md-2">
+                                Currency
+                            </label>
+                            <div class="col-md-4">
+                                    <select name="currencyId" id="currencyId" formControlName="currencyId" 
+                                     class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value=""></option>
+                                    <option *ngFor="let b of currencyList" value="{{b.currencyId}}">
+                                        {{b.currencyName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <label for="approvedAmount" class="control-label col-md-2">Loan Approved Amount</label>
+                            <div class="col-md-4">
+                                <input type="text" readonly="readonly" value="" name="approvedAmount" id="approvedAmount" formControlName="approvedAmount" 
+                                    class="form-control" >
+                            </div>
+                            <div class="col-md-2">
+                                       
+                                </div>
+                        </div>
+                <div class="col-md-12 pull-right">
+                    <button type="button" (click)="addBulkDisbursementPackageScheme(bulkDisbursementSchemeForm)"
+                            class="btn btn-success pull-right" [disabled]="!bulkDisbursementSchemeForm.valid">Save
+                    </button>
+                    <button type="button" (click)="closeModal()" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                </div>
+
+            </form>
+                 
+         </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12"></div>
+            </div>
+        </div>
+        
+ </div>
+</div>
+
+<!-- ======================================================= -->
+
+<p-dialog [responsive]=true [(visible)]="displaySearchSchemeModal" modal="modal" id="searchSchemeModal" showEffect="fade" width="900">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div style="margin-left:0" class="row">
+                    <h2 class="panel-title pull-left">
+                        Search Scheme
+                    </h2>
+                </div>
+            </div>
+
+    <div class="panel-body">
+        <form novalidate [formGroup]="bulkDisburseSchemeSearchForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="schemeName" class="control-label col-md-2">
+                            Scheme Name
+                        </label>
+                        <div class="col-md-12">
+                                <div class="input-group">
+                                    <input type="text" (click)="displayschemeModal = true" (keyup)="searchSchemeDB($event.target.value)" [ngClass]="!bulkDisburseSchemeSearchForm.controls['searchString2'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchString2" placeholder="Search Scheme/Code" name="searchString2">
+                                    <div class="input-group-btn">
+                                        <button (click)="displayschemeModal = false" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                    </div>
+                                </div>
+                                <div *ngIf="displayschemeModal && schemeResults" style="overflow-y: scroll; height:auto;" >
+                                        <div class="col-md-12 pull-left">
+                                            <table *ngIf="schemeResults && displayschemeModal" style="overflow-y: scroll;" class="table table-striped table-hover" >
+                                                <thead>
+                                                    <tr>
+                                                        <th>Scheme Code</th>
+                                                        <th>Scheme Name</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr (click)="pickSchemeData(res)" style="cursor: pointer" *ngFor="let res of schemeResults; let i = index">
+                                                        <td>{{res.schemeCode}}</td>
+                                                        <td>{{res.schemeName}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>             
+                        </div>
+                        
+                    </div>
+                    
+                   
+                </form>
+            </div>
+        </div>
+    </p-dialog> 
+
+<!-- =========================================================== -->
+
+ <!--FINTRAK SHORT LOAN SCHEME  EDIT FORM -->
+ <p-dialog [responsive]=true [(visible)]="displayBulkDisbursementSchemeUpdate" modal="modal" showEffect="fade"
+                          width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+ <div style="margin-bottom:0" class="panel panel-default">
+     <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    {{packageText | uppercase}}
+                </h2>
+            </div>
+           </div>
+       </div>
+
+     <div class="panel-body">
+       <div class="form-horizontal">
+            <form novalidate [formGroup]="bulkDisbursementSchemeForm" autocomplete="off">
+          
+                    <div class="form-group">
+                        <label for="searchedName" class="control-label col-md-2">Application/Customer Name</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" (click)="displaySearchModal = true" (keyup)="searchLoanAppDB($event.target.value)" [ngClass]="!bulkDisbursementSchemeForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchedName" placeholder="Search Customer" name="searchedName">
+                                <div class="input-group-btn">
+                                    <button  (click)="displaySearchModal = false" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                </div>
+                            </div>
+                            <div *ngIf="searchResults && displaySearchModal" style="overflow-y: scroll; height:100px;" class="form-group">
+                                    <div class="col-md-12 pull-left">
+                                        <table *ngIf="searchResults && displaySearchModal" style="overflow-y: scroll;" class="table table-striped table-hover" >
+                                            <thead>
+                                                <tr>
+                                                    <th>Staff Code</th>
+                                                    <th>Customer Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                                    <td>{{res.customerCode}}</td>
+                                                    <td>{{res.customerName}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div> 
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                                Application Reference 
+                            </label>          
+                        <div class="col-md-4">
+                          <input  type="text" readonly="readonly"  [(ngModel)]="loanApplicationReferenceNumber" id="loanApplicationReferenceNumber" formControlName="loanApplicationReferenceNumber" name="searchString" placeholder="Application Reference Number"
+                                class="form-control"  [(ngModel)]="event.productPriceIndex"  [ngClass]="!bulkDisbursementSchemeForm.controls['loanApplicationReferenceNumber'].valid ? 'required-input' : 'valid-input'" >
+                    
+                        </div>
+                    </div>
+     
+                    
+                                                                 
+                 <div class="form-group">
+                            
+                            <label for="applicationDetail" class="control-label col-md-2">
+                                Facility Line  </label>
+                           
+                            <div class="col-md-4">
+                                    <select [(ngModel)]="applicationDetail" class="form-control" formControlName="applicationDetail">
+                                            <option value="">-- Select Facility Line --</option>
+                                            <option *ngFor="let x of searchResults" [ngValue]="x.loanApplicationDetailId">
+                                                {{ x.customerName }} -- {{ x.approvedProductName }} -- {{ x.proposedAmount }}
+                                            </option>
+                                        </select>
+                            </div>
+                            <label for="schemeName" class="control-label col-md-2">
+                                    Scheme Name
+                                </label>
+                                <div class="col-md-4">
+                                        <div class="input-group">
+                                                <input type="text"   [ngClass]="!bulkDisbursementSchemeForm.controls['schemeName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="schemeName" placeholder="Scheme name" name="schemeName">
+                                                <div class="input-group-btn">
+                                                    <button  (click)="getExistingScheme()" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                                </div>
+                                            </div>
+                                </div>
+                                                                   
+                        </div>
+
+                <div class="form-group">
+                    <label for="facilityName" class="control-label col-md-2">
+                        Facility
+                    </label>
+                    <div class="col-md-4">
+                        <select name="facilityName" id="facilityName" formControlName="facilityName"
+                                class="form-control" [(ngModel)]="event.facilityName" (change)="onChangeFacility($event.target.value)"
+                                [ngClass]="!bulkDisbursementSchemeForm.controls['facilityName'].valid ? 'required-input' : 'valid-input'">
+                            <option value="--- Select Facility ---">--- Select Facility ---</option>
+                            <option *ngFor="let facility of facilities" value="{{facility.productId}}">
+                                {{facility.productName}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <label for="productPriceIndex" class="control-label col-md-2">
+                            Product Price Index
+                        </label>
+                        <div class="col-md-4">
+                            <select name="productPriceIndex" id="productPriceIndex" formControlName="productPriceIndex"
+                                    class="form-control" [(ngModel)]="event.productPriceIndex" (change)="onChangePriceIndex($event.target.value)"  [ngClass]="!bulkDisbursementSchemeForm.controls['productPriceIndex'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="--- Select Product Price Index ---">--- Select Product Price Index ---</option>
+                                    <option value="{{priceIndex}}">{{priceIndexName}}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                                   
+                            </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tenor" class="control-label col-md-2">
+                        Tenor
+                    </label>
+                    <div class="col-md-4">
+                        <input type="text" id="tenor" formControlName="tenor"
+                            name="tenor" class="form-control">
+                    </div>
+
+                    <label for="schedule" class="control-label col-md-2">
+                        Schedule
+                    </label>
+                    <div class="col-md-4">
+                        <select name="schedule" id="schedule" formControlName="schedule"
+                                class="form-control" [(ngModel)]="event.schedule" [ngClass]="!bulkDisbursementSchemeForm.controls['schedule'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Schedule ---">--- Select Schedule ---</option>
+                                <option *ngFor="let schedule of periodicSchedule"
+                                    value="{{schedule.lookupId}}"> {{schedule.lookupName}}
+                                </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                                   
+                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interestRate" class="control-label col-md-2">
+                        Interest Rate
+                    </label>
+                    <div class="col-md-4">
+                        <input type="text" id="interestRate" formControlName="interestRate" readonly="readonly"
+                            name="interestRate" value="{{interestRates}}" class="form-control">
+                    </div>
+                    <label for="basis" class="control-label col-md-2">Accurual Basis</label>
+                    <div class="col-md-4">
+                        <select name="accrualBasis" id="accrualBasis" formControlName="accrualBasis" 
+                            class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['accrualBasis'].valid ? 'required-input' : 'valid-input'">
+                            <option value=""></option>
+                            <option *ngFor="let b of basis" value="{{b.lookupId}}">
+                                {{b.lookupName}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                                   
+                        </div>
+                </div>
+
+                <div class="form-group">
+                        <label for="interestFreq" class="control-label col-md-2">
+                            Interest Frequency
+                        </label>
+                        <div class="col-md-4">
+                                <select name="interestFreq" id="interestFreq" formControlName="interestFreq" 
+                                 class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['interestFreq'].valid ? 'required-input' : 'valid-input'">
+                                <option value=""></option>
+                                <option *ngFor="let b of frequency" value="{{b.lookupId}}">
+                                    {{b.lookupName}}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="principalFreq" class="control-label col-md-2">Principal Frequency</label>
+                        <div class="col-md-4">
+                            <select name="principalFreq" id="principalFreq" formControlName="principalFreq" 
+                                class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['principalFreq'].valid ? 'required-input' : 'valid-input'">
+                                <option value=""></option>
+                                <option *ngFor="let b of frequency" value="{{b.lookupId}}">
+                                    {{b.lookupName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                                   
+                            </div>
+                    </div>
+                    <div class="form-group">
+                            <label for="currencyId" class="control-label col-md-2">
+                                Currency
+                            </label>
+                            <div class="col-md-4">
+                                    <select name="currencyId" id="currencyId" formControlName="currencyId" 
+                                     class="form-control" [ngClass]="!bulkDisbursementSchemeForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value=""></option>
+                                    <option *ngFor="let b of currencyList" value="{{b.currencyId}}">
+                                        {{b.currencyName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <label for="approvedAmount" class="control-label col-md-2">Loan Approved Amount</label>
+                            <div class="col-md-4">
+                                <input type="text" readonly="readonly" value="" name="approvedAmount" id="approvedAmount" formControlName="approvedAmount" 
+                                    class="form-control" >
+                            </div>
+                            <div class="col-md-2">
+                                       
+                                </div>
+                        </div>
+                <div class="col-md-12 pull-right">
+                    <button type="button" (click)="editBulkDisbursementPackageScheme(bulkDisbursementSchemeForm)"
+                            class="btn btn-success pull-right" [disabled]="!bulkDisbursementSchemeForm.valid">Update
+                    </button>
+                    <button type="button" (click)="closeModal()" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                </div>
+
+            </form>
+                             
+         </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12"></div>
+            </div>
+        </div>
+        
+ </div>
+ </p-dialog>
+
+
+
+    </div>
+   </div>   
+   </div>
+</div>

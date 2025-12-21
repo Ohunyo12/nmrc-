@@ -1,0 +1,475 @@
+<!-- editMode: {{editMode}}
+customerGroupId: {{customerGroupId}} -->
+<!-- {{ storedApplicationInfo | json }} -->
+<!-- [mainForm]="loanApplicationForm.value" -->
+
+<div *ngIf="displayFacilityDetailForm">
+    <facility-details 
+        [ApplicationRef]="loanApplicationReferance" 
+        [customerGroupId]="customerGroupId" 
+        [customerId]="customerId"
+        [customerTypeId1]="customerTypeId"
+        [customerName]="customerNameTitle" 
+        [editMode]="editMode" 
+        [facilityDetail]="loanFacilityDetails" 
+        [loanApplication]="loanApp" 
+        [loanTypeId]="loanTypeId" 
+        [maximumAmount]="loanAmount"
+        [newLoanApplicationId]="loanApplicationId" 
+        [productClassProcessId]="productClassProcessId"
+        [productClassId]="productClassId" 
+        [applicationDetailId]="applicationDetailId"
+        [utilizedAmount]="proposedAmount" 
+        [utilizedAmount]="editFee" 
+        [isAdhoc]="isAdhoc"
+        [isIblRequest]="isIblRequest"
+        [isIBLEligible]="isIBLEligible"
+        [iblAmount]="iblAmount"
+        [iblMinimumAmount]="iblMinimumAmount"
+        (refreshDetailsGrid)=refreshDetailsGrid($event)
+    ></facility-details>
+</div>
+
+<div *ngIf="!displayFacilityDetailForm" class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left"> 
+                                Facility Application Number:
+                                <strong> {{loanApplicationReferance}}</strong>
+                                <!-- -{{loanApplicationId}} -->
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <form novalidate [formGroup]="loanApplicationForm" autocomplete="off">
+                        <div class="form-horizontal">
+
+                            <credit-limits [selectedCustomer]="selectedCustomerLimit"> </credit-limits>
+
+                            <br />
+
+                            <p-accordion #accordion>
+                                <p-accordionTab [selected]="true" header="Customer Information">
+                                    <fieldset>
+                                        <legend>Customer Information</legend>
+
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                {{customerLabelName}}
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" name="customerName" formControlName="customerName" [attr.disabled]="true" name="customerName" class="form-control">
+                                            </div>
+
+                                            <!-- <label for="" class="control-label col-md-2">
+                                        Customer Account
+                                    </label>
+
+                                    <div class="col-md-4">
+                                        <input type="text" name="customerAccount" formControlName="customerAccount" [attr.disabled]="true" [ngClass]="!loanApplicationForm.controls['customerAccount'].valid ? 'required-input' : 'valid-input'"
+                                            name="customerAccount" class="form-control">
+                                    </div> -->
+                                            <label style="padding-top: 13px" for="" class="control-label col-md-2">Facility
+                                                Type
+                                            </label>
+
+                                            <div class="col-md-4">
+
+                                                <select formControlName="loanTypeId" [ngClass]="!loanApplicationForm.controls['loanTypeId'].valid ? 'required-input' : 'valid-input'"
+                                                    [attr.disabled]="true" name="loanTypeId" class="form-control" id="loanTypeId">
+
+                                                    <option value=""></option>
+                                                    <option *ngFor="let pc of facilityTypes" value="{{pc.lookupId}}">
+                                                        {{pc.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+
+                                        <!--   <div class="form-group">
+                                    <label for="" class="control-label col-md-2">
+                                        Relationship Manager
+                                    </label>
+                                    <div class="col-md-4">
+
+                                            <label for="" class="control-label"> {{userInfo.staffName}} </label>
+
+                                           
+                                         <select  [ngClass]="!loanApplicationForm.controls['relationshipOfficerId'].valid ? 'required-input' : 'valid-input'"
+                                         name="relationshipOfficerId"  formControlName="relationshipOfficerId" class="form-control" id="relationshipOfficerId">
+                                            <option value=""></option>
+                                            <option *ngFor="let p of officers" value="{{p.staffId}}">
+                                                {{p.fullName}}
+                                            </option>
+                                        </select> 
+                                    </div>
+
+                                    <label for="" class="control-label col-md-2">
+                                        Business Manager
+                                    </label>
+                                    <div class="col-md-4">
+                                         <select  [ngClass]="!loanApplicationForm.controls['relationshipManagerId'].valid ? 'required-input' : 'valid-input'"
+                                        name="relationshipManagerId" formControlName="relationshipManagerId" 
+                                           class="form-control" id="relationshipManagerId">
+                                            <option value=""></option>
+                                            <option *ngFor="let p of officers" value="{{p.staffId}}">
+                                                {{p.fullName}}
+                                            </option>
+                                        </select> 
+                                    </div>
+                                </div>-->
+                                        <div class="form-group">
+
+                                            <label style="padding-top: 13px" for="" class="control-label col-md-2">Customer
+                                                Type</label>
+                                            <div class="col-md-4">
+                                                <select [ngClass]="!loanApplicationForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'" [attr.disabled]="true"
+                                                    formControlName="customerTypeId" name="customerTypeId" class="form-control"
+                                                    id="customerTypeId">
+                                                    <option value=""></option>
+                                                    <option *ngFor="let pc of customerTypes" value="{{pc.value}}">
+                                                        {{pc.name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <!-- <label style="padding-top: 13px" for="" class="control-label col-md-2">Customer
+                                                PEN</label>
+                                            <div class="col-md-4">
+                                                <select formControlName="loanPreliminaryEvaluationId" [ngClass]="!loanApplicationForm.controls['loanPreliminaryEvaluationId'].valid ? 'required-input' : 'valid-input'"
+                                                    name="loanPreliminaryEvaluationId" class="form-control" id="loanPreliminaryEvaluationId">
+                                                    <option value="">-- Select PEN Code --</option>
+                                                    <option *ngFor="let pc of penCodeList" value="{{pc.lookupId}}">
+                                                        {{pc.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div> -->
+                                            
+                                            <!--In case of proper use of term sheet, change the ngFor to termSheetCodeList ie remove the Correction-->
+                                            <label style="padding-top: 13px" for="" class="control-label col-md-2">
+                                                Customer Term Sheet
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select formControlName="loantermSheetId" [ngClass]="!loanApplicationForm.controls['loantermSheetId'].valid ? 'required-input' : 'valid-input'"
+                                                    name="loantermSheetId" class="form-control" id="loantermSheetId">
+                                                    <option value="">-- Select TERMSHEET Code --</option>
+                                                    <option *ngFor="let ts of termSheetCodeListCorrection" value="{{ts.lookupId}}">
+                                                        {{ts.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="form-group">
+
+                                            <label class="control-label col-md-2">Require Collateral</label>
+                                            <div class="col-md-4">
+                                                <select name="requireCollateralTypeId" formControlName="requireCollateralTypeId" id="requireCollateralTypeId" class="form-control" [ngClass]="!loanApplicationForm.controls['requireCollateralTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                    <option value="null">-- Select Require Collateral --</option>
+                                                    <option *ngFor="let x of requireCollateralTypes" value="{{x.id}}">{{x.name}}</option>
+                                                </select>
+                                            </div>
+ 
+
+                                            <label *ngIf="loanApplicationId>0" class="control-label col-md-2">Is An Already Approved Application?</label>
+                                            <div class="col-md-2" *ngIf="loanApplicationId>0">
+                                                <input type="checkbox" name="isAdHocApplication" formControlName="isAdHocApplication" (click)="setShowAdhocUploadLink($event)"
+                                                id="isAdHocApplication"  
+                                                style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                                                <a *ngIf="showAdhocUploadLink == true" (click)="setShowAdhocUpload($event)" href="javascript:void(0)"><span class="glyphicon glyphicon-upload"></span> <b>Upload</b></a>
+                                            </div>
+
+                                            <!-- <label class="control-label col-md-2">Rac Details</label>
+                                            <div class ="col-md-2">
+
+                                                    <div style="text-align:center">                                           
+                                                    <a (click)="GetRacResult()" href="javascript:void(0)">View Details</a>
+                                                    </div> 
+                                            </div> -->
+                                            <!-- <div class="col-md-2"> -->
+                                            <!-- </div> -->
+
+                                            <!-- <label class="control-label col-md-2">CAP Region</label>
+                                            <div class="col-md-4">
+                                                <select formControlName="regionId" [ngClass]="!loanApplicationForm.controls['regionId'].valid ? 'required-input' : 'valid-input'"
+                                                    name="regionId" class="form-control" id="regionId">
+                                                    <option value="">-- Select Region --</option>
+                                                    <option *ngFor="let pc of regions" value="{{pc.lookupId}}">
+                                                        {{pc.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div> --> 
+
+                                        </div>
+
+
+                                        <div class="form-group">
+
+                                            <label for="" class="control-label col-md-2">Product Class</label>
+                                            <div class="col-md-3">
+                                                <select name="productClassId" [(ngModel)]="productClassId" class="form-control" formControlName="productClassId" id="productClassId">
+                                                    <option value="">--- Select Product Class ---</option>
+                                                    <option *ngFor="let pc of productClasses" value="{{pc.lookupId}}">
+                                                        {{pc.lookupName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-1">
+                                                    <button [disabled]="!productClasses" pButton type="button" style="
+                                                        margin-left: -20px;
+                                                        padding:5px 0 24px 0;
+                                                        width: 127%;" 
+                                                    (click)="AddFacilityDetails()" label="Add Facility" class="ui-button-info"></button>
+                                            </div>
+
+                                            <!-- <label class="control-label col-md-2">Approved Line Facility</label>
+                                            <div class="col-md-4">
+                                                <select [disabled]="disableApprovedLineSelect == false" name="approvedLimitId" formControlName="approvedLimitId" id="approvedLimitId" class="form-control">
+                                                    <option value=0>-- Select facility --</option>
+                                                    <option *ngFor="let x of facilities" value="{{x.loanApplicationId}}">{{x.productName}}</option>
+                                                </select>
+                                            </div> -->
+                                            <label class="control-label col-md-2">Loan Amount with Other Bank:</label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="loansWithOthers" formatM name="loansWithOthers"
+                                                [ngClass]="!loanApplicationForm.controls['loansWithOthers'].valid ? 'required-input' : 'valid-input'"
+                                                formControlName="loansWithOthers" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2"></label>
+                                            <div class="col-md-3">
+                                                
+                                            </div>
+                                            <div class="col-md-1">
+                                                    
+                                            </div>
+                                            <label for="isEmployerRelated" class="control-label col-md-2">Is Employer Related?</label>
+                                            <div class="col-md-1">
+                                                <input type="checkbox" name="isEmployerRelated" 
+                                                    formControlName="isEmployerRelated" (click)="toggleIsEmployerRelated($event)"
+                                                    id="isEmployerRelated"style="box-shadow: none;margin-top: 10px;margin-left: 0px;"
+                                                    [ngClass]="!loanApplicationForm.controls['isEmployerRelated'].valid ? 'required-input' : 'valid-input'"
+                                                >
+                                            </div>
+                                            <!-- [attr.disabled]="isEmployerRelatedToggled() ? true : null" //might be needed due to Client's inconsistencies-->
+                                            <label for="relatedEmployerId" class="control-label col-md-1">Employer:</label>
+                                            <div class="col-md-2">
+                                                <select class="form-control" id="relatedEmployerId" name="relatedEmployerId"
+                                                formControlName="relatedEmployerId"
+                                                [ngClass]="!loanApplicationForm.controls['relatedEmployerId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-Select Employer-</option>
+                                                <option *ngFor="let item of relatedEmployers"
+                                                    value="{{item.employerId}}">
+                                                    {{item.employerName}}
+                                                </option>
+                                            </select>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="form-group"> -->
+<!-- 
+                                            <div class="col-md-2 col-md-offset-2 form-check  ">
+                                                <label class="form-check-label">
+                                                    <strong>Backed by Collateral</strong>
+                                                    <input type="checkbox" class="form-check-input" formControlName="requireCollateral" name="requireCollateral " id="requireCollateral" value="checkedValue">
+                                                </label>
+                                            </div>
+
+                                            <div class="col-md-2 form-check ">
+                                                <label class="form-check-label">
+                                                    <b>
+                                                        <strong>Obligor Rating : {{customerRating}} </strong>
+                                                    </b>
+                                                </label>
+                                            </div> -->
+
+
+                                            <!-- <label for="casaAccountId" class="control-label col-md-2">Customer Account (Operating) </label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" id="casaAccountId" name="casaAccountId" formControlName="casaAccountId" [ngClass]="!loanApplicationForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                            <option value=""> Select Customer Account</option>
+                                            <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">{{item.productAccountNumber}} </option>
+                                        </select>
+                                    </div> -->
+
+                                        <!-- </div> -->
+                                        <!--                                                                                         
+                                            <div class="col-md-2 col-md-offset-2">
+                                                <button type="button" (click)="AddFacilityDetails()" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-plus" style="padding-right:4px;"></span> Add Facility Details</button>
+                                            </div> -->
+                                        <!-- {{ loanApplication.value | json }} -->
+
+                                    </fieldset>
+                                </p-accordionTab>
+
+                                <p-accordionTab header="List of facility(s)">
+                                    <fieldset>
+                                        <legend>
+                                            <h4>List of facility(s)</h4>
+                                        </legend>
+                                        <div style="max-height:250px; overflow:auto;" *ngIf="loanApplicationDetails && loanApplicationDetails.length > 0">
+                                            <table class="table table-striped" style="margin-right:5px">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>Customer Name</th>
+                                                        <th>Facility</th>
+                                                        <th>Tenor(Days)</th>
+                                                        <th>Rate(%)</th>
+                                                        <th>Currency</th>
+                                                        <th>Exchange Rate</th>
+                                                        <th>Requested Amount</th>
+                                                        <th>NGN Equivalent</th>
+                                                        <th></th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tfoot>
+                                                    <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                                                        <td></td>
+                                                        <td>Total</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>{{proposedAmount | number : '1.2'}}</td>
+                                                        <td>{{exchangeAmount | number : '1.2'}}</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
+
+                                                </tfoot>
+                                                <tbody>
+                                                    <tr *ngFor="let p of loanApplicationDetails;let indx=index">
+                                                        <td>{{indx + 1}}</td>
+                                                        <td>{{p.customerName}}</td>
+                                                        <td>{{p.proposedProductName}}</td>
+                                                        <td>{{p.proposedTenor}} </td>
+                                                        <td>{{p.proposedInterestRate}}</td>
+                                                        <td>{{p.currencyName}} </td>
+                                                        <td>{{p.exchangeRate | number : '1.2'}}</td>
+                                                        <td>{{p.proposedAmount | number : '1.2'}}</td>
+                                                        <td>{{p.exchangeAmount | number : '1.2'}}</td>
+                                                        <td style="width:50px">
+                                                            <a (click)="editFacilityDetails(p)" style="color:#3ace" href="javascript:void(0)">Edit</a>
+                                                        </td>
+                                                        <td style="width:50px">
+                                                            <a (click)="removeApplicationDetailsItem($event,indx)" style="color:#ff0000" href="javascript:void(0)">Remove</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </fieldset>
+                                </p-accordionTab>
+
+                                <!-- <p-accordionTab header="Collateral Detail">
+                                    <fieldset>
+                                        <legend>
+                                            <h4>Collateral Detail</h4>
+                                        </legend>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <textarea formControlName="collateralDetail" name="collateralDetail" rows=5 class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </p-accordionTab> -->
+
+                                <p-accordionTab header="Provide Organisation and Management Profile">
+                                    <fieldset>
+                                        <legend>
+                                            <h4>Provide Organisation and Management Profile</h4>
+                                        </legend>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                            <!-- <app-ckeditior-project (contentChange)="contentChange($event)" [content]="ckEditorContent" [height]="200">
+                                            </app-ckeditior-project> -->
+                                            <p-editor formControlName="loanInformation" name="loanInformation" [style]="{'height':'100px'}"></p-editor>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </p-accordionTab>
+
+                                <p-accordionTab header="Ownership Structure">
+                                    <fieldset>
+                                        <legend>
+                                            <h4>Ownership Structure (% Local/Foreign Ownership)</h4>
+                                        </legend>
+                                        <div class="col-md-12">
+                                                <input type="text" name="ownershipStructure" formControlName="ownershipStructure"
+                                                    id="ownershipStructure" class="form-control"
+                                                    [ngClass]="!loanApplicationForm.controls['ownershipStructure'].valid ? 'required-input' : 'valid-input'">
+                                            <!-- <textarea type="text" id="ownershipStructure" rows=12 formControlName="ownershipStructure" [ngClass]="!loanApplicationForm.controls['ownershipStructure'].valid ? 'required-input' : 'valid-input'"
+                                                class="form-control">
+                                            </textarea> -->
+                                        </div>
+                                    </fieldset>
+                                </p-accordionTab>
+                            </p-accordion>
+
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" style="margin-right:5px" class="btn btn-success pull-right" (click)="onSubmit(true)"
+                                     [disabled]="(loanApplicationForm.invalid || loanApplicationDetails.length === 0)"> Save and Continue
+                                    </button>
+                                    <button type="button" style="margin-right:5px" class="btn btn-danger pull-right" (click)="hideModal()">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <pre>{{ totalExposureLimit | json }}</pre> -->
+
+<p-dialog [responsive]=true [(visible)]="showAdhocUpload" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+'max-height': '80vh','min-height':'500px'}" width="1000" [style]="{'z-index': 10}" id="ct-modal" modal="modal" showEffect="fade"
+    width="1200">
+
+    <document-upload [reload]="reload" [autoZIndex]="false" [operationId]="133" [customerId]="storedApplicationInfo.customerId" [targetId]="loanApplicationId"
+        [targetReferenceNumber]="loanApplicationReferance">
+    </document-upload>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="showAdhocUpload=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+
+
+
+
+
+
+
+
+        

@@ -1,0 +1,101 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Product Groups
+                            </h2>
+
+                            <div class="pull-right">
+                                <!-- <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                            </div>
+                            <!--<button (click)="showModalForm()" class="btn btn-default pull-right"><span class="glyphicon glyphicon-plus"></span> Add New {{ entityName }}</button>-->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="productGroups" [paginator]="true" [rows]="20" [responsive]="true">
+                        <p-column field="productGroupName" header="Product Group Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productGroupCode" header="Product Group Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editRow(pGrp)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="deleteProductGroup(pGrp,$event)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                            </ng-template>
+                        </p-column> -->
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+        </div>
+    </div>
+</div>
+
+
+<!--add modal-->
+<p-dialog [responsive]="true" [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="460">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{panelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <input type="hidden" name="productGroupId" formControlName="productGroupId" id="productGroupId">
+
+                    <div class="form-group">
+                        <label for="productGroupName" class="control-label col-md-4">
+                            Product Group Name
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" name="productGroupName" formControlName="productGroupName" id="productGroupName" class="form-control" [ngClass]="!createUpdateForm.controls['productGroupName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productGroupCode" class="control-label col-md-4">
+                            Product Group Code
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="productGroupCode" formControlName="productGroupCode" id="productGroupCode" class="form-control" [ngClass]="!createUpdateForm.controls['productGroupCode'].valid ? 'required-input' : 'valid-input'" [attr.disabled]="isUpdate ? true : null">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

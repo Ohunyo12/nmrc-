@@ -1,0 +1,340 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{ entityName }}
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="addNewCronJob()" pButton type="button" label="Add New Cron"
+                                    icon="fa-plus"></button>
+                                <button (click)="addComputation()" pButton type="button" label="Computation Setup"
+                                    icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- tabs here -->
+                    <p-tabView>
+
+                        <!-- Branch Limit -->
+                        <p-tabPanel header="Cron Job Setup">
+
+                            <p-dataTable [value]="cronList" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="startDate" header="Start Date" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.startDate | date: 'dd-MM-yyyy'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="startTime" header="Start Time" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="endDate" header="End Date" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.endDate | date: 'dd-MM-yyyy'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="endTime" header="End Time" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+
+                                <p-column field="cronNature" header="Frequency" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editCron(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                        <span style="padding:3px;">|</span>
+                                        <a (click)="deleteCron(d)" href="javascript:void(0)">Delete</a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="Computation Setup">
+                            <p-dataTable [value]="computationList" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="dateTimeCreated" header="Created Date" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.dateTimeCreated | date: 'dd-MM-yyyy'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="vat" header="Value Added Tax %" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="wht" header="With Holding Tax %" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+
+                                <p-column field="commissionPayable" header="Commission Rate(%) (Internal)"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="commissionPayableLimit" header="Fixed Commission Payable (Internal)"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                               
+                                <p-column field="recoveredAmountBelow" header="Recovered Amount Below (Internal)" sortable="true"
+                                    [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.recoveredAmountBelow | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="recoveredAmountAbove" header="Recovered Amount Above (Internal)" sortable="true"
+                                    [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.recoveredAmountAbove | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="commissionRateExternal2" header="Commission Rate Above  (External)"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="commissionRateExternal" header="Commission Rate Below (External)"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="recoveredAmountExternalAbove" header="Recovered Amount Above (External)" sortable="true"
+                                    [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.recoveredAmountExternalAbove | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="recoveredAmountExternalBelow" header="Recovered Amount Below (External)" sortable="true"
+                                    [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.recoveredAmountExternalBelow | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editComputation(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                        <span style="padding:3px;">|</span>
+                                        <a (click)="deleteComputation(d)" href="javascript:void(0)">Delete</a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+                        </p-tabPanel>
+
+                    </p-tabView>
+                    <!-- end tabs here -->
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel2-->
+
+        </div>
+        <!--end of card2-->
+
+
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal forms starts here-->
+
+<!-- Branch Limit -->
+<p-dialog [responsive]=true [(visible)]="cronDisplayAddModal" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="cronForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="startDate" class="control-label col-md-2">Start Date</label>
+                        <div class="col-md-4">
+                            <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true"
+                                [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                [style]="{'width': '100%', 'z-index': '999'}"
+                                [ngClass]="cronForm.controls['startDate'].valid ? 'valid-input' : 'required-input'">
+                            </p-calendar>
+                        </div>
+                        <label for="startTime" class="control-label col-md-2">Start Time: <em>(8,0,0)</em></label>
+                        <div class="col-md-4">
+                            <input type="text" name="startTime" id="startTime" class="form-control"
+                                formControlName="startTime"
+                                [ngClass]="cronForm.controls['startTime'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate" class="control-label col-md-2">End Date</label>
+                        <div class="col-md-4">
+                            <p-calendar id="endDate" formControlName="endDate" [monthNavigator]="true"
+                                [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                [style]="{'width': '100%', 'z-index': '988'}"
+                                [ngClass]="cronForm.controls['endDate'].valid ? 'valid-input' : 'required-input'">
+                            </p-calendar>
+                        </div>
+                        <label for="endTime" class="control-label col-md-2">End Time: <em>(17,30,0)</em></label>
+                        <div class="col-md-4">
+                            <input type="text" name="endTime" id="endTime" class="form-control"
+                                formControlName="endTime"
+                                [ngClass]="cronForm.controls['endTime'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cronNature" class="control-label col-md-2">Frequency</label>
+                        <div class="col-md-4">
+                            <select id="cronNature" formControlName="cronNature" name="cronNature" class="form-control"
+                                [ngClass]="!cronForm.controls['cronNature'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">Select Frequency Type</option>
+                                <option value="1">Monthly</option>
+                                <option value="2">Quarterly</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormCronJob(cronForm)" [disabled]="cronForm.invalid"
+                            class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="cronDisplayAddModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="computationDisplayAddModal" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="computationForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="vat" class="control-label col-md-2">VAT (%)</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="vat" formControlName="vat" id="vat" class="form-control"
+                                [ngClass]="computationForm.controls['vat'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="wht" class="control-label col-md-2">Whitholding Tax (%)</label>
+                        <div class="col-md-4">
+                            <input type="text" name="wht" id="wht" class="form-control" formControlName="wht"
+                                [ngClass]="computationForm.controls['wht'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="commissionPayable" class="control-label col-md-2">Commission Rate(%) (Internal Agents) </label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="commissionPayable" id="commissionPayable"
+                                class="form-control" formControlName="commissionPayable"
+                                [ngClass]="computationForm.controls['commissionPayable'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="commissionPayableLimit" class="control-label col-md-2">Fixed Commission Payable (Internal
+                            Agents)  </label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="commissionPayableLimit"
+                                formControlName="commissionPayableLimit" id="commissionPayableLimit"
+                                class="form-control"
+                                [ngClass]="computationForm.controls['commissionPayableLimit'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recoveredAmountBelow" class="control-label col-md-2">Amount Recovered Below (Internal)</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="recoveredAmountBelow"
+                                formControlName="recoveredAmountBelow" id="recoveredAmountBelow" class="form-control"
+                                [ngClass]="computationForm.controls['recoveredAmountBelow'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="recoveredAmountAbove" class="control-label col-md-2">Amount Recovered Above (Internal)</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="recoveredAmountAbove"
+                                formControlName="recoveredAmountAbove" id="recoveredAmountAbove" class="form-control"
+                                [ngClass]="computationForm.controls['recoveredAmountAbove'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="commissionRateExternal" class="control-label col-md-2">Commission Rate 1(%) (External)</label>
+                        <div class="col-md-4">
+                            <input type="text" name="commissionRateExternal" id="commissionRateExternal"
+                                class="form-control" formControlName="commissionRateExternal"
+                                [ngClass]="computationForm.controls['commissionRateExternal'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="recoveredAmountExternalBelow" class="control-label col-md-2">Amount Recovered Below (External)</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="recoveredAmountExternalBelow"
+                                formControlName="recoveredAmountExternalBelow" id="recoveredAmountExternalBelow" class="form-control"
+                                [ngClass]="computationForm.controls['recoveredAmountExternalBelow'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="commissionRateExternal2" class="control-label col-md-2">Commission Rate 2(%) (External)</label>
+                        <div class="col-md-4">
+                            <input type="text" name="commissionRateExternal2" id="commissionRateExternal2"
+                                class="form-control" formControlName="commissionRateExternal2"
+                                [ngClass]="computationForm.controls['commissionRateExternal2'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="recoveredAmountExternalAbove" class="control-label col-md-2">Amount Recovered Above (External)</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="recoveredAmountExternalAbove"
+                                formControlName="recoveredAmountExternalAbove" id="recoveredAmountExternalAbove" class="form-control"
+                                [ngClass]="computationForm.controls['recoveredAmountExternalAbove'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormComputation(computationForm)"
+                            [disabled]="computationForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="computationDisplayAddModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>

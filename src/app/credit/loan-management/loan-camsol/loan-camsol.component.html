@@ -1,0 +1,335 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{headerText}}
+                            </h2>
+                            <div class="pull-right">
+                                <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)"  pButton type="button" label="Collapse upload" icon="fa-arrow-up"></button>
+                                <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)"  pButton type="button" label="Bulk upload" icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="collapseForm==false" class="panel-body">
+                    <div class="form-group col-md-12">
+                        <div class="col-md-12">
+                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" [accept]="'.xslx, .xls, .xltx'" #fileInput name="fileInput"
+                                style="padding-top:2px;" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <div class="col-md-6">
+                            <button class="btn btn-sm btn-primary pull-left" (click)="uploadCamsolFile()" [disabled]="file==undefined ">
+                                <span class="glyphicon glyphicon-upload"></span> Upload</button>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                                <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                            <a href="./../../../../assets/files/CamsolSampleDocument.xlsx" target="_blank" class="btn btn-sm btn-primary pull-right">
+                                <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <button type="button" (click)="submitCustomerSearchForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                                    <button type="button" (click)="clearCustomerSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button> -->
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="collapseForm==false && (uploadedData != null && uploadedData.length > 0)" class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="5" [value]="uploadedData" [responsive]=true selectionMode="single">
+                        <p-column field="customercode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="loansystemtype" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="camsolType" header="camsol Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customername" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="date" header="Date" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.date | date : 'dd MMM yyyy' }}
+                                </ng-template>
+                        </p-column>
+                        <p-column field="principal" header="Principal" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.principal | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="balance" header="Balance" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.balance | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="cantakeloan" header="Can Take Loan" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                         <p-column>
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-camsol="rowData" let-i="rowIndex" pTemplate="body">
+                                <span style="color: red">{{camsol.message}}</span>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+                <div *ngIf="collapseForm==false && (failedUpload != null && failedUpload.length > 0)" class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="5" [value]="failedUpload" [responsive]=true selectionMode="single">
+                        <p-column field="customercode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="loansystemtype" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="camsolType" header="camsol Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customername" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="date" header="Date" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.date | date : 'dd MMM yyyy' }}
+                                </ng-template>
+                        </p-column>
+                        <p-column field="principal" header="Principal" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.principal | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="balance" header="Balance" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.balance | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="cantakeloan" header="Can Take Loan" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                         <p-column>
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-camsol="rowData" let-i="rowIndex" pTemplate="body">
+                                <span style="color: red">{{camsol.message}}</span>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+                <div *ngIf="!collapseForm==false" class="panel-body">
+                        <div class="ui-g ui-fluid">
+                                <div class="form-group" style="margin-right:10px">
+                                    <label for="searchItem" class="control-label col=md-3">
+                                        Cusotmer Name / Code
+                                    </label>
+                                    <div class="col=md-9">
+                                        <input type="text" name="searchValue" placeholder=" Search value ..." [(ngModel)]="searchValue" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-right:10px">
+                                    <label for="searchItem" class="control-label col=md-3">
+                                        .
+                                    </label>
+                                    <div class="col=md-9">
+                                        <button pButton type="button" (click)="GetAllSearchCamsol()" label="Search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                    <p-dataTable [value]="loanCamsolData" [paginator]="true" [rows]="5">
+                        <p-column field="customercode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="loansystemtype" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="camsolType" header="camsol Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customername" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="date" header="Date" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.date | date : 'dd MMM yyyy' }}
+                                </ng-template>
+                        </p-column>
+                        <p-column field="principal" header="Principal" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.principal | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="balance" header="Balance" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.balance | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="cantakeloan" header="Can Take Loan" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'110px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="ViewLaonCamsolById(d.loancamsolid)" href="javascript:void(0)">View</a>
+                                    <span style="padding:3px;"></span>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'110px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="EditLaonCamsolByCustomerName(d.customercode)" href="javascript:void(0)">Request</a>
+                                    <span style="padding:3px;"></span>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="viewCusotmerDetail" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div class="ui-g ui-fluid">
+
+        <div class="panel-body">
+
+        <div class="form-group" style="margin-right:10px">
+            <label for="searchItem" class="control-label col=md-3">
+                <!-- Approve Loan -->
+                Can Take Loan
+            </label>
+
+            <div class="col=md-9">
+                <select [(ngModel)]="updateOption" name="updateOption" id="updateOption" class="form-control">
+                    <option value="">-- Select Option --</option>
+                    <option [value]="true"> true </option>
+                    <option [value]="false">false</option>
+                </select>
+            </div>
+        </div>
+        </div>
+        <div class="form-group" style="margin-right:10px; padding-top: 35px">
+            <div class="col=md-9">
+                <button pButton type="button" (click)="ApproveLoan()" label="Save"></button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate *ngIf="viewCusotmerDetail" autocomplete="off">
+
+            <div class="panel-body">
+                <p-dataTable [value]="customerLoanCamsol" [paginator]="true" [rows]="5">
+                    <p-column field="customercode" header="Customer Code" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+                    <p-column field="loansystemtype" header="Loan Type" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+                    <p-column field="camsolType" header="camsol Type" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+                    <p-column field="customername" header="Customer Name" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+                    <p-column field="date" header="Date" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.date | date : 'dd MMM yyyy' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="loanRef" header="loan Ref" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+
+                    <p-column field="principal" header="Principal" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.principal | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="balance" header="Balance" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.balance | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="cantakeloan" header="Can Take Loan" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+                </p-dataTable>
+
+
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="viewCusotmerDetail=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="viewDetail" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate *ngIf="viewDetail" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="panel-body">
+                        <div class="row" style="padding:0 15px 0 15px;">
+                            <h4>Loan Written-off Accounts Detail</h4>
+                            <table class="table table-casa-information">
+                                <tbody>
+
+                                    <tr>
+                                        <!-- <td>
+                                                <strong>Account Name:</strong>
+                                            </td>
+                                            <td>{{ loanCamsolValue.accountname }}</td> -->
+                                        <td>
+                                            <strong>Customer Name:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.customername }}</td>
+                                        <td>
+                                            <strong>Balance:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.balance | number:'1.2' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Loan System Type:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.loansystemtype }}</td>
+                                        <td>
+                                            <strong>camsolType</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.camsolType }}</td>
+                                        <td>
+                                            <strong>Interest Insuspense:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.interestinsuspense | number:'1.2' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Loan Reference:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.loanRef }}</td>
+                                        <td>
+                                            <strong>Date Logged:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue?.date | date:"dd-MM-yyyy" }}</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        <!-- </div> -->
+
+    </form>
+    <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="viewDetail=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+</div>
+</p-dialog>

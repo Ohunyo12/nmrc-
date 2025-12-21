@@ -1,0 +1,118 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <!--card 1 loan search-->
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer KYC Item
+                            </h2>
+                            <div class="pull-right">
+                                <button pButton type="button" label="Add New" icon="fa-plus" (click)="showDisplayModalForm()"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body coll-list">
+                    <p-dataTable [value]="kycObject">
+                        <!--<p-column field="collateralTypeId" header="Collateral Type Id" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+                        <p-column field="item" header="KYC Item" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="displayOrder" header="Order" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="isMandatory" header="Compulsory" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editKYCItem($event, i)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{entityName}}
+            </h2>
+        </div>
+
+        <form [formGroup]="kycitemform" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            KYC Item
+                        </label>
+
+
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" formControlName="item" name="item" id="item">
+
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                            Product
+                        </label>
+
+
+                        <div class="col-md-4">
+                            <select id="productId" name="productId" formControlName="productId" class="form-control">
+                                <option value=""> Select Product</option>
+                                <option *ngFor="let curr of product" value="{{curr.productId}}"> {{curr.productName}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Display Order
+                        </label>
+
+
+                        <div class="col-md-4">
+                            <select id="displayOrder" name="displayOrder" formControlName="displayOrder" class="form-control">
+                                <option value=""> Select Position</option>
+                                <option *ngFor="let curr of positions" value="{{curr.id}}"> {{curr.name}}</option>
+                            </select>
+
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                            Compulsory
+                        </label>
+
+
+                        <div class="col-md-4">
+                            <label class="form-check-label">
+                                <input type="checkbox" formControlName="isMandatory" class="form-check-input" name="isMandatory " id="isMandatory " value="checkedValue">
+                                <span>Check if the required item is compulsory</span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--[disabled]="groupForm.invalid"-->
+                        <button type="submit" (click)="onSubmitKycItemForm(kycitemform)" class="btn btn-success pull-right">Save</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="hideDisplayModalForm()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</p-dialog>

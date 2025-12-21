@@ -1,0 +1,332 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+
+      <div class="card no-padding">
+
+          <div class="panel panel-default">
+
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              Project Criteria 
+                             
+                          </h2>
+                          <div class="pull-right">
+                              <button (click)="addNewContractorCriteria()" pButton type="button" label="Add Contractor Criteria" icon="fa-plus"></button>
+                              <button (click)="addNewContractorCriteriaOption()" pButton type="button" label="Add Contractor Criteria Options" icon="fa-plus"></button>
+                              <button (click)="addNewProjectRiskRatingCategory()" pButton type="button" label="Add Project Risk Rating Category" icon="fa-plus"></button>
+                              <button (click)="addNewProjectRiskRatingCriteria()" pButton type="button" label="Add Project Risk Rating" icon="fa-plus"></button>
+                       </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="panel-body">
+                  <!-- tabs here -->
+                  <p-tabView>
+                      <!-- Contractor criteria -->
+                      <p-tabPanel header="Contractor Criteria">
+                          <p-dataTable [value]="contractorCriterias" [paginator]="true" [rows]="10" [responsive]="true">
+                              <p-column field="criteria" header="Criteria" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <p-column field="tierOne" header="Tier 1" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <p-column field="tierTwo" header="Tier 2" sortable="true" [filter]="true" filterMatchMode="contains">
+                              </p-column>
+                              <p-column field="tierThree" header="Tier 3" sortable="true" [filter]="true" filterMatchMode="contains">
+                              </p-column>
+                              <p-column [style]="{'width':'100px'}">
+                                  <ng-template pTemplate="header">
+                                      Edit
+                                  </ng-template>
+                                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      <a (click)="editContractorCriteria(d)" href="javascript:void(0)">
+                                          Edit
+                                      </a>
+                                  </ng-template>
+                              </p-column>
+
+                          </p-dataTable>
+                      </p-tabPanel>
+                      <p-tabPanel header="Contractor Criteria Option">
+                        <p-dataTable [value]="contractorCriteriaOptions" [paginator]="true" [rows]="10" [responsive]="true">
+                            <p-column field="criteria" header="Criteria" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="optionName" header="Option Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="optionValue" header="Value" sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">
+                                    Edit
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editContractorCriteriaOption(d)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+                    </p-tabPanel>
+
+                      <!-- Project Risk Rating -->
+                      <p-tabPanel header="Project Risk Rating Category">
+                          <p-dataTable [value]="projectRiskRatingCategories" [paginator]="true" [rows]="10" [responsive]="true">
+                              <p-column field="categoryName" header="Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <p-column [style]="{'width':'100px'}">
+                                  <ng-template pTemplate="header">
+                                      Edit
+                                  </ng-template>
+                                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      <a (click)="editProjectRiskRatingCategory(d)" href="javascript:void(0)">
+                                          Edit
+                                      </a>
+                                  </ng-template>
+                              </p-column>
+
+                          </p-dataTable>
+
+                      </p-tabPanel>
+
+                      <p-tabPanel header="Project Risk Rating Criteria">
+                        <p-dataTable [value]="projectCriterias" [paginator]="true" [rows]="10" [responsive]="true">
+                            <p-column field="criteria" header="Criteria" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="criteriaValue" header="Value" sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="category" header="Project Category" sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">
+                                    Edit
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editProjectRiskRatingCriteria(d)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                    </p-tabPanel>
+              </p-tabView>
+                  <!-- end tabs here -->
+              </div>
+              <div class="panel-footer">
+                  <div class="row">
+                      <div class="col-md-12">
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+          <!--end of panel2-->
+
+      </div>
+      <!--end of card2-->
+
+
+  </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal forms starts here-->
+<p-dialog [responsive]=true [(visible)]="contractorDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              {{ entityName}}
+          </h2>
+      </div>
+
+      <form novalidate [formGroup]="contractorCriteriaForm" autocomplete="off">
+
+          <div class="panel-body">
+              <div class="form-horizontal">
+                  <div class="form-group">
+                      <label for="criteria" class="control-label col-md-2">Criteria</label>
+                      <div class="col-md-4">
+                          <textarea  name="criteria" formControlName="criteria" id="criteria" class="form-control" [ngClass]="!contractorCriteriaForm.controls['criteria'].valid ? 'required-input' : 'valid-input'"></textarea>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="tierOne" class="control-label col-md-2">Tier 1</label>
+                    <div class="col-md-4">
+                        <input type="text" name="tierOne" id="tierOne" class="form-control" formControlName="tierOne" [ngClass]="contractorCriteriaForm.controls['tierOne'].valid ? 'valid-input' : 'required-input'">
+                    </div>
+                </div>
+                  <div class="form-group">
+                      <label for="tierTwo" class="control-label col-md-2">Tier 2</label>
+                      <div class="col-md-4">
+                          <input type="text" name="tierTwo" id="tierTwo" class="form-control" formControlName="tierTwo" [ngClass]="contractorCriteriaForm.controls['tierTwo'].valid ? 'valid-input' : 'required-input'">
+                      </div>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="tierThree" class="control-label col-md-2">Tier 3</label>
+                    <div class="col-md-4">
+                        <input type="text" name="tierThree" id="tierThree" class="form-control" formControlName="tierThree" [ngClass]="contractorCriteriaForm.controls['tierThree'].valid ? 'valid-input' : 'required-input'">
+                    </div>
+
+                </div>
+              </div>
+          </div>
+
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="button" (click)="submitContractorCriteriaForm(contractorCriteriaForm)" [disabled]="contractorCriteriaForm.invalid" class="btn btn-success pull-right">Save</button>
+                      <button type="button" (click)="contractorDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                  </div>
+              </div>
+          </div>
+
+      </form>
+
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="projectRistCriteriaDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              {{ entityName}}
+          </h2>
+      </div>
+
+      <form novalidate [formGroup]="projectRiskCriteriaForm" autocomplete="off">
+
+          <div class="panel-body">
+              <div class="form-horizontal">
+                  <div class="form-group">
+                      <label for="criteria" class="control-label col-md-2">Criteria</label>
+                      <div class="col-md-4">
+                          <input type="text" name="criteria" formControlName="criteria" id="criteria" class="form-control" [ngClass]="!projectRiskCriteriaForm.controls['criteria'].valid ? 'required-input' : 'valid-input'">
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <label for="criteriaValue" class="control-label col-md-2">Value</label>
+                      <div class="col-md-4">
+                          <input type="text" name="criteriaValue" formControlName="criteriaValue" id="criteriaValue" class="form-control" [ngClass]="!projectRiskCriteriaForm.controls['criteriaValue'].valid ? 'required-input' : 'valid-input'">
+                      </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="projectRiskRatingCategoryId" class="control-label col-md-2">Project Category</label>
+                    <div class="col-md-4">
+                      <select class="form-control" id="projectRiskRatingCategoryId" name="projectRiskRatingCategoryId"
+                      formControlName="projectRiskRatingCategoryId"
+                      [ngClass]="!projectRiskCriteriaForm.controls['projectRiskRatingCategoryId'].valid ? 'required-input' : 'valid-input'">
+                      <option value=""> Select Category</option>
+                      <option *ngFor="let item of projectRiskRatingCategories" value="{{item.categoryId}}">
+                          {{item.categoryName}}
+                      </option>
+                  </select>
+                    </div>
+                </div>
+              </div>
+          </div>
+
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="button" (click)="submitProjectRiskCriteriaForm(projectRiskCriteriaForm)" [disabled]="projectRiskCriteriaForm.invalid" class="btn btn-success pull-right">Save</button>
+                      <button type="button" (click)="projectRistCriteriaDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                  </div>
+              </div>
+          </div>
+
+      </form>
+
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="projectRistCategoryDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              {{ entityName}}
+          </h2>
+      </div>
+
+      <form novalidate [formGroup]="projectRiskCategoryForm" autocomplete="off">
+
+          <div class="panel-body">
+              <div class="form-horizontal">
+                  <div class="form-group">
+                      <label for="categoryName" class="control-label col-md-2">Category Name</label>
+                      <div class="col-md-4">
+                          <input type="text" name="categoryName" formControlName="categoryName" id="categoryName" class="form-control" [ngClass]="!projectRiskCategoryForm.controls['categoryName'].valid ? 'required-input' : 'valid-input'">
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="button" (click)="submitProjectRistRatingCategoryForm(projectRiskCategoryForm)" [disabled]="projectRiskCategoryForm.invalid" class="btn btn-success pull-right">Save</button>
+                      <button type="button" (click)="projectRistCategoryDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                  </div>
+              </div>
+          </div>
+
+      </form>
+
+  </div>
+</p-dialog>
+
+<!--modal forms starts here-->
+<p-dialog [responsive]=true [(visible)]="contractorOptionDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+  
+        <form novalidate [formGroup]="contractorCriteriaOptionForm" autocomplete="off">
+  
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="criteriaId" class="control-label col-md-2">Criteria</label>
+                        <div class="col-md-4">
+                            <select class="form-control" id="criteriaId" name="criteriaId"
+                            formControlName="criteriaId"
+                            [ngClass]="!contractorCriteriaOptionForm.controls['criteriaId'].valid ? 'required-input' : 'valid-input'">
+                            <option value=""> Select Category</option>
+                            <option *ngFor="let item of criteriaList" value="{{item.criteriaId}}">
+                                {{item.criteria}}
+                            </option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="optionName" class="control-label col-md-2">Option Name</label>
+                      <div class="col-md-4">
+                          <textarea type="text" name="optionName" id="optionName" class="form-control" formControlName="optionName" [ngClass]="contractorCriteriaOptionForm.controls['optionName'].valid ? 'valid-input' : 'required-input'"></textarea>
+                      </div>
+                  </div>
+                    <div class="form-group">
+                        <label for="optionValue" class="control-label col-md-2">Value</label>
+                        <div class="col-md-4">
+                            <input type="text" name="optionValue" id="optionValue" class="form-control" formControlName="optionValue" [ngClass]="contractorCriteriaOptionForm.controls['optionValue'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+  
+                    </div>
+                   
+                </div>
+            </div>
+  
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitContractorCriteriaOptionForm(contractorCriteriaOptionForm)" [disabled]="contractorCriteriaOptionForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="contractorOptionDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+  
+        </form>
+  
+    </div>
+  </p-dialog>

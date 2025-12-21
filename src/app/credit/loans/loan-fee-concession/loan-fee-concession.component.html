@@ -1,0 +1,260 @@
+<p-growl [(value)]="msgs"></p-growl>
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+
+    <div *ngIf="display" class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">Search for loan</h2>
+          </div>
+        </div>
+      </div>
+      <form #searchForm="ngForm" novalidate autocomplete="off">
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="searchQuery" class="control-label col-sm-2">Search For Loan</label>
+              <div class="col-sm-6">
+                <input type="text" id="searchQuery" [(ngModel)]="searchQuery" class="form-control" [ngModelOptions]="{standalone: true}"
+                  [ngClass]="{'valid-input':searchQuery, 'required-input':!searchQuery}">
+              </div>
+              <div class="col-sm-2">
+                <button type="submit" (click)="searchForLoan(searchQuery)" class="btn btn-sm btn-success" [disabled]="searchForm.invalid">
+                  <span class="glyphicon glyphicon-search"></span> Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div *ngIf="displayLoanSearchResults" class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">Search Result</h2>
+            <div class="pull-right">
+              <button (click)="backToSearch()" pButton type="button" label="Back To Search" icon="fa-back"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <p-dataTable [paginator]="true" [rows]="15" [value]="searchResult" [responsive]=true selectionMode="single">
+          <p-column field="applicationReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"
+            [style]="{'width':'90px'}"></p-column>
+          <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+          <p-column field="relationshipOfficerName" header="Relationship Manager" sortable="true" [filter]="true" filterMatchMode="contains">
+          </p-column>
+          <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '150px'}"></p-column>
+          <p-column field="applicationAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right', 'width': '120px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.applicationAmount | number : '1.2' }}
+            </ng-template>
+          </p-column>
+          <p-column field="interestRate" header="Rate" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right', 'width': '70px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.interestRate | number : '1.2' }}
+            </ng-template>
+          </p-column>
+          <p-column field="applicationTenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right', 'width': '70px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.applicationTenor | number : '1.2' }}
+            </ng-template>
+          </p-column>
+
+          <p-column [style]="{'width':'80px'}">
+
+            <ng-template pTemplate="header">
+
+            </ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <a (click)="viewLoanConcession(d, $event)" style="display: block" href="#">
+                View Concession
+              </a>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+    </div>
+
+    <div *ngIf="displayLoanFeeConcession" class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">Loan Fee Concession</h2>
+            <div class="pull-right">
+              <button (click)="showAddNew()" pButton type="button" label="Add New" icon="fa-plus"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <p-dataTable [paginator]="true" [rows]="15" [value]="feeConcessionData" [responsive]=true selectionMode="single">
+          <p-column field="loanRefNo" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'90px'}"></p-column>
+          <p-column field="concessionTypeName" header="Concession Type" sortable="true" [filter]="true" filterMatchMode="contains"
+            [style]="{'width': '100px'}"></p-column>
+
+          <p-column field="concessionReason" header="Reason For Concession" sortable="true" [filter]="true" filterMatchMode="contains">
+          </p-column>
+
+          <p-column field="defaultValue" header="Default Value" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+          </p-column>
+          <p-column field="concession" header="Concession" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+          </p-column>
+          <p-column field="loanChargeFeeName" header="Fee Charge" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '150px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.loanChargeFeeName ? d.loanChargeFeeName : 'N/A' }}
+            </ng-template>
+          </p-column>
+          <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+          </p-column>
+          <p-column [style]="{'width':'70px', 'text-align': 'center'}">
+            <ng-template pTemplate="header"></ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <a (click)="viewDocument(d, $event)" href="javascript:void(0)">
+                View
+              </a>
+            </ng-template>
+          </p-column>
+          <p-column [style]="{'width':'70px', 'text-align': 'center'}">
+            <ng-template pTemplate="header"></ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <a (click)="editFeeConcession(d, $event)" href="javascript:void(0)">
+                Edit
+              </a>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+
+            <button type="button" (click)="BackToList()" style="margin-right:5px" class="btn btn-danger pull-right">Back To List</button>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="600">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{ entityName }}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="feeConcessionForm" autocomplete="off">
+
+      <div class="panel-body">
+        <div class="form-horizontal">
+
+          <div class="form-group">
+            <label for="concessionTypeId" class="control-label col-md-4">Concession Type</label>
+            <div class="col-md-8">
+              <select name="concessionTypeId" id="concessionTypeId" formControlName="concessionTypeId" (change)="onConcessionTypeChanged($event.target.value)"
+                class="form-control" [ngClass]="!feeConcessionForm.controls['concessionTypeId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Concession type --</option>
+                <option *ngFor="let x of feeConcessiontype" [value]="x.concessionTypeId">
+                  {{x.concessionTypeName}}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="displayLoannFeeType">
+            <label for="loanChargeFeeId" class="control-label col-md-4">Loan Fee Type</label>
+            <div class="col-md-8">
+              <select name="loanChargeFeeId" id="loanChargeFeeId" formControlName="loanChargeFeeId" (change)="onLoanFeeTypeChanged($event.target.value)"
+                class="form-control" [ngClass]="!feeConcessionForm.controls['loanChargeFeeId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Fee Type --</option>
+                <option *ngFor="let x of feeConcessionCharges" [value]="x.loanChargeFeeId">
+                  {{x.chargesTypeName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="defaultValue">
+            <label for="defaultValue" class="control-label col-md-4">Default Value (%)</label>
+            <div class="col-md-8">
+              <input [attr.disabled]=true type="text" name="defaultValue" formControlName="defaultValue" id="defaultValue" class="form-control"
+                [ngClass]="'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="concession" class="control-label col-md-4">Concession (%)</label>
+            <div class="col-md-8">
+              <input type="text" name="concession" formControlName="concession" id="concession" class="form-control" [ngClass]="!feeConcessionForm.controls['concession'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="concessionReason" class="control-label col-md-4">Reason For Concession</label>
+            <div class="col-md-8">
+              <textarea rows="5" name="concessionReason" formControlName="concessionReason" id="concessionReason" class="form-control"
+                [ngClass]="!feeConcessionForm.controls['concessionReason'].valid ? 'required-input' : 'valid-input'"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="control-label col-md-4">Has Supporting Document?</label>
+            <div class="col-md-8">
+              <input type="checkbox" (change)="hasDocumentChanged($event.target.checked)" name="hasDocument" formControlName="hasDocument"
+                id="hasDocument">
+            </div>
+          </div>
+          <div *ngIf="hasDocument">
+            <div class="form-group">
+              <label style="padding-top: 13px" for="" class="control-label col-md-4">Supporting Document</label>
+              <div class="col-md-8">
+                <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                  #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitFeeConcessionForm(feeConcessionForm)" [disabled]="feeConcessionForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Document Title:
+        <strong>{{ selectedDocumentName }}</strong>
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayUpload=false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body" style="overflow:auto;height:500px">
+      <div style="margin: auto; width: 50%">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+          class="img-thumbnail">
+      </div>
+    </div>
+  </div>
+</p-dialog>

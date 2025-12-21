@@ -1,0 +1,70 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Proposed Facilities
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [scrollable]="true" #dt [paginator]="true" [responsive]="true"
+                    	[value]="proposedfacilities" [rows]="10">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header>
+                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralCode" header="Collateral Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"> </p-column>
+                        <p-column [style]="{'width':'150px','font-size':'12px'}" field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"> </p-column>
+                        <p-column [style]="{'width':'120px','font-size':'12px'}" field="applicationReferenceNumber" header="Application Ref No" sortable="true"
+                            [filter]="true" filterMatchMode="contains"> </p-column>
+                        
+						<p-column [style]="{'width':'120px','font-size':'12px'}" field="facilityAmount" header="Approved Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.facilityAmount | number : '1.2' }}
+                            </ng-template>
+						</p-column>
+						<p-column [style]="{'width':'100px','font-size':'12px'}" field="productName" header="Product" sortable="true" [filter]="true"
+                            filterMatchMode="contains"> </p-column>
+                        <p-column [style]="{'width':'120px','font-size':'12px'}" field="disbursedAmount" header="Booked Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.disbursedAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column> 
+                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="bookingDate" header="Book Date">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="maturityDate" header="Maturity Date">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="actualCollateralCoverage" header="Coverage" [filter]="false" filterMatchMode="contains"
+                            [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.actualCollateralCoverage | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'120px','font-size':'12px'}" field="outstandingPrincipal" header="Outstanding Principal" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.outstandingPrincipal | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

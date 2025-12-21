@@ -1,0 +1,148 @@
+<div class="panel panel-default">
+  <div class="panel-heading" >
+      <h2 class="panel-title">Approval Level Staff Modification</h2>
+  </div>
+  <div class="panel-body">
+
+<div  class="row">
+  <p-dataTable [value]="levelStaffTableView" [paginator]="true" [rows]="10">
+    <p-column field="approvalLevelName" header="Approval Level Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column field="staffLevelName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column field="position" header="Position" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+    
+    <p-column field="maximumAmount" header="Maximum Amount" [filter]="true" filterMatchMode="contains" [style]="{'width':'120px'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.maximumAmount | number : '1.2' }}
+        </ng-template>
+    </p-column>
+    
+    
+    <p-column [style]="{'width':'103px'}">
+       
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            <a (click)="viewtSelectLevelStaffDetail(d)" href="javascript:void(0)" title="Edit Staff">View</a>
+        </ng-template>
+    </p-column>
+</p-dataTable>
+</div>
+</div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayModel" modal="modal" showEffect="fade" width="600">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Approval Level Staff Modification
+        </h2>
+       
+      </div>
+
+              <div class="panel-body">
+                  <div *ngIf="levelStaffView != null" class="row" style="padding:0 15px 0 15px;">
+                    
+                      <table *ngIf="levelStaffView" class="table table-casa-information">
+                          <tbody>
+                              <tr>
+                                  <td>
+                                      <strong><h5>Approval Level Staff Modification</h5></strong>
+                                  </td>
+                              </tr>
+                              <tr>
+                                <td>
+                                    <strong>Maximum Amount:</strong>
+                                </td>
+                                <td>{{ levelStaffView.maximumAmount }}</td>
+                                <td>
+                                    <strong>Process View Scope:</strong>
+                                </td>
+                                <td>{{ levelStaffView.processViewScope }}</td>
+                                <td>
+                                    <strong>Can View Document:</strong>
+                                </td>
+                                <td>{{ levelStaffView.canViewDocument  }}</td>
+                            </tr>
+                            <tr>
+                                    <td>
+                                        <strong>Can View Uploaded File:</strong>
+                                    </td>
+                                    <td>{{ levelStaffView.canViewUploadedFile }}</td>
+                                    <td>
+                                        <strong>Can View Approval:</strong>
+                                    </td>
+                                    <td>{{ levelStaffView.canViewApproval }}</td>
+                                    <td>
+                                        <strong>Can Approve:</strong>
+                                    </td>
+                                    <td>{{ levelStaffView.canApprove  }}</td>
+                                </tr>
+                                <tr>
+                                        <td>
+                                            <strong>Can Upload File:</strong>
+                                        </td>
+                                        <td>{{ levelStaffView.canUploadFile }}</td>
+                                        <td>
+                                            <strong>Can Edit:</strong>
+                                        </td>
+                                        <td>{{ levelStaffView.canEdit }}</td>
+                                        <td>
+                                            <strong>Veto Power:</strong>
+                                        </td>
+                                        <td>{{ levelStaffView.vetoPower  }}</td>
+                                    </tr>
+                                    <tr>
+                                            <td>
+                                                <strong>Position:</strong>
+                                            </td>
+                                            <td>{{ levelStaffView.position }}</td>
+                                            <td>
+                                                <strong>Approval Level Name:</strong>
+                                            </td>
+                                            <td>{{ levelStaffView.approvalLevelName }}</td>
+                                            <td>
+                                                <strong>Staff Level Name:</strong>
+                                            </td>
+                                            <td>{{ levelStaffView.staffLevelName  }}</td>
+                                        </tr>
+                                        <tr>
+                                                <td>
+                                                    <strong>Date Created:</strong>
+                                                </td>
+                                                <td>{{ levelStaffView.dateTimeCreated }}</td>
+                                               
+                                            </tr>
+                            </tbody>
+                      </table>
+                  </div>
+                  <div class="panel-body">
+                  <div class="row">
+                      <div class="col-md-9">
+                      <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                  </div>
+                  <div class="col-md-3">
+                      <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId < 0? 'required-input' : 'valid-input'">
+                          <option value="0">--- Select Approval ---</option>
+                          <option value="1"> Approve </option>
+                          <option value="3"> Decline </option>
+                      </select>
+                  </div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="row">
+                  <div class="col-md-6">
+                      </div>
+          <div class="col-md-6">
+                  <div class="btn-group pull-right">
+                          <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger" style="margin-right:5px">Close</button>
+                          <button type="button" (click)="forwardGroupApproval()" [disabled]="comment == null || comment == '' || approvalStatusId < 1" class="btn btn-success">
+                          Submit</button>
+          </div>
+          </div>
+      </div>
+          </div>
+              <div >
+       </div>
+ </div>
+
+ 
+</p-dialog>

@@ -1,0 +1,1214 @@
+<!-- los -->
+	<div class="panel panel-default" *ngIf="showLMSDialogForEnhancement == false">
+		<p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+			<p-tabPanel [selected]="activeTabindex == 0" header="LC Issuances">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-md-12">
+								<h2 class="panel-title pull-left">
+									LC Application(s) {{label}}
+								</h2>
+								<div class="pull-right" *ngIf="currentStaffActivities">
+									<button (click)="showCustomerSearchForm()" *ngIf="(isAmongActivities('Lc Issuance')) && (!(isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()==true))" pButton type="button" label="Add New" icon="fa-plus"></button>
+									<button (click)="showLcSearch()" *ngIf="(isAmongActivities('Lc Enhancement')) && (isForLCEnhancement()==true && isLcCancelation == false && isLCSearch == false)" pButton type="button" label="Search for LC to Enhance" icon="fa-search"></button>
+									<button (click)="showLcSearch()" *ngIf="(isAmongActivities('Lc Extension')) && (isForLCExtension()==true && isLcCancelation == false && isLCSearch == false)" pButton type="button" label="Search for LC to Extend" icon="fa-search"></button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+		
+				<div class="panel-body"> 
+			 
+					<p-dataTable [value]="lcIssuances" [responsive]="true" [paginator]="true" [rows]="10"
+						[(selection)]="lcSelection" dataKey="lcIssuanceId"
+						(onRowSelect)="onlcIssuanceChange($event)" [rowsPerPageOptions]="[10,20,30]">
+			
+						<p-column [style]="{'width':'4%'}" selectionMode="single"></p-column>
+						<!-- for row selection -->
+			
+						<p-column field="dateTimeCreated" header="Date" [filter]="false">
+						<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+							{{ d.dateTimeCreated | date: 'dd-MM-yyyy' }}
+						</ng-template>
+						</p-column>
+			
+						<p-column [style]="{'width':'10%'}" field="lcReferenceNumber"
+						header="Reference" [filter]="true" filterMatchMode="contains"></p-column>
+			
+						<p-column [style]="{'width':'10%'}" field="lcIssuanceId"
+						header="LC ID" [filter]="true" filterMatchMode="contains"></p-column>
+
+						<p-column header="Customer Name/Group" [filter]="true" filterMatchMode="contains"
+						[style]="{'width':'22%'}">
+							<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+								{{ d.customerName }} {{ d.customerGroupName }}
+							</ng-template>
+						</p-column>
+			
+						<p-column field="letterOfCreditAmount" header="LC Amount" [filter]="false"
+						filterMatchMode="contains" [style]="{'width':'10%','text-align':'right'}">
+							<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+								{{getCurrencyCode(d.currencyId)}} {{ d.letterOfCreditAmount | number : '1.2' }}
+							</ng-template>
+						</p-column>
+			
+						<p-column *ngIf="isForReleaseOfShippingDocuments==true" field="releasedAmount" header="Total Released Amount" [filter]="false"
+						filterMatchMode="contains" [style]="{'width':'10%','text-align':'right'}">
+							<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+								{{getCurrencyCode(d.currencyId)}} {{ d.releasedAmount | number : '1.2' }}
+							</ng-template>
+						</p-column>
+
+						<p-column *ngIf="isForReleaseOfShippingDocuments==true" field="availableAmountForRelease" header="Available Amount For Release" [filter]="false"
+						filterMatchMode="contains" [style]="{'width':'10%','text-align':'right'}">
+							<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+								{{getCurrencyCode(d.currencyId)}} {{ d.availableAmountForRelease | number : '1.2' }}
+							</ng-template>
+						</p-column>
+
+						<p-column *ngIf="isForReleaseOfShippingDocuments==true" field="releaseAmount" header="Release Amount" [filter]="false"
+						filterMatchMode="contains" [style]="{'width':'10%','text-align':'right'}">
+							<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+								{{getCurrencyCode(d.currencyId)}} {{ d.releaseAmount | number : '1.2' }}
+							</ng-template>
+						</p-column>
+						
+						<p-column [style]="{'width':'9%'}">
+							<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+								<div class="btn-group"
+									[innerHtml]="getApprovalStatus(row.approvalStatusId)">
+								</div>
+							</ng-template>
+						</p-column>
+						
+					</p-dataTable>
+				</div>
+			
+			</p-tabPanel>
+	
+			<p-tabPanel header="Shipping Documents" [selected]="activeTabindex == 1" *ngIf="((isForReleaseOfShippingDocuments==true || isLCSearch == true) && selectedId>0)">
+				<div class="form-horizontal">
+					<div class="form-group" *ngIf="isLCSearch == true">
+						<label style="padding-top: 13px" for="" class="control-label col-md-1">Select Release:</label>
+						<div class="col-md-4">
+							<select (change)="onReleaseChange($event.target.value)" [(ngModel)]="lcReleaseAmountId" name="lcReleaseAmountId" class="form-control">
+								<option value="null">--select amount to see release details--</option>
+								<option *ngFor="let pc of lcReleases" value="{{pc.lcReleaseAmountId}}">
+									{{pc.releaseAmount}}
+								</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="releaseAmount" class="control-label col-md-1">Release Amount:</label>
+						<div class="col-md-2">
+							<!-- <input type="text" (keyup)="setReleaseAmount()" [readonly]="isLCSearch==true" pInputText name="releaseAmount" formControlName="releaseAmount" formatM id="releaseAmount" class="form-control" [ngClass]="releaseAmount > 0 ? 'valid-input' : 'required-input'"> -->
+							<input type="text" [readonly]="showButtons==false" id="releaseAmount" pInputText [(ngModel)]="releaseAmount" formatM class="numeric form-control" [ngClass]="releaseAmount > 0 ? 'valid-input' : 'required-input'">
+						</div>
+						<div class="col-md-1">
+							<input type="text" [readonly]="true" [(ngModel)]="LCAmountCurrencyCode" formatM class="form-control">
+						</div>
+						<div class="col-md-1">
+							<button [disabled]="!(releaseAmount > 0) || showButtons==false" type="button" (click)="saveRelease()"
+							class="btn btn-success">Save Release Amount</button>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="isLCSearch == true">
+					<app-approval-comments *ngIf="lcReleaseAmountId>0" [requireAll]=false [operationId]="138"
+						[applicationId]="lcReleaseAmountId" [tableLabel]="'LC Release Comments'">
+					</app-approval-comments>
+				</div>
+				<document-upload *ngIf="lcReleaseAmountId>0"
+					[reload]="lcReleaseAmountId"
+					[operationId]="138"
+					[customerId]="customerId"
+					[targetId]="lcReleaseAmountId"
+					[targetReferenceNumber]="lcReferenceNumber"
+					[showUploadForm]="showButtons"
+					(uploadCount)="numberOfShippingDocuments">
+				</document-upload>
+			</p-tabPanel>
+
+			<p-tabPanel header="LC Issuance details" *ngIf="((isForReleaseOfShippingDocuments == true || isLCSearch == true) && (customerId>0))">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-md-12">
+								<h2 class="panel-title pull-left">
+									Lc Issuance Details <span *ngIf="selectedId>0">for LCID: {{selectedId}}</span>
+								</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+				<app-customer-information-detail [loadWithCustomerId]="customerId"
+				(customer)="setCustomerName($event)">
+				</app-customer-information-detail>
+				<div style="margin-bottom:0" class="panel panel-default" *ngIf="customerId">
+		
+					<div class="panel-heading">
+						<h2 class="panel-title">
+							{{ formState }} Lc Issuance <span *ngIf="selectedId>0">for LCID: {{selectedId}}</span>
+						</h2>
+					</div>
+								
+				<form novalidate [formGroup]="lcIssuanceForm" (ngSubmit)="saveLcIssuance(lcIssuanceForm)" autocomplete="off">
+						<div class="panel-body">
+							<div class="form-horizontal">
+			
+								<div class="form-group">
+									<label for="beneficiaryName" class="control-label col-md-2">Beneficiary Name</label>
+									<div class="col-md-4">
+										<input [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  type="text" pInputText name="beneficiaryName" formControlName="beneficiaryName" id="beneficiaryName" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryName'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="beneficiaryPhoneNumber" class="control-label col-md-2">Beneficiary Phone Number</label>
+									<div class="col-md-4">
+										<input pattern="[0-9]*" type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryPhoneNumber" formControlName="beneficiaryPhoneNumber" id="beneficiaryPhoneNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryPhoneNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="beneficiaryAddress" class="control-label col-md-2">Beneficiary Address</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryAddress" formControlName="beneficiaryAddress" id="beneficiaryAddress" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryAddress'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="beneficiaryEmail" class="control-label col-md-2">Beneficiary Email</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryEmail" formControlName="beneficiaryEmail" id="beneficiaryEmail" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryEmail'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="beneficiaryBank" class="control-label col-md-2">Beneficiary Bank</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryBank" formControlName="beneficiaryBank" id="beneficiaryBank" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryBank'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="customerName" class="control-label col-md-2">Customer</label>
+									<div class="col-md-4">
+										<input type="text" [readonly]="true" name="customerName" [(ngModel)]="customerName" [ngModelOptions]="{standalone: true}" id="customerName" class="form-control" [ngClass]="customerName ? 'valid-input' : 'required-input'">
+									</div>
+									
+								</div>
+			
+								<div class="form-group">
+									<label for="letterOfCreditTypeId" class="control-label col-md-2">LC Type</label>
+									<div class="col-md-4">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="letterOfCreditTypeId" (change)="resetButton($event.target.value)" id="letterOfCreditTypeId" class="form-control" formControlName="letterOfCreditTypeId" [ngClass]="lcIssuanceForm.controls['letterOfCreditTypeId'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select LC Type ---</option>
+											<option *ngFor="let item of lcType" [value]="item.id">{{item.name}}</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<div class="checkbox-container">
+											<input [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" formControlName="isDraftRequired" id="isDraftRequired" type="checkbox">
+										</div><label class="checkbox">LC Draft Required</label>
+									</div>
+									<label for="lcReferenceNumber" class="control-label col-md-2">Lc Reference Number</label>
+									<div class="col-md-2">
+										<input type="text" [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()" name="lcReferenceNumber" formControlName="lcReferenceNumber" id="lcReferenceNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['lcReferenceNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+			
+			
+								<div class="form-group">
+									<label for="letterOfcreditExpirydate" class="control-label col-md-2">LC Expirydate</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="letterOfcreditExpirydate" formControlName="letterOfcreditExpirydate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['letterOfcreditExpirydate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+									<label for="fundSourceId" class="control-label col-md-2">Fund Source</label>
+									<div class="col-md-1">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceId" (change)="resetLCFundSource($event.target.value)" id="fundSourceId" class="form-control" formControlName="fundSourceId" [ngClass]="lcIssuanceForm.controls['fundSourceId'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select LC Fund Source ---</option>
+											<option *ngFor="let item of lcFundSource" [value]="item.id">{{item.name}}</option>
+										</select>
+									</div>
+									<div class="col-md-3" *ngIf="lcFundSourceId() == 1">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceDetails" (change)="setAmounts($event.target.value)" id="fundSourceDetails" class="form-control" formControlName="fundSourceDetails" [ngClass]="lcIssuanceForm.controls['fundSourceDetails'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select Collection Account ---</option>
+											<option *ngFor="let item of customerAccount" [value]="item.casaAccountId">{{item.productAccountNumber}}</option>
+										</select>
+									</div>
+									<div class="col-md-3" *ngIf="lcFundSourceId() == 2">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceDetails" (change)="setIFFAmounts($event.target.value)" id="fundSourceDetails" class="form-control" formControlName="fundSourceDetails" [ngClass]="lcIssuanceForm.controls['fundSourceDetails'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select IFF Line ---</option>
+											<option *ngFor="let item of lines" [value]="item.loanApplicationId">{{item.applicationReferenceNumber + ' ' + item.customerAvailableAmount}}</option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="formMNumber" class="control-label col-md-2">FORM M Number</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="formMNumber" formControlName="formMNumber" id="formMNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['formMNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="totalApprovedAmount" class="control-label col-md-2">Total Approved Amount</label>
+									<div class="col-md-3">
+										<input type="text" [readonly]="true" name="totalApprovedAmount" formControlName="totalApprovedAmount" formatM id="totalApprovedAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['totalApprovedAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-1">
+										<input type="text" [attr.disabled]="true" name="totalApprovedAmountCurrencyCode" formControlName="totalApprovedAmountCurrencyCode" formatM id="totalApprovedAmountCurrencyCode" class="form-control">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="letterOfCreditAmount" class="control-label col-md-2">LC Amount</label>
+									<div class="col-md-2">
+										<input type="text" (keyup)="setExchangeAmt($event)" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="letterOfCreditAmount" formControlName="letterOfCreditAmount" formatM id="letterOfCreditAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['letterOfCreditAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="lcAmtExchangeRate" formControlName="lcAmtExchangeRate" formatM id="lcAmtExchangeRate" class="numeric form-control">
+									</div>
+									<label for="availableAmount" class="control-label col-md-2">Available Amount</label>
+									<div class="col-md-3">
+										<input type="text" [readonly]="true" name="availableAmount" formControlName="availableAmount" formatM id="availableAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['availableAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-1">
+										<input type="text" [readonly]="true" name="availableAmountCurrencyCode" formControlName="availableAmountCurrencyCode" formatM id="availableAmountCurrencyCode" class="form-control">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="lcTolerancePercentage" class="control-label col-md-2">Tolerance Value (%)</label>
+									<div class="col-md-4">
+										<input type="text" [readonly]="(isLCSearch==true) || (isForLCUssance==true) || (isLCEnhancement == true)" (keyup)="calculateToleranceAmount($event)" pInputText name="lcTolerancePercentage" formControlName="lcTolerancePercentage" formatM id="lcTolerancePercentage" class="form-control" [ngClass]="lcIssuanceForm.controls['lcTolerancePercentage'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="lcToleranceValue" class="control-label col-md-2">Tolerance Value</label>
+									<div class="col-md-2">
+										<input type="text" [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()" pInputText name="lcToleranceValue" formControlName="lcToleranceValue" formatM id="lcToleranceValue" class="form-control" [ngClass]="lcIssuanceForm.controls['lcToleranceValue'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="nairaEquivalent2" formControlName="nairaEquivalent2" formatM id="nairaEquivalent2" class="numeric form-control">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="currencyId" class="control-label col-md-2">Currency</label>
+									<div class="col-md-2">
+											<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="currencyId" formControlName="currencyId" name="currencyId" 
+											(change)="setExchangeRate($event.target.value)"	[ngClass]="lcIssuanceForm.controls['currencyId'].valid ? 'valid-input' : 'required-input'"
+											class="form-control">
+											<option value=""> Select Currency</option>
+											<option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyName}}</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="nairaEquivalent" formControlName="nairaEquivalent" formatM id="nairaEquivalent" class="numeric form-control">
+									</div>
+									<label for="proformaInvoiceId" class="control-label col-md-2">Proforma Invoice No.</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="proformaInvoiceId" formControlName="proformaInvoiceId" id="proformaInvoiceId" class="form-control" [ngClass]="lcIssuanceForm.controls['proformaInvoiceId'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="invoiceDate" class="control-label col-md-2">Proforma Invoice Date</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="invoiceDate" formControlName="invoiceDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['invoiceDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+								<!-- </div>
+								<div class="form-group"> -->
+									<label for="invoiceDueDate" class="control-label col-md-2">Proforma Invoice Due Date</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="invoiceDueDate" formControlName="invoiceDueDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['invoiceDueDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="transactionCycle" class="control-label col-md-2">Transaction Cycle(Days):</label>
+									<div class="col-md-4">
+										<input type="number" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="transactionCycle" formControlName="transactionCycle" 
+										class="numeric form-control" [ngClass]="lcIssuanceForm.controls['transactionCycle'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+								<!-- <div class="form-group">
+									<label for="cashBuildUpAvailable" class="control-label col-md-2">Cash BuildUp Available</label>
+									<div class="col-md-4">
+										<input type="checkbox" name="cashBuildUpAvailable" formControlName="cashBuildUpAvailable" 
+										(click)="setCashBuildUpDetails($event)">
+									</div>
+								</div> 
+								<div *ngIf="isCashBuildUpAvailable()">
+									<div class="form-group">
+										<label for="cashBuildUpReferenceType" class="control-label col-md-2">Cash BuildUp Reference Type</label>
+										<div class="col-md-4">
+											<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="cashBuildUpReferenceType" formControlName="cashBuildUpReferenceType" id="cashBuildUpReferenceType" class="form-control">
+										</div>
+										<label for="cashBuildUpReferenceNumber" class="control-label col-md-2">Cash BuildUp Reference Number</label>
+										<div class="col-md-4">
+											<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="cashBuildUpReferenceNumber" formControlName="cashBuildUpReferenceNumber" id="cashBuildUpReferenceNumber" class="form-control">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="percentageToCover" class="control-label col-md-2">Percentage To Cover (%)</label>
+										<div class="col-md-4">
+											<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="percentageToCover" formControlName="percentageToCover" id="percentageToCover" class="form-control">
+										</div>
+									</div>
+								</div> -->
+								
+							</div>
+						</div>
+				</form>
+					
+					<div class="panel-footer">
+						<div class="row">
+							<div class="col-md-12">
+								<button type="button" *ngIf="((isForReleaseOfShippingDocuments==false) || (isForLCUssance==false)) && (isLCSearch==false)" (click)="saveLcIssuance(lcIssuanceForm)" [disabled]="lcIssuanceForm.invalid" class="btn btn-success pull-right">Save</button>
+								<!-- <button type="button" (click)="displayLcIssuanceForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+							</div>
+						</div>
+					</div>
+				
+				</div>
+			</p-tabPanel>
+
+			<p-tabPanel header="LC Issuance details" *ngIf="((isForReleaseOfShippingDocuments != true && isLCSearch != true) && (customerId>0))" [selected]="activeTabindex == 1">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-md-12">
+								<h2 class="panel-title pull-left">
+									Lc Issuance Details <span *ngIf="selectedId>0">for LCID: {{selectedId}}</span>
+								</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+				<app-customer-information-detail [loadWithCustomerId]="customerId"
+				(customer)="setCustomerName($event)">
+				</app-customer-information-detail>
+				<div style="margin-bottom:0" class="panel panel-default" *ngIf="customerId">
+		
+					<div class="panel-heading">
+						<h2 class="panel-title">
+							{{ formState }} Lc Issuance <span *ngIf="selectedId>0">for LCID: {{selectedId}}</span>
+						</h2>
+					</div>
+								
+				<form novalidate [formGroup]="lcIssuanceForm" (ngSubmit)="saveLcIssuance(lcIssuanceForm)" autocomplete="off">
+						<div class="panel-body">
+							<div class="form-horizontal">
+			
+								<div class="form-group">
+									<label for="beneficiaryName" class="control-label col-md-2">Beneficiary Name</label>
+									<div class="col-md-4">
+										<input [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  type="text" pInputText name="beneficiaryName" formControlName="beneficiaryName" id="beneficiaryName" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryName'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="beneficiaryPhoneNumber" class="control-label col-md-2">Beneficiary Phone Number</label>
+									<div class="col-md-4">
+										<input pattern="[0-9]*" type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryPhoneNumber" formControlName="beneficiaryPhoneNumber" id="beneficiaryPhoneNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryPhoneNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="beneficiaryAddress" class="control-label col-md-2">Beneficiary Address</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryAddress" formControlName="beneficiaryAddress" id="beneficiaryAddress" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryAddress'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="beneficiaryEmail" class="control-label col-md-2">Beneficiary Email</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryEmail" formControlName="beneficiaryEmail" id="beneficiaryEmail" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryEmail'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="beneficiaryBank" class="control-label col-md-2">Beneficiary Bank</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="beneficiaryBank" formControlName="beneficiaryBank" id="beneficiaryBank" class="form-control" [ngClass]="lcIssuanceForm.controls['beneficiaryBank'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="customerName" class="control-label col-md-2">Customer</label>
+									<div class="col-md-4">
+										<input type="text" [readonly]="true" name="customerName" [(ngModel)]="customerName" [ngModelOptions]="{standalone: true}" id="customerName" class="form-control" [ngClass]="customerName ? 'valid-input' : 'required-input'">
+									</div>
+									
+								</div>
+			
+								<div class="form-group">
+									<label for="letterOfCreditTypeId" class="control-label col-md-2">LC Type</label>
+									<div class="col-md-4">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="letterOfCreditTypeId" (change)="resetButton($event.target.value)" id="letterOfCreditTypeId" class="form-control" formControlName="letterOfCreditTypeId" [ngClass]="lcIssuanceForm.controls['letterOfCreditTypeId'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select LC Type ---</option>
+											<option *ngFor="let item of lcType" [value]="item.id">{{item.name}}</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<div class="checkbox-container">
+											<input [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" formControlName="isDraftRequired" id="isDraftRequired" type="checkbox">
+										</div><label class="checkbox">LC Draft Required</label>
+									</div>
+									<label for="lcReferenceNumber" class="control-label col-md-2">Lc Reference Number</label>
+									<div class="col-md-2">
+										<input type="text" [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()" name="lcReferenceNumber" formControlName="lcReferenceNumber" id="lcReferenceNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['lcReferenceNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+			
+			
+								<div class="form-group">
+									<label for="letterOfcreditExpirydate" class="control-label col-md-2">LC Expirydate</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrCancelationOrEnhancement() ? true : null" id="letterOfcreditExpirydate" formControlName="letterOfcreditExpirydate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['letterOfcreditExpirydate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+									<label for="fundSourceId" class="control-label col-md-2">Fund Source</label>
+									<div class="col-md-1">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceId" (change)="resetLCFundSource($event.target.value)" id="fundSourceId" class="form-control" formControlName="fundSourceId" [ngClass]="lcIssuanceForm.controls['fundSourceId'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select LC Fund Source ---</option>
+											<option *ngFor="let item of lcFundSource" [value]="item.id">{{item.name}}</option>
+										</select>
+									</div>
+									<div class="col-md-3" *ngIf="lcFundSourceId() == 1">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceDetails" (change)="setAmounts($event.target.value)" id="fundSourceDetails" class="form-control" formControlName="fundSourceDetails" [ngClass]="lcIssuanceForm.controls['fundSourceDetails'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select Collection Account ---</option>
+											<option *ngFor="let item of customerAccount" [value]="item.casaAccountId">{{item.productAccountNumber}}</option>
+										</select>
+									</div>
+									<div class="col-md-3" *ngIf="lcFundSourceId() == 2">
+										<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" name="fundSourceDetails" (change)="setIFFAmounts($event.target.value)" id="fundSourceDetails" class="form-control" formControlName="fundSourceDetails" [ngClass]="lcIssuanceForm.controls['fundSourceDetails'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select IFF Line ---</option>
+											<option *ngFor="let item of lines" [value]="item.loanApplicationId">{{item.applicationReferenceNumber + ' ' + item.customerAvailableAmount}}</option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="formMNumber" class="control-label col-md-2">FORM M Number</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="formMNumber" formControlName="formMNumber" id="formMNumber" class="form-control" [ngClass]="lcIssuanceForm.controls['formMNumber'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="totalApprovedAmount" class="control-label col-md-2">Total Approved Amount</label>
+									<div class="col-md-3">
+										<input type="text" [readonly]="true" name="totalApprovedAmount" formControlName="totalApprovedAmount" formatM id="totalApprovedAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['totalApprovedAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-1">
+										<input type="text" [attr.disabled]="true" name="totalApprovedAmountCurrencyCode" formControlName="totalApprovedAmountCurrencyCode" formatM id="totalApprovedAmountCurrencyCode" class="form-control">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="letterOfCreditAmount" class="control-label col-md-2">LC Amount</label>
+									<div class="col-md-2">
+										<input type="text" (keyup)="setExchangeAmt($event)" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrCancelationOrExtension()"  name="letterOfCreditAmount" formControlName="letterOfCreditAmount" formatM id="letterOfCreditAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['letterOfCreditAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="lcAmtExchangeRate" formControlName="lcAmtExchangeRate" formatM id="lcAmtExchangeRate" class="numeric form-control">
+									</div>
+									<label for="availableAmount" class="control-label col-md-2">Available Amount</label>
+									<div class="col-md-3">
+										<input type="text" [readonly]="true" name="availableAmount" formControlName="availableAmount" formatM id="availableAmount" class="numeric form-control" [ngClass]="lcIssuanceForm.controls['availableAmount'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-1">
+										<input type="text" [readonly]="true" name="availableAmountCurrencyCode" formControlName="availableAmountCurrencyCode" formatM id="availableAmountCurrencyCode" class="form-control">
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="lcTolerancePercentage" class="control-label col-md-2">Tolerance Value (%)</label>
+									<div class="col-md-4">
+										<input type="text" [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()" (keyup)="calculateToleranceAmount($event)" pInputText name="lcTolerancePercentage" formControlName="lcTolerancePercentage" formatM id="lcTolerancePercentage" class="form-control" [ngClass]="lcIssuanceForm.controls['lcTolerancePercentage'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<label for="lcToleranceValue" class="control-label col-md-2">Tolerance Value</label>
+									<div class="col-md-2">
+										<input type="text" [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()" pInputText name="lcToleranceValue" formControlName="lcToleranceValue" formatM id="lcToleranceValue" class="form-control" [ngClass]="lcIssuanceForm.controls['lcToleranceValue'].valid ? 'valid-input' : 'required-input'">
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="nairaEquivalent2" formControlName="nairaEquivalent2" formatM id="nairaEquivalent2" class="numeric form-control">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="currencyId" class="control-label col-md-2">Currency</label>
+									<div class="col-md-2">
+											<select [attr.disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="currencyId" formControlName="currencyId" name="currencyId" 
+											(change)="setExchangeRate($event.target.value)"	[ngClass]="lcIssuanceForm.controls['currencyId'].valid ? 'valid-input' : 'required-input'"
+											class="form-control">
+											<option value=""> Select Currency</option>
+											<option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyName}}</option>
+										</select>
+									</div>
+									<div class="col-md-2">
+										<input type="text" pInputText readonly="true"  name="nairaEquivalent" formControlName="nairaEquivalent" formatM id="nairaEquivalent" class="numeric form-control">
+									</div>
+									<label for="proformaInvoiceId" class="control-label col-md-2">Proforma Invoice No.</label>
+									<div class="col-md-4">
+										<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="proformaInvoiceId" formControlName="proformaInvoiceId" id="proformaInvoiceId" class="form-control" [ngClass]="lcIssuanceForm.controls['proformaInvoiceId'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label for="invoiceDate" class="control-label col-md-2">Proforma Invoice Date</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="invoiceDate" formControlName="invoiceDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['invoiceDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+								<!-- </div>
+								<div class="form-group"> -->
+									<!-- <label for="invoiceDueDate" class="control-label col-md-2">Proforma Invoice Due Date</label> -->
+									<label for="invoiceDueDate" class="control-label col-md-2">LC Establishment Date</label>
+									<div class="col-md-4">
+										<p-calendar [disabled]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension() ? true : null" id="invoiceDueDate" formControlName="invoiceDueDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcIssuanceForm.controls['invoiceDueDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="transactionCycle" class="control-label col-md-2">Transaction Cycle(Days):</label>
+									<div class="col-md-4">
+										<input type="number" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="transactionCycle" formControlName="transactionCycle" 
+										class="numeric form-control" [ngClass]="lcIssuanceForm.controls['transactionCycle'].valid ? 'valid-input' : 'required-input'">
+									</div>
+								</div>
+							</div>
+						</div>
+				</form>
+					
+					<div class="panel-footer">
+						<div class="row">
+							<div class="col-md-12">
+								<button type="button" *ngIf="((isForReleaseOfShippingDocuments==false) || (isForLCUssance==false)) && (isLCSearch==false)" (click)="saveLcIssuance(lcIssuanceForm)" [disabled]="lcIssuanceForm.invalid" class="btn btn-success pull-right">Save</button>
+								<!-- <button type="button" (click)="displayLcIssuanceForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+							</div>
+						</div>
+					</div>
+				
+				</div>
+			</p-tabPanel>
+
+			<p-tabPanel header="Cash Build Up Plan" *ngIf="selectedId>0 && customerId>0">
+				<app-lc-cash-buildup-plan 
+					[lcIssuanceId]="selectedId"
+					[customerId]="customerId"
+					[reload]="selectedId"
+					[showButtons]="showButtons && (!(isForReleaseOrUssanceOrSearchOrCancelationOrEnhancementOrExtension()))">
+				</app-lc-cash-buildup-plan>
+				<!-- <form novalidate [formGroup]="lcIssuanceForm" autocomplete="off">
+					<div class="panel-body">
+						<div class="form-horizontal">
+						
+							<div class="form-group">
+								<label for="cashBuildUpReferenceType" class="control-label col-md-2"> Cash BuildUp Reference Type</label>
+								<div class="col-md-4">
+									<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="cashBuildUpReferenceType" formControlName="cashBuildUpReferenceType" id="cashBuildUpReferenceType" class="form-control">
+								</div>
+								<label for="cashBuildUpReferenceNumber" class="control-label col-md-2">Cash BuildUp Reference Number</label>
+								<div class="col-md-4">
+									<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="cashBuildUpReferenceNumber" formControlName="cashBuildUpReferenceNumber" id="cashBuildUpReferenceNumber" class="form-control">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="percentageToCover" class="control-label col-md-2">Percentage To Cover (%)</label>
+								<div class="col-md-4">
+									<input type="text" pInputText [readonly]="isForReleaseOrUssanceOrSearchOrEnhancementOrExtension()"  name="percentageToCover" formControlName="percentageToCover" id="percentageToCover" class="form-control">
+								</div>
+							</div>
+							<div class="panel-footer">
+									<div class="row">
+										<div class="col-md-12">
+											<button type="button" *ngIf="((isForReleaseOfShippingDocuments==false) || (isForLCUssance==false)) && (isLCSearch==false)" (click)="saveLcIssuance(lcIssuanceForm)" [disabled]="lcIssuanceForm.invalid" class="btn btn-success pull-right">Save</button>
+										</div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</form> -->
+			
+			</p-tabPanel>
+
+			<p-tabPanel header="LC Required Documents" *ngIf="selectedId>0">
+				<div>
+					<lc-document [reload]="reload" 
+					[lcIssuanceId]="selectedId"
+					[showButtons]="showButtons">
+					</lc-document>
+				</div>
+				
+				<div>
+					<document-upload *ngIf="selectedId>0"
+						[reload]="selectedId"
+						[showUploadForm]="showButtons"
+						[operationId]="135"
+						[customerId]="customerId"
+						[targetId]="selectedId"
+						[targetReferenceNumber]="lcReferenceNumber"
+						(uploadCount)="numberOfLCRequiredDocuments">
+					</document-upload>
+				</div>
+				<!-- [showUploadForm]="(!(isForReleaseOrUssanceOrSearch()) && !(isForLCCancelation()))" -->
+			</p-tabPanel>
+			
+			<p-tabPanel header="Shipping" *ngIf="selectedId>0">
+				<lc-shipping [reload]="reload" 
+				[lcIssuanceId]="selectedId"
+				[showButtons]="showButtons && (!(isForReleaseOrUssanceOrSearchOrCancelationOrEnhancementOrExtension()))"
+				(count)="numberOfShippings">
+				</lc-shipping>
+			</p-tabPanel>
+
+			<p-tabPanel header="Conditions" *ngIf="selectedId>0">
+				<lc-condition [reload]="reload" 
+				[lcIssuanceId]="selectedId"
+				[showButtons]="showButtons && (!(isForReleaseOrUssanceOrSearchOrCancelationOrEnhancementOrExtension()))">
+				</lc-condition>
+			</p-tabPanel>
+		
+			<p-tabPanel header="IFF Line Details" *ngIf="(selectedApplicationId>0)">
+				<div>
+					<p-accordion #accordion>
+						<p-accordionTab header="Facility Details and FAM">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="row">
+										<div class="col-md-12">
+											<div class="pull-right">
+												<button (click)="viewFAM()"><span class="glyphicon glyphicon-file"></span> Preview FAM Document</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<app-loan-application-details-view [isRecommendedInfo]="true"
+								[showOrHideViewDetails]="false"
+								[loanApplicationId]="selectedApplicationId">
+							</app-loan-application-details-view>
+						</p-accordionTab>
+						<p-accordionTab header="Line Collateral(s)">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="row">
+										<div class="col-md-12">
+											<h2 class="panel-title pull-left">
+												Line Collateral(s)
+											</h2>
+										</div>
+									</div>
+								</div>
+								<div class="panel-body">
+									<app-collaterals-proposed [loanApplicationId]="selectedApplicationId"
+                                        [currencyId]=1
+                                        [reload]="selectedApplicationId">
+                                    </app-collaterals-proposed>
+								</div>
+							</div>
+						</p-accordionTab>
+						<p-accordionTab header="Line Conditions">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="row">
+										<div class="col-md-12">
+											<h2 class="panel-title pull-left">
+												Line Conditions
+											</h2>
+										</div>
+									</div>
+								</div>
+								<div class="panel-body">
+									<app-credit-condition [reload]="reload" [callerId]="1" [isAnalyst]="false" [isBusiness]="false"
+										[displayedOnly]="true" [applicationId]="selectedApplicationId" [proposedItems]="proposedItems">
+									</app-credit-condition>
+								</div>
+							</div>
+						</p-accordionTab>
+						<p-accordionTab header="Line Transaction Dynamics">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="row">
+										<div class="col-md-12">
+											<h2 class="panel-title pull-left">
+												Line Transaction Dynamics
+											</h2>
+										</div>
+									</div>
+								</div>
+								<div class="panel-body">
+									<app-transaction-dynamics [reload]="reload" [callerId]="1" [isAnalyst]="false" [isBusiness]="false"
+										[displayedOnly]="true" [applicationId]="selectedApplicationId" [proposedItems]="proposedItems">
+									</app-transaction-dynamics>
+								</div>
+							</div>
+						</p-accordionTab>
+					</p-accordion>
+				</div>
+			</p-tabPanel>
+
+			<p-tabPanel header="LC Usance" *ngIf="((isForLCUssance==true || isLCSearch == true) && (selectedId>0))">
+				<div class="panel panel-default" width="1200px">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-md-12">
+									<h2 class="panel-title pull-left">
+										Lc Usance Details
+									</h2>
+								</div>
+							</div>
+						</div>
+									
+					<form novalidate [formGroup]="lcUssanceForm" (ngSubmit)="saveLcIssuance(lcUssanceForm)" autocomplete="off">
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group" *ngIf="isLCSearch == true">
+										<label style="padding-top: 13px" for="" class="control-label col-md-2">Select Usance:</label>
+										<div class="col-md-4">
+											<select (change)="onLcUsanceChange($event.target.value)" [(ngModel)]="lcUssanceId" 
+												[ngModelOptions]="{standalone: true}" name="lcUssanceId" class="form-control">
+												<option value="null">--select usance to see details--</option>
+												<option *ngFor="let usance of lcUsances" value="{{usance.lcUssanceId}}">
+													{{getCurrencyCode(usance.usanceAmountCurrencyId)}} {{usance.ussanceAmount}} {{usance.ussanceTenor}} Days
+												</option>
+											</select>
+										</div>
+										<label style="padding-top: 13px" for="" class="control-label col-md-2">Select Usance Extension:</label>
+										<div class="col-md-4">
+											<select (change)="onLcUsanceExtensionChange($event.target.value)" [(ngModel)]="tempLcUsanceId" 
+												[ngModelOptions]="{standalone: true}" name="tempLcUsanceId" class="form-control">
+												<option value="null">--select usance extension to see details--</option>
+												<option *ngFor="let usance of lcUsanceExtensions" value="{{usance.tempLcUsanceId}}">
+													{{getCurrencyCode(usance.usanceAmountCurrencyId)}} {{usance.ussanceAmount}} {{usance.ussanceTenor}} Days
+												</option>
+											</select>
+										</div>
+									</div>
+									<div class="form-group" *ngIf="isForLCUssanceExtension != true">
+										<label for="ussanceAmount" class="control-label col-md-2">Usance Amount:</label>
+										<div class="col-md-2">
+											<input type="text" [readonly]="isLCSearch==true || isForLCUssanceExtension == true" (keyup)="setoutstandingUsanceAmount($event)" pInputText name="ussanceAmount" formControlName="ussanceAmount" formatM id="ussanceAmount" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceAmount'].valid ? 'valid-input' : 'required-input'">
+										</div>
+										<div class="col-md-2">
+											<select id="usanceAmountCurrencyId" formControlName="usanceAmountCurrencyId" name="usanceAmountCurrencyId" 
+												[ngClass]="lcUssanceForm.controls['usanceAmountCurrencyId'].valid ? 'valid-input' : 'required-input'"
+												class="form-control" (change)="setExchangeRateForUssance($event.target.value)"
+												[attr.disabled]="(isForLCSearch() || isForLCUssanceExtension == true ) ? true : null">
+												<option value=""> Select Currency</option>
+												<option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyName}}</option>
+											</select>
+										</div>
+										<label for="ussanceRate" class="control-label col-md-2">Usance Rate (%)</label>
+										<div class="col-md-4">
+											<input type="text" [readonly]="isLCSearch==true || isForLCUssanceExtension == true" pInputText name="ussanceRate" formControlName="ussanceRate" formatM id="ussanceRate" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceRate'].valid ? 'valid-input' : 'required-input'">
+										</div>
+									</div>
+									<div class="form-group" *ngIf="isForLCUssanceExtension == true">
+										<label for="ussanceAmount" class="control-label col-md-1">Usance Amount:</label>
+										<div class="col-md-3">
+											<input type="text" [readonly]="true" (keyup)="setoutstandingUsanceAmount($event)" pInputText name="ussanceAmount" formControlName="ussanceAmount" formatM id="ussanceAmount" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceAmount'].valid ? 'valid-input' : 'required-input'">
+										</div>
+										<div class="col-md-2">
+											<select id="usanceAmountCurrencyId" formControlName="usanceAmountCurrencyId" name="usanceAmountCurrencyId" 
+												[ngClass]="lcUssanceForm.controls['usanceAmountCurrencyId'].valid ? 'valid-input' : 'required-input'"
+												class="form-control" (change)="setExchangeRateForUssance($event.target.value)"
+												[attr.disabled]="true">
+												<option value=""> Select Currency</option>
+												<option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyName}}</option>
+											</select>
+										</div>
+										<label for="ussanceRate" class="control-label col-md-1">Usance Rate (%)</label>
+										<div class="col-md-5">
+											<input type="text" [readonly]="true" pInputText name="ussanceRate" formControlName="ussanceRate" formatM id="ussanceRate" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceRate'].valid ? 'valid-input' : 'required-input'">
+										</div>
+									</div>
+	
+									<div class="form-group" *ngIf="isForLCUssanceExtension != true">
+										<label for="lcEffectiveDate" class="control-label col-md-2">Usance Value Date:</label>
+										<div class="col-md-4">
+											<p-calendar [disabled]="isLCSearch==true" id="lcEffectiveDate" formControlName="lcEffectiveDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2100"
+												[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+												[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcUssanceForm.controls['lcEffectiveDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+										</div>
+										<label for="ussanceTenor" class="control-label col-md-2">Usance Tenor (Days)</label>
+										<div class="col-md-4">
+											<input [readonly]="isLCSearch==true" type="text" (keyup)="fillUsanceMaturityDate($event)" name="ussanceTenor" formControlName="ussanceTenor" id="ussanceTenor" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceTenor'].valid ? 'valid-input' : 'required-input'">
+										</div>
+									</div>
+									<div class="form-group" *ngIf="isForLCUssanceExtension == true">
+										<label for="lcEffectiveDate" class="control-label col-md-1">Usance Value Date:</label>
+										<div class="col-md-5">
+											<p-calendar [disabled]="true" id="lcEffectiveDate" formControlName="lcEffectiveDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2100"
+												[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+												[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcUssanceForm.controls['lcEffectiveDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+										</div>
+
+										<label for="ussanceTenor" class="control-label col-md-1">Proposed Usance Tenor (Days)</label>
+										<div class="col-md-2">
+											<input type="text" (keyup)="fillUsanceMaturityDate($event)" name="ussanceTenor" formControlName="ussanceTenor" id="ussanceTenor" class="form-control" [ngClass]="lcUssanceForm.controls['ussanceTenor'].valid ? 'valid-input' : 'required-input'">
+										</div>
+										<label for="oldUssanceTenor" class="control-label col-md-1">Approved Usance Tenor (Days)</label>
+										<div class="col-md-2">
+											<input type="text" [readonly]="true" [(ngModel)]="oldUssanceTenor" [ngModelOptions]="{standalone: true}" name="oldUssanceTenor" id="oldUssanceTenor" class="form-control">
+										</div>
+									</div>
+									<div class="form-group" *ngIf="isForLCUssanceExtension != true">
+										<label for="lcMaturityDate" class="control-label col-md-2">Usance Maturity Date</label>
+										<div class="col-md-4">
+											<p-calendar [disabled]="true" id="lcMaturityDate" formControlName="lcMaturityDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2100"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcUssanceForm.controls['lcMaturityDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+										</div>
+										<label for="outstandingUsanceAmount" class="control-label col-md-2">Outstanding LC Amount:</label>
+										<div class="col-md-4">
+											<input type="text" [readonly]="true" [(ngModel)]="outstandingUsanceAmount" [ngModelOptions]="{standalone: true}" formatM id="outstandingUsanceAmount" class="form-control">
+										</div>
+									</div>
+									<div class="form-group" *ngIf="isForLCUssanceExtension == true">
+										<label for="lcMaturityDate" class="control-label col-md-1">Proposed Usance Maturity Date</label>
+										<div class="col-md-2">
+											<p-calendar [disabled]="true" id="lcMaturityDate" formControlName="lcMaturityDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2100"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcUssanceForm.controls['lcMaturityDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+										</div>
+										<label for="oldLcMaturityDate" class="control-label col-md-1">Approved Usance Maturity Date</label>
+										<div class="col-md-2">
+											<p-calendar [disabled]="true" id="oldLcMaturityDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2100"
+											[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+											[style]="{'width': '100%', 'z-index': '999'}" [(ngModel)]="oldLcMaturityDate" [ngModelOptions]="{standalone: true}"></p-calendar>
+										</div>
+
+										<label for="outstandingUsanceAmount" class="control-label col-md-1">Outstanding LC Amount:</label>
+										<div class="col-md-5">
+											<input type="text" [readonly]="true" [(ngModel)]="outstandingUsanceAmount" [ngModelOptions]="{standalone: true}" formatM id="outstandingUsanceAmount" class="form-control">
+										</div>
+									</div>
+								</div>
+								<!-- <div *ngIf="isLCSearch == true">
+									<app-approval-comments *ngIf="lcUssanceId>0" [requireAll]=false [operationId]="140"
+										[applicationId]="lcUssanceId" [tableLabel]="'LC Usance Comments'">
+									</app-approval-comments>
+								</div> -->
+							</div>
+					</form>
+
+					<div class="panel-footer" *ngIf="!isLCSearch==true">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="btn-group pull-right">
+									<button (click)="resetUssanceForm()" type="button" class="btn btn-danger" style="margin-right:5px">Reset</button>
+									<button [disabled]="lcUssanceForm.invalid" type="button" (click)="saveUssanceForm(lcUssanceForm)"
+										class="btn btn-success">Save LC Usance Details</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</p-tabPanel>
+
+			<!-- <p-tabPanel header="{{lcForwardTitle}} Approval Memo" *ngIf="targetId>0 && (selectedId>0) && OPERATION_ID != 135">
+				<app-approval-memo
+					[showControls]="true"
+					[allowTemplateToLoad]="isLCSearch == false"
+					[referenceNumber]="lcReferenceNumber"
+					[label]="lcForwardTitle"
+					[customerId]="customerId"
+					[OPERATION_ID]="OPERATION_ID"
+					[targetId]="targetId">
+				</app-approval-memo>
+				<br/>
+				<div *ngIf="isForUssanceExtension() == true">
+					<app-approval-comments *ngIf="lcUssanceId>0" [requireAll]=false [operationId]="140"
+						[applicationId]="lcUssanceId" [tableLabel]="'LC Usance Comments'">
+					</app-approval-comments>
+				</div>
+				<br/>
+				<app-approval-comments *ngIf="isForReleaseOrUssanceOrSearchOrCancelationOrEnhancementOrExtension()" [operationId]="135"
+					[applicationId]="selectedId" [requireAll]=false [tableLabel]="'LC Issuance Comments'">
+				</app-approval-comments>
+				<app-approval-memo
+					[showControls]="true"
+					[allowTemplateToLoad]="true"
+					[referenceNumber]=""
+					[customerId]="customerId"
+					[OPERATION_ID]="OPERATION_ID"
+					[targetId]="">
+
+				</app-approval-memo>
+			</p-tabPanel>
+			<br/>
+			<p-tabPanel *ngIf="(isForUssanceExtension() == true) && (isLCSearch == true) && (targetId>0 && (selectedId>0))" header="LC Usance Approval Memo">
+				<app-approval-memo
+					[showControls]="true"
+					[allowTemplateToLoad]="false"
+					[referenceNumber]="lcReferenceNumber"
+					[label]="'LC Usance'"
+					[customerId]="customerId"
+					[OPERATION_ID]="140"
+					[targetId]="lcUssanceId">
+				</app-approval-memo>
+			</p-tabPanel>
+			<p-tabPanel header="LC Issuance Approval Memo" *ngIf="isForReleaseOrUssanceOrSearchOrCancelationOrEnhancementOrExtension() && (targetId>0 && (selectedId>0))">
+				<app-approval-memo
+					[showControls]="true"
+					[allowTemplateToLoad]="false"
+					[referenceNumber]="lcReferenceNumber"
+					[label]="'LC Issuance'"
+					[customerId]="customerId"
+					[OPERATION_ID]="135"
+					[targetId]="selectedId">
+				</app-approval-memo>
+			</p-tabPanel> -->
+ 
+			<p-tabPanel header="Comments" *ngIf="targetId>0 && (selectedId>0)">
+				<div class="panel panel-default">
+					<div class="panel panel-default">
+						<app-approval-comments [requireAll]=false [operationId]="OPERATION_ID"
+							[applicationId]="targetId" [tableLabel]="commentHeading + ' Comments'">
+						</app-approval-comments>
+						<br/>
+						<div *ngIf="isForUssanceExtension() == true">
+							<app-approval-comments *ngIf="lcUssanceId>0" [requireAll]=false [operationId]="140"
+								[applicationId]="lcUssanceId" [tableLabel]="'LC Usance Comments'">
+							</app-approval-comments>
+						</div>
+						<br/>
+						<div *ngIf="isForReleaseOrUssanceOrCancelationOrEnhancementOrExtension() == true">
+							<app-approval-comments *ngIf="lcUssanceId>0" [requireAll]=false [operationId]="140"
+								[applicationId]="lcUssanceId" [tableLabel]="'LC Usance Comments'">
+							</app-approval-comments>
+							<br/>
+							<app-approval-comments *ngIf="tempLcUsanceId>0" [requireAll]=false [operationId]="276"
+								[applicationId]="tempLcUsanceId" [tableLabel]="'LC Usance Extension Comments'">
+							</app-approval-comments>
+						</div>
+						<br/>
+						<app-approval-comments *ngIf="isForReleaseOrUssanceOrCancelationOrEnhancementOrExtension()" [operationId]="135"
+							[applicationId]="selectedId" [requireAll]=false [tableLabel]="'LC Issuance Comments'">
+						</app-approval-comments>
+					</div>
+				</div>
+			</p-tabPanel>
+
+			<p-tabPanel header="LC Cancellation" *ngIf="isForLCCancelation() && (this.isForLMSSearch == false) && (selectedId>0)">
+				<form novalidate [formGroup]="lcForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							LC Cancellation
+						</div>
+						<div class="panel-footer">
+							<div class="row">
+								<div class="col-md-12">
+									<button type="button" (click)="goForApproval()" [disabled]="lcForwardForm.invalid" class="btn btn-success pull-right">Start LC Cancellation</button>
+									<!-- <button type="button" (click)="closeDialog()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</p-tabPanel>
+
+			<!-- <p-tabPanel header="Comments" *ngIf="selectedId>0">
+				<div class="panel panel-default">
+					<app-approval-comments [operationId]="OPERATION_ID"
+					[operationIds]="OPERATION_IDs"
+					[targetId]="selectedId"
+						[all]="true"></app-approval-comments>
+				</div>
+			</p-tabPanel> -->
+
+		</p-tabView>
+		<div class="panel-footer" *ngIf="(!isOnIssuanceListTab() && !isForLCSearch())">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="btn-group pull-right">
+						<button (click)="resetActiveTabIndex()" type="button" class="btn btn-danger" style="margin-right:5px">Back to Issuances</button>
+						<!-- <button *ngIf="!(isForLCUssance==true || isForReleaseOfShippingDocuments==true)" [disabled]="(!(customerId>0))" type="button" (click)="forward()"
+							class="btn btn-success">Submit For Approval</button> -->
+						<button *ngIf="(isForReleaseOfShippingDocuments==true)" [disabled]="(!(customerId>0) || !(lcReleaseAmountId>0))" type="button" (click)="forward()"
+							class="btn btn-success">Submit For Approval</button>
+							<button *ngIf="(isForLCUssance==true)" [disabled]="!(customerId>0)||(lcUssanceForm.invalid)||!(selectedId>0)" type="button" (click)="forward()"
+							class="btn btn-success">Submit For Approval</button>
+						<button *ngIf="!(isForRelease() || isForUssance() || isForLCEnhancement())" [disabled]="!(customerId>0)||(lcIssuanceForm.invalid)||!(selectedId>0)" type="button" (click)="forward()"
+							class="btn btn-success">Submit For Approval</button>
+						<button *ngIf="isForLCEnhancement()" [disabled]="!(tempLcIssuanceId>0)" type="button" (click)="forward()"
+							class="btn btn-success">Submit For Approval</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showSearchCustomerDialog"
+	 width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+			<customer-search (customer)="setCustomer($event)"
+			[showPhoneNumberSearch]="false">
+                    
+			</customer-search>
+	</p-dialog>
+
+	<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showLcForward" width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+		<form novalidate [formGroup]="lcForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					{{lcForwardTitle}}
+				</div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+						<div class="col-md-12">
+							<textarea [ngClass]="lcForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'" 
+							class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+						</div>
+						<!-- <label for="forward" class="control-label col-md-12">Status</label>
+						<div class="col-md-12">
+								<select name="forward" (change)="resetButton($event.target.value)" id="forward" class="form-control" formControlName="forward" [ngClass]="lcForwardForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+									<option value="">--- Select Approval Status ---</option>
+									<option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+								</select>
+						</div> -->
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-md-12">
+							<button type="button" (click)="goForApproval()" [disabled]="lcForwardForm.invalid" class="btn btn-success pull-right">Submit</button>
+							<button type="button" (click)="closeDialog()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</p-dialog>
+
+	<p-dialog [responsive]=true [(visible)]="displayFAM" showEffect="fade" width="1200" [contentStyle]="{'overflow':'auto','max-height':'900px'}">
+        <div *ngIf="displayFAM" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    FACILITY APPROVAL MEMO No.:
+                    <strong>{{ applicationReferenceNumber }}</strong> 
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="closeDocumentation()">&times;</a>
+				</div> 
+				<br>
+				<br>
+				<app-form-3800b-los *ngIf="displayFAM" [applicationReferenceNumber]="applicationReferenceNumber"></app-form-3800b-los>
+			</div>
+		</div>
+	</p-dialog>
+<!-- los end -->
+
+<!-- lms -->
+	<!-- for Lc Enhancement/Extension initiation -->
+	<div *ngIf="showLMSDialogForEnhancement == true">
+		<div class="pull-right">
+			<button (click)="showLMSDialogForEnhancement = false" type="button" class="btn btn-danger" style="margin-right:5px">Back</button>
+		</div>
+		<div>
+			<p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+				<p-tabPanel header="LC Applications">
+		
+					<!-- loan applications -->
+					<div class="card no-padding">
+						<div class="panel panel-default">
+		
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-md-12">
+										<h2 class="panel-title pull-left">
+												Select LC Application for Enhancement
+										</h2>
+				
+										<div class="pull-right">
+											<button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+										</div>
+									</div>
+								</div>
+							</div>
+		
+							<div class="panel-body">
+								<p-tabView>
+									<p-tabPanel header="LC Applications" *ngIf="displaySearchTable" >
+										<p-dataTable [value]="LCapplications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+		
+										<p-column field="arrivalDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+											<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+												{{ d.arrivalDate | date: 'dd-MM-yyyy' }}
+											</ng-template>
+										</p-column>
+		
+										<p-column field="lcReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										
+										<p-column field="letterOfCreditAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+											<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+												{{getCurrencyCode(d.currencyId)}} {{ d.letterOfCreditAmount | number : '1.2' }}
+											</ng-template>
+										</p-column>
+										<p-column field="lcApplicationStatus" header="Issuance Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="releaseApplicationStatus" header="Release Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="usanceStatus" header="Usance Application Status" sortable="true" filterMatchMode="contains"></p-column>
+										<p-column field="approvalStatus" header="Issuance Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="releaseApprovalStatus" header="Release Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="usanceApprovalStatus" header="Usance Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="currentApprovalLevel" header="Issuance Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="releaseCurrentApprovalLevel" header="Release Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column field="usanceCurrentApprovalLevel" header="Usance Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+										<p-column>
+											<ng-template pTemplate="header"></ng-template>
+											<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+												<a (click)="setLc(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>Select</a>
+											</ng-template>
+										</p-column>  
+		
+									</p-dataTable>
+									</p-tabPanel>
+								</p-tabView> 
+							</div>
+		
+							<div class="panel-footer">
+								<div class="row">
+									<div class="col-md-3 col-md-offset-9 ">
+										<!-- buttons -->
+									</div>
+								</div>
+							</div>
+		
+						</div>
+					</div>
+		
+				</p-tabPanel>        
+			</p-tabView>
+		</div>
+	</div>
+
+	<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450"
+	[contentStyle]="{'overflow':'auto','max-height':'900px'}">
+		<div style="margin-bottom:0" class="panel panel-default">
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					Search LC
+				</h2>
+			</div>
+	
+			<form novalidate [formGroup]="searchForm" (submit)="submitForm(searchForm)" autocomplete="off">
+	
+				<div class="panel-body">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<label for="searchString" class="control-label col-md-12">LC Issuance Reference Number/ Form M Number / Customer Name/ Customer Code</label>
+							<div class="col-md-12">
+								<input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+							</div>
+						</div>
+					</div>
+				</div>
+	
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-md-12">
+							<button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+							<button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+						</div>
+					</div>
+				</div>
+	
+			</form>
+	
+		</div>
+	</p-dialog>
+	<!-- for Lc Enhancement/Extension initiation -->
+<!-- lms end	 -->
+
+	<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

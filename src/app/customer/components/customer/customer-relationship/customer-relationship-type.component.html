@@ -1,0 +1,74 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Relationship Types
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New Relationship" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-md-6">-->
+                <div class="panel-body">
+                    <p-dataTable [value]="customerRelationshipTypes">
+                        <p-column field="lookupName" header="Relationship Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                <a (click)="editCustomerRelationshipType(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+                <!--</div>-->
+
+            </div>
+            <!--end of panel-->
+
+            <!--add modal-->
+            <p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="500">
+                <div style="margin-bottom:0" class="panel panel-default">
+                    <div style="padding:4px" class="panel-heading">
+                        <h2 style="margin:0" class="panel-heading">
+                            {{ entityName }}
+                        </h2>
+                    </div>
+                    <!--form here-->
+                    <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="lookupName" class="control-label col-md-4"> Relationship Type</label>
+                                    <div class="col-md-8">
+                                        <input type="text" formControlName="lookupName" [ngClass]="'valid-input'" name="lookupName" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--buttons-->
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" [disabled]="createUpdateForm.invalid" (click)="submitCustomerRelationship(createUpdateForm)" class="btn btn-success pull-right">Save </button>
+                                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </p-dialog>
+            <!--end of add modal-->
+
+            <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+        </div>
+    </div>
+</div>

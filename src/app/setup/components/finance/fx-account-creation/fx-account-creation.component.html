@@ -1,0 +1,705 @@
+<div class="ui-g" *ngIf="displayCustomerInfo">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Search for Customer
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="form-group">
+              <div class="col-md-6 input-group  pull-left" style="margin-bottom: 15px; margin-left: 15px">
+                <input type="text" id="search" [(ngModel)]="searchString" class="form-control" placeholder="Enter Customer Name, Customer Code ...">
+                <span (click)="searchForCustomerInfo(searchString)" class="input-group-addon btn btn-primary">
+                  <span class="glyphicon glyphicon-search"></span> Search
+                </span>
+              </div>
+            </div>
+          </div>
+
+
+          <p-dataTable [value]="customersInfo" [responsive]=true [paginator]="true" [rows]="10" [(selection)]="selectedCustomer" dataKey="customerId"
+            (onRowSelect)="onSelectedCustomerChanged()" [rowsPerPageOptions]="[10,20,30]">
+            <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+            <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerTypeName" header="Customer Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="branchName" header="Customer Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          </p-dataTable>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="ui-g" *ngIf="displayAccountCreation">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Customer FX Account Creation
+              </h2>
+            </div>
+          </div>
+        </div>
+        <form [formGroup]="fxAccountCreationForm" autocomplete="off">
+          <div class="panel-body">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="customerCode" class="control-label col-md-2">
+                  Customer Code
+                </label>
+                <div class="col-md-4">
+                  <input type="text" name="customerCode" [attr.disabled]="true" formControlName="customerCode" [ngClass]="!fxAccountCreationForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'"
+                    id="customerCode" class="form-control">
+                </div>
+                <label for="channel" class="control-label col-md-2">
+                  Channel
+                </label>
+                <div class="col-md-4">
+                  <input type="text" name="channel" [attr.disabled]="true" formControlName="channel" [ngClass]="!fxAccountCreationForm.controls['channel'].valid ? 'required-input' : 'valid-input'"
+                    id="channel" class="form-control">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="currencyCode" class="control-label col-md-2">
+                  Currency Code
+                </label>
+                <div class="col-md-4">
+                  <select name="currencyCode" formControlName="currencyCode" [ngClass]="!fxAccountCreationForm.controls['currencyCode'].valid ? 'required-input' : 'valid-input'"
+                    id="currencyCode" class="form-control">
+                    <option value="">---Select CurrencyCode ---</option>
+                    <option *ngFor="let dt of currencyCodes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="schemeCode" class="control-label col-md-2">
+                  Scheme Code
+                </label>
+                <div class="col-md-4">
+                  <select name="schemeCode" formControlName="schemeCode" (change)="onSelectedSchemeCodeChanged($event.target.value)" [ngClass]="!fxAccountCreationForm.controls['schemeCode'].valid ? 'required-input' : 'valid-input'"
+                    id="schemeCode" class="form-control">
+                    <option value="">---Select SchemeCode ---</option>
+                    <option *ngFor="let dt of schemeCodes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="generalLedgerSubHeadCode" class="control-label col-md-2">
+                  GL Sub-Head Code
+                </label>
+                <div class="col-md-4">
+                  <select name="generalLedgerSubHeadCode" formControlName="generalLedgerSubHeadCode" [ngClass]="!fxAccountCreationForm.controls['generalLedgerSubHeadCode'].valid ? 'required-input' : 'valid-input'"
+                    id="generalLedgerSubHeadCode" class="form-control">
+                    <option value="">---Select GL Sub-Head Code ---</option>
+                    <option *ngFor="let dt of glSubHeadCodes" value="{{dt.fx_Code}}">
+                      {{dt.fx_Code}}
+                    </option>
+                  </select>
+                </div>
+                <label for="solId" class="control-label col-md-2">
+                  Sol ID
+                </label>
+                <div class="col-md-4">
+                  <select name="solId" formControlName="solId" [ngClass]="!fxAccountCreationForm.controls['solId'].valid ? 'required-input' : 'valid-input'"
+                    id="solId" class="form-control">
+                    <option value="">---Select Sol_Id ---</option>
+                    <option *ngFor="let dt of sol_Ids" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="modeOfAdavance" class="control-label col-md-2">
+                  Mode Of Adavance
+                </label>
+                <div class="col-md-4">
+                  <select name="modeOfAdavance" formControlName="modeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['modeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                    id="modeOfAdavance" class="form-control">
+                    <option value="">---Select Mode Of Adavance ---</option>
+                    <option *ngFor="let dt of modeOfAdvances" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="typeOfAdavance" class="control-label col-md-2">
+                  Type Of Adavance
+                </label>
+                <div class="col-md-4">
+                  <select name="typeOfAdavance" formControlName="typeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['typeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                    id="typeOfAdavance" class="form-control">
+                    <option value="">---Select Type Of Adavance ---</option>
+                    <option *ngFor="let dt of advanceTypes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="purposeOfAdavance" class="control-label col-md-2">
+                  Purpose Of Adavance
+                </label>
+                <div class="col-md-4">
+                  <select name="purposeOfAdavance" formControlName="purposeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['purposeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                    id="purposeOfAdavance" class="form-control">
+                    <option value="">---Select Purpose Of Adavance ---</option>
+                    <option *ngFor="let dt of purposeOfAdvances" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="natureOfAdavance" class="control-label col-md-2">
+                  Nature Of Adavance
+                </label>
+                <div class="col-md-4">
+                  <select name="natureOfAdavance" formControlName="natureOfAdavance" [ngClass]="!fxAccountCreationForm.controls['natureOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                    id="natureOfAdavance" class="form-control">
+                    <option value="">---Select Nature Of Adavance ---</option>
+                    <option *ngFor="let dt of natureOfAdvances" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="accountOccupationCode" class="control-label col-md-2">
+                  Account Occupation Code
+                </label>
+                <div class="col-md-4">
+                  <select name="accountOccupationCode" formControlName="accountOccupationCode" [ngClass]="!fxAccountCreationForm.controls['accountOccupationCode'].valid ? 'required-input' : 'valid-input'"
+                    id="accountOccupationCode" class="form-control">
+                    <option value="">--- Select Account Occupation ---</option>
+                    <option *ngFor="let dt of occupationCodes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="borrowerCategoryCode" class="control-label col-md-2">
+                  Borrower Category Code
+                </label>
+                <div class="col-md-4">
+                  <select name="borrowerCategoryCode" formControlName="borrowerCategoryCode" [ngClass]="!fxAccountCreationForm.controls['borrowerCategoryCode'].valid ? 'required-input' : 'valid-input'"
+                    id="borrowerCategoryCode" class="form-control">
+                    <option value="">--- Select Borrower Category ---</option>
+                    <option *ngFor="let dt of borrowerCategoryCodes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="sectorCode" class="control-label col-md-2">
+                  Sector Code
+                </label>
+                <div class="col-md-4">
+                  <select name="sectorCode" formControlName="sectorCode" [ngClass]="!fxAccountCreationForm.controls['sectorCode'].valid ? 'required-input' : 'valid-input'"
+                    id="sectorCode" class="form-control">
+                    <option value="">--- Select Sector Code ---</option>
+                    <option *ngFor="let dt of sectorCodes" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="subSectorCode" class="control-label col-md-2">
+                  SubSector Code
+                </label>
+                <div class="col-md-4">
+                  <select name="subSectorCode" formControlName="subSectorCode" [ngClass]="!fxAccountCreationForm.controls['subSectorCode'].valid ? 'required-input' : 'valid-input'"
+                    id="subSectorCode" class="form-control">
+                    <option value="">--- Select SubSector Code ---</option>
+                    <option *ngFor="let dt of sub_sectors" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="freeCodeOne" class="control-label col-md-2">
+                  FreeCode One
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeOne" formControlName="freeCodeOne" [ngClass]="!fxAccountCreationForm.controls['freeCodeOne'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeOne" class="form-control">
+                    <option value="">--- Select FreeCode One ---</option>
+                    <option *ngFor="let dt of freeCode1" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="freeCodeFour" class="control-label col-md-2">
+                  FreeCode Four
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeFour" formControlName="freeCodeFour" [ngClass]="!fxAccountCreationForm.controls['freeCodeFour'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeFour" class="form-control">
+                    <option value="">--- Select FreeCode Four ---</option>
+                    <option *ngFor="let dt of freeCode4" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="freeCodeFive" class="control-label col-md-2">
+                  FreeCode Five
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeFive" formControlName="freeCodeFive" [ngClass]="!fxAccountCreationForm.controls['freeCodeFive'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeFive" class="form-control">
+                    <option value="">--- Select FreeCode Five ---</option>
+                    <option *ngFor="let dt of freeCode5" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="freeCodeSix" class="control-label col-md-2">
+                  FreeCode sIX
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeSix" formControlName="freeCodeSix" [ngClass]="!fxAccountCreationForm.controls['freeCodeSix'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeSix" class="form-control">
+                    <option value="">--- Select FreeCode Six ---</option>
+                    <option *ngFor="let dt of freeCode6" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="freeCodeSeven" class="control-label col-md-2">
+                  FreeCode Seven
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeSeven" formControlName="freeCodeSeven" [ngClass]="!fxAccountCreationForm.controls['freeCodeSeven'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeSeven" class="form-control">
+                    <option value="">--- Select FreeCode Seven ---</option>
+                    <option *ngFor="let dt of freeCode7" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="freeCodeEight" class="control-label col-md-2">
+                  FreeCode Eight
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeEight" formControlName="freeCodeEight" [ngClass]="!fxAccountCreationForm.controls['freeCodeEight'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeEight" class="form-control">
+                    <option value="">--- Select FreeCode Eight ---</option>
+                    <option *ngFor="let dt of freeCode8" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="freeCodeNine" class="control-label col-md-2">
+                  FreeCode Nine
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeNine" formControlName="freeCodeNine" [ngClass]="!fxAccountCreationForm.controls['freeCodeNine'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeNine" class="form-control">
+                    <option value="">--- Select FreeCode Nine ---</option>
+                    <option *ngFor="let dt of freeCode9" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+                <label for="freeCodeTen" class="control-label col-md-2">
+                  FreeCode Ten
+                </label>
+                <div class="col-md-4">
+                  <select name="freeCodeTen" formControlName="freeCodeTen" [ngClass]="!fxAccountCreationForm.controls['freeCodeTen'].valid ? 'required-input' : 'valid-input'"
+                    id="freeCodeTen" class="form-control">
+                    <option value="">--- Select FreeCode Ten ---</option>
+                    <option *ngFor="let dt of freeCode10" value="{{dt.fx_Code}}">
+                      {{dt.ref_Desc}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-12">
+                <button type="button" (click)="submitFSaccountCreation(fxAccountCreationForm)" [disabled]="fxAccountCreationForm.invalid"
+                  class="btn btn-success pull-right">Save</button>
+                <button type="button" (click)="backToSearch()" style="margin-right:5px" class="btn btn-danger pull-right">Back To Search</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Authentication Token
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="form-horizontal">
+          <div  class="form-group">
+            <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+            <div class="col-md-12">
+                <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+            </div>
+    </div>
+
+        <div class="form-group">
+          <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+          <div class="col-md-12">
+            <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <div class="form-group text-center">
+            <div class="col-md-12">
+              <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="createFXAccount(fxAccountCreationForm)" style="margin-right:5px "
+                class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+<!-- <p-dialog [responsive]=true [(visible)]="displayAccountCreation" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Add New FX Account
+      </h2>
+    </div>
+
+    <form [formGroup]="fxAccountCreationForm">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="customerCode" class="control-label col-md-2">
+              Customer Code
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="customerCode" formControlName="customerCode" [ngClass]="!fxAccountCreationForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'"
+                id="customerCode" class="form-control">
+            </div>
+            <label for="channel" class="control-label col-md-2">
+              Channel
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="channel" [attr.disabled]="true" formControlName="channel" [ngClass]="!fxAccountCreationForm.controls['channel'].valid ? 'required-input' : 'valid-input'"
+                id="channel" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="currencyCode" class="control-label col-md-2">
+              Currency Code
+            </label>
+            <div class="col-md-4">
+              <select name="currencyCode" formControlName="currencyCode" [ngClass]="!fxAccountCreationForm.controls['currencyCode'].valid ? 'required-input' : 'valid-input'"
+                id="currencyCode" class="form-control">
+                <option value="">---Select CurrencyCode ---</option>
+                <option *ngFor="let dt of currencyCodes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="schemeCode" class="control-label col-md-2">
+              Scheme Code
+            </label>
+            <div class="col-md-4">
+              <select name="schemeCode" formControlName="schemeCode" (change)="onSelectedSchemeCodeChanged($event.target.value)" [ngClass]="!fxAccountCreationForm.controls['schemeCode'].valid ? 'required-input' : 'valid-input'"
+                id="schemeCode" class="form-control">
+                <option value="">---Select SchemeCode ---</option>
+                <option *ngFor="let dt of schemeCodes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="generalLedgerSubHeadCode" class="control-label col-md-2">
+              GL Sub-Head Code
+            </label>
+            <div class="col-md-4">
+              <select name="generalLedgerSubHeadCode" formControlName="generalLedgerSubHeadCode" [ngClass]="!fxAccountCreationForm.controls['generalLedgerSubHeadCode'].valid ? 'required-input' : 'valid-input'"
+                id="generalLedgerSubHeadCode" class="form-control">
+                <option value="">---Select GL Sub-Head Code ---</option>
+                <option *ngFor="let dt of glSubHeadCodes" value="{{dt.fx_Code}}">
+                  {{dt.fx_Code}}
+                </option>
+              </select>
+            </div>
+            <label for="solId" class="control-label col-md-2">
+              Sol ID
+            </label>
+            <div class="col-md-4">
+              <select name="solId" formControlName="solId" [ngClass]="!fxAccountCreationForm.controls['solId'].valid ? 'required-input' : 'valid-input'"
+                id="solId" class="form-control">
+                <option value="">---Select Sol_Id ---</option>
+                <option *ngFor="let dt of sol_Ids" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="modeOfAdavance" class="control-label col-md-2">
+              Mode Of Adavance
+            </label>
+            <div class="col-md-4">
+              <select name="modeOfAdavance" formControlName="modeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['modeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                id="modeOfAdavance" class="form-control">
+                <option value="">---Select Mode Of Adavance ---</option>
+                <option *ngFor="let dt of modeOfAdvances" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="typeOfAdavance" class="control-label col-md-2">
+              Type Of Adavance
+            </label>
+            <div class="col-md-4">
+              <select name="typeOfAdavance" formControlName="typeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['typeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                id="typeOfAdavance" class="form-control">
+                <option value="">---Select Type Of Adavance ---</option>
+                <option *ngFor="let dt of advanceTypes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="purposeOfAdavance" class="control-label col-md-2">
+              Purpose Of Adavance
+            </label>
+            <div class="col-md-4">
+              <select name="purposeOfAdavance" formControlName="purposeOfAdavance" [ngClass]="!fxAccountCreationForm.controls['purposeOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                id="purposeOfAdavance" class="form-control">
+                <option value="">---Select Purpose Of Adavance ---</option>
+                <option *ngFor="let dt of purposeOfAdvances" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="natureOfAdavance" class="control-label col-md-2">
+              Nature Of Adavance
+            </label>
+            <div class="col-md-4">
+              <select name="natureOfAdavance" formControlName="natureOfAdavance" [ngClass]="!fxAccountCreationForm.controls['natureOfAdavance'].valid ? 'required-input' : 'valid-input'"
+                id="natureOfAdavance" class="form-control">
+                <option value="">---Select Nature Of Adavance ---</option>
+                <option *ngFor="let dt of natureOfAdvances" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="accountOccupationCode" class="control-label col-md-2">
+              Account Occupation Code
+            </label>
+            <div class="col-md-4">
+              <select name="accountOccupationCode" formControlName="accountOccupationCode" [ngClass]="!fxAccountCreationForm.controls['accountOccupationCode'].valid ? 'required-input' : 'valid-input'"
+                id="accountOccupationCode" class="form-control">
+                <option value="">--- Select Account Occupation ---</option>
+                <option *ngFor="let dt of occupationCodes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="borrowerCategoryCode" class="control-label col-md-2">
+              Borrower Category Code
+            </label>
+            <div class="col-md-4">
+              <select name="borrowerCategoryCode" formControlName="borrowerCategoryCode" [ngClass]="!fxAccountCreationForm.controls['borrowerCategoryCode'].valid ? 'required-input' : 'valid-input'"
+                id="borrowerCategoryCode" class="form-control">
+                <option value="">--- Select Borrower Category ---</option>
+                <option *ngFor="let dt of borrowerCategoryCodes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sectorCode" class="control-label col-md-2">
+              Sector Code
+            </label>
+            <div class="col-md-4">
+              <select name="sectorCode" formControlName="sectorCode" [ngClass]="!fxAccountCreationForm.controls['sectorCode'].valid ? 'required-input' : 'valid-input'"
+                id="sectorCode" class="form-control">
+                <option value="">--- Select Sector Code ---</option>
+                <option *ngFor="let dt of sectorCodes" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="subSectorCode" class="control-label col-md-2">
+              SubSector Code
+            </label>
+            <div class="col-md-4">
+              <select name="subSectorCode" formControlName="subSectorCode" [ngClass]="!fxAccountCreationForm.controls['subSectorCode'].valid ? 'required-input' : 'valid-input'"
+                id="subSectorCode" class="form-control">
+                <option value="">--- Select SubSector Code ---</option>
+                <option *ngFor="let dt of sub_sectors" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="freeCodeOne" class="control-label col-md-2">
+              FreeCode One
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeOne" formControlName="freeCodeOne" [ngClass]="!fxAccountCreationForm.controls['freeCodeOne'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeOne" class="form-control">
+                <option value="">--- Select FreeCode One ---</option>
+                <option *ngFor="let dt of freeCode1" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="freeCodeFour" class="control-label col-md-2">
+              FreeCode Four
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeFour" formControlName="freeCodeFour" [ngClass]="!fxAccountCreationForm.controls['freeCodeFour'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeFour" class="form-control">
+                <option value="">--- Select FreeCode Four ---</option>
+                <option *ngFor="let dt of freeCode4" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="freeCodeFive" class="control-label col-md-2">
+              FreeCode Five
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeFive" formControlName="freeCodeFive" [ngClass]="!fxAccountCreationForm.controls['freeCodeFive'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeFive" class="form-control">
+                <option value="">--- Select FreeCode Five ---</option>
+                <option *ngFor="let dt of freeCode5" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="freeCodeSix" class="control-label col-md-2">
+              FreeCode 6
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeSix" formControlName="freeCodeSix" [ngClass]="!fxAccountCreationForm.controls['freeCodeSix'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeSix" class="form-control">
+                <option value="">--- Select FreeCode Six ---</option>
+                <option *ngFor="let dt of freeCode6" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="freeCodeSeven" class="control-label col-md-2">
+              FreeCode Seven
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeSeven" formControlName="freeCodeSeven" [ngClass]="!fxAccountCreationForm.controls['freeCodeSeven'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeSeven" class="form-control">
+                <option value="">--- Select FreeCode Seven ---</option>
+                <option *ngFor="let dt of freeCode7" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="freeCodeEight" class="control-label col-md-2">
+              FreeCode Eight
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeEight" formControlName="freeCodeEight" [ngClass]="!fxAccountCreationForm.controls['freeCodeEight'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeEight" class="form-control">
+                <option value="">--- Select FreeCode Eight ---</option>
+                <option *ngFor="let dt of freeCode8" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="freeCodeNine" class="control-label col-md-2">
+              FreeCode Nine
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeNine" formControlName="freeCodeNine" [ngClass]="!fxAccountCreationForm.controls['freeCodeNine'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeNine" class="form-control">
+                <option value="">--- Select FreeCode Nine ---</option>
+                <option *ngFor="let dt of freeCode9" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+            <label for="freeCodeTen" class="control-label col-md-2">
+              FreeCode Ten
+            </label>
+            <div class="col-md-4">
+              <select name="freeCodeTen" formControlName="freeCodeTen" [ngClass]="!fxAccountCreationForm.controls['freeCodeTen'].valid ? 'required-input' : 'valid-input'"
+                id="freeCodeTen" class="form-control">
+                <option value="">--- Select FreeCode Ten ---</option>
+                <option *ngFor="let dt of freeCode10" value="{{dt.fx_Code}}">
+                  {{dt.ref_Desc}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitFSaccountCreation(fxAccountCreationForm)" [disabled]="fxAccountCreationForm.invalid"
+              class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayAccountCreation=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog> -->

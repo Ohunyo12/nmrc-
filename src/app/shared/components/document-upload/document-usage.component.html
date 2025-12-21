@@ -1,0 +1,136 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Document Search
+        </h2>
+    </div>
+
+        <form novalidate [formGroup]="documentSearchForm" (ngSubmit)="getCustomerDocuments(documentSearchForm)" autocomplete="off">
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+
+                    <div class="col-md-3">
+                        <input type="text" name="customerCode" formControlName="customerCode" id="customerCode"
+                            class="form-control" placeholder="Search by Customer Code or Name"
+                            [ngClass]="!documentSearchForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                    <div class="col-md-4">
+                        <select (change)="getDocumentTypesByCategory($event.target.value)" name="documentCategoryId" id="documentCategoryId" formControlName="documentCategoryId"
+                            class="form-control"
+                            [ngClass]="!documentSearchForm.controls['documentCategoryId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Document Category --</option>
+                            <option *ngFor=" let x of documentCategories" [value]="x.documentCategoryId">{{x.documentCategoryName }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="documentTypeId" id="documentTypeId" formControlName="documentTypeId"
+                            class="form-control"
+                            [ngClass]="!documentSearchForm.controls['documentTypeId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Document Type --</option>
+                            <option *ngFor=" let x of documentTypes" [value]="x.documentTypeId">{{x.documentTypeName }}</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" type="button" style="
+                        height: 30px;
+                        padding: 4px 12px;
+                    " (click)="getCustomerDocuments(documentSearchForm)"
+                        [disabled]="documentSearchForm.invalid">Search</button>
+
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+
+
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Document Search Result <small>{{ customerName }}</small>
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+<p-dataTable [value]="documentUploads" [responsive]="true" [paginator]="true" [rows]="5">
+    <p-column header="DateTime Uploaded">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
+        </ng-template>
+    </p-column>
+    <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column field="uploadedBy" header="Uploaded By" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column header="File Name">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+            <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+            <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+            <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+            <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+            <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+            <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+            <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+            <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+            {{d.fileName}}
+        </ng-template>
+    </p-column>
+    <!-- <p-column field="fileName" header="File Name" sortable="true" filterMatchMode="contains"></p-column> -->
+    <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
+    <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains"
+        [style]="{'width':'100px'}"></p-column>
+    <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
+    <p-column field="documentTypeName" header="Document Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains">
+    </p-column>
+    <p-column [style]="{'width':'120px'}">
+        <ng-template pTemplate="header"> </ng-template>
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            <div style="text-align:center">
+                <!-- <span *ngIf="deleteLink && d.owner"><a (click)="deleteDocumentUpload(d)"
+                        href="javascript:void(0)">Delete</a>
+                    <span style="padding:3px;"> | </span>
+                </span> -->
+                <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                    (click)="downloadDocument(d,true)" href="javascript:void(0)">View</a>
+                <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                    (click)="downloadDocument(d)" href="javascript:void(0)">Download</a>
+            </div>
+        </ng-template>
+    </p-column>
+
+</p-dataTable>
+
+
+    </div>
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body" style="overflow:auto;height:450px">
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile"
+                alt="" class="img-thumbnail">
+        </div>
+    </div>
+</p-dialog>
+
+</div>
+
+    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

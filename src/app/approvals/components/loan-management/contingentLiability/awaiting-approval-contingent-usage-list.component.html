@@ -1,0 +1,143 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Contingent Loans Usage Approval
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                <p-tabPanel header="Contingent Loan Usage">
+                    <div class="panel-body">
+
+
+                        <p-dataTable [value]="contingentData" selectionMode="single" [(selection)]="selectedContingentData" (onRowSelect)="onRowSelect($event)" [rows]="20" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]">
+
+                            <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column>
+
+                            <p-column [style]="{'width':'40px'}" field="timeLapse" header="Time In"></p-column>
+
+                            <!-- for row selection -->
+                            <p-column [style]="{'width':'90px'}" field="customerName" header="Obligor Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                            <p-column [style]="{'width':'90px'}" field="productName" header="Product"></p-column>
+                            <!-- <p-column [style]="{'width':'110px'}" field="contingentLoanUsageId" header="contingentLoanUsageId"></p-column> -->
+
+                            <p-column [style]="{'width':'40px'}" field="loanReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                            <p-column [style]="{'width':'40px'}" field="principalName" header="Principal " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                            <p-column field="contingentAmount" header="Facility Amount" [style]="{'width':'40px','text-align':'right'}"></p-column>
+
+                            <p-column field="operationName" header="Operation Name" [style]="{'width':'50px','text-align':'right'}"></p-column>
+
+                            <!-- 
+                <p-column field="outStandingAmount" header="Outstanding Amount" [style]="{'width':'60px','text-align':'right'}"></p-column>
+                
+                <p-column field="percentageUsed" header="Used (%)" [style]="{'width':'60px','text-align':'right'}"></p-column>
+                 -->
+                        </p-dataTable>
+
+                    </div>
+                </p-tabPanel>
+
+                <p-tabPanel header="Approval" *ngIf="disableApprovalTab">
+                    <div class="panel-body">
+
+                        <table class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Obligor:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.customerName }}</td>
+                                    <td>
+                                        <strong>Principal:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.principalName }}</td>
+                                    <td>
+                                        <strong>Account Number:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.casaAccountNumber }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <strong>Contingent Amount:</strong>
+                                    </td>
+                                    <td>{{selectedContingentData?.contingentAmount}} {{selectedContingentData?.currencyCode}}
+                                    </td>
+                                    <td>
+                                        <strong>Book Date:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.effectiveDate | date:"dd-MM-yyyy" }}</td>
+                                    <td>
+                                        <strong>Maturity Date:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.maturityDate | date:"dd-MM-yyyy" }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <strong>Amount Used:</strong>
+                                    </td>
+                                    <td>{{selectedContingentData?.usedAmount | number:'1.2' }} </td>
+                                    <td>
+                                        <strong>Percentage Used:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.percentageUsed }}</td>
+                                    <td>
+                                        <strong>Amount Requested:</strong>
+                                    </td>
+                                    <td>{{ selectedContingentData?.amountRequested | number:'1.2'}}</td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" (click)="onSubmit(2)" class="btn btn-success">Approve</button>
+                                <button type="button" (click)="onSubmit(3)" class="btn btn-primary">Disapprove</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </p-tabPanel>
+                <p-tabPanel header="Collateral Details" *ngIf="disableApprovalTab">
+                    <app-mapped-loan-collateral [loanId]="loanId" [loanSystemTypeId]="loanSystemTypeId"></app-mapped-loan-collateral>
+                </p-tabPanel>
+                <p-tabPanel header="Used Contingent" *ngIf="disableApprovalTab">
+                    <app-all-contingent-used [loanId]="loanId"></app-all-contingent-used>
+                </p-tabPanel>
+                <p-tabPanel header="Documents" *ngIf="disableApprovalTab">
+                    <document-upload [reload]="reload" [operationId]="6" [customerId]="selectedContingentData?.customerId" [targetId]="selectedContingentData?.contingentLoanId" [deleteLink]="deleteLink" [showUploadForm]="showUploadForm" [targetReferenceNumber]="selectedContingentData?.loanApplicationNumber">
+                    </document-upload>
+
+                </p-tabPanel>
+            </p-tabView>
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<!-- <pre>{{ selectedContingentData | json }}</pre> -->

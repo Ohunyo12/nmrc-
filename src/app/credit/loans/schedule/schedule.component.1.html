@@ -1,0 +1,163 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Schedule Simulation
+                            </h2>
+                            <div class="pull-right">
+                                <button *ngIf="schedules" class="btn btn-primary" type="button" (click)="exportToExcel()">
+                                     Export To Excel
+                                    </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div *ngIf="!schedules">
+                        <form novalidate class="form-horizontal" [formGroup]="scheduleGroup" (ngSubmit)="onSubmit(scheduleGroup)" autocomplete="off">
+
+                            <div class="form-group">
+                                <label for="" class="control-lable col-md-2">Principal Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" formatM name="principalAmount" formControlName="principalAmount" class="form-control" [ngClass]="!scheduleGroup.controls['principalAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Effective Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="loanDate" dateFormat="dd/mm/yy" [ngClass]="!scheduleGroup.controls['loanDate'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="loanDate" [inputStyle]="{'width': '290px'}" [monthNavigator]="true"
+                                        [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 9px" class="form-group">
+                                <label for="" class="control-label col-md-2">Tenor Mode</label>
+                                <div class="col-md-4">
+                                    <select name="tenormode" formControlName="tenorMode" id="tenormode" class="form-control">
+                                        <option value=""> Select Tenor Mode</option>
+                                        <option value="1">Days</option>
+                                        <option value="2">Months</option>
+                                        <option value="3">Years</option>
+                                    </select>
+                                </div>
+
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Tenor</label>
+                                <div class="col-md-4">
+                                    <input type="text" (blur)="onTenorFocusOut()" formControlName="tenor" class="form-control">
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 9px" class="form-group">
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Interest Rate</label>
+
+                                <div class="col-md-4">
+                                    <input type="text" formControlName="interestRate" class="form-control" [ngClass]="!scheduleGroup.controls['interestRate'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Fee Charge</label>
+
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" formControlName="feeCharge" id="feeCharge">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Fee Frequency</label>
+
+                                <div class="col-md-4">
+                                    <select name="frequency" id="frequency" formControlName="frequency" class="form-control">
+                                        <option value=""> Select Frequency</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Twice Yearly</option>
+                                        <option value="3">Quarterly</option>
+                                        <option value="3">Six Times Yearly</option>
+                                        <option value="3">Yearly</option>
+                                    </select>
+                                </div>
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">Maturity Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="maturityDate" formControlName="maturityDate" dateFormat="dd/mm/yy" [ngClass]="!scheduleGroup.controls['firstPaymentDate'].valid ? 'required-input' : 'valid-input'"
+                                        [inputStyle]="{'width': '290px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"
+                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" style="margin-top:8px" class="control-lable col-md-2">First Payment Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="firstPaymentDate" dateFormat="dd/mm/yy" [ngClass]="!scheduleGroup.controls['firstPaymentDate'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="firstPaymentDate" [inputStyle]="{'width': '290px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"
+                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                                </div>
+                                <label for="" class="control-label col-md-2">Schedule Method</label>
+                                <div class="col-md-4">
+                                    <select name="scheduleMethod" id="scheduleMethod" formControlName="scheduleMethod" class="form-control">
+                                        <option value=""> Select Schedule Method</option>
+                                        <option *ngFor="let st of scheduleTypes" value="{{st.lookupId}}">
+                                            {{st.lookupName}}
+                                            </option>                                       
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Interest Freq</label>
+                                <div class="col-md-4">
+                                    <select name="interestfrequency" id="interestFrequency" formControlName="interestFrequency" class="form-control">
+                                        <option value=""> Select Frequency</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Twice Yearly</option>
+                                        <option value="3">Quarterly</option>
+                                        <option value="3">Six Times Yearly</option>
+                                        <option value="3">Yearly</option>
+                                    </select>
+                                </div>
+
+                                <label for="" class="control-label col-md-2">Principal Freq</label>
+                                <div class="col-md-4">
+                                    <select name="principalfrequency" id="principalfrequency" formControlName="principalfrequency" class="form-control">
+                                        <option value=""> Select Frequency</option>
+                                        <option value="1">Monthly</option>
+                                        <option value="2">Twice Yearly</option>
+                                        <option value="3">Quarterly</option>
+                                        <option value="3">Six Times Yearly</option>
+                                        <option value="3">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Installments</label>
+                                <div class="col-md-4">
+
+                                    <input type="text" formControlName="numberOfPayments" disabled='disabled' class="form-control">
+                                </div>
+
+                                <div class="col-md-2 col-md-offset-4">
+                                    <button type="submit" [disabled]="scheduleGroup.invalid" class="btn btn-success btn-block">Generate</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div *ngIf="schedules" class="form-group">
+                        <p-dataTable [paginator]="true" [rows]="15" [value]="schedules" [responsive]=true selectionMode="single">
+                            <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="formattedPaymentDate" header="Payment Date" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="formattedPeriodicPayment" header="Periodic Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="formattedPrincipalAmount" header="Principal Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="formattedPeriodicInterestAmount" header="Interest Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        </p-dataTable>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

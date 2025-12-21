@@ -1,0 +1,233 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <!--module header-->
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            HOU Routing
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- panel content -->
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                <p-tabPanel header="Loan Applications">
+
+                    <!-- loan applications -->
+                    <div class="card no-padding">
+                        <div class="panel panel-default">
+
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            Loan Applications
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pull-right" style="margin-right:16px;margin-bottom:2px;">
+                                <input type="search" [(ngModel)]="searchString" id="searchString" name="searchString" placeholder="Search loan applications..." aria-label="Search" size="30" minlength="4" maxlength="50">
+                                <button (click)="getLoanApplications(0,20,true)">Search</button>
+                                <button (click)="reset()" title="Refresh">
+                                    <span class="glyphicon glyphicon-refresh"></span>
+                                </button>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <p-dataTable [value]="applications" [responsive]="true" [paginator]="true" [rows]="10" [(selection)]="applicationSelection"
+                                    dataKey="loanApplicationId" (onRowSelect)="onSelectedApplicationChange()" [rowsPerPageOptions]="[10,20,30]"
+                                    [lazy]="true" [totalRecords]="itemTotal" (onLazyLoad)="loadData($event)" [loading]="showLoadIcon">
+
+                                    <p-column [style]="{'width':'25px'}" selectionMode="single"></p-column>
+                                    <!-- for row selection -->
+
+                                    <!-- <p-column [style]="{'width':'40px'}" field="loanApplicationId" header="ID"></p-column> -->
+
+                                    <p-column [style]="{'width':'80px'}" field="applicationReferenceNumber" header="Reference" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'30px'}"></p-column>
+                                    <p-column field="facilityType" header="Facility Type" [style]="{'width':'160px'}"></p-column>
+                                    
+                                    <p-column header="Amount" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px','text-align':'right'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationAmount | number : '1.2' }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column header="Tenor" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'40px','text-align':'right'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationTenor }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="regionName" header="Region" [style]="{'width':'150px'}"></p-column>
+                                    
+                                    <p-column header="Date" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'50px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <!-- 
+                                    <p-column header="Time In" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.timeIn | date: 'medium' }}
+                                        </ng-template>
+                                    </p-column> -->
+                                    
+                                    <p-column field="timeLapse" header="Time In" [filter]="false" filterMatchMode="contains" [style]="{'width':'50px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.timeLapse }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column [style]="{'width':'130px'}" field="responsiblePerson" header="Responsible Person" sortable="false" [filter]="false" filterMatchMode="contains">
+                                    </p-column>
+                                    <p-column [style]="{'width':'110px'}" field="currentApprovalLevel" header="Approval Level" sortable="false" [filter]="false" filterMatchMode="contains"></p-column>
+
+                                </p-dataTable>
+                            </div>
+
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-3 col-md-offset-9 ">
+                                        <!-- buttons -->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- endof loan applications -->
+
+
+
+                    <!-- loan review applications -->
+                    <div class="card no-padding">
+                        <div class="panel panel-default">
+
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            Loan Review Applications
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <p-dataTable [value]="reviewApplications" [responsive]="true" [paginator]="true" [rows]="10" [(selection)]="reviewSelection"
+                                    dataKey="loanReviewApplicationId" (onRowSelect)="onSelectedReviewApplicationChange()" [rowsPerPageOptions]="[10,20,30]"
+                                    [lazy]="true" [totalRecords]="itemTotal" (onLazyLoad)="loadData($event)" [loading]="showLoadIcon">
+
+                                    <p-column [style]="{'width':'27px'}" selectionMode="single"></p-column>
+
+                                    <p-column [style]="{'width':'110px'}" field="referenceNumber" header="Reference" sortable="false" [filter]="false"
+                                        filterMatchMode="contains" [style]="{'width':'30px'}"></p-column>
+                                    <p-column field="facilityType" header="Facility Type" [style]="{'width':'160px'}"></p-column>
+                                    <p-column field="creditOperationType" header="Operation Type" [style]="{'width':'160px'}"></p-column>
+                                    <p-column field="regionName" header="Region" [style]="{'width':'150px'}"></p-column>
+                                    <p-column header="Date" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'60px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <!-- 
+                                    <p-column header="Time In" sortable="false" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.timeIn | date: 'medium' }}
+                                        </ng-template>
+                                    </p-column> -->
+
+                                    <p-column field="timeLapse" header="Time In" [filter]="false" filterMatchMode="contains" [style]="{'width':'100px'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.timeLapse }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column [style]="{'width':'180px'}" field="responsiblePerson" header="Responsible Person" sortable="false" [filter]="false"
+                                        filterMatchMode="contains"></p-column>
+
+                                </p-dataTable>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- endof loan review applications -->
+
+
+
+                </p-tabPanel>
+
+
+                <p-tabPanel header="Application Information" [disabled]="disableApplicationInformationTab">
+        
+                    <app-workflow-routing 
+                        [moduleId]="operationType"
+                        [currentSelection]="workflowTarget" 
+                        [enableRoutePreset]="true" 
+                        [enableReroute]="true" 
+                        [panelLabel]="'Application Routing'"
+                        [referenceNumber]="applicationSelection?.applicationReferenceNumber" 
+                        (rerouted)="resetGrid($event)"
+                    ></app-workflow-routing>
+
+                    <div *ngIf="operationType == 1">
+                        <app-customer-information-detail [loanApplicationId]="applicationSelection?.loanApplicationId"></app-customer-information-detail>
+                        <app-loan-application-details-view [isRecommendedInfo]="true" [loanApplicationId]="applicationSelection?.loanApplicationId" [loanInformation]="applicationSelection?.loanInformation"> </app-loan-application-details-view>
+                    </div>
+
+                    <div *ngIf="operationType == 2">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">Loan Details</h2>
+                            </div>
+                            <div class="panel-body">
+    
+                                <div class="col-md-6">
+                                    <select (change)="onFacilityChange($event.target.value)" class="form-control"  [ngClass]="reloadLoanDetails == null ? 'required-input' : 'valid-input'">
+                                        <option value="null">-- Select Facility --</option>
+                                        <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                                    </select>
+                                </div>
+                            
+                            </div>
+    
+                            <div class="panel-body">
+                                <app-disbursed-facility-detail [displayDetails]="loanSystemTypeId != 0 && loanSystemTypeId != 4" [loanSystemTypeId]="loanSystemTypeId" [LoadLoanDetails]="reloadLoanDetails"></app-disbursed-facility-detail>
+                                <app-loan-application-details-view *ngIf="loanSystemTypeId == 4" [loanApplicationDetailId]="reloadLoanDetails"> </app-loan-application-details-view>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+
+                </p-tabPanel>
+
+
+
+            </p-tabView>
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+</div>
+
+
+<!-- <pre>{{reviewSelection?.applicationDetails | json}}</pre> -->
+<!-- <pre>{{ applicationSelection | json }}</pre> -->
+<!-- <pre>{{ loanApplication | json }}</pre> -->

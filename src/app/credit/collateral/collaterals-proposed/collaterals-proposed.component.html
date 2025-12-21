@@ -1,0 +1,162 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="panel-title pull-left">
+					Proposed Collaterals
+				</h2>
+			</div>
+		</div>
+	</div>
+	<div class="panel-body">
+		<div class="panel-body coll-list">
+			<p-dataTable [scrollable]="true" #dt [value]="proposedCollateral" [paginator]="true" [rows]="3">
+				<p-header>
+					<div class="ui-helper-clearfix">
+						<button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+					</div>
+				</p-header>  
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralCode" header="Collateral Code" filterMatchMode="contains"></p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralOwnerName" header="Collateral Owner" 
+					filterMatchMode="contains">
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="productName" header="Product Name" 
+					filterMatchMode="contains">
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="customerName" header="Obligor Name" 
+					filterMatchMode="contains">
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="facilityAmount" header="Propose Facility Amount" filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{d.facilityCurrencyCode}} {{ d.facilityAmount | number : '1.2' }}
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="availableCollateralValue" header="Available Collateral Value" filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{d.collateralCurrencyCode}} {{ d.availableCollateralValue | number : '1.2' }}
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="expectedCoveragePercentage" header="Expected Collateral Coverage (%)"  filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.expectedCoveragePercentage }} %
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="expectedCollateralCoverage" header="Expected Coverage" filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{d.facilityCurrencyCode}} {{ d.expectedCollateralCoverage | number : '1.2' }}
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="actualCollateralCoverage" header="Actual Coverage" filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{d.facilityCurrencyCode}} {{ d.actualCollateralCoverage | number : '1.2' }}
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="actualCoveragePercentage" header="Actual Collateral Coverage (%)"  filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.actualCoveragePercentage | number : '1.2' }} %
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'100px','font-size':'12px'}" field="totalCoverage" header="Total Facility Coverage Achieved (%)"  filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.totalCoverage | number : '1.2' }} %
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'70px'}">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						<div style="text-align:center">                                           
+							<a (click)="viewCollateralHistory(d)" href="javascript:void(0)">History</a>
+						</div>
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'70px'}">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						<div style="text-align:center">                                           
+							<a (click)="viewCollateralDetail(d)" href="javascript:void(0)">View Collateral Details</a>
+						</div>
+					</ng-template>
+				</p-column>
+				<p-column [style]="{'width':'50px'}" *ngIf="isForSwap">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						<div style="text-align:center">                                           
+							<a (click)="showSearchCollateral(d)" href="javascript:void(0)">Swap With</a>
+						</div>
+					</ng-template>
+				</p-column>
+
+
+				
+			</p-dataTable>
+		</div>
+	</div>
+</div>
+	
+<p-dialog  [responsive]="true" [(visible)]="displayCollateralDetails" id="add-modal" modal="modal" showEffect="fade" width="1000"
+    [contentStyle]="{'overflow':'auto','max-height':'1000px'}" [style]="{'z-index': 10000}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <collateral-information-view *ngIf="displayCollateralDetails"
+            [collateralCustomerId]="collateral?.collateralId"
+            [showCollateralInformation]="displayCollateralDetails"
+			[allowToAddInsurancePolicy]="allowToAddInsurancePolicy"
+            [reload]="collateral?.collateralId"
+			[loanApplicationDetailId]="loanApplicationDetailId"
+            (closeWindow)="displayCollateralDetails=false"
+			(insurancePolicyInformationDetail)="getInsurancePolicyInformationConfirmation($event)">
+        </collateral-information-view>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCollateralHistory" modal="modal" showEffect="fade" width="1000"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+	
+	<div class="panel panel-default">
+		<div style="margin-bottom:0" class="panel panel-default">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-md-12">
+						<h2 class="panel-title pull-left">
+							Proposed Facilities
+						</h2>
+					</div>
+				</div>
+			</div>
+			<app-collateral-facilities *ngIf="displayCollateralHistory"
+				[collateralId]="collateral?.collateralId"
+				[reload]="collateral?.collateralId">
+			</app-collateral-facilities>
+		</div>
+		<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-12">
+					<button type="button" (click)="displayCollateralHistory=false" style="margin-right:5px"
+					class="btn btn-danger pull-right">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="showSearchCollateralForSwap" modal="true" showEffect="fade" width="1200"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+	<div class="panel panel-default">
+		<collateral-information 
+			[isRegistrationDoneViaLoanApplication]="false"
+			[showCustomerCollaterals]="true"
+			[applicationId]="collateral?.loanApplicationId"
+			[autoMapNew]="true" [collateralAtAppraisal]="false"
+			[hideCreateButton]="true"  [canEditExternally]="false"
+			[hideProposeButton]="true"
+			[isForSwap]="isForSwap"
+			[applicationCustomerId]="collateral?.customerId"
+			[reloadCustomerCollateral]="collateral?.loanApplicationId"
+			(emitCollateral)="emitCollateralDetail($event)">
+		</collateral-information>
+		<div class="panel-footer">
+			<div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="showSearchCollateralForSwap=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+		</div>
+	</div>
+</p-dialog>

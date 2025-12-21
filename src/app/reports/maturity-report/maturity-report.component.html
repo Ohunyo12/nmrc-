@@ -1,0 +1,138 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+               
+              Maturity Report
+              </h2>
+
+            </div>
+          </div>
+        </div>
+       
+        
+        <div class="panel-body" *ngIf="displayReportSearch">
+            <div class="form-horizontal">
+                 <form novalidate [formGroup]="maturityReportForm" autocomplete="off">
+               
+                                                                
+                      <div class="form-group">
+                                 
+                                 <label for="runDate" class="control-label col-md-1">Run Date  </label>
+                                 <div class="col-md-2">
+                                    <p-calendar id="runDate" formControlName="runDate"
+                                                [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                                [showIcon]="true"
+                                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                [style]="{'width': '100%', 'z-index': '999'}"
+                                                [ngClass]="!maturityReportForm.controls['runDate'].valid ? 'required-input' : 'valid-input'">
+                                            </p-calendar>
+                                 </div>
+                                <label for="level" class="control-label col-md-1"> Level</label>
+                                <div class="col-md-2">
+                                  <select name="level" id="level" formControlName="level" class="form-control"
+                                    [ngClass]="!maturityReportForm.controls['level'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="--- Select Level ---">--- Select Level ---</option>
+                                    <option value="4">4</option>
+                                  </select>
+                                </div>
+                                <label for="misCode" class="control-label col-md-1"> MIS Code</label>
+                                <div class="col-md-2">
+                                  <select name="misCode" id="level" formControlName="misCode" class="form-control"
+                                    [ngClass]="!maturityReportForm.controls['misCode'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="--- Select Mis Code ---">--- Select Mis Code ---</option>
+                                    <option value="BAC800">BAC800</option>
+                                  </select>
+                                </div>   
+                                <label for="exposureType" class="control-label col-md-1">Exposure Type</label>
+                                <div class="col-md-2">
+                                  <select name="exposureType" id="level" formControlName="exposureType" class="form-control">
+                                    <option value="--- Select Exposure Type ---">--- Select Exposure Type ---</option>
+                                    <option value="DIRECT">DIRECT</option>
+                                  </select>
+                                </div>                                                                 
+                      </div>
+
+                      <div class="form-group">
+                          <label for="divisionName" class="control-label col-md-1">Division Name  </label>
+                          <div class="col-md-2">
+                              <select name="divisionName" id="divisionName" formControlName="divisionName" class="form-control">
+                              <option value="--- Select Division Name  ---">--- Select Division Name ---</option>
+                              <option value="BUSINESS BANKING DIVISION">BUSINESS BANKING DIVISION</option>
+                            </select>
+                          </div>
+                         <label for="groupName" class="control-label col-md-1"> Group Name</label>
+                         <div class="col-md-2">
+                           <select name="groupName" id="groupName" formControlName="groupName" class="form-control">
+                             <option value="--- Select Group Name ---">--- Select Group Name ---</option>
+                             <option value="Business Banking Abuja & North">Business Banking Abuja & North</option>
+                           </select>
+                         </div>
+                         <label for="branchName" class="control-label col-md-1"> Branch Name</label>
+                         <div class="col-md-2">
+                           <select name="branchName" id="branchName" formControlName="branchName" class="form-control">
+                             <option value="--- Select Branch Name ---">--- Select Branch Name ---</option>
+                             <option value="BBD Branch_Business Banking Team (Garki)">BBD Branch_Business Banking Team (Garki)</option>
+                           </select>
+                         </div>   
+                         <label for="regionName" class="control-label col-md-1">Region Name</label>
+                         <div class="col-md-2">
+                           <select name="regionName" id="regionName" formControlName="regionName" class="form-control">
+                             <option value="--- Select Region Name ---">--- Select Region Name ---</option>
+                             <option value="Business Banking Abuja Cadastral Zone">Business Banking Abuja Cadastral Zone</option>
+                           </select>
+                         </div>                                                                 
+                      </div>
+
+                     <div class="col-md-12 pull-right">
+                         <button type="button" (click)="popoverSeeMore(maturityReportForm)"
+                                 class="btn btn-success pull-right" [disabled]="!maturityReportForm.valid">Preview Report
+                         </button>
+                         
+                     </div>
+     
+                 </form>
+                      
+              </div>
+             </div>
+             <div class="panel-footer" *ngIf="displayReportSearch">
+                 <div class="row">
+                     <div class="col-md-12"></div>
+                 </div>
+             </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="panel panel-default" *ngIf="displayReportArea">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+          </h2>
+          <button type="button" (click)="clearInput()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+       </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+        <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px" style="overflow:auto"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer" *ngIf="displayReportArea">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="clearInput()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+      </div>
+    </div>
+  </div>

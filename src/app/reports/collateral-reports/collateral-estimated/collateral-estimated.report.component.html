@@ -1,0 +1,113 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Collateral Estimated Report
+                            </h2>
+                            <!-- <div class="pull-right">
+                                <button pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="panel-body">
+
+                    <div class="ui-g ui-fluid">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="text"  name="searchParam" placeholder="Customer ID| Customer Name | LoanRef" [(ngModel)]="searchParam"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <button pButton type="button" (click)="getCollateralDetails()" label="Collateral Record"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="row"> -->
+
+                <!-- <div class="col-xs-4 col-xs-offset-7 ui-widget-header" style="padding:1px 10px;border-bottom: 0 none;color:black">                                 -->
+                <!-- <label style="color:gold"> Search All</label>    -->
+                <!-- <input #gb type="text" pInputText size="50" placeholder="Global Filter"> -->
+                <!-- <i class="fa fa-search" style="margin:4px 4px 0 0"></i> -->
+                <!-- <input type="text" name="param" placeholder="Customer ID" [(ngModel)]="param" class="form-control"  >
+                                            <button pButton type="button" (click)="getCollateralDetails()" label="Collateral Record"></button> -->
+
+                <!-- </div> -->
+                <!-- </div>                                -->
+                <div class="panel-body">
+                    <p-dataTable [value]="collateralDetail" [responsive]=true [paginator]="true" [rows]="10"
+                        [(selection)]="loanSelection" dataKey="loanApplicationId">
+
+                        <p-header><b>List of Collateral Estimated</b></p-header>
+                        <p-column [style]="{'width':'150px'}" field="collateralId" header="Collateral Id" sortable="true"
+                            [filter]="true" filterPlaceholder="Search"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="collateralCode" header="Collateral Code" sortable="true"
+                            [filter]="true" filterPlaceholder="Search"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="camRefNumber" header="Cam RefNo." sortable="true"
+                            [filter]="true" filterPlaceholder="Search"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="accountNumber" header="Account Number" sortable="true"
+                            [filter]="true" filterPlaceholder="Search"></p-column>
+                        <p-column field="collateralTypeName" header="Collateral Name" sortable="true" [filter]="true"
+                            filterPlaceholder="Search"></p-column>
+
+                        <p-column field="collateralValue" header="Collateral Value" sortable="true" [style]="{'width':'130px','text-align':'right'}"
+                            [filter]="true" filterPlaceholder="Search">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.collateralValue | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'80px'}">
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <div class="btn-group">
+                                    <a href="javascript:;" title="See More Info.." (click)="popoverSeeMore($event, row.collateralCode)">View
+                                        Report</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="1200" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Collateral Estimated Report
+
+                    </h2>
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="600px" width="1500px" style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>

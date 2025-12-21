@@ -1,0 +1,71 @@
+<div class="form-group">
+    <div class="col-md-12">
+        <div class="pull-right">
+            <button (click)="displayMandatesUpload = true;" pButton type="button" label="Add New" icon="fa-plus"></button>
+        </div>
+    </div>
+</div>
+<p-dataTable [value]="kycDocumentUploadList" [paginator]="true" [rows]="5">
+    <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+    <p-column field="physicalFileNumber" header="File Number" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}"></p-column>
+    <p-column field="physicalLocation" header="Physical Location" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    <p-column [style]="{'width':'100px'}">
+        <ng-template pTemplate="header"> </ng-template>
+        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+        </ng-template>
+    </p-column>
+</p-dataTable>
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayMandatesUpload" id="add-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+              Upload Supporting Documents
+                <!-- <small>- {{ customerCodetitle }}</small> -->
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="documentTypeId" class="control-label col-md-2">Upload Type</label>
+                    <div class="col-md-8">
+                        <select type="text" name="documentTypeId" [(ngModel)]="documentTypeId" id="documentTypeId" class="form-control" [ngClass]="'valid-input'">
+                            <option value="">-- Select Upload Type --</option>
+                            <option *ngFor="let type of uploadDocumentType" [value]="type.documentTypeId">
+                                {{ type.documentTypeName }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="description" placeholder="Document title...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".jpg,.jpeg,.png" #fileInput name="fileInput"
+                            style="padding-top:2px;" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="uploadFile()" [disabled]="uploadFileTitle==null || file==undefined" class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Upload</button>
+                    <button type="button" (click)="displayMandatesUpload=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>

@@ -1,0 +1,305 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Risk Assessment
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="newAssessment()" pButton type="button" label="New Assessment" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-body" *ngIf="!showAssessmentForm">
+
+                    <p-dataTable [value]="assessmentResults">
+
+                        <p-column field="dateTimeCreated" header="Date" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'80px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.dateTimeCreated | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="assessmentTitle" header="Assessment Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="creditRating" header="Credit Rating" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'120px'}"></p-column>
+                        <p-column field="totalScore" header="Total Score" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'120px'}"></p-column>
+                        
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="continueAssessment(row)" href="javascript:void(0)">View</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="showAssessmentForm" class="card no-padding">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        <strong>{{ currentPageNumber }} :: {{ currentTitleName }}</strong>
+                        <!--TitleID - {{currentTitleId}}-->
+                    </h2>
+                    <h2 class="panel-title pull-right">
+                        <strong>{{ selectedCustomerName }}</strong>
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+        <form [formGroup]="assessmentForm" novalidate (ngSubmit)="save(assessmentForm)" autocomplete="off">
+        <!--{{ assessmentForm.value | json }}-->
+
+            <div *ngFor="let category of categories;">
+
+                <!--category-->
+                <!--<table class="table .table-condensed .table-striped">-->
+                <table class="table table-striped table-bordered table-condensed">
+
+                    <thead class="thead-default" [ngStyle]="getColor(category.level)">
+                        <tr>
+                        <th>{{ category.name }}</th>
+                        <!--<th>{{ category.name }} --- ID: {{ category.riskId }}, PARID: {{ category.parentId }}</th>-->
+                        <th style="text-align:right; width:150px">Score: {{ category.score }}, Weight: {{ category.weight }}</th>
+                        </tr>
+                    </thead>
+
+                    <!--options-->
+                    <tbody formArrayName="indexFields">
+                        <ng-container *ngFor="let option of assessmentForm.controls.indexFields.controls; let i = index;" [formGroupName]="i">
+                            <tr *ngIf="option.value.parentId == category.riskId && hasNoChild(option.value.riskId)">
+                                <td>
+                                     {{ option.value.name }}
+                                </td> 
+                                <td style="text-align:center">
+                                    <input 
+                                        type="checkbox"
+                                        id="selected"
+                                        name="selected"
+                                        formControlName="selected"
+                                        (change)="onCheckboxChange(option.controls.riskId.value, i)"
+                                        [checked]="option.controls.selected.value"
+                                    >
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </form>
+        
+        </div><!--endof panel-->
+        <hr />
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--<div *ngIf="body">Form Vaues: {{ body | json }}</div>-->
+                    <!--{{ titleIndex }}-->
+                    <button type="button" (click)="previousTitle()" [disabled]="disablePrevious" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span> Previous</button>
+                    <button type="button" (click)="nextTitle()" [disabled]="disableNext" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> Next</button>
+                    <button type="button" (click)="save(assessmentForm)" class="btn btn-success"><span class="glyphicon glyphicon-floppy-disk"></span> Save Computed Scores</button>
+                    <button type="button" (click)="save(assessmentForm,'finish')" [disabled]="!disableNext" class="btn btn-warning"><span class="glyphicon glyphicon-ok"></span> Finish Assessment</button>
+                    <button type="button" (click)="closeAssessmentForm()" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Close</button>
+                </div>
+            </div>
+        </div>
+<!-- 
+        <pre>
+            {{ assessmentForm.value.indexFields | json }}
+        </pre> -->
+
+        </div>
+    </div>
+
+<!--
+
+sort order by id thenby parentid or level
+
+-->
+
+<!--title modal-->
+<p-dialog [responsive]=true [(visible)]="showAssessmentTypeForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Set Risk Assessment Type
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="assessmentTypeForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="riskAssessmentTitleId" class="control-label col-md-12">
+                            Assessment Title
+                        </label>
+                        <div class="col-md-12">
+                            <select (change)="onAssessmentTitleChange($event.target.value)" type="text" name="riskAssessmentTitleId" formControlName="riskAssessmentTitleId" id="riskAssessmentTitleId" class="form-control" [ngClass]="!assessmentTypeForm.controls['riskAssessmentTitleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Assessment Title --</option>
+                                <option *ngFor="let title of assessmentTitles" [value]="title.riskAssessmentTitleId">
+                                    {{ title.riskTitle }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="riskTypeId" class="control-label col-md-12">Risk Type</label>
+                        <div class="col-md-12">
+                            <select [attr.disabled]="true" name="riskTypeId" formControlName="riskTypeId"
+                                id="riskTypeId" class="form-control" [ngClass]="!assessmentTypeForm.controls['riskTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Risk Type --</option>
+                                <option *ngFor="let x of riskTypes" [value]="x.riskTypeId">{{ x.riskTypeName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12" *ngIf="selectedPersonName != null">
+                            <strong>Target:</strong>
+                            <h4>{{ selectedPersonName }}</h4>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitAssessmentTypeForm(assessmentTypeForm)" [disabled]="assessmentTypeForm.invalid" class="btn btn-success pull-right">Start Assessment</button>
+                    <button type="button" (click)="showAssessmentTypeForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+
+
+<!--real time search form-->
+<p-dialog [responsive]="true" [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displaySearchModal=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModalC" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Customer
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displaySearchModalC=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <table *ngIf="searchResultsC" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResultsC; let i = index">
+                                <td>{{res.branchName}}</td>
+                                <td>{{res.customerCode}}</td>
+                                <td>{{res.customerName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<!--modal ends-->
+<!--<pre>{{ categories | json }}</pre>-->
+<!--<pre>{{ currentIndexes | json }}</pre>-->
+<!--<pre>{{ indexFields | json }}</pre>-->
+<!-- <pre>{{ assessmentTitles | json }}</pre> -->

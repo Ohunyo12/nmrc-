@@ -1,0 +1,359 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            LC Application Search
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p-tabView>
+            <p-tabPanel header="LC Applications">
+
+                <!-- loan applications -->
+                <div class="card no-padding">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title pull-left">
+                                        LC Applications
+                                    </h2>
+            
+                                    <div class="pull-right">
+                                        <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <p-tabView *ngIf="isForLMSSearch == false">
+                                <p-tabPanel header="LC Applications" *ngIf="displaySearchTable" >
+                                    <p-dataTable [style]="{'overflow':'auto'}" [value]="LCapplications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="arrivalDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.arrivalDate | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="lcReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="customerName" header="Customer Name/Group" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="letterOfCreditAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{getCurrencyCode(d.currencyId)}} {{ d.letterOfCreditAmount | number : '1.2' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="lcApplicationStatus" header="Issuance Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="releaseApplicationStatus" header="Release Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="usanceStatus" header="Usance Application Status" sortable="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="approvalStatus" header="Issuance Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="releaseApprovalStatus" header="Release Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="usanceApprovalStatus" header="Usance Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentApprovalLevel" header="Issuance Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="releaseCurrentApprovalLevel" header="Release Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="usanceCurrentApprovalLevel" header="Usance Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                    <!-- <p-column [style]="{'width':'100px','font-size':'12px'}" field="responsiblePerson" header="Person" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                                    <!-- <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentApprovalLevel" header="Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                                    <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+                                        </ng-template>
+                                    </p-column>  
+
+                                    </p-dataTable>
+                                </p-tabPanel>
+                            </p-tabView> 
+
+                            <p-tabView *ngIf="isForLMSSearch == true" [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                                <p-tabPanel header="LC Applications For LMS" *ngIf="displaySearchTable" [selected]="activeTabindex == 0">
+                                    <p-dataTable [style]="{'overflow':'auto'}" [value]="LCapplications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+
+                                    <!-- <p-column [style]="{'width':'100px','font-size':'12px'}" [style]="{'width':'10px'}" selectionMode="single"></p-column> -->
+
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="arrivalDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.arrivalDate | date: 'dd-MM-yyyy' }}
+                                            </ng-template>
+                                        </p-column>
+
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="lcReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="customerName" header="Customer Name/Group" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="letterOfCreditAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{getCurrencyCode(d.currencyId)}} {{ d.letterOfCreditAmount | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="lcApplicationStatus" header="LC Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="approvalStatus" header="LC Cancellation Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentApprovalLevel" header="LC Cancellation at Current Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentlyWith" header="Currently with" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Lc</a>
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.lcApprovalTrailId > 0" (click)="viewCancelation(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Cancelation Details</a>
+                                            </ng-template>
+                                        </p-column>  
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.lcEnhancements != null && row.lcEnhancements != undefined && row.lcEnhancements.length > 0" (click)="showEnhancementList(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View amount modifications</a>
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.lcExtensions != null && row.lcExtensions != undefined && row.lcExtensions.length > 0" (click)="showExtensionList(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Extensions</a>
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.lcUsanceExtensions != null && row.lcUsanceExtensions != undefined && row.lcUsanceExtensions.length > 0" (click)="showUsanceExtensionList(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Usance Extensions Status</a>
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </p-tabPanel>
+                                <p-tabPanel header="Enhancement Applications" *ngIf="lcEnhancements.length > 0" [selected]="activeTabindex == 1">
+                                    <p-dataTable [value]="lcEnhancements" [paginator]="true" [rows]="15" [responsive]="true">
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="dateTimeCreated" header="Enhancement Initiation Date">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="letterOfCreditAmount" header="Enhancement Amount" sortable="true" [filter]="true"
+                                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{getCurrencyCode(d.currencyId)}} {{ d.letterOfCreditAmount | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="letterOfcreditExpirydate" header="Expiry Date">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="approvalStatus" header="Approval Status" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="requestStaffName" header="Sender Name" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="requestApprovalLevel" header="Sender Level" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentApprovalLevel" header="Current Level" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentlyWith" header="Currently With" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="arrivalDate" header="Date of Arrival">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <!-- <p-column [style]="{'width':'100px','font-size':'12px'}" *ngIf="isAmongActivities('Reassign Loan')">
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.toApprovalLevelId > 0" (click)="selectapprover(row)" href="javascript:void(0)">
+                                                    Reassign DrawDown Approval
+                                                </a>
+                                            </ng-template>
+                                        </p-column>    -->
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <span *ngIf="listShown == 1">
+                                                    <a (click)="viewEnhancement(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Enhancement Details</a>
+                                                </span>
+                                                <span *ngIf="listShown == 2">
+                                                    <a (click)="viewExtension(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View Extension Details</a>
+                                                </span>
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </p-tabPanel>
+                                <p-tabPanel header="Usance Extension Applications" *ngIf="lcUsanceExtensions.length > 0" [selected]="activeTabindex == 2">
+                                    <p-dataTable [value]="lcUsanceExtensions" [paginator]="true" [rows]="15" [responsive]="true">
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="dateTimeCreated" header="Usance Extension Initiation Date">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="ussanceAmount" header="Usance Amount" sortable="true" [filter]="true"
+                                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{getCurrencyCode(d.currencyId)}} {{ d.ussanceAmount | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="ussanceTenor" header="Proposed Usance Tenor" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="lcMaturityDate" header="Proposed maturity Date">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="approvalStatus" header="Approval Status" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="requestStaffName" header="Sender Name" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="requestApprovalLevel" header="Sender Level" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentApprovalLevel" header="Current Level" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="currentlyWith" header="Currently With" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"> </p-column>
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}" field="arrivalDate" header="Date of Arrival">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <!-- <p-column [style]="{'width':'100px','font-size':'12px'}" *ngIf="isAmongActivities('Reassign Loan')">
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <a *ngIf="row.toApprovalLevelId > 0" (click)="selectapprover(row)" href="javascript:void(0)">
+                                                    Reassign DrawDown Approval
+                                                </a>
+                                            </ng-template>
+                                        </p-column>    -->
+                                        <p-column [style]="{'width':'100px','font-size':'12px'}">
+                                            <ng-template pTemplate="header"></ng-template>
+                                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                <span *ngIf="listShown == 1">
+                                                    <a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+                                                </span>
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-9 ">
+                                    <!-- buttons -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </p-tabPanel>        
+        </p-tabView>
+
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search LC
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="searchForm" autocomplete="off" (ngSubmit)="submitForm(searchForm)">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">LC Issuance Reference Number/ Form M Number / Customer Name/ Customer Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<p-dialog *ngIf="selectedLCApplication != null" [responsive]=true [(visible)]="showLCDetailsDialog" modal="modal" width="1200px"
+[contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                LC Search
+            </h2>
+        </div>
+
+        <div class="panel-body" *ngIf="!isForLMSSearch || isLcCancelation">
+            <lc-issuance [isLCSearch]=true
+                [lcIssuanceId]="selectedLCApplication.lcIssuanceId"
+                [isForLMSSearch]="isForLMSSearch"
+                [isLcCancelation]="isLcCancelation"
+                [lcReleaseAmountId]="selectedLCApplication.lcReleaseAmountId"
+                [lcUssanceId]="selectedLCApplication.lcUssanceId"
+                [releaseAmount]="selectedLCApplication.releaseAmount"
+                [totalUsanceAmount]="selectedLCApplication.totalUsanceAmount"
+                [lcReleases]="selectedLCApplication.lcReleases"
+                [lcUsances]="selectedLCApplication.lcUsances"
+                [reload]="selectedLCApplication.lcIssuanceId"
+                [showButtons]="false"
+                [resetTabs]="reload">
+            </lc-issuance>
+        </div>
+
+        <div class="panel-body" *ngIf="isForLMSSearch && !isLcCancelation">
+            <lc-issuance 
+                [isLCSearch]=true
+                [isForLMSSearch]=true
+                [isLCEnhancement]="isLCEnhancement"
+                [isLCExtension]="isLCExtension"
+                [lcIssuanceId]="selectedLCApplication.lcIssuanceId"
+                [tempLcIssuanceId]="selectedLCApplication.tempLcIssuanceId"
+                [lcReleaseAmountId]="selectedLCApplication.lcReleaseAmountId"
+                [lcUssanceId]="selectedLCApplication.lcUssanceId"
+                [releaseAmount]="selectedLCApplication.releaseAmount"
+                [totalUsanceAmount]="selectedLCApplication.totalUsanceAmount"
+                [reload]="selectedLCApplication.tempLcIssuanceId"
+                [lcReleases]="selectedLCApplication.lcReleases"
+                [lcUsances]="selectedLCApplication.lcUsances"
+                [showButtons]="false"
+                [resetTabs]="selectedLCApplication.tempLcIssuanceId">
+            </lc-issuance>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button (click)="closeLcDetailsDialog()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal ends-->

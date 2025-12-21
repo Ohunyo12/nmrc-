@@ -1,0 +1,327 @@
+<p-growl [(value)]="msgs"></p-growl>
+<button *ngIf="AvailChecklist" class="btn btn-success" (click)="displayConditionPrecedentValidation=true">Load Checklist</button>
+<div *ngIf="showLoanList" class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                FAM Approved Loans Awaiting Checklist
+              </h2>
+            </div>
+          </div>
+
+        </div>
+        <div class="panel-body">
+          <p-dataTable [value]="camApprovedLoans" dataKey="loanApplicationId" [rows]="20" [paginator]="true" [responsive]="true">
+            <p-column field="applicationReferenceNumber" header="Loan Reference Number" [style]="{'width':'150px'}" sortable="true" [filter]="true"
+              filterMatchMode="contains"></p-column>
+            <p-column field="loanTypeName" header="Loan Type" [style]="{'width':'150px'}" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerName" header="Obligor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="productName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="approvedAmount" header="Loan Amount" [style]="{'text-align':'right', 'width':'120px'}" sortable="true" [filter]="true"
+              filterMatchMode="contains">
+              <ng-template let-col let-loan="rowData" pTemplate="body">
+                {{loan[col.field] | number : '1.2-2' }}
+              </ng-template>
+            </p-column>
+            <p-column field="applicationDate" header="Application Date" [style]="{'width':'150px'}" sortable="true" [filter]="true" filterMatchMode="contains">
+              <ng-template let-col let-loan="rowData" pTemplate="body">
+                {{loan[col.field] | date : 'dd/MM/yyyy' }}
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'90px'}">
+              <ng-template pTemplate="header">
+              </ng-template>
+              <ng-template let-col let-row="rowData" pTemplate="body">
+                <a (click)="viewConditionPrecedence(row, $event)" style="display: block" href="">
+                  Check
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCheckListDetails" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{checklistHeader}}
+      </h2>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Unchecked Items</legend> 
+                <div class="col-md-12" style="max-height: 400px; overflow: auto">
+                  <p-dataTable [value]="ChecklistDefinitionList" [(selection)]="selectedChecklist" [rows]="5" [paginator]="true" [responsive]="true">
+                    <p-column field="condition" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="isExternal" [style]="{'width':'70px'}">
+                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                          <span *ngIf="d.isExternal == true">External</span>
+                          <span *ngIf="d.isExternal == false">Internal</span>
+
+                      </ng-template>
+                  </p-column>
+                    <p-column [style]="{'width':'70px'}">
+                      <ng-template pTemplate="header"> </ng-template>
+                      <ng-template pTemplate="body" let-col let-i="rowData">
+                        <a (click)="uncheckedChecklistItem(i, $event)" href="javascript:void(0)">Check
+                          <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                      </ng-template>
+                    </p-column>
+                  </p-dataTable>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Checked Checklist Items</legend> 
+                <div class="col-md-12" style="max-height: 400px; overflow: auto">
+                   <p-dataTable [value]="ChecklistDetailsList" [rows]="5" [paginator]="true" [responsive]="true"> 
+                    <p-column field="condition" header="Checklist Item" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'70px'}" field="status" header="Check list Status"></p-column>
+                    <p-column [style]="{'width':'70px'}" field="approvalStatus" header="Approval Status"></p-column>
+                    <p-column [style]="{'width':'70px'}" field="comment" header="Comment"></p-column>
+                    <p-column [style]="{'width':'70px'}">
+                      <ng-template pTemplate="header"> </ng-template>
+                      <ng-template pTemplate="body" let-d="rowData" let-col let-i="rowIndex">
+                        <a (click)="onRemoveClicked(d)" style="color:#ff0000" href="javascript:void(0)">Remove</a>
+                      </ng-template>
+                    </p-column>
+                  </p-dataTable> 
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">  
+        <div class="col-md-12 ">
+          <button type="button" [disabled]="(ChecklistDetailsList == undefined) || (!(ChecklistDetailsList.length > 0))" class="btn btn-success pull-right" (click)="getDrawdownDeferralMemo()">Deferals/Waivers Memo</button>  
+          <button type="button" [disabled]="(ChecklistDetailsList == undefined) || (!(ChecklistDetailsList.length > 0))" style="margin-right:5px " class="btn btn-success pull-right" (click)="submitLoanCheckList()">Go For Approval</button>
+          <button type="button" (click)="displayCheckListDetails=false;resetofferLetterChecklist.emit(true)" style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistEntry" id="create-edit-modal" modal="modal" showEffect="fade" width="600" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        CheckList Details
+      </h2>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Checklist Item</label>
+            <div class="col-md-8">
+              <textarea rows="3" name="checklistItem" id="checklistItem" class="form-control" [(ngModel)]="checklistItem" [ngClass]="'valid-input'"
+                [attr.disabled]="true"></textarea>
+            </div>
+          </div>
+          <div *ngIf="checklistDefferedOrWaived" class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Reason</label>
+            <div class="col-md-8">
+              <textarea rows="3" name="reason" id="reason" required  class="form-control" [(ngModel)]="reason" [ngClass]="reason ? 'valid-input' : 'required-input'"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Checklist Status</label>
+            <div class="col-md-8">
+              <select name="checkListStatusId" id="checkListStatusId" required class="form-control" (change)="onChecklistStatusChanged($event.target.value)"
+                [(ngModel)]="checkListStatusId" [ngModelOptions]="{standalone: true}" [ngClass]="checkListStatusId ? 'valid-input' : 'required-input'">
+                <option value=" ">--- Select Checklist Status ---</option>
+                <option *ngFor="let item of checklistStatusResponse " [value]="item.checklistStatusId ">{{item.checklistStatusName}}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- <div class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Period(Days)</label>
+            <div class="col-md-8">
+                <input type="number" [(ngModel)]="deferedNumberOfDays" name="optionName" id="optionName" class="form-control">
+            </div>
+          </div> -->
+          <div *ngIf="checklistDeffered" class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Defered Date</label>
+            <div class="col-md-8">
+              <p-calendar id="deferedDate " dateFormat="dd/mm/yy " [inputStyle]="{ 'width': '350px'}" [monthNavigator]="true " [yearNavigator]="true "
+                yearRange="1955:2030 " [(ngModel)]="deferedDate" [ngModelOptions]="{standalone: true}" [showIcon]="true " [ngClass]=" 'valid-input' "></p-calendar>
+            </div>
+          </div>
+          <div *ngIf="checklistNotProvided">
+            <div class="form-group">
+              <label style="padding-top: 13px" for="" class="control-label col-md-4">Upload Document</label>
+              <div class="col-md-8">
+                    <a (click)="setShowUpload($event)" href="javascript:void(0)"><span class="glyphicon glyphicon-upload"></span> <b>Upload</b></a>
+                <!-- <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                  #fileInput name="fileInput" style="padding-top:2px;" class="form-control"> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-success pull-right" (click)="updateLoanChecklist()">Save</button>
+          <button type="button" (click)="displayChecklistEntry=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Document Title:
+        <strong>{{ selectedDocumentName }}</strong>
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayUpload=false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body" style="overflow:auto;height:500px">
+      <div style="margin: auto; width: 50%">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+          class="img-thumbnail">
+      </div>
+    </div>
+
+  </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayConditionPrecedentValidation" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="900" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View Offer Letter Checklist
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayConditionPrecedentValidation=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-12" style="max-height: 400px; overflow: auto">
+              <p-dataTable [value]="ChecklistDetailsList" [responsive]=true [style]="{'overflow':'auto', 'max-height':'400px'}">
+                <p-column field="condition" header="CheckList Item"></p-column>
+                <p-column field="status" header="Checklist Status(RM)" [style]="{'width':'100px'}"></p-column>
+
+                <p-column field="isExternal" header="Condition Type" [style]="{'width':'100px'}" filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-m="rowData">
+                    <span *ngIf="m.isExternal==false">Internal</span>
+                    <span *ngIf="m.isExternal==true">External</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="approvalStatus" header="Approval Status" [style]="{'width':'100px'}"></p-column>
+                <p-column  field="validationStatus" header="Checklist Status(Availment)" [style]="{'width':'100px'}"
+                  filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-m="rowData">
+                    <span *ngIf="m.validationStatus==true">Validated</span>
+                    <span *ngIf="m.validationStatus==false">Declined</span>
+                    <span *ngIf="m.validationStatus==null">Not Checked</span>
+                  </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"> Checklist Document</ng-template>
+                  <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                    <a (click)="viewConditionPrecedentChecklistUpload(d)" href="javascript:void(0)">View</a>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="isAvailmentChecklist" field="validationStatus" [style]="{'width':'120px'}">
+                  <ng-template pTemplate="header"> Availment Validation</ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <select name="validationStatus" id="validationStatus" class="form-control" (change)="validateConditionPrecedent(d, $event.target.value)"
+                      [(ngModel)]="d.validationStatus" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                      <option value=" ">--- Select Option ---</option>
+                      <option value="true">--- Yes ---</option>
+                      <option value="false">--- No ---</option>
+                    </select>
+                  </ng-template>
+                </p-column>
+              </p-dataTable> 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button " (click)="displayConditionPrecedentValidation=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]="true" [(visible)]="showUpload" id="ct-modal" modal="modal" showEffect="fade" width="1200" [style]="{'overflow-y': 'auto', 'max-height': '90vh'}">
+ 
+ 
+
+    <document-upload *ngIf="selectedChecklist != null" [reload]="reload" [autoZIndex]="false" 
+        [operationId]="42"
+        [customerId]="customerId"
+        [targetId]="selectedChecklist.conditionId"
+        [targetReferenceNumber]="applicationRefNumber">
+    </document-upload>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="showUpload=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Close</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+ 
+<p-dialog [responsive]=true [(visible)]="displayDrawdownDeferralMemo" id="ct-modal" modal="modal" showEffect="fade"
+    width="1200" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <app-ckeditior-project *ngIf="displayDrawdownDeferralMemo==true"  [content]="ckEditorContent"
+                        (contentChange)="contentChange($event)" [height]="450">
+                        </app-ckeditior-project>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">         
+            <button type="button" (click)="displayDrawdownDeferralMemo=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+          </div>
+        </div>
+      </div>
+</p-dialog> 
+

@@ -1,0 +1,164 @@
+<p-growl [(value)]="msgs"></p-growl>
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Fee Concession Awaiting Approval
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p-dataTable [paginator]="true" [rows]="15" [value]="feeConcessionAwaitingApproval" [responsive]=true selectionMode="single">
+            <p-column field="loanRefNo" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'90px'}"></p-column>
+            <p-column field="concessionTypeName" header="Concession Type" sortable="true" [filter]="true" filterMatchMode="contains"
+              [style]="{'width': '100px'}"></p-column>
+
+            <p-column field="concessionReason" header="Reason For Concession" sortable="true" [filter]="true" filterMatchMode="contains">
+            </p-column>
+
+            <p-column field="defaultValue" header="Default Value" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+            </p-column>
+            <p-column field="concession" header="Concession" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+            </p-column>
+            <p-column field="loanChargeFeeName" header="Fee Charge" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '150px'}">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.loanChargeFeeName ? d.loanChargeFeeName : 'N/A' }}
+              </ng-template>
+            </p-column>
+            <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width': '100px'}">
+            </p-column>
+            <p-column [style]="{'width':'70px', 'text-align': 'center'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewDocument(d, $event)" href="javascript:void(0)">
+                  View Document
+                </a>
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'70px', 'text-align': 'center'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewFeeConcessionDetails(d, $event)" href="javascript:void(0)">
+                  View Details
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayFeeConcessionApprovalModal" widgetVar="ajaxDialog" [draggable]="false" appendToBody="true"
+  modal="modal" showEffect="fade" width="949">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Fee Concession Approval
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayFeeConcessionApprovalModal=false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="form-horizontal">
+        <table class="table table-customer-information">
+          <tbody>
+            <tr>
+              <td>
+                <strong>Application Reference Number</strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.loanRefNo }}</td>
+              <td>
+                <strong>Concession Type </strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.concessionTypeName }}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Reason For Concession</strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.concessionReason }}</td>
+              <td>
+                <strong>Charge Fee</strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.loanChargeFeeName ? selectedFeeConcessionData.loanChargeFeeName : 'N/A'}}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Default Value</strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.defaultValue }}</td>
+              <td>
+                <strong>Concession Value</strong>
+              </td>
+              <td>{{ selectedFeeConcessionData.concession}}</td>
+            </tr>
+            <br/>
+            <tr>
+
+              <td>
+                <strong>Comment</strong>
+              </td>
+              <td>
+                <textarea [ngClass]="!selectedFeeConcessionData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="selectedFeeConcessionData.comment"
+                  name="comment" cols="15" rows="3"></textarea>
+              </td>
+              <td>
+                <strong>Status</strong>
+              </td>
+              <td>
+                <select name="approvalStatusId" id="approvalStatusId" class="form-control" [(ngModel)]="selectedFeeConcessionData.approvalStatusId"
+                  [ngClass]="!selectedFeeConcessionData.approvalStatusId ? 'required-input' : 'valid-input'">
+                  <option value="">--- Select Approval Status ---</option>
+                  <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group pull-right">
+            <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+
+            <button [disabled]="!selectedFeeConcessionData.comment || !selectedFeeConcessionData.approvalStatusId" type="button" (click)="goForApproval(selectedFeeConcessionData)"
+              class="btn btn-success">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Document Title:
+        <strong>{{ selectedDocumentName }}</strong>
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayUpload=false">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body" style="overflow:auto;height:500px">
+      <div style="margin: auto; width: 50%">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+          class="img-thumbnail">
+      </div>
+    </div>
+  </div>
+</p-dialog>

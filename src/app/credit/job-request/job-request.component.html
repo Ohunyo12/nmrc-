@@ -1,0 +1,437 @@
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Job Request
+        </h2>
+    </div>
+    <form [formGroup]="jobRequestForm" autocomplete="off">
+        <p-tabView>
+            <p-tabPanel header="Main content">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <p-accordion #accordion>
+                            <p-accordionTab *ngIf="firstArea" [selected]="firstArea" (selectedChange)="resetAccordion()" header="Request Route">
+                                <div class="form-group">
+                                    <label for="jobTypeId" class="control-label col-md-2">Request Type</label>
+                                    <div class="col-md-10">
+                                        <select class="selectpicker" (change)="onRequestTypeChange($event.target.value)" name="jobTypeId"
+                                            id="jobTypeId" [ngClass]="jobRequestForm.controls['jobTypeId'].valid ? 'valid-input' : 'required-input'"
+                                            class="form-control" formControlName="jobTypeId">
+                                            <option value="">-- Select Request Type --</option>
+                                            <option *ngFor="let x of jobTypes" [value]="x.jobTypeId">{{ x.jobTypeName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jobSubTypeId" class="control-label col-md-2">Job Type</label>
+                                    <div class="col-md-10">
+                                        <select class="selectpicker" (change)="onJobSubTypeChange($event.target.value)" name="jobSubTypeId"
+                                            id="jobSubTypeId" [ngClass]="jobRequestForm.controls['jobSubTypeId'].valid ? 'valid-input' : 'required-input'"
+                                            class="form-control" formControlName="jobSubTypeId">
+                                            <option value="">-- Select Job Type --</option>
+                                            <option *ngFor="let x of jobSubTypeData" [value]="x.jobSubTypeId">{{ x.jobSubTypeName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div *ngIf="!operationAvailable" class="form-group">
+                                        <label for="operationId" class="control-label col-md-2">Operation</label>
+                                        <div class="col-md-10">
+                                            <select (change)="validateSelectedOperations($event.target.value)" name="operationId" id="operationId" [ngClass]="jobRequestForm.controls['operationId'].valid ? 'valid-input' : 'required-input'"
+                                                class="form-control" formControlName="operationId">
+                                                <option value="1">-- Select Operation --</option>
+                                                <option *ngFor="let x of operations" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <div *ngIf="useFacilityDropdownToDetermineTarget" class="form-group">
+                                    <label for="targetFacility" class="control-label col-md-2">Target Facility</label>
+                                    <div class="col-md-10">
+                                        <select name="targetId" (change)="changeTargetId($event.target.value)" id="targetId" [ngClass]="jobRequestForm.controls['targetId'].valid ? 'valid-input' : 'required-input'"
+                                            class="form-control" formControlName="targetId">
+                                            <option value="">-- Select Facility --</option>
+                                            <option *ngFor="let x of facilityList" [value]="x.loanApplicationDetailId">{{ x.customerName.substring(0,15)}}/{{x.proposedProductName.substring(0,20) }} (Tenor:{{x.proposedTenorString}} Amount:{{x.proposedAmount}} IR:{{x.proposedInterestRate}})</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group hide">
+                                    <label for="" class="control-label col-md-2"></label>
+                                    <div class="col-md-10">
+                                        <p-checkbox *ngFor="let option of jobSubTypeData" formControlName="jobSubTypeId" [value]="option.jobSubTypeId" [label]="option.jobSubTypeName">
+                                        </p-checkbox>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="departmentUnitId" class="control-label col-md-2">Destination Unit</label>
+                                    <div class="col-md-10 ">
+                                        <select class="selectpicker" formControlName="departmentUnitId" data-live-search="true" (change)="onDepartmentUnitSelect($event.target.value)"
+                                            [ngClass]="jobRequestForm.controls['departmentUnitId'].valid ? 'valid-input' : 'required-input'"
+                                            name="departmentUnitId" id="departmentUnitId" class="form-control">
+                                            <option value="">-- Select Destination Unit --</option>
+                                            <option *ngFor="let x of jobDestinationUnits" [value]="x.jobTypeUnitId">{{ x.unitName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="canSearchTargetStaff" class="form-group">
+                                    <label for="searchedName" class="control-label col-md-2">Target Staff</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <input type="text" (click)="displaySearchModal = true" (keyup)="searchDB($event.target.value)" [ngClass]="!jobRequestForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchedName" placeholder="Search staff" name="searchedName">
+                                            <div class="input-group-btn">
+                                                <button  style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="displaySearchModal && searchResults" style="overflow-y: scroll; height:100px;" class="form-group">
+                                    <div class="col-md-10 pull-right">
+                                        <table *ngIf="searchResults" class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Staff Code</th>
+                                                    <th>First Name</th>
+                                                    <th>Middle Name</th>
+                                                    <th>Last Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                                    <td>{{res.staffCode}}</td>
+                                                    <td>{{res.firstName}}</td>
+                                                    <td>{{res.middleName}}</td>
+                                                    <td>{{res.lastName}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-10 ">
+                                        <p-checkbox label="Require Document" formControlName="requireDocument" (onChange)="addDocument($event)"></p-checkbox>
+                                    </div>
+                                </div>
+                            </p-accordionTab>
+                            <p-accordionTab *ngIf="secondArea" [selected]="secondArea" header="Message">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <input type="text" placeholder="Message Title" name="requestSubject" id="requestSubject" [ngClass]="jobRequestForm.controls['requestSubject'].valid ? 'valid-input' : 'required-input'"
+                                                class="form-control" formControlName="requestSubject">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-editor style="overflow-y: scroll" placeholder="Message Body" formControlName="senderComment" id="senderComment" name="senderComment"
+                                                [style]="{'height':'145px'}">
+                                                <p-header>
+                                                    <span class="ql-formats">
+                                                        <select class="ql-header">
+                                                            <option value="1">Heading</option>
+                                                            <option value="2">Subheading</option>
+                                                            <option selected>Normal</option>
+                                                        </select>
+                                                        <select class="ql-font">
+                                                            <option selected>Sans Serif</option>
+                                                            <option value="serif">Serif</option>
+                                                            <option value="monospace">Monospace</option>
+                                                        </select>
+                                                    </span>
+                                                    <span class="ql-formats">
+                                                        <button class="ql-bold" aria-label="Bold"></button>
+                                                        <button class="ql-italic" aria-label="Italic"></button>
+                                                        <button class="ql-underline" aria-label="Underline"></button>
+                                                    </span>
+
+                                                    <span class="ql-formats">
+                                                        <select class="ql-color"></select>
+                                                        <select class="ql-background"></select>
+                                                    </span>
+                                                    <span class="ql-formats">
+                                                        <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                                        <button class="ql-list" value="bullet" aria-label="Unordered List"></button>
+                                                        <select class="ql-align">
+                                                            <option selected></option>
+                                                            <option value="center"></option>
+                                                            <option value="right"></option>
+                                                            <option value="justify"></option>
+                                                        </select>
+                                                    </span>
+                                                    <span class="ql-formats">
+                                                        <button class="ql-link" aria-label="Insert Link"></button>
+                                                        <!-- <button class="ql-Image" aria-label="Insert Image"></button> -->
+                                                        <button class="ql-code-block" aria-label="Insert Code Block"></button>
+                                                    </span>
+                                                    <span class="ql-formats">
+                                                        <button class="ql-clean" aria-label="Remove Style"></button>
+                                                    </span>
+
+                                                </p-header>
+
+                                            </p-editor>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </p-accordionTab>
+                            <p-accordionTab *ngIf="thirdArea" [selected]="thirdArea" header="Upload Documents">
+                                <div class="panel-body" style="overflow-y: scroll; height:200px;">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="documentTitle" class="control-label col-md-2">Document Title</label>
+                                            <div class="col-md-8">
+                                                <input type="text" [(ngModel)]="uploadFileTitle" formControlName="uploadFileTitle" class="form-control" name="uploadFileTitle"  placeholder="Document title..." [ngClass]="jobRequestForm.controls['uploadFileTitle'].valid ? 'valid-input' : 'required-input'">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2">Select Document</label>
+                                            <div class="col-md-8">
+                                                <input type="file"  (change)="onFileChange($event)" placeholder="Upload file" accept=".xls,.xlsx,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        #fileInput name="fileInput" formControlName="fileInput" style="padding-top:2px;" class="form-control" [ngClass]="jobRequestForm.controls['fileInput'].valid ? 'valid-input' : 'required-input'">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2"></label>
+                                            <div class="col-md-2">
+                                                <button (click)="validateUpload()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null && file==undefined">
+                                                    <span class="glyphicon glyphicon-upload"></span> Upload</button> 
+                                            </div>
+                                            <!-- <span class=" input-group-btn col-md-2">
+                                                <button class=" input-group-btn col-md-2" type="button" (click)="saveDocument()" [disabled]="file == undefined || file == null"  class="btn btn-warning btn-sm pull-left"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span>Upload</button>
+                                            </span> -->
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <div *ngIf="showDocumentGrid" class="panel-body col-md-12 ">
+                                                <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                                    <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                                    <p-column [style]="{'width':'100px'}">
+                                                        <ng-template pTemplate="header"> </ng-template>
+                                                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d)" href="javascript:void(0)">View</a>
+                                                            <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d)" href="javascript:void(0)">Download</a>
+                                                        </ng-template>
+                                                    </p-column>
+                                                    <p-column [style]="{'width':'50px'}">
+                                                        <ng-template pTemplate="header"></ng-template>
+                                                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                            <a (click)="deleteDocument(row)" href="javascript:void(0)">Delete</a>
+                                                        </ng-template>
+                                                    </p-column>
+                                                </p-dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-accordionTab>
+                            <!-- <p-accordionTab *ngIf="thirdArea" header="Summary">
+                            <div class="form-horizontal">
+                                <div class="panel-body" style="min-height:270px;">
+                                    <div class="col-md-12 ">
+                                        <label class="control-label col-md-2">Subject:</label>
+                                        <label class="control-label col-md-6">
+                                            <strong>{{subjectContent}}</strong>
+                                        </label>
+                                    </div>
+                                    <div class="panel-body" style="min-height:220px;">
+                                        <div [innerHTML]="messageContent" class="paper" style="overflow:auto;height:200px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            </p-accordionTab> -->
+                        </p-accordion>
+                    </div>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <strong>
+                        <button *ngIf="secondArea || thirdArea" style="margin-right:5px" type="button" [disabled]="autoSaveUsed" (click)="previous()" class="btn btn-default pull-left">Previous</button>
+                    </strong>
+                    <strong>
+                        <button *ngIf="(secondArea || firstArea) " style="margin-right:5px" type="button" [disabled]="!requireDocument && secondArea == true" (click)="next()" class="btn btn-default pull-left">Next</button>
+                    </strong>
+                    <button type="button" [disabled]="jobRequestForm.invalid || (supportingDocuments.length <= 0 && requireDocument ==true)" (click)="sendRequest(jobRequestForm)" class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Send</button>
+                    <button *ngIf="!onPage" type="button" (click)="emitClose()" style="margin-right:5px" class="btn btn-danger pull-right {{buttonVisibilityText}}">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- <pre> {{ jobRequestForm.value | json }}</pre> -->
+
+<!-- <p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right"><a class="close" style="margin: -10px 8px;" (click)="displaySearchModal=false">&times;</a></div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.middleName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog> -->
+
+<p-dialog [responsive]=true [(visible)]="displaySupportingDocument" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Supporting Documents
+                </h2>
+
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <p-dataTable *ngIf="showDocumentGrid" [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                <p-column field="physicalFileNumber" header="File Number" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}"></p-column>
+                <p-column field="physicalLocation" header="Physical Location" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="systemDateTime" header="Arrival Date" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                    <ng-template let-col let-row="rowData" pTemplate="body">
+                        <span  *ngIf="row.systemDateTime != null && row.systemDateTime != undefined">
+                            {{ row.systemDateTime | date : 'yMdjm'  }}
+                        </span>
+                        <span  *ngIf="row.systemDateTime == null || row.systemDateTime == undefined">
+                            n/a
+                        </span>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"> </ng-template>
+                    <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                        <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d)" href="javascript:void(0)">View</a>
+                        <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d)"
+                            href="javascript:void(0)">Download</a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+
+<script>
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+        ['blockquote', 'code-block'],
+
+        [{
+            'header': 1
+        }, {
+            'header': 2
+        }], // custom button values
+        [{
+            'list': 'ordered'
+        }, {
+            'list': 'bullet'
+        }],
+        [{
+            'script': 'sub'
+        }, {
+            'script': 'super'
+        }], // superscript/subscript
+        [{
+            'indent': '-1'
+        }, {
+            'indent': '+1'
+        }], // outdent/indent
+        [{
+            'direction': 'rtl'
+        }], // text direction
+
+        [{
+            'size': ['small', false, 'large', 'huge']
+        }], // custom dropdown
+        [{
+            'header': [1, 2, 3, 4, 5, 6, false]
+        }],
+
+        [{
+            'color': []
+        }, {
+            'background': []
+        }], // dropdown with defaults from theme
+        [{
+            'font': []
+        }],
+        [{
+            'align': []
+        }],
+
+        ['clean'] // remove formatting button
+    ];
+
+    var quill = new Quill('#senderComment', {
+        modules: {
+            toolbar: toolbarOptions
+        },
+        theme: 'snow'
+    });
+</script>
+
+<!-- 
+    <job-request-template 
+        [requestComment]="requestComment"
+        [pageHeaderTitle]="requestPageHeaderTitle" 
+        [isReassigned]="isRequestReassigned"
+        [isAcknowledged]="isRequestAcknowledged" 
+        [targetId]="loanApplicationDetailId" 
+        [moduleReferenceNumber]="loanApplicationReferance"
+        [operationsId]="requestOperationsId" 
+        [requestStatusId]="requestStatusId" 
+        (notify)="getRequestData($event)" 
+        (displayOption)="CallRequestClose()">
+    </job-request-template>
+
+    CallRequestClose() {
+        this.displayRequestForm = false;
+    }
+    getRequestData(event: any) {
+        if (event) {
+            this.displayRequestForm = false;
+        } else {}
+    }
+ -->
+

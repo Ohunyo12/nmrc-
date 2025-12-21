@@ -1,0 +1,486 @@
+import { Component, OnInit } from '@angular/core';
+import { GeneralSetupService } from 'app/setup/services';
+import { LoadingService } from 'app/shared/services/loading.service';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import swal, { SweetAlertType } from 'sweetalert2';
+import { GlobalConfig } from 'app/shared/constant/app.constant';
+import { ValidationService } from 'app/shared/services/validation.service';
+
+@Component({
+  //selector: 'app-insurance-company',
+  templateUrl: './insurance-company.component.html',
+})
+export class InsuranceCompanyComponent implements OnInit {
+
+  insuranceCompanyForm: FormGroup;
+  insurancePolicyTypeForm: FormGroup;
+  GPSCoordinatesCollateralTypeForm: FormGroup;
+  insuranceTypeForm: FormGroup;
+  displayInsuranceTypeForm: boolean = false;
+  displayInsuranceCompanyForm: boolean = false;
+  selectedId: number;
+  insuranceCompanies: any;
+  rowToEdit: any;
+  insuranceTypes: any;
+  insurancePolicyTypes: any[];
+  GPSCoordinatesCollateralTypes: any[];
+  formState: any;
+  displayInsurancePolicyTypeForm: boolean = false;
+  displayGPSCoordinatesCollateralTypeForm: boolean = false;
+
+  constructor(
+    private generalSetupService: GeneralSetupService,
+    private loadingService: LoadingService,
+    private fb: FormBuilder,
+  ) { }
+
+  ngOnInit() {
+    this.getAllInsuranceCompanies();
+    this.clearFormControls();
+    this.getInsuranceTypes();
+    this.getInsurancePolicyTypes();
+  }
+
+  getInsuranceTypes() {
+    this.generalSetupService.getAllInsuranceTypes().subscribe((response: any) => {
+      this.insuranceTypes = response.result;
+    });;
+  }
+
+  getInsurancePolicyTypes() {
+    this.generalSetupService.getAllInsurancePolicyTypes().subscribe((response: any) => {
+      this.insurancePolicyTypes = response.result;
+    });;
+  }
+
+  getGPSCoordinatesCollateralTypes() {
+    this.generalSetupService.getAllGPSCoordinatesCollateralTypes().subscribe((response: any) => {
+      this.GPSCoordinatesCollateralTypes = response.result;
+    });;
+  }
+
+  getAllInsuranceCompanies() {
+    this.generalSetupService.getAllInsuranceCompanies().subscribe((response: any) => {
+      this.insuranceCompanies = response.result;
+    });;
+  }
+
+  addInsuranceCompany() {
+    this.formState = "Add New";
+    this.selectedId = null;
+    this.clearFormControls();
+    this.displayInsuranceCompanyForm = true;
+  }
+
+  addInsuranceType() {
+    this.formState = "Add New";
+    this.selectedId = null;
+    this.clearFormControls();
+    this.displayInsuranceTypeForm = true;
+  }
+
+  addInsurancePolicyType() {
+    this.formState = "Add New";
+    this.selectedId = null;
+    this.clearFormControls();
+    this.displayInsurancePolicyTypeForm = true;
+  }
+
+  addGPSCollateralType() {
+    this.formState = "Add New";
+    this.selectedId = null;
+    this.clearFormControls();
+    this.displayGPSCoordinatesCollateralTypeForm = true;
+  }
+
+  saveInsuranceCompany(form) {
+
+    let body = {
+      companyName: form.value.companyName,
+      address: form.value.companyAddress,
+      contactEmail: form.value.contactEmail,
+      phoneNumber: form.value.phoneNumber,
+    };
+
+    
+    this.loadingService.show();
+    if (this.selectedId === null) {
+      this.generalSetupService.saveInsuranceCompany(body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getAllInsuranceCompanies();
+          this.displayInsuranceCompanyForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Saved Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    } else {
+
+      this.generalSetupService.updateInsuranceCompany(this.selectedId, body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getAllInsuranceCompanies();
+          this.displayInsuranceCompanyForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Updated Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    }
+
+  }
+
+
+  saveInsuranceType(form) {
+
+    let body = {
+      insuranceType: form.value.insuranceType,
+    };
+
+    this.loadingService.show();
+    if (this.selectedId === null) {
+      this.generalSetupService.saveInsuranceType(body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getInsuranceTypes();
+          this.displayInsuranceTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Saved Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    } else {
+
+      this.generalSetupService.updateInsuranceType(this.selectedId, body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getInsuranceTypes();
+          this.displayInsuranceTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Updated Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    }
+
+  }
+
+  saveInsurancePolicyType(form) {
+    let body = {
+      description: form.value.description,
+      valuation: form.value.valuation,
+    };
+
+    this.loadingService.show();
+    if (this.selectedId === null) {
+      this.generalSetupService.saveInsurancePolicyType(body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getInsurancePolicyTypes();
+          this.displayInsuranceTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Saved Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    } else {
+
+      this.generalSetupService.updateInsurancePolicyType(this.selectedId, body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getInsurancePolicyTypes();
+          this.displayInsuranceTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Updated Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    }
+
+  }
+
+  saveGPSCoordinatesCollateralType(form) {
+    let body = {
+      collateralType: form.value.collateralType,
+      required: form.value.required,
+    };
+
+    this.loadingService.show();
+    if (this.selectedId === null) {
+      this.generalSetupService.saveGPSCoordinatesCollateralType(body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getGPSCoordinatesCollateralTypes();
+          this.displayGPSCoordinatesCollateralTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Saved Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    } else {
+
+      this.generalSetupService.updateGPSCoordinatesCollateralType(this.selectedId, body).subscribe((response: any) => {
+        this.loadingService.hide();
+        if (response.success == true) {
+          this.getInsurancePolicyTypes();
+          this.displayInsuranceTypeForm = false;
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Updated Successfully!', 'success');
+        }
+        else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      }, (err: any) => {
+        this.loadingService.hide();
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      });
+    }
+
+  }
+
+
+  clearFormControls() {
+    this.insuranceCompanyForm = this.fb.group({
+      companyName: ['', Validators.required],
+      companyAddress: ['', Validators.required],
+      contactEmail: ['', Validators.compose([Validators.required, ValidationService.isEmail])],
+      phoneNumber: ['', [Validators.required, Validators.minLength(9)]],
+
+    });
+
+    this.insuranceTypeForm = this.fb.group({
+      insuranceType: ['', Validators.required],
+
+    });
+
+    this.insurancePolicyTypeForm = this.fb.group({
+      description: ['', Validators.required],
+      valuation: ['', Validators.required],
+
+    });
+    this.GPSCoordinatesCollateralTypeForm = this.fb.group({
+      collateralType: ['', Validators.required],
+      required: ['', Validators.required],
+
+    });
+
+
+  }
+
+
+  editInsuranceCompany(row) {
+
+    this.clearFormControls();
+    this.formState = "Edit";
+    this.rowToEdit = row;
+    this.selectedId = row.insuranceCompanyId; //change this guy to the right thing
+
+    this.insuranceCompanyForm = this.fb.group({
+      companyName: [row.companyName, Validators.required],
+      companyAddress: [row.address, Validators.required],
+      contactEmail: [row.contactEmail, Validators.required],
+      phoneNumber: [row.phoneNumber, [Validators.required, Validators.pattern(/^0|[0-9]\d*$/), Validators.minLength(9)]],
+    });
+
+    this.displayInsuranceCompanyForm = true;
+  }
+
+
+  editInsuranceType(row) {
+
+    this.clearFormControls();
+    this.formState = "Edit";
+    this.rowToEdit = row;
+    this.selectedId = row.insuranceTypeId; //change this guy to the right thing
+
+    this.insuranceTypeForm = this.fb.group({
+      insuranceType: [row.insuranceType, Validators.required],
+    });
+
+    this.displayInsuranceTypeForm = true;
+  }
+
+  editInsurancePolicyType(row) {
+    this.clearFormControls();
+    this.formState = "Edit";
+    this.rowToEdit = row;
+    this.selectedId = row.policyTypeId;
+
+    this.insurancePolicyTypeForm = this.fb.group({
+      description: [row.description, Validators.required],
+      valuation: [row.valuationRequired, Validators.required],
+    });
+
+    this.displayInsurancePolicyTypeForm = true;
+  }
+
+  editGPSCollateralType(row) {
+    this.clearFormControls();
+    this.formState = "Edit";
+    this.rowToEdit = row;
+    this.selectedId = row.policyTypeId;
+
+    this.GPSCoordinatesCollateralTypeForm = this.fb.group({
+      collateralType: [row.description, Validators.required],
+      required: [row.valuationRequired, Validators.required],
+    });
+
+    this.displayGPSCoordinatesCollateralTypeForm = true;
+  }
+
+
+  removeInsuranceCompany(row) {
+    let __this = this;
+    swal({
+      title: 'Are you sure?',
+      text: "This cannot be reversed. Are you sure you want to Proceed?",
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn btn-success btn-move',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: true,
+    }).then(function () {
+      __this.generalSetupService.deleteInsuranceCompany(row.insuranceCompanyId).subscribe((response: any) => {
+        if (response.success == true) {
+          __this.getAllInsuranceCompanies();
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Record has been Successfully Removed', 'success');
+
+        } else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      });
+    }, function (dismiss) {
+      if (dismiss === 'cancel') {
+        swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
+      }
+    });
+  }
+
+
+  removeInsuranceType(row) {
+    let __this = this;
+    swal({
+      title: 'Are you sure?',
+      text: "This cannot be reversed. Are you sure you want to Proceed?",
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn btn-success btn-move',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: true,
+    }).then(function () {
+      __this.generalSetupService.deleteInsuranceType(row.insuranceTypeId).subscribe((response: any) => {
+        if (response.success == true) {
+          __this.getInsuranceTypes();
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Record has been Successfully Removed', 'success');
+
+        } else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      });
+    }, function (dismiss) {
+      if (dismiss === 'cancel') {
+        swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
+      }
+    });
+  }
+
+
+  removeInsurancePolicyType(row) {
+    let __this = this;
+    swal({
+      title: 'Are you sure?',
+      text: "This cannot be reversed. Are you sure you want to Proceed?",
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn btn-success btn-move',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: true,
+    }).then(function () {
+      __this.generalSetupService.deleteInsurancePolicyType(row.policyTypeId).subscribe((response: any) => {
+        if (response.success == true) {
+          __this.getInsurancePolicyTypes();
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Record has been Successfully Removed', 'success');
+
+        } else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      });
+    }, function (dismiss) {
+      if (dismiss === 'cancel') {
+        swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
+      }
+    });
+  }
+
+  removeGPSCollateralType(row) {
+    let __this = this;
+    swal({
+      title: 'Are you sure?',
+      text: "This cannot be reversed. Are you sure you want to Proceed?",
+      type: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No, cancel!',
+      confirmButtonClass: 'btn btn-success btn-move',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: true,
+    }).then(function () {
+      __this.generalSetupService.deleteGPSCollateralType(row.policyTypeId).subscribe((response: any) => {
+        if (response.success == true) {
+          __this.getGPSCoordinatesCollateralTypes();
+          swal(`${GlobalConfig.APPLICATION_NAME}`, 'Record has been Successfully Removed', 'success');
+
+        } else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'error');
+        }
+      });
+    }, function (dismiss) {
+      if (dismiss === 'cancel') {
+        swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
+      }
+    });
+  }
+
+}

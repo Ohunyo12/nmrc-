@@ -1,0 +1,264 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">ESG Checklist Setup</h2>
+				<div class="pull-right">
+					<button type="button" (click)="showESGCategoryDefinitionForm()" pButton icon="fa-plus" label="Add New ESG Category Definition"></button>
+					<button type="button" (click)="showESGChecklistDefinitionForm()" pButton icon="fa-plus" label="Add New ESG Checklist Definition"></button>
+				</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <p-dataTable [value]="ESGchecklistDefData" [rows]="10" [paginator]="true" [responsive]="true">
+          <p-column field="checklistItemName" header="Checklist Item" [style]="{'width':'400px'}" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="esgCategoryName" header="Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="esgSubCategoryName" header="Sub-Category" sortable="true" [filter]="true" filterMatchMode="contains">
+            <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+              {{ model.esgSubCategoryName ? model.esgSubCategoryName : 'N/A' }}
+            </ng-template>
+          </p-column>
+          <p-column field="itemDescription" header="Item Description" sortable="true" [filter]="true" filterMatchMode="contains">
+            <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+              {{ model.itemDescription ? model.itemDescription : 'N/A' }}
+            </ng-template>
+          </p-column>
+          <p-column field="isCompulsory" header="Compulsory" sortable="true" [style]="{'width':'60px'}" [filter]="true" filterMatchMode="contains">
+            <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+              {{ model.isCompulsory ? 'Yes' : 'No' }}
+            </ng-template>
+          </p-column>
+
+          <p-column [style]="{'width':'50px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template pTemplate="body" let-col let-i="rowData">
+              <a (click)="deleteESGChecklistDefinition(i)" href="javascript:void(0)">
+                Delete
+              </a>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayESGChecklistForm" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1300" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        ESG Checklist Definition
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="ESGChecklistDefForm" (ngSubmit)="submitESGChecklistDefForm(ESGChecklistDefForm)" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="esgCategoryId" class="control-label col-md-2">Category</label>
+            <div class="col-md-4">
+              <select name="esgCategoryId" (change)="onSelectedCategoryChange($event.target.value)" id="esgCategoryId" class="form-control"
+                formControlName="esgCategoryId" [ngClass]="ESGChecklistDefForm.controls['esgCategoryId'].valid ? 'valid-input':'required-input'">
+                <option value="">--- Select Category ---</option>
+                <option *ngFor="let type of categoryList" [value]="type.esgCategoryId">{{type.esgCategoryName}}</option>
+              </select>
+            </div>
+            <!-- <label for="esgSubCategoryId" class="control-label col-md-2">Sub-Category</label>
+            <div class="col-md-4">
+            <select name="esgSubCategoryId" formControlName="esgSubCategoryId" id="esgSubCategoryId" class="form-control" 
+            (change)="onSubCategoryChange($event.target.value)" [ngClass]="!ESGChecklistDefForm.controls['esgSubCategoryId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">--Select Sub-Category--</option>
+                <option *ngFor="let x of subCategoryList" [value]="x.esgSubCategoryId">
+                  {{ x.esgSubCategoryName }}
+                </option>
+              </select>
+            </div> -->
+          </div>
+          <div class="form-group" *ngIf="showChecklistItemData">
+            <div class="col-md-6">
+              <fieldset style="overflow: auto">
+                <legend>Unmapped Checklist Items</legend>
+                <p-dataTable [value]="unmappedChecklistItems" [editable]="true" [(selection)]="selectedChecklistItem" dataKey="checkListItemName"
+                  [rows]="5" [paginator]="true" [responsive]="true">
+                  <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                  <p-column field="checkListItemName" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+                  <p-column header="Define the Grade For 'Yes'">
+                    <div class="form-group row">
+                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <select name="yesChecklistScoresId" id="yesChecklistScoresId" class="form-control"
+                          [(ngModel)]="d.yesChecklistScoresId" [ngModelOptions]="{standalone: true}" [ngClass]="d.yesChecklistScoresId > 0 ? 'valid-input':'required-input'">
+                          <option value="">--- Select checkListScore For Yes---</option>
+                          <option *ngFor="let checkListScore of yesCheckListScoresData" [value]="checkListScore.checklistScoresId">{{checkListScore.grade}}</option>
+                        </select>
+                      </ng-template>
+                    </div>
+                  </p-column>
+                  <p-column header="Define the Grade For 'No'">
+                    <div class="form-group row">
+                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <select name="noChecklistScoresId" id="noChecklistScoresId" class="form-control"
+                          [(ngModel)]="d.noChecklistScoresId" [ngModelOptions]="{standalone: true}" [ngClass]="d.noChecklistScoresId > 0 ? 'valid-input':'required-input'">
+                          <option value="">--- Select checkListScore For No---</option>
+                          <option *ngFor="let checkListScore of noCheckListScoresData" [value]="checkListScore.checklistScoresId">{{checkListScore.grade}}</option>
+                        </select>
+                      </ng-template>
+                    </div>
+                  </p-column>
+                  <!-- <p-column header="Define the Grade For 'Yes'">
+                      <div class="form-group row">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      <label class="radio-inline"><input type="radio" name="{{i}}" id="{{i}}" value=1 [(ngModel)]="d.gradeScore" [ngModelOptions]="{standalone: true}"><b>'A'</b></label>
+                      <label class="radio-inline"><input type="radio" name="{{i}}" id="{{i}}" value=5 [(ngModel)]="d.gradeScore" [ngModelOptions]="{standalone: true}"><b>'B'</b></label>
+                    </ng-template>
+                  </div>
+                  </p-column> -->
+				        </p-dataTable>
+              </fieldset>
+            </div>
+            <div class="col-md-1">
+              <br/>
+              <br/>
+              <br/>
+              <button type="submit" [disabled]="ESGChecklistDefForm.invalid || !(selectedChecklistIsValid())" style="margin-left: 5px" class="btn btn-success pull-right">Save > </button>
+            </div>
+            <div class="col-md-5">
+              <fieldset style="overflow: auto">
+                <legend>Mapped Checklist Items</legend>
+
+                <p-dataTable [value]="mappedChecklistItems" [rows]="5" [paginator]="true" [responsive]="true">
+                <p-column field="checklistItemName" header="Checklist Item"></p-column>
+                <p-column field="yesGrade" header="Defined Grades For 'Yes'"></p-column>
+                <p-column field="noGrade" header="Defined Grades For 'No'"></p-column>
+                  <!-- <p-column [style]="{'width':'30px'}">
+                    <ng-template pTemplate="header"> </ng-template>
+                    <ng-template pTemplate="body" let-col let-i="rowData">
+                      <a (click)="editChecklistItemMapping(i, $event)" href="javascript:void(0)">
+                        Edit
+                      </a>
+                    </ng-template>
+                  </p-column> -->
+                  <p-column [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"> </ng-template>
+                    <ng-template pTemplate="body" let-col let-i="rowData">
+                      <a (click)="deleteESGChecklistDefinition(i)" href="javascript:void(0)">
+                        Delete
+                      </a>
+                    </ng-template>
+                  </p-column>
+                </p-dataTable>
+              </fieldset>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="displayESGChecklistForm=false" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayESGCategoryForm" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        ESG Category Definition
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="ESGCategoryForm" (ngSubmit)="submitForSubCategory(ESGCategoryForm)" autocomplete="off">
+		<div class="panel-body">
+			<div class="form-horizontal">
+				<div div class="form-group">
+					<label class="control-label col-md-2" for="esgCategoryId">Enter new ESG Category Name:</label>
+					<div class="col-md-4">
+						<textarea row=3 name="esgCategoryName" formControlName="esgCategoryName" id="esgCategoryName" class="form-control" [ngClass]="ESGCategoryForm.controls['esgCategoryName'].valid
+						? 'valid-input' : 'required-input'"></textarea>	
+					</div>
+					<!-- <label class="control-label col-md-2" for="esgCategoryId">Select Category For ESG Sub-category</label>
+					<div class="col-md-4">
+					<select name="esgCategoryId" (change)="onSelectedCategoryChange($event.target.value)" id="esgCategoryId" class="form-control"
+						formControlName="esgCategoryId">
+						<option value="">--- Select Category ---</option>
+						<option *ngFor="let type of categoryList" [value]="type.esgCategoryId">{{type.esgCategoryName}}</option>
+					</select>
+					</div> -->
+				</div>
+				<div div class="form-group">
+					<label class="control-label col-md-2" for="subCategoryName">Enter SubCategory Name</label>
+					<div class="col-md-4">
+						<textarea row=3 name="subCategoryName" formControlName="subCategoryName" id="subCategoryName" class="form-control"></textarea>
+					</div>
+				</div>
+				<div class="form-group" *ngIf="categoryList">
+					<div class="col-md-6">
+						<fieldset style="overflow: auto">
+							<legend>Category Items</legend>
+							<p-dataTable [value]="categoryList" [rows]="5" [paginator]="true" [responsive]="true"
+							[(selection)]="categorySelection" (onRowClick)="onSelectedCategoryChange($event.data.esgCategoryId)">
+								<p-column field="esgCategoryName" header="Category Item Name" filterMatchMode="contains"></p-column>
+								<p-column [style]="{'width':'50px'}">
+								<ng-template pTemplate="header"> </ng-template>
+								<ng-template pTemplate="body" let-col let-i="rowData">
+										<a (click)="editESGCategory(i)" href="javascript:void(0)">
+											Edit
+										</a>
+										|
+										<a (click)="deleteESGCategory(i)" href="javascript:void(0)">
+											Delete
+										</a>
+									</ng-template>
+								</p-column>
+							</p-dataTable>
+						</fieldset>
+					</div>
+					<div class="col-md-6">
+						<fieldset style="overflow: auto">
+							<legend>Mapped ESG SubCategory Items</legend>
+							<p-dataTable  *ngIf="subCategoryList" [value]="subCategoryList" [rows]="5" [paginator]="true" [responsive]="true">
+								<p-column field="esgSubCategoryName" header="SubCategory Item Name" filterMatchMode="contains"></p-column>
+								<p-column [style]="{'width':'50px'}">
+									<ng-template pTemplate="header"></ng-template>
+									<ng-template pTemplate="body" let-col let-i="rowData">
+										<a (click)="editESGSubCategory(i)" href="javascript:void(0)">
+											Edit
+										</a>
+										|
+										<a (click)="deleteSubCategory(i)" href="javascript:void(0)">
+											Delete
+										</a>
+									</ng-template>
+								</p-column>
+							</p-dataTable>
+						</fieldset>
+					</div>
+				</div>
+				</div>
+			</div>
+      	<div class="panel-footer">
+        <div class="row">
+          	<div class="col-md-12">
+				<button type="button" (click)="resetESGCategoryForm()" style="margin-left: 5px" class="btn btn-success pull-right">Reset</button>
+				<button type="button" (click)="saveESGCategory(ESGCategoryForm)" [disabled]="ESGCategoryForm.controls['esgCategoryName'].invalid" style="margin-left: 5px" class="btn btn-success pull-right">{{ESGCategoryFormState}}</button>
+				<button type="submit" [disabled]="ESGCategoryForm.invalid" style="margin-left: 5px" class="btn btn-success pull-right">Save ESG SubCategory</button>
+				<button type="button" (click)="displayESGCategoryForm=false" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+	  </div>
+	</form>
+</div>
+</p-dialog>

@@ -1,0 +1,113 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">Actions</h2>
+    </div>
+    <div class="panel-body">
+
+        <button *ngIf="enableReferBackButton == true" type="button" (click)="refer()" class="btn btn-primary">
+            <span class="glyphicon glyphicon-chevron-left" style="padding-right:4px;"></span> Refer Back
+        </button>
+
+        <button *ngIf="privilege?.canApprove == false && enableForwardButton == true" type="button" (click)="forward()" class="btn btn-success">
+            <span class="glyphicon glyphicon-chevron-right" style="padding-right:4px;"></span> Submit
+        </button>
+
+        <!-- <button type="button" (click)="disapprove()" class="btn btn-danger">
+            <span class="glyphicon glyphicon-remove" style="padding-right:4px;"></span> Decline
+        </button> 
+    
+         <button *ngIf="isDrawdown == false" type="button" (click)="approve()" class="btn btn-success">
+            <span class="glyphicon glyphicon-ok" style="padding-right:4px;"></span> Approve
+        </button> -->
+        <button *ngIf="privilege?.canApprove == true && enableForwardButton == true && enableDeclineButton == true" type="button" (click)="disapprove()" class="btn btn-danger">
+            <span class="glyphicon glyphicon-remove" style="padding-right:4px;"></span> Decline
+        </button>
+
+        <button *ngIf="privilege?.canApprove == true && enableForwardButton == true" type="button" (click)="approve()" class="btn btn-success">
+            <span class="glyphicon glyphicon-ok" style="padding-right:4px;"></span> Approve
+        </button>
+
+        <!-- [attr.disabled]="privilege?.owner == false || privilege?.canApprove == false ? true : null" -->
+
+
+    </div>
+</div>
+
+
+
+<!--terms form modal-->
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="terms-modal" modal="modal" showEffect="fade" width="450">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{ commentTitle }}</h2>
+        </div>
+
+        <form novalidate [formGroup]="commentForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div *ngIf="forwardAction == 5" class="form-group">
+                        <label for="staffName" class="col-md-12">Target Level / Staff</label>
+                        <div class="col-md-12">
+                            <select (change)="onTargetStaffLevelChange($event.target.value)" type="text" name="trailId" formControlName="trailId" id="trailId" class="form-control" [ngClass]="!commentForm.controls['trailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Staff / Level --</option>
+                                <option *ngFor="let x of backtrail" [value]="x.approvalTrailId">{{ x.fromApprovalLevelName }} -- {{ x.staffName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="comment">Comment</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea style="height:87px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="!commentForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="margin: 0 15px 0 15px;width: -webkit-fill-available;">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error: </span>{{ errorMessage }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="forwardApplication(commentForm)" [disabled]="commentForm.invalid" class="btn btn-success pull-right">
+                            <span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Send</button>
+                        <button type="button" (click)="cancelForm()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayReferBackForm" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <!-- <h2 class="panel-title">Refer back</h2> -->
+        </div>
+        <app-refer-back *ngIf="displayReferBackForm == true" [forbidExternalNotification]="forbidExternalNotification" [isClassified]="isClassified" [currentLevelId]="currentLevelId" [isLMSCrossWorkflow]="isLMSCrossWorkflow" [referBackOperationId]="referBackOperationId"
+            [referBackTargetId]="referBackTargetId" (notify)="displayStatus($event)" (notifyAfterReferBack)="referBackResultControl($event)">
+        </app-refer-back>
+    </div>
+</p-dialog>
+<!--end of form modal-->
+<!-- 
+
+<pre>{{ privilege | json }}</pre>
+
+<pre>OWNER: {{ privilege?.owner }}</pre>
+<pre>canApprove: {{ privilege?.canApprove }}</pre>
+<pre>DISABLE APPROVE BUTTON: {{ privilege?.owner == false || privilege?.canApprove == false }}</pre>
+<pre>DISABLE SUBMIT BUTTON: {{ privilege?.owner == false && privilege?.canApprove == false }}</pre> -->

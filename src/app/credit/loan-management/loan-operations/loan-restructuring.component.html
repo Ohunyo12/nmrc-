@@ -1,0 +1,81 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Restructuring Operation
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="loanOperationApprovalData" [responsive]=true selectionMode="single"
+                        [(selection)]="loanSelection">
+                        <p-column field="loanReferenceNumber" header="Ref.Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="relationshipManagerName" header="Relationship Manager" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="operationTypeName" header="Operation Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="newEffectiveDate" header="Effictive Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-ln="rowData" pTemplate="body">
+                                {{ln[col.field] | date : 'dd/MM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="approvalStatusName" header="Approval Status " sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-ln="rowData" pTemplate="body">
+                                {{ln[col.field] | uppercase }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'80px'}">
+                            <ng-template pTemplate="header">
+                                Restructure
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewLoanDetails(i, $event)" style="display: block" href="#">
+                                    <span class="label label-info">RESTRUCTURE</span>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayRestructureModal" widgetVar="ajaxDialog" [draggable]="false" appendToBody="true"
+    modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Loan Review Approval Details
+            </h2>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="approvalDetails">
+                <p-column field="targetName" header="Loan Ref No" filterMatchMode="contains"></p-column>
+                <p-column field="staffName" header="Approving Staff" filterMatchMode="contains"></p-column>
+                <p-column field="operationName" header="Operation" filterMatchMode="contains"></p-column>
+                <p-column field="approvalLevelName" header="Approval Level" filterMatchMode="contains"></p-column>
+                <p-column field="approvalStatusName" header="Approval Status" filterMatchMode="contains">
+                    <ng-template let-col let-ln="rowData" pTemplate="body">
+                        {{ln[col.field]==0 ? 'Initialise' : 'Approved'}}
+                    </ng-template>
+                </p-column>
+                <p-column field="comment" header="Comment" filterMatchMode="contains"></p-column>
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="displayRestructureModal=false" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                        <button [disabled]="false" type="button" (click)="goForRestructure()" class="btn btn-success">Restructure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

@@ -1,0 +1,135 @@
+<div class="panel panel-default">
+
+    <div *ngIf="rac != null" class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Risk Acceptance Criteria
+                </h2>
+                <div class="pull-right">
+                    <!-- <button (click)="showRiskAcceptanceCriteriaForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <!-- RISK ACCEPTANCE CRITERIA
+<pre>{{ racForm?.value | json }}</pre>
+<pre>{{ racForm?.valid | json }}</pre> -->
+
+        <form *ngIf="categoriesCount > 0" [formGroup]="racForm" class="form-horizontal" autocomplete="off">
+            <!-- <form (ngSubmit)="onSubmit.emit(this.form.value)" [formGroup]="form" class="form-horizontal"> -->
+
+            <table class="table table-bordered table-hover">
+
+                <tr>
+                    <!-- <th>Id</th> -->
+                    <th>SN</th>
+                    <!-- <th>Criteria</th> -->
+                    <th>Required</th>
+                    <th>Input Option</th>
+                    
+                </tr>
+
+                <tbody *ngFor="let c of rac.categories;">
+
+                    <tr>
+                        <td colspan="7"><strong>{{c.name}}</strong></td>
+                    </tr>
+
+                    <tr *ngFor="let field of c.rows; let i = index;">
+                        <!-- <td>{{field.id}}</td> -->
+                        <td>{{i + 1}}</td>
+                        <!-- <td>{{field.criteria}}</td> -->
+                        <td>{{field.criteria}}</td>
+                        <td>{{field.value}}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </form>
+    </div>
+    <!-- <button type="button" (click)="test()" style="margin-right:5px">test</button> -->
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="displayCriteriaCommentForm" id="ct-modal" modal="modal" showEffect="fade"
+    width="600">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Criteria Comments
+            </h2>
+        </div>
+
+        <div class="panel-body">
+
+            <p-dataTable [value]="criteriaComments" [responsive]="true" [paginator]="false" [rows]="5">
+
+                <p-column field="comment" header="Comment" sortable="true" filterMatchMode="contains"></p-column>
+
+            </p-dataTable>
+
+        </div>
+
+        <form novalidate [formGroup]="criteriaCommentForm" (ngSubmit)="saveCriteriaComment(criteriaCommentForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="comment" class="control-label col-md-12">Comment</label>
+                        <div class="col-md-12">
+                            <textarea name="comment" formControlName="comment" id="comment" class="form-control"
+                                [ngClass]="criteriaCommentForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="saveCriteriaComment(criteriaCommentForm)"
+                        [disabled]="criteriaCommentForm.invalid" class="btn btn-success pull-right">Save and
+                        Close</button>
+                    <button type="button" (click)="displayCriteriaCommentForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCriteriaUploadsForm" id="ct-modal" modal="modal" showEffect="fade"
+    width="900">
+
+    <document-upload [reload]="1" [autoZIndex]="false" [operationId]="operationId" [customerId]="customerId"
+        [targetId]="loanApplicationId" [customerId]="customerId" [targetReferenceNumber]="targetReferenceNumber">
+    </document-upload>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayCriteriaUploadsForm=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<!-- <pre>{{ rac | json }}</pre> -->

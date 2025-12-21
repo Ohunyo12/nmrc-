@@ -1,0 +1,172 @@
+<div class="card no-padding">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Loan Recovery Payment
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div *ngIf="showRepaymentInfo" class="pull-right" style="margin-right:16px;margin-bottom:2px;">
+            <input type="search" [(ngModel)]="searchString" id="searchString" name="searchString"
+                placeholder="Search applications..." aria-label="Search" size="30" minlength="4" maxlength="50">
+            <button (click)="getLoans()">Search</button>
+        </div>
+
+        <div *ngIf="showRepaymentInfo" class="panel-body">
+
+            <p-dataTable [value]="loans" [responsive]="true" [paginator]="true" [rows]="10"
+                [(selection)]="applicationSelection" dataKey="loanReviewOperationId"
+                (onRowSelect)="onSelectedLoan($event)" [loading]="showLoadIcon">
+
+                <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column>
+
+                <p-column *ngIf="selectable" [style]="{'width':'40px'}" selectionMode="single"></p-column>
+                <p-column field="customerName" header="customer Name" [filter]="false" filterMatchMode="contains">
+                </p-column>
+                <p-column field="loanReferenceNumber" header="Loan Reference Number"></p-column>
+                <p-column field="effectiveDate" header="Recovery Effective Date">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.effectiveDate | date: 'dd-MM-yyyy' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="maturityDate" header="Recovery End Date">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.maturityDate | date: 'dd-MM-yyyy' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="principalAmount" header="Amount To Recover">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.principalAmount | number  }}
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+
+        <div *ngIf="showRepaymentInput" class="panel-body">
+
+            <form novalidate [formGroup]="repaymentForm" autocomplete="off">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="writtenOffAmount" class="control-label col-md-2">Total Amount Paid</label>
+                            <div class="col-md-4">
+                                <input type="text" name="writtenOffAmount" [attr.disabled]="true"
+                                    formControlName="writtenOffAmount" id="writtenOffAmount" class="form-control"
+                                    [ngClass]="!repaymentForm.controls['writtenOffAmount'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                            <label for="totalAmountPaid" class="control-label col-md-2">Expected Amount</label>
+                            <div class="col-md-4">
+                                <input type="text" name="totalAmountPaid" [attr.disabled]="true"
+                                    formControlName="totalAmountPaid" id="totalAmountPaid" class="form-control"
+                                    [ngClass]="!repaymentForm.controls['totalAmountPaid'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="paymentDate" class="control-label col-md-2">Payment Date</label>
+                            <div class="col-md-4">
+                                <p-calendar id="paymentDate" formControlName="paymentDate" [monthNavigator]="true"
+                                    [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"
+                                    [inputStyle]="!repaymentForm.controls['paymentDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                    [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                            </div>
+                            <label for="paymentAmount" class="control-label col-md-2">Repayment Amount</label>
+                            <div class="col-md-4">
+                                <input type="text" name="paymentAmount" formControlName="paymentAmount" id="paymentAmount"
+                                    class="form-control"
+                                    [ngClass]="!repaymentForm.controls['paymentAmount'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="SaveRecovery(repaymentForm)"
+                                class="btn btn-success pull-right" [disabled]="(repaymentForm.invalid)">Save</button>
+                            <button type="button" (click)="showRepaymentInput=false; showRepaymentInfo=true;"
+                                style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-3 col-md-offset-9 ">
+                    <!-- buttons -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displaySchedule" id="add-modal" modal="modal" showEffect="fade" width="850">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Repayment Schedule
+        </h2>
+    </div>
+    <p-tabView  (onChange)="onTabChange($event)">
+        <p-tabPanel header="Loan Applications">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        Repayment Schedule
+                    </h2>
+                </div>
+
+                <div class="panel-heading">
+
+
+                    <p-dataTable [value]="repaymentSchedule" [responsive]="true" [paginator]="true" [rows]="10">
+
+                        <p-column field="dateTimeCreated" header="Date Created" [filter]="false"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.dateTimeCreated | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="paymentDate" header="Date to Pay">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.paymentDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="paymentAmount" header="Amount to Pay">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.paymentAmount | number }}
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm()"
+                                class="btn btn-success pull-right">Make Payment</button>
+                            <button type="button" (click)="displaySchedule=false" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-dialog>

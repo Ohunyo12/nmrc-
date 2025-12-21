@@ -1,0 +1,305 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Consultants</h2>
+                <div class="pull-right">
+                    <button (click)="showLoanConsultantForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="panel-body">
+        <p-dataTable [value]="consultants" [paginator]="true" [rows]="5" selectionMode="single">
+
+            <p-column field="productCustomerName" header="Facility"></p-column>
+            <p-column field="consultantName" header="Consultant Name"></p-column>
+            <p-column field="description" header="Description"></p-column>
+
+            <p-column [style]="{'width':'130px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="removeLoanConsultant(d)" href="javascript:void(0)">Remove</a>
+                        <span style="padding:3px;">|</span>
+                        <a (click)="editLoanConsultant(d)" href="javascript:void(0)">Edit</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayLoanConsultantForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="450">
+ 
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{formState}} Loan Consultant</h2>
+        </div>
+
+        <form novalidate [formGroup]="consultantForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Facility</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                class="form-control" [ngClass]="!consultantForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{
+                                    x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div><div class="form-group">
+                        <div class="col-md-12">
+                            <label>Accredited Consultant</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="accreditedConsultantId" formControlName="accreditedConsultantId" id="accreditedConsultantId"
+                                class="form-control" [ngClass]="!consultantForm.controls['accreditedConsultantId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Consultant --</option>
+                                <option *ngFor="let x of accreditedConsultants" [value]="x.accreditedConsultantId">{{ x.name }} {{
+                                    x.firmName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Description</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea name="description" formControlName="description" id="description" class="form-control"
+                                [ngClass]="!consultantForm.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveLoanConsultant(consultantForm)" [disabled]="consultantForm.invalid"
+                            class="btn btn-success pull-right">Save and Close</button>
+                        <button type="button" (click)="displayLoanConsultantForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- <div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Consultants</h2>
+                <div class="pull-right">
+                    <button (click)="showLoanConsultantForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-dataTable [value]="consultants" [paginator]="true" [rows]="5" selectionMode="single">
+
+            <p-column field="productCustomerName" header="Facility"></p-column>
+            <p-column field="consultantName" header="Consultant Name"></p-column>
+            <p-column field="description" header="Description"></p-column>
+
+            <p-column [style]="{'width':'130px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editLoanConsultant(d)" href="javascript:void(0)">Edit</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayLoanConsultantForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="450">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{formState}} Proposed Collateral</h2>
+        </div>
+
+        <form novalidate [formGroup]="consultantForm">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Facility</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                class="form-control" [ngClass]="!consultantForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{
+                                    x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div><div class="form-group">
+                        <div class="col-md-12">
+                            <label>Accredited Consultant</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="accreditedConsultantId" formControlName="accreditedConsultantId" id="accreditedConsultantId"
+                                class="form-control" [ngClass]="!consultantForm.controls['accreditedConsultantId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Consultant --</option>
+                                <option *ngFor="let x of accreditedConsultants" [value]="x.accreditedConsultantId">{{ x.name }} {{
+                                    x.firmName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Description</label>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <textarea name="description" formControlName="description" id="description" class="form-control"
+                                    [ngClass]="!consultantForm.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveLoanConsultant(consultantForm)" [disabled]="consultantForm.invalid"
+                            class="btn btn-success pull-right">Save and Close</button>
+                        <button type="button" (click)="displayLoanConsultantForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">Consultants</h2>
+                    <div class="pull-right">
+                        <button (click)="showLoanConsultantForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="consultants" [paginator]="true" [rows]="5" selectionMode="single">
+
+                <p-column field="productCustomerName" header="Facility"></p-column>
+                <p-column field="consultantName" header="Consultant Name"></p-column>
+                <p-column field="description" header="Description"></p-column>
+
+                <p-column [style]="{'width':'130px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <div style="text-align:center">
+                            <a (click)="editLoanConsultant(d)" href="javascript:void(0)">Edit</a>
+                        </div>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+
+    </div>
+
+    <p-dialog [responsive]=true [(visible)]="displayLoanConsultantForm" id="reccol-modal" modal="modal" showEffect="fade"
+        width="450">
+
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{formState}} Loan Consultant</h2>
+            </div>
+
+            <form novalidate [formGroup]="consultantForm">
+
+                <div class="panel-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label>Facility</label>
+                            </div>
+                            <div class="col-md-12">
+                                <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                    class="form-control" [ngClass]="!consultantForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Facility--</option>
+                                    <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label>Accredited Consultant</label>
+                            </div>
+                            <div class="col-md-12">
+                                <select name="accreditedConsultantId" formControlName="accreditedConsultantId" id="accreditedConsultantId"
+                                    class="form-control" [ngClass]="!consultantForm.controls['accreditedConsultantId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Consultant --</option>
+                                    <option *ngFor="let x of accreditedConsultants" [value]="x.accreditedConsultantId">{{ x.name }} {{ x.firmName }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label>Description</label>
+                            </div>
+                            <div class="col-md-12">
+                                <textarea name="description" formControlName="description" id="description" class="form-control"
+                                        [ngClass]="!consultantForm.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="saveLoanConsultant(consultantForm)" [disabled]="consultantForm.invalid"
+                                class="btn btn-success pull-right">Save and Close</button>
+                            <button type="button" (click)="displayLoanConsultantForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </p-dialog> -->

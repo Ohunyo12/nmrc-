@@ -1,0 +1,160 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="card no-padding"  >
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                            Prudential Guideline Setup
+                          </h2>
+                          <div class="pull-right">
+                               <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+             
+              <div class="panel-body">
+                  <p-dataTable [paginator]="true" [rows]="15" [value]="prudentialGuideline" [responsive]=true selectionMode="single">
+                      <p-column [style]="{'width':'110px'}" field="statusName" header="Status Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="classification" header="Classification" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="internalMinimun" header="Internal Minimum" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="internalMaximun" header="Internal Maximum" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="externalMinimun" header="External Minimum" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="externalMaximun" header="External Maximum" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="naration" header="naration" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                      <p-column [style]="{'width':'60px'}">
+
+                          <ng-template pTemplate="header">
+                          </ng-template>
+                          <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editPrudential(staff)">
+                                  Edit
+                              </a>
+                          </ng-template>
+                      </p-column>
+                      <!-- <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                            <a style="text-decoration: none;color:#ff0000"  href="javascript:void(0)" (click)="deletePrudentialGuideline(pGrp.prudentialGuidelineId)"><i class="glyphicon glyphicon-remove"></i> </a> 
+                        </ng-template>
+                    </p-column> -->
+                  </p-dataTable>
+              </div>                
+      </div>
+  </div>
+</div>
+<p-dialog [responsive]=true [(visible)]="displayGuideline" modal="modal" showEffect="fade" width="900">
+      <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                             {{TitleName}}
+                          </h2>
+                          
+                      </div>
+                  </div>
+              </div>
+  <div class="panel-body">
+      
+     <form novalidate [formGroup]="prudentialGuidelineForm" autocomplete="off">
+
+         <div class="panel-body">
+             <div class="form-horizontal">                                                       
+                     <div class="form-group">
+                         <label for="" class="control-label col-md-2">Classification</label>
+                         <div class="col-md-4 ">
+                                <select [ngClass]="!prudentialGuidelineForm.controls['prudentialGuidelineTypeId'].valid ? 'required-input' : 'valid-input'"
+                                name="prudentialGuidelineTypeId" id="prudentialGuidelineTypeId" class="form-control" formControlName="prudentialGuidelineTypeId"> 
+                                        <option value="">-- Select Status --</option>
+                                        <option *ngFor="let x of prudentialGuidelineType" [value]="x.prudentialGuidelineTypeId">
+                                            {{x.prudentialGuidelineTypeName}}
+                                        </option>
+                                </select>
+                         </div>
+                         <label for="" class="control-label col-md-2">
+                            Status Name
+                         </label>
+                         <div class="col-md-4 ">
+                             <input type="text" class="form-control " formControlName="classification"  maxlength="20"
+                             [ngClass]="!prudentialGuidelineForm.controls['classification'].valid ? 'required-input' : 'valid-input'"
+                             name="classification">
+                         </div>
+                     </div>
+
+                     <div class="form-group">
+                         <label for="" class="control-label col-md-2">
+                          Internal Minimum
+                         </label>
+                         <div class="col-md-4 ">
+                             <input type="text" class="numeric form-control " formatM  maxlength="10"
+                             [ngClass]="!prudentialGuidelineForm.controls['internalMinimun'].valid ? 'required-input' : 'valid-input'"            
+                             formControlName="internalMinimun" name="internalMinimun">
+                         </div>
+                         <label for="" class="control-label col-md-2">
+                          Internal Maximum
+                         </label>
+                         <div class="col-md-4 ">
+                             <input type="text" class="numeric form-control " maxlength="10" formatM
+                             [ngClass]="!prudentialGuidelineForm.controls['internalMaximun'].valid ? 'required-input' : 'valid-input'"                                               
+                             formControlName="internalMaximun" name="internalMaximun" > 
+                         </div>
+                     </div>
+
+                     <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        External Minimum
+                      </label>
+                      <div class="col-md-4 ">
+                          <input type="text" class="numeric form-control "  maxlength="10" formatM
+                          [ngClass]="!prudentialGuidelineForm.controls['externalMinimun'].valid ? 'required-input' : 'valid-input'"            
+                          formControlName="externalMinimun" name="externalMinimun">
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        External Maximum
+                      </label>
+                      <div class="col-md-4 ">
+                          <input type="text" class="numeric form-control " maxlength="10" formatM
+                          [ngClass]="!prudentialGuidelineForm.controls['externalMaximun'].valid ? 'required-input' : 'valid-input'"                                               
+                          formControlName="externalMaximun" name="externalMaximun" > 
+                      </div>
+                  </div>
+                     
+                     <div class="form-group">
+                          <label for="" class="control-label col-md-2">
+                            Narration
+                          </label>
+                          
+                          <div class="col-md-4 ">
+                                  <textarea class="form-control " minlength="5" maxlength="200"
+                                  [ngClass]="!prudentialGuidelineForm.controls['naration'].valid ? 'required-input' : 'valid-input'" 
+                                  formControlName="naration"></textarea> 
+                          </div>
+                          <label for="" class="control-label col-md-2">
+                              
+                          </label>
+                          <div class="col-md-4 ">
+                             
+                          </div>
+                      </div>
+             </div>
+         </div>
+     </form>
+ </div>
+     <div class="panel-footer">
+         <div class="row">
+             <div class="col-md-12">
+                  <button type="submit" (click)="savePrudemtialGuideline(prudentialGuidelineForm)"  [disabled]="prudentialGuidelineForm.invalid" class="btn btn-success pull-right">Save</button>                    
+                  <button type="button" (click)="displayGuideline=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+             </div>
+         </div>
+     </div>
+
+      </div>
+
+
+</p-dialog>
+

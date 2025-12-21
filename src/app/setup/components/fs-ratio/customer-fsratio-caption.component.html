@@ -1,0 +1,75 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Financial Statement Ratio Captions
+                            </h2>
+
+                            <!-- <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [value]="fsRatioCaptionData" [sortMode]="multiple">
+                        <p-column *ngFor="let col of fsRatioCaptionTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                        <!-- <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                <a (click)="editFSRatioCaption(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column> -->
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Financial Statement Ratio Caption
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createEditForm" (ngSubmit)="submitFSRatioCaptionForm(createEditForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="fsRadioCaption" class="control-label col-md-4">Ratio Caption Name</label>
+                        <div class="col-md-8">
+                            <input type="text" id="ratioCaptionName" class="form-control" formControlName="ratioCaptionName" [ngClass]="createEditForm.controls['ratioCaptionName'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="annualised" class="control-label col-md-4">Annualised</label>
+                        <div class="col-md-2">
+                            <input type="checkbox" name="annualised" id="annualised" formControlName="annualised">
+                        </div>
+                        <label for="position" class="control-label col-md-3">Position</label>
+                        <div class="col-md-3">
+                            <input type="number" min="0" max="100" name="position" class="form-control" formControlName="position" [ngClass]="createEditForm.controls['position'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="createEditForm.invalid" class="btn btn-success pull-right">Save FS Ratio Caption</button>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

@@ -1,0 +1,119 @@
+<div class="panel panel-default">
+
+		<div class="panel-heading">
+			<div class="row">
+				<div class="col-md-12">
+					<h2 class="panel-title pull-left">
+						Lc Document
+					</h2>
+					<div class="pull-right">
+						<button  *ngIf="showButtons==true" (click)="showLcDocumentForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel-body">
+	
+			<p-dataTable [value]="lcDocuments" [responsive]="true" [paginator]="false" [rows]="5">
+	
+				<p-column field="lcIssuanceId" header="Lc Issuance Id" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="documentTitle" header="Document Title" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="isSentToIssuingBank" header="Is Sent To Issuing Bank" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="numberOfCopies" header="Number Of Copies" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="isSentToApplicant" header="Is Sent To Applicant" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="lcDocument" header="Additional Comment" sortable="true" filterMatchMode="contains"></p-column>
+	
+				<p-column [style]="{'width':'100px'}" header="View">
+					<ng-template pTemplate="header"> </ng-template>
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+					<div style="text-align:center">
+						<!-- <div style="text-align:center" *ngIf="d.owner"> -->
+						<a (click)="deleteLcDocument(d)" href="javascript:void(0)">Remove</a>
+						<span style="padding:3px;">|</span>
+						<a (click)="editLcDocument(d)" href="javascript:void(0)">Edit</a>
+					</div>
+					</ng-template>
+				</p-column>
+	
+			</p-dataTable>
+	
+		</div>
+	
+	</div>
+	
+	<p-dialog [responsive]=true [(visible)]="displayLcDocumentForm" [modal]=true 
+	width="600" [contentStyle]="{'overflow':'auto','max-height':'600px'}">
+	
+		<div style="margin-bottom:0" class="panel panel-default">
+			
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					{{ formState }} Lc Document
+				</h2>
+			</div>
+						
+			<form novalidate [formGroup]="lcDocumentForm" (ngSubmit)="saveLcDocument(lcDocumentForm)" autocomplete="off">
+			   <div class="panel-body">
+					<div class="form-horizontal">
+	
+						<div class="form-group">
+							<label for="lcIssuanceId" class="control-label col-md-12">Lc Issuance Id</label>
+							<div class="col-md-12">
+								<input type="text" [disabled]="true" name="lcIssuanceId" formControlName="lcIssuanceId" id="lcIssuanceId" class="form-control">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="documentTitle" class="control-label col-md-12">Document Title</label>
+							<div class="col-md-12">
+								<input type="text" name="documentTitle" formControlName="documentTitle" id="documentTitle" class="form-control" [ngClass]="lcDocumentForm.controls['documentTitle'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<div class="col-md-6">
+								<div class="checkbox-container">
+									<input formControlName="isSentToIssuingBank" id="isSentToIssuingBank" type="checkbox">
+								</div><label class="checkbox">Is Sent To Issuing Bank</label>
+							</div>
+							<div class="col-md-6">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="numberOfCopies" class="control-label col-md-12">Number Of Copies</label>
+							<div class="col-md-12">
+								<input type="text" name="numberOfCopies" formControlName="numberOfCopies" id="numberOfCopies" class="form-control" [ngClass]="lcDocumentForm.controls['numberOfCopies'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<div class="col-md-6">
+								<div class="checkbox-container">
+									<input formControlName="isSentToApplicant" id="isSentToApplicant" type="checkbox">
+								</div><label class="checkbox">Is Sent To Applicant</label>
+							</div>
+							<div class="col-md-6">
+							</div>
+						</div>
+	
+					</div>
+				</div>
+			</form>
+	
+			<div class="panel-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<button type="button" (click)="saveLcDocument(lcDocumentForm)" [disabled]="lcDocumentForm.invalid" class="btn btn-success pull-right">Save and Close</button>
+						<button type="button" (click)="displayLcDocumentForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+					</div>
+				</div>
+			</div>
+	
+		</div>
+		
+	</p-dialog>
+	
+	<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+	

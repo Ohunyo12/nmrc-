@@ -1,0 +1,191 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding"  >
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                             Approved Employer
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable #dt [paginator]="true" [rows]="15" [value]="employersListTable" [responsive]=true selectionMode="single">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header>
+                        <p-column [style]="{'width':'110px'}" field="employerName" header="Employer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="employerSubTypeName" header="Employer Sub Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="emailAddress" header="Email Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="cityName" header="cityName" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="address" header="Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'60px'}">
+
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editEmployer(staff)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>                
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayEmployer" modal="modal" showEffect="fade" width="900">
+        <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                               {{TitleName}}
+                            </h2>
+                            
+                        </div>
+                    </div>
+                </div>
+    <div class="panel-body">
+        
+       <form novalidate [formGroup]="employerSetupForm" autocomplete="off">
+
+           <div class="panel-body">
+               <div class="form-horizontal">                                                       
+                       <div class="form-group">
+                           <label for="" class="control-label col-md-2">Employer Name</label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control " formControlName="employerName" minlength="3" maxlength="300"
+                               [ngClass]="!employerSetupForm.controls['employerName'].valid ? 'required-input' : 'valid-input'"
+                               name="employerName" >
+                           </div>
+                         
+                       </div>
+
+                       <div class="form-group">
+                        
+                        <label for="" class="control-label col-md-2">Employer Type</label>
+                        <div class="col-md-4 ">
+                            <select (change)="getEmployerSubType($event.target.value)"
+                            name="employerTypeId" id="employerTypeId" 
+                            [ngClass]="!employerSetupForm.controls['employerTypeId'].valid ? 'required-input' : 'valid-input'" 
+                            formControlName="employerTypeId" class="form-control">  
+                           
+                                    <option value="">-- Select Empleyer Type --</option>
+                                    <option *ngFor="let x of emplyerType" [value]="x.employerTypeId">
+                                        {{x.employerTypeName}}
+                                    </option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-2">
+                            Employer Sub Type
+                           </label>
+                           <div class="col-md-4 ">
+                               <select name="employerSubTypeId" id="employerSubTypeId" 
+                               [ngClass]="!employerSetupForm.controls['employerSubTypeId'].valid ? 'required-input' : 'valid-input'" 
+                               formControlName="employerSubTypeId" class="form-control">  
+                              
+                                       <option value="">-- Select Emplyer Sub Type --</option>
+                                       <option *ngFor="let x of emplyerSubType" [value]="x.employerSubTypeId">
+                                           {{x.employerSubTypeName}}
+                                       </option>
+                               </select>
+                           </div>
+                    </div>
+
+                       <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                            Phone Number
+                       </label>
+                       <div class="col-md-4 ">
+                           <input type="text" class="form-control " minlength="5" maxlength="25"
+                           [ngClass]="!employerSetupForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"                                               
+                           formControlName="phoneNumber" name="phoneNumber" id="phoneNumber" > 
+                       </div>
+                           <label for="" class="control-label col-md-2">
+                            Email Address
+                       </label>
+                       <div class="col-md-4 ">
+                           <input type="text" class="form-control " minlength="5" maxlength="50"
+                           [ngClass]="!employerSetupForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'"            
+                           formControlName="emailAddress" name="emailAddress" id="emailAddress">
+                       </div>
+                    </div>
+
+
+
+                       <div class="form-group">
+                       
+                       <label for="" class="control-label col-md-2">
+                        State
+                   </label>
+                   
+                   <div class="col-md-4 ">
+                        <select (change)="getStateCities($event.target.value)" 
+                        [ngClass]="!employerSetupForm.controls['stateId'].valid ? 'required-input' : 'valid-input'" 
+                        name="stateId" id="stateId" class="form-control" formControlName="stateId"> 
+                       
+                                <option value="">-- Select State --</option>
+                                <option *ngFor="let x of states" [value]="x.stateId">
+                                    {{x.stateName}}
+                                </option>
+                        </select>
+                   </div>
+                   <label for="" class="control-label col-md-2">
+                    City
+                </label>
+                <div class="col-md-4 ">
+                     <select name="cityId" id="cityId" 
+                     [ngClass]="!employerSetupForm.controls['cityId'].valid ? 'required-input' : 'valid-input'" 
+                     formControlName="cityId" class="form-control">  
+                    
+                             <option value="">-- Select City --</option>
+                             <option *ngFor="let x of cities" [value]="x.cityId">
+                                 {{x.cityName}}
+                             </option>
+                     </select>
+                </div>
+                       </div>
+
+
+
+                       <div class="form-group">
+                        
+                        <label for="" class="control-label col-md-2">
+                            Address
+                       </label>
+                       
+                       <div class="col-md-4 ">
+                               <textarea class="form-control " minlength="5" maxlength="500"
+                               [ngClass]="!employerSetupForm.controls['address'].valid ? 'required-input' : 'valid-input'" 
+                               formControlName="address" id="address" name="address"></textarea> 
+                       </div>
+                       </div>
+                       
+               </div>
+           </div>
+       </form>
+   </div>
+       <div class="panel-footer">
+           <div class="row">
+               <div class="col-md-12">
+                    <button type="submit" (click)="saveEmployer(employerSetupForm)"  [disabled]="employerSetupForm.invalid" class="btn btn-success pull-right">Save</button>                    
+                    <button type="button" (click)="displayEmployer=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+               </div>
+           </div>
+       </div>
+  
+        </div>
+</p-dialog>
+

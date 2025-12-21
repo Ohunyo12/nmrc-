@@ -1,0 +1,192 @@
+<p-tabView>
+    <p-tabPanel header="Stamp Duty Report">
+        <div class="panel-body">
+            <div class="ui-g ui-fluid">
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+
+                        Start Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [monthNavigator]="true"
+                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3 ">
+                        End Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="endDate" dateFormat="dd-MM-yy" [monthNavigator]="true"
+                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+                        .
+                    </label>
+                    <div class="col=md-9">
+                        <button pButton type="button" (click)="GetFacilities()" label="Fetch Record"></button>
+                    </div>
+                </div>
+
+            </div>
+            <p-tabView>
+                <p-dataTable [scrollable]="true" [value]="facilityStampDuties" #dt [paginator]="true"
+                    [responsive]="true" [rows]="15">
+                    <p-header>
+                        <div class="ui-helper-clearfix">
+                            <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                (click)="dt.exportCSV()" style="float:left"></button>
+                        </div>
+                    </p-header>
+                    <!-- <p-column [style]="{'width':'35px','font-size':'12px'}" field="serial" header="S/N"> </p-column> -->
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="dateTimeCreated"
+                        header="Transaction Date" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-col let-apr="rowData" pTemplate="body">
+                            {{apr[col.field] | date: 'medium' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="customerName" header="Customer Name"
+                        sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <!-- <p-column [style]="{'width':'70px','font-size':'12px'}" field="customerDivisionShortCode"
+                        header="Division" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="applicationReferenceNumber"
+                        header="Application Ref No" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="productNames" header="Product"
+                        sortable="true" [filter]="true" filterMatchMode="contains"> </p-column> -->
+
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="loanAmount" header="Loan Amount"
+                        sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{d.baseCurrencyCode}} {{ d.loanAmount | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="approvedTenor" header="Tenor"
+                        [filter]="true" filterMatchMode="contains">
+
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.approvedTenor/30 | number : '1.0-0' }} months
+                        </ng-template>
+
+                    </p-column>
+
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="dutiableValue"
+                        header="Dutiable Value" sortable="true" [filter]="true" filterMatchMode="contains"
+                        [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.dutiableValue }} %
+                        </ng-template>
+                    </p-column>
+
+                    <p-column [style]="{'width':'120px','font-size':'12px'}" field="stampDutyAmount"
+                        header="Stamp Duty Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                        [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{d.baseCurrencyCode}} {{ d.stampDutyAmount | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+
+                    <p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralSubType"
+                        header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+
+                    <!-- <p-column [style]="{'width':'70px'}">
+                        <ng-template pTemplate="header"></ng-template>
+                        <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                            <span>
+                                <a (click)="viewRecord(x)" href="javascript:void(0)">Details</a>
+                            </span>
+                        </ng-template>
+                    </p-column> -->
+
+                </p-dataTable>
+            </p-tabView>
+
+        </div>
+    </p-tabPanel>
+</p-tabView>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="1200"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">Details
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayModalForm=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <p-tabView>
+                <p-tabPanel header="Approval Comments">
+                    <p-dataTable [value]="approvalWorkflowData" #dt3 [paginator]="true" [rows]="15" [responsive]="true">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                    (click)="dt3.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header>
+                        <!-- <p-column field="customerDivisionShortCode" header="Division" filterMatchMode="contains"> </p-column> -->
+                        <p-column field="requestStaffName" header="Intiated By"></p-column>
+                        <!-- <p-column field="requestApprovalsLevel" header="Initiator Approval Level"></p-column> -->
+                        <p-column field="responseStaffName" header="Directed To"></p-column>
+                        <p-column field="responseApprovalLevel" header="Receiver Approval Level"></p-column>
+                        <p-column field="approvalStatus" header="Approval Status"></p-column>
+                        <p-column field="comment" header="Comment"></p-column>
+                        <p-column field="systemArrivalDate" header="Date of Arrival">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="systemResponseDate" header="Date of Response">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'120px','font-size':'12px'}" field="" header="Actual Time Spent">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.displayDuration }}
+
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column [style]="{'width':'120px','font-size':'12px'}" field="maxIndividualSLA" header="Maximum SLA">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ maxIndividualSLA }}
+                        
+                            </ng-template>
+                        </p-column> -->
+                    </p-dataTable>
+                </p-tabPanel>
+            </p-tabView>
+
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>

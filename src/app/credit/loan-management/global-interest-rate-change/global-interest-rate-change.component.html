@@ -1,0 +1,252 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                            Global Interest Rate Change
+                            </h2>
+                            <div class="pull-right">
+                                    <button (click)="showAddAddPricingIndexModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <p-tabView [activeIndex]="activeIndex">
+                                <p-tabPanel header="Product Price Index Global">
+                                    <div class="row">
+                                        <p-dataTable [value]="productPriceIndexGlobalData" [paginator]="true" [rows]="20" [responsive]="true">
+                                            <p-column field="productPriceIndexName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="oldRate" header="Old Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="newRate" header="New Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="dateTimeCreated" header="Application Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template let-col let-ln="rowData" pTemplate="body">
+                                                    {{ln[col.field] | date : 'medium' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column field="effectiveDate" header="Effictive Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template let-col let-ln="rowData" pTemplate="body">
+                                                    {{ln[col.field] | date : 'dd/MM/yyyy' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column header="hasBeenApplied" header="Has Been Applied" [style]="{'width':'7%'}">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <span *ngIf="d.hasBeenApplied==true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column header="isMarketInduced" header="Market Induced" [style]="{'width':'7%'}">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <span *ngIf="d.isMarketInduced==true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'9%'}" header="Status">
+                                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <div class="btn-group">
+                                                       
+                                                       </div>
+                                                    <div class="btn-group"
+                                                        [innerHtml]="getApplicationStatus(true,row.approvalStatusId)">
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column  [style]="{'width':'80px', 'text-align':'center'}">
+                                                    <ng-template pTemplate="header">
+                                                            Edit
+                                                    </ng-template>
+                                                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                        <button *ngIf="(row.approvalStatusId == 0 || row.approvalStatusId == 5)" type="button" (click)="editRow(row, $event)">
+                                                            <i class="glyphicon glyphicon-pencil"></i>
+                                                        </button>
+                                                    </ng-template>
+                                            </p-column>
+
+                                            <p-column [style]="{'width':'80px', 'text-align':'center'}">
+                                                <ng-template pTemplate="header">
+                                                   View Comments
+                                                </ng-template>
+                                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <button type="button" (click)="viewComments(row, $event)">
+                                                        <i class="glyphicon glyphicon-eye-open"></i>
+                                                    </button>
+                                                </ng-template>
+                                        </p-column>
+                                            
+                                        </p-dataTable>
+                                   </div>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="500" >
+        <div class="panel-heading">
+            <h2 class="panel-title">
+            Add/Update Global Price Index 
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <input type="hidden" name="productPriceIndexGlobalId" formControlName="productPriceIndexGlobalId" id="productPriceIndexGlobalId">
+
+                    <div class="form-group">
+                        <label for="productPriceIndexId" class="control-label col-md-4">
+                            Product Price Index
+                                    </label>
+                        <div class="col-md-8">
+                            <select name="productPriceIndexId" id="productPriceIndexId" formControlName="productPriceIndexId" class="form-control" [ngClass]="!createUpdateForm.controls['productPriceIndexId'].valid ? 'required-input' : 'valid-input'"
+                            (change)="onPriceIndexSelect($event.target.value)">
+                                <option value="">-- Select Price Index --</option>
+                                <option *ngFor="let item of productPriceIndexData" [value]="item.productPriceIndexId">{{item.priceIndexName}}</option>
+
+                        </select>                        
+                    </div>
+                </div>
+                <div class="form-group">
+                        <label for="effectiveDate" class="control-label col-md-4">
+                                Effective Date
+                              </label>
+                              <div class="col-md-8">
+                                  <p-calendar id="effectiveDate" dateFormat="dd/mm/yy" formControlName="effectiveDate" [ngClass]="!createUpdateForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'" [inputStyle]="{'width': '270px' }"
+                                   [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030"
+                                  [showIcon]="true"></p-calendar>                        
+                              </div>
+                </div>
+
+                    <div class="form-group">
+                            <label for="oldRate" class="control-label col-md-4">
+                                    Old Rate
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input type="number" disabled name="oldRate" [(ngModel)]="priceIndexRateValue" formControlName="oldRate" id="oldRate" class="form-control" >
+                                    </div>
+                           
+                                </div>
+                    <div class="form-group">
+                        <label for="newRate" class="control-label col-md-4">
+                            New Rate
+                        </label>
+                        <div class="col-md-8">
+                         <input type="number" name="newRate" formControlName="newRate" id="newRate" class="form-control" [ngClass]="!createUpdateForm.controls['newRate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        
+                    </div>
+
+                   
+                     <div class="form-group">
+
+                            <label for="isMarketInduced" class="control-label col-md-4">
+                                    Is Market Induced
+                                            </label>
+                                <div class="col-md-8">
+                                    <input type="checkbox" name="isMarketInduced" formControlName="isMarketInduced" id="isMarketInduced"  style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                                </div>
+                                
+                            </div> 
+                            <div class="form-group" *ngIf="approvalStatusId == 5">
+                                <div class="col-md-12">
+                                    <!-- <label for="comment">{{ commentLabel }}</label> -->
+                                    <label for="comment">Comment/Recommendation</label>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <textarea style="height:87px;" name="comment" formControlName="comment" id="comment"
+                                        class="form-control"
+                                        [ngClass]="!createUpdateForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                                </div>
+                            </div>
+                    <br/>
+                    <br/>
+
+
+                </div>
+            </div>
+        </form>
+        <div class="panel-footer" >
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitPriceIndexForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayApprovalComment" id="comment-modal" modal="modal" showEffect="fade"
+width="1200">
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title"> Global Interest rate Approval Comments</h2>
+                        </div>
+                        <div class="panel-body">
+                    
+                    
+                            <p-dataTable #dt [value]="trail" [paginator]="true" [rows]="5">
+                                <p-header>
+                                    <div class="ui-helper-clearfix">
+                                        <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                    </div>
+                                </p-header>
+                                <p-column field="fromStaffName" header="From : Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="toStaffName" header="To : Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="fromApprovalLevelName" header="From : Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="toApprovalLevelName" header="To : Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="systemArrivalDateTime" header="Arrival Date Time" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.systemArrivalDateTime | date: 'medium' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="systemResponseDateTime" header="Response Date Time" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.systemResponseDateTime | date: 'medium' }}
+                                    </ng-template>
+                                </p-column> 
+                                <p-column field="comment" header="Comment" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="approvalState" header="State" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            </p-dataTable>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayApprovalComment=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</p-dialog>

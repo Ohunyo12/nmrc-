@@ -1,0 +1,415 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+
+        <!--card 2 list-->
+
+        <div *ngIf="displayList" class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Document Templates Setup
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="documents" [paginator]="true" [rows]="10" [responsive]=true>
+                        <p-column field="templateName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="staffRoleId" header="Staff Role ID" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getStaffRoleName(d.staffRoleId) }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="operationId" header="Operation ID" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getOperationName(d.operationId) }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editDocument(d)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="sectionDocument(d)" href="javascript:void(0)">Section</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="removeDocument(d)" href="javascript:void(0)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Name</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="templateName" [ngClass]="!documentForm.controls['templateName'].valid ? 'required-input' : 'valid-input'"
+                                name="templateName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">Staff Role</label>
+                        <div class="col-md-4">
+                            <select name="staffRoleId" id="staffRoleId" class="form-control" formControlName="staffRoleId"
+                                [ngClass]="documentForm.controls['staffRoleId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Staff Role ---</option>
+                                <option *ngFor="let x of staffRole" [value]="x.staffRoleId">{{ x.staffRoleName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Operation ID</label><br>
+                        <div class="col-md-4">
+                            <select name="operationId" id="operationId" class="form-control" formControlName="operationId"
+                                [ngClass]="documentForm.controls['operationId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Operation ID ---</option>
+                                <option *ngFor="let x of Operations" [value]="x.lookupId">{{ x.lookupName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<!--section modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalSection" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Section List
+            </h2>
+            <div class="pull-right">
+                <button (click)="showAddSectionModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="sections" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="title" header="Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="position" header="Position" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editDocumentSection(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="roleDocumentSection(d)" href="javascript:void(0)">Roles</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeDocumentSection(d)" href="javascript:void(0)"> <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button> -->
+                    <button type="button" (click)="displayModalSection=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of section modal-->
+
+
+<!--section form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalSectionForm" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'600px'}"
+    modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ sectionName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-6">Title</label>
+                        <label for="" class="control-label col-md-6">Postion</label>
+                        <div class="col-md-6">
+                            <input type="text" formControlName="title" [ngClass]="!documentSectionForm.controls['title'].valid ? 'required-input' : 'valid-input'"
+                                name="title" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="number" formControlName="position" [ngClass]="!documentSectionForm.controls['position'].valid ? 'required-input' : 'valid-input'"
+                                name="position" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-6">Description</label>
+                        <div class="col-md-12">
+                            <input type="text" formControlName="description" name="description" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Can Edit</label><br>
+                        <div class="col-md-12">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" formControlName="canEdit" name="canEdit" id="canEdit" value="">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!--as p-editor is buggy within form tag-->
+        <div class="panel-body" [style]="{'padding-top':'0px'}">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <!-- <label class="control-label">{{documentContent}} </label> -->
+
+                    <div class="col-md-12">
+                        <CKEDITOR [content]="documentContent" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" (click)="saveSection()" [disabled]="documentSectionForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalSectionForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p>
+                Replace dynamic content with <code>@{{</code><i>PlaceholderName</i><code>}}</code>
+            </p>
+
+            <h4>List of placeholbers:</h4>
+            <ol>
+                <li>AccountNumbers</li>
+                <li>AllCustomerCollateralRemarks</li>
+                <li>AllCustomerFacilities</li>
+                <li>AmountDisbursed</li>
+                <li>AmountPaidSoFar</li>
+                <li>AmountProposed</li>
+                <li>AnnualReviewDate</li>
+                <li>ApprovalLevel</li>
+                <li>Approvals</li>
+                <li>Branch</li>
+                <li>BusinessSectors</li>
+                <li>CollateralCoverage</li>
+                <li>ConditionsPrecedentToDrawdown</li>
+                <li>ContingentFacilities</li>
+                <li>CurrentDate</li>
+                <li>CustomerExposure</li>
+                <li>CustomerName</li>
+                <li>CustomerTurnover</li>
+                <li>DateCreated</li>
+                <!-- <li>DirectFacilities</li> -->
+                <li>Directors</li>
+                <li>EnvironmentalSocialRisk</li>
+                <li>ExchangeRate</li>
+                <!-- <li>ForeignContingentFacilities</li>
+                <li>ForeignDirectFacilities</li>
+                <li>ForeignImportFinanceFacilities</li> -->
+                <li>GroupExposure</li>
+                <li>GroupFacilitySummary</li>
+                <li>GroupFacilitySummaryFcy</li>
+                <!-- <li>ImportFinanceFacilities</li> -->
+                <li>IsOwnerOccupied</li>
+                <li>IsRelatedParty</li>
+                <li>IsSecurity</li>
+                <li>Location</li>
+                <li>MisCode</li>
+                <li>MonitoringTriggers</li>
+                <li>ObligorRiskRating</li>
+                <li>PreparedBy</li>
+                <li>ProposedConditions</li>
+                <li>RecommendedInterest</li>
+                <li>ReviewType</li>
+                <li>Country</li>
+                <li>SecurityDescription</li>
+                <li>SecurityFirstSellValue</li>
+                <li>SecurityLocation</li>
+                <li>SecurityOpenMarketValue</li>
+                <li>SecurityPerfectionStatus</li>
+                <li>SecurityType</li>
+                <li>SecurityValuationDate</li>
+                <li>ShareHolders</li>
+                <li>Signitories</li>
+                <li>MCCDigitalStamp</li>
+                <li>BCCDigitalStamp</li>
+                <!-- <li>TotalContingents</li>
+                <li>TotalDirects</li>
+                <li>TotalForeignDirects</li>
+                <li>TotalForeignContingents</li>
+                <li>TotalForeignImportFinanceFacilities</li>
+                <li>TotalImportFinanceFacilities</li> -->
+                <li>TransactionsDynamics</li>
+            </ol>
+
+        </div>
+
+
+
+    </div>
+</p-dialog>
+<!--end of section form modal-->
+
+<!--section role modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalSectionRole" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Section Role List
+            </h2>
+            <div class="pull-right">
+                <button (click)="showAddSectionRoleModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="roles" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="staffRoleId" header="Staff Role" sortable="true" [filter]="true" filterMatchMode="contains">
+                    <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                        {{ getStaffRoleName(d.staffRoleId) }}
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editDocumentSectionRole(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeDocumentSectionRole(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button>  -->
+                    <button type="button" (click)="displayModalSectionRole=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of section role modal-->
+
+<!--section role form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalSectionRoleForm" id="add-modal" modal="modal" showEffect="fade"
+    width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ sectionRoleName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentSectionRoleForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-4">Staff Role</label>
+                        <div class="col-md-12">
+                            <select name="staffRoleId" id="staffRoleId" class="form-control" formControlName="staffRoleId"
+                                [ngClass]="documentSectionRoleForm.controls['staffRoleId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Staff Role ---</option>
+                                <option *ngFor="let x of staffRole" [value]="x.staffRoleId">{{ x.staffRoleName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitSectionRoleForm(documentSectionRoleForm)" [disabled]="documentSectionRoleForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalSectionRoleForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of section role form modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

@@ -1,0 +1,140 @@
+<div class="panel panel-default">
+
+	<div class="panel-heading">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="panel-title pull-left">
+					LMS Facility Modifications Awaiting Approval
+				</h2>
+			</div>
+		</div>
+	</div>
+  
+	<div class="panel-body">
+  
+		<p-dataTable [value]="facilityModifications" [responsive]="true" [paginator]="true" [rows]="5">
+			<p-column field="systemArrivalDateTime" header="Arrival Date" sortable="true" [filter]="true" filterMatchMode="contains">
+				<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+					{{ d.systemArrivalDateTime | date: 'short' }}
+				</ng-template>
+			</p-column>
+			<p-column field="applicationRef" header="Application Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+			<p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+			<p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+  
+			<p-column [style]="{'width':'100px'}" header="View">
+				<ng-template pTemplate="header"> </ng-template>
+				<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+				<div style="text-align:center">
+					<a (click)="editFacilityModification(d)" href="javascript:void(0)">View</a>
+				</div>
+				</ng-template>
+			</p-column>
+		</p-dataTable>
+	</div>
+</div>
+  
+	<p-dialog [responsive]=true [(visible)]="displayFacilityModificationForm" id="ct-modal" modal="modal" showEffect="fade" width="900"
+	[contentStyle]="{'overflow':'auto','max-height':'900px'}">
+	
+		<div style="margin-bottom:0" class="panel panel-default">
+			
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					{{ formState }} Facility Modification
+				</h2>
+			</div>
+					
+			<div class="panel-body" style="overflow: auto;">
+				<form novalidate [formGroup]="facilityModificationForm" (ngSubmit)="approveFacilityModification(facilityModificationForm)">
+					<div class="form-horizontal">
+						<div class="form-group">
+							<label for="approvedProductId" class="control-label col-md-2">
+								Product
+							</label>
+							<div class="col-md-4">
+								<select [attr.disabled]="true" name="approvedProductId" class="form-control" [ngClass]="!facilityModificationForm.controls['approvedProductId'].valid ? 'required-input' : 'valid-input'"
+									formControlName="approvedProductId" id="approvedProductId">
+									<option value=""></option>
+									<option *ngFor="let pc of filteredProducts" value="{{pc.productId}}">
+										{{pc.productName}}
+									</option>
+								</select>
+							</div>
+
+							
+						</div>
+						
+						<div class="form-group">
+							<label for="approvedTenor" class="control-label col-md-2 pull-left">approved Tenor</label> 
+							<div>
+								<div class="col-md-2">
+									<input name="approvedTenor" [readonly]="true" formControlName="approvedTenor" [ngClass]="!facilityModificationForm.controls['approvedTenor'].valid ? 'required-input' : 'valid-input'" class="form-control">
+								</div>
+								<div class="col-md-2">
+									<select [attr.disabled]="true" class="form-control" formControlName="tenorModeId" [ngClass]="!facilityModificationForm.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
+										name="tenorModeId" id="tenorModeId">
+										<option *ngFor="let item of tenorTypes" value="{{item.tenorModeId}}">{{item.name}}</option>
+									</select>
+								</div>
+							</div>
+							<div *ngIf="(isContingent != true)">
+								<label for="" class="control-label col-md-2">Interest Rate</label>
+								<div class="col-md-4">
+									<input class="form-control" [readonly]="true" type="text" formControlName="approvedInterestRate" [ngClass]="!facilityModificationForm.controls['approvedInterestRate'].valid ? 'required-input' : 'valid-input'">
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="approvedAmount" class="control-label col-md-2">Facility Amount</label>
+							<div class="col-md-4">
+							<input type="text" [readonly]="true" id="approvedAmount" formatM name="approvedAmount" [ngClass]="!facilityModificationForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'"
+								formControlName="approvedAmount" class="form-control">
+							</div>
+							<label for="reviewDetails" class="control-label col-md-2">Review Details</label>
+							<div class="col-md-4">
+							<input type="text" [readonly]="true" id="reviewDetails" formatM name="reviewDetails" [ngClass]="!facilityModificationForm.controls['reviewDetails'].valid ? 'required-input' : 'valid-input'"
+								formControlName="reviewDetails" class="form-control">
+							</div>
+						</div>
+
+						
+						<div class="form-group">
+							<label for="comment" class="control-label col-md-2"><strong>Comment</strong></label>
+							<div class="col-md-4">
+								<textarea [ngClass]="facilityModificationForm.controls['comment'].valid ? 'valid-input' : 'required-input'"
+									class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+							</div>
+							<label for="forward" class="control-label col-md-2">Status</label>
+							<div class="col-md-4">
+								<select name="forward" id="forward"
+									class="form-control" formControlName="forward"
+									[ngClass]="facilityModificationForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+									<option value="">--- Select Approval Status ---</option>
+									<option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">
+										{{item.approvalStatusName}}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div class="panel-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<button type="button" (click)="approveFacilityModification(facilityModificationForm)" [disabled]="facilityModificationForm.invalid" class="btn btn-success pull-right">Approve</button>
+						<button type="button" (click)="displayFacilityModificationForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+					</div>
+				</div>
+			</div>
+		
+	
+		</div>
+	
+	</p-dialog>
+  
+  <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+  
+ 

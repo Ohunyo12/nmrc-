@@ -1,0 +1,1311 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Customer Search
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <!--<div class="row">-->
+
+          <form novalidate [formGroup]="customerSearchForm" (keyup.enter)="submitForm(customerSearchForm)" autocomplete="off">
+
+            <div class="panel-body">
+              <div class="form-horizontal">
+
+                <div class="form-group">
+                  <label for="customerName" class="control-label col-md-2">Customer Name / Code</label>
+                  <div class="col-md-4">
+                    <input type="text" name="customerName" formControlName="customerName" id="customerName" class="form-control" [ngClass]="!customerSearchForm.controls['customerName'].valid ? 'required-input' : 'valid-input'">
+                  </div>
+                  <label for="phoneNumber" class="control-label col-md-2">Phone Number</label>
+                  <div class="col-md-4">
+                    <input type="text" name="phoneNumber" formControlName="phoneNumber" id="phoneNumber" class="form-control" [ngClass]="!customerSearchForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="customerTypeId" class="control-label col-md-2">Customer Type</label>
+                  <div class="col-md-4">
+                    <select type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" class="form-control" [ngClass]="!customerSearchForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">-- Select Customer Type --</option>
+                      <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                        {{ type.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <label for="branchId" class="control-label col-md-2">Branch</label>
+                  <div class="col-md-4">
+                    <select type="text" name="branchId" formControlName="branchId" id="branchId" class="form-control" [ngClass]="!customerSearchForm.controls['branchId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">-- Select Branch --</option>
+                      <option *ngFor="let branch of branches" [value]="branch.branchId">
+                        {{ branch.branchName }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+
+
+              </div>
+            </div>
+          </form>
+
+          <!--</div>-->
+        </div>
+
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+              <button type="button" (click)="submitForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right">
+                <span class="glyphicon glyphicon-search"></span> Search</button>
+              <button type="button" (click)="clearSearchForm()" style="margin-right:5px" class="btn btn-default pull-right">Clear</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--end of panel-->
+
+    </div>
+    <!--end of card-->
+
+    <div *ngIf="displayCustomerList" class="card no-padding">
+
+      <div class="panel panel-default">
+
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Search Result
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+
+          <p-dataTable [value]="customers" [paginator]="true" [rows]="20">
+
+            <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="customerTypeId" header="Customer Type" sortable="true" [filter]="true" filterMatchMode="contains">
+              <ng-template let-i="rowIndex" let-model="rowData" pTemplate type="body">
+                {{ getCustomerType(model.customerTypeId) }}
+              </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                <a #viewDetail name="viewDetail" (click)="viewCustomerDetails(i)" href="javascript:void(0)">View Details</a>
+              </ng-template>
+            </p-column>
+
+          </p-dataTable>
+        </div>
+
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--end of panel2-->
+
+    </div>
+    <!--end of card2-->
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCustomerDetails" modal="modal" showEffect="fade" width="900">
+  <div class="ui-g">
+    <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                  Edit Customer Details For: 
+                  <strong>{{ customerFullName }}</strong> 
+                </h2>
+                <!--button type="button" class="btn btn-primary pull-right" (click)="startLoanAppHome()">Cancel PEN</button-->
+              </div>
+            </div>
+
+          </div>
+
+          <div class="panel-body">
+            <form novalidate [formGroup]="editCustomerForm" autocomplete="off">
+
+              <div class="form-horizontal">
+                <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                  <p-tabPanel *ngIf="customersInfo" header="General">
+                    <table class="table table-customer-information">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <strong>Customer Code:</strong>
+                          </td>
+                          <td>{{ customersInfo.customerCode }}</td>
+                          <td>
+                            <strong>Customer Type:</strong>
+                          </td>
+                          <td>{{ getCustomerType(customersInfo.customerTypeId) }}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Branch:</strong>
+                          </td>
+                          <td>{{ getBranch(customersInfo.branchId) }}</td>
+                          <td>
+                            <strong>Company:</strong>
+                          </td>
+                          <td>{{ getCompany(customersInfo.companyMainId) }}</td>
+                          <!--<td><strong>Relationship Officer:</strong></td> <td>{{ model.relationshipOfficerId }}</td>-->
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>MIS Code:</strong>
+                          </td>
+                          <td>{{ customersInfo.misCode }}</td>
+                          <td>
+                            <strong>MIS Staff:</strong>
+                          </td>
+                          <td>{{ customersInfo.misStaff }}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Approval Status:</strong>
+                          </td>
+                          <td>{{ getApprovalStatus(customersInfo.approvalStatus) }}</td>
+                          <td>
+                            <strong>Date Acted On:</strong>
+                          </td>
+                          <td>{{ customersInfo.dateActedOn | date:"dd-MM-yyyy" }}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Acted On By:</strong>
+                          </td>
+                          <td>{{ customersInfo.actedOnBy }}</td>
+                          <td>
+                            <strong>Tax Number:</strong>
+                          </td>
+                          <td>{{ customersInfo.taxNumber }}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Customer Sensitivity Level:</strong>
+                          </td>
+                          <td>{{ getCustomerSensitivityLevel(customersInfo.customerSensitivityLevelId) }}</td>
+                          <td>
+                            <strong>Active:</strong>
+                          </td>
+                          <td>{{ customersInfo.creationMailSent ? "Yes" : "No" }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </p-tabPanel>
+                  <p-tabPanel header="Personal">
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Title
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="title" [ngClass]="'valid-input'" name="title" class="form-control">
+                      </div>
+
+                      <label for="" class="control-label col-md-2">
+                        Gender
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="gender" [ngClass]="'valid-input'" name="gender" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        First Name
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="firstName" [ngClass]="'valid-input'" name="firstName" class="form-control">
+                      </div>
+
+                      <label for="" class="control-label col-md-2">
+                        Date Of Birth
+                      </label>
+                      <div class="col-md-4">
+                        <p-calendar id="dateOfBirth" formControlName="dateOfBirth" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050"
+                          [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" [style]="{'width': '267px', 'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"></p-calendar>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Middle Name
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="middleName" [ngClass]="'valid-input'" name="middleName" class="form-control">
+                      </div>
+
+                      <label for="" class="control-label col-md-2">
+                        Place of Birth
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="placeOfBirth" [ngClass]="'valid-input'" name="placeOfBirth" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Last Name
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="lastName" [ngClass]="'valid-input'" name="lastName" class="form-control">
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        Nationality
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="nationality" name="interestRate" [ngClass]="'valid-input'" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Occupation
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" name="occupation" formControlName="occupation" [ngClass]="'valid-input'" class="form-control">
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        Tax Number
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="taxNumber" [ngClass]="'valid-input'" name="taxNumber" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Marital Status
+                      </label>
+                      <div class="col-md-4">
+                        <select name="maritalStatus" formControlName="maritalStatus" [ngClass]="'valid-input'" id="maritalStatus" class="form-control">
+                          <option value="">--- Select Marital Status ---</option>
+                          <option *ngFor="let status of maritalStatusList" value="{{status.MaritalStatusId}}">
+                            {{status.MaritalStatus}}
+                          </option>
+                        </select>
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        Spouse
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" name="spouse" formControlName="spouse" [ngClass]="'valid-input'" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        First Child Name:
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" name="firstChildName" formControlName="firstChildName" [ngClass]="'valid-input'" class="form-control">
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        Child Date of Birth
+                      </label>
+                      <div class="col-md-4">
+                        <p-calendar id="childDateOfBirth" formControlName="childDateOfBirth" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050"
+                          [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" [style]="{'width': '267px', 'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"></p-calendar>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Maiden Name
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" name="maidenName" formControlName="maidenName" [ngClass]="'valid-input'" class="form-control">
+                      </div>
+                      <label for="" class="control-label col-md-2">
+                        Email Address
+                      </label>
+                      <div class="col-md-4">
+                        <input type="text" formControlName="emailAddress" [ngClass]="'valid-input'" name="registrationNumber" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="" class="control-label col-md-2">
+                        Politically Exposed
+                      </label>
+                      <div class="col-md-4">
+                        <input type="checkbox" name="politicallyExposedPerson" formControlName="politicallyExposedPerson" [ngClass]="'valid-input'">
+                      </div>
+                    </div>
+                  </p-tabPanel>
+                  <p-tabPanel header="Corporate">
+                    <div formGroupName="customerCompanyInfomation">
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Registration Number
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="registrationNumber" [ngClass]="'valid-input'" name="registrationNumber" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                          Company Name
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="companyName" [ngClass]="'valid-input'" name="companyName" class="form-control">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Company Website
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="companyWebsite" [ngClass]="'valid-input'" name="companyWebsite" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                          Company Email
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="companyEmail" [ngClass]="'valid-input'" name="companyEmail" class="form-control">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Registered Office
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="registeredOffice" [ngClass]="'valid-input'" name="registeredOffice" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                          Annual Turn Over
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="annualTurnOver" [ngClass]="'valid-input'" name="annualTurnOver" class="form-control">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Corporate Business Category
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="corporateBusinessCategory" [ngClass]="'valid-input'" name="corporateBusinessCategory"
+                            class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                          Credit Rating
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="creditRating" [ngClass]="'valid-input'" name="creditRating" class="form-control">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Paid Up Capital
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="paidUpCapital" [ngClass]="'valid-input'" name="paidUpCapital" class="form-control">
+                        </div>
+
+                        <label for="" class="control-label col-md-2">
+                          Authorized Capital
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="authorizedCapital" [ngClass]="'valid-input'" name="authorizedCapital" class="form-control">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="" class="control-label col-md-2">
+                          Previous Credit Rating
+                        </label>
+                        <div class="col-md-4">
+                          <input type="text" formControlName="previousCreditRating" [ngClass]="'valid-input'" name="previousCreditRating" class="form-control">
+                        </div>
+
+                      </div>
+                    </div>
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="Contact">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewAddresses()" pButton type="button" label="Add Address" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerAddresses" [responsive]="true">
+                          <p-header>Customer Address Information</p-header>
+                          <p-column field="address" header="Address"></p-column>
+                          <p-column field="homeTown" header="Home Town"></p-column>
+                          <p-column field="nearestLandmark" header="nearestLandmark"></p-column>
+                          <p-column field="active" header="Active"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editAddresses(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewAPhoneContact()" pButton type="button" label="Add Phone Contact" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerPhoneContact" [responsive]="true">
+                          <p-header>Customer Phone Contact</p-header>
+                          <p-column field="phone" header="Phone"></p-column>
+                          <p-column field="phoneNumber" header="Phone Number"></p-column>
+                          <p-column field="active" header="Active"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editPhoneContact(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+
+
+
+
+
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="Director">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewCompanyDirectors()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerCompanyDirectors" [responsive]="true">
+                          <p-header>Directors</p-header>
+                          <p-column field="firstname" header="Firstname"></p-column>
+                          <p-column field="surname" header="Surname"></p-column>
+                          <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                          <p-column field="companyDirectorTypeName" header="Type"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editDirectorInformation(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerCompanyShareholder" [responsive]="true">
+                          <p-header>Shareholders</p-header>
+                          <p-column field="firstname" header="Firstname"></p-column>
+                          <p-column field="surname" header="Surname"></p-column>
+                          <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                          <p-column field="companyDirectorTypeName" header="Type"></p-column>
+                          <p-column field="numberOfShares" header="% Holding"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editShareholderInformation(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="Client/Supplier">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewClientSupplier()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerSupplier" [responsive]="true">
+                          <p-header>Customer Top Supplier(s)</p-header>
+                          <p-column field="clientOrSupplierName" header="Supplier Name"></p-column>
+                          <p-column field="client_SupplierAddress" header="Address"></p-column>
+                          <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                          <p-column field="client_SupplierEmail" header="Email"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editSupplier(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerClientOrSupplier" [responsive]="true">
+                          <p-header>Customer Top Client(s)</p-header>
+                          <p-column field="clientOrSupplierName" header="Supplier Name"></p-column>
+                          <p-column field="client_SupplierAddress" header="Address"></p-column>
+                          <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                          <p-column field="client_SupplierEmail" header="Email"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editClient(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="BVN Details">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewBVN()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerBvn" [responsive]="true">
+                          <p-header>Customer BVN Information</p-header>
+                          <p-column field="firstname" header="Firstname"></p-column>
+                          <p-column field="surname" header="Surname"></p-column>
+                          <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                          <p-column field="isValidBvn" header="Valid"></p-column>
+                          <p-column field="isPoliticallyExposed" header="Politically Exposed"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editBVN(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="Identification">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewIdentification()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerIdentification" [responsive]="true">
+                          <p-header>Customer BVN Information</p-header>
+                          <p-column field="identificationNo" header="Identification No"></p-column>
+                          <p-column field="identificationMode" header="Identification Mode"></p-column>
+                          <p-column field="issuePlace" header="Issuing Office"></p-column>
+                          <p-column field="issueAuthority" header="Issuing Authority"></p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editIdentification(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+
+                  </p-tabPanel>
+                  <p-tabPanel *ngIf="customersInfo" header="Employment History">
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <div class="pull-right">
+                          <button (click)="showAddNewEmploymentHistory()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-md-12">
+                        <p-dataTable [value]="customersInfo.customerEmploymentHistory" [responsive]="true">
+                          <p-header>Customer Employment History</p-header>
+                          <p-column field="employerName" header="Employer Name"></p-column>
+                          <p-column field="employerAddress" header="Employer Address"></p-column>
+                          <p-column field="officePhone" header="Office Phone"></p-column>
+                          <p-column field="employDate" header="Employment Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              {{ d.employDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                          </p-column>
+                          <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editEmploymentHistory(i)" href="javascript:void(0)">
+                                Edit
+                              </a>
+                            </ng-template>
+                          </p-column>
+                        </p-dataTable>
+                      </div>
+                    </div>
+                  </p-tabPanel>
+                </p-tabView>
+              </div>
+
+              <div class="panel-footer">
+                <div class="row">
+                  <div class="col-md-12">
+                    <button type="submit" [disabled]="editCustomerForm.invalid" *ngIf="activeIndex == 1 || activeIndex==2" (click)="submitCustomerCompanyInformation(editCustomerForm)"
+                      class="btn btn-success pull-right">Save</button>
+                    <button style="margin-right:5px" type="button" *ngIf="activeIndex != 8" (click)="next()" class="btn btn-primary pull-right">Next</button>
+                    <button style="margin-right:5px" type="button" *ngIf="activeIndex > 0" class="btn btn-primary pull-right" (click)="prev()">Previous</button>
+                    <button type="button" (click)="displayCustomerDetails=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displaySupplier" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerClientOrSupplierForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              First Name
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="firstName" [ngClass]="'valid-input'" name="firstName" class="form-control">
+            </div>
+
+            <label for="" class="control-label col-md-2">
+              Last Name
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="lastName" [ngClass]="'valid-input'" name="lastName" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Middle Name
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="middleName" [ngClass]="'valid-input'" name="middleName" class="form-control">
+            </div>
+
+            <label for="" class="control-label col-md-2">
+              Customer Type
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" class="form-control" [ngClass]="'valid-input'">
+                <option value="">-- Select Type --</option>
+                <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Type
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="client_SupplierTypeId" formControlName="client_SupplierTypeId" id="client_SupplierTypeId" class="form-control"
+                [ngClass]="'valid-input'">
+                <option value="">-- Select Type --</option>
+                <option *ngFor="let type of clientSuplierTypes" [value]="type.client_SupplierTypeId">
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+
+            <label for="" class="control-label col-md-2">
+              Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="client_SupplierAddress" [ngClass]="'valid-input'" name="client_SupplierAddress" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Phone Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="client_SupplierPhoneNumber" [ngClass]="'valid-input'" name="client_SupplierPhoneNumber"
+                class="form-control">
+            </div>
+
+            <label for="" class="control-label col-md-2">
+              Email
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="client_SupplierEmail" [ngClass]="'valid-input'" name="client_SupplierEmail" class="form-control">
+            </div>
+          </div>
+          <!--buttons-->
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerClientOrSupplierForm.invalid" (click)="submitClientOrSupplier(customerClientOrSupplierForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displaySupplier=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayIdentification" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerIdentificationForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Identification No
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="identificationNo" formControlName="identificationNo" [ngClass]="'valid-input'" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Identification Mode
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="identificationModeId" formControlName="identificationModeId" id="identificationModeId" class="form-control"
+                [ngClass]="'valid-input'">
+                <option value="">-- Select Identification Mode --</option>
+                <option *ngFor="let type of identificationModeTypes" [value]="type.identificationModeId">
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Issuing Office
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="issuePlace" formControlName="issuePlace" [ngClass]="'valid-input'" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Issuing Authority
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="issueAuthority" [ngClass]="'valid-input'" name="issueAuthority" class="form-control">
+            </div>
+          </div>
+        </div>
+        <!--buttons-->
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerIdentificationForm.invalid" (click)="submitCustomerIdentification(customerIdentificationForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayIdentification=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayBVN" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerBvnForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Surname
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="identificationNo" formControlName="surname" [ngClass]="!customerBvnForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Firstname
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="firstname" [ngClass]="!customerBvnForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                name="firstname" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Bank Verification Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="bankVerificationNumber" formControlName="bankVerificationNumber" [ngClass]="!customerBvnForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Validity
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" formControlName="isValidBvn" [ngClass]="!customerBvnForm.controls['isValidBvn'].valid ? 'required-input' : 'valid-input'"
+                name="isValidBvn">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Politically Exposed
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" formControlName="isPoliticallyExposed" [ngClass]="!customerBvnForm.controls['isPoliticallyExposed'].valid ? 'required-input' : 'valid-input'"
+                name="isPoliticallyExposed">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerBvnForm.invalid" (click)="submitCustomerBVN(customerBvnForm)" class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayBVN=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayEmploymentHistory" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerEmploymentHistoryForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer Name
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="employerName" formControlName="employerName" [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Employer Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="employerAddress" [ngClass]="!customerEmploymentHistoryForm.controls['employerAddress'].valid ? 'required-input' : 'valid-input'"
+                name="employerAddress" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer State
+            </label>
+            <div class="col-md-4">
+              <select name="state" formControlName="employerStateId" [ngClass]="!customerEmploymentHistoryForm.controls['employerStateId'].valid ? 'required-input' : 'valid-input'"
+                id="employerStateId" class="form-control">
+                <option value="">--- Select State ---</option>
+                <option *ngFor="let state of states" value="{{state.stateId}}">
+                  {{state.stateName}}
+                </option>
+              </select>
+            </div>
+            <label for="" class="control-label col-md-2">
+              Employer Country
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="employerCountryId" formControlName="employerCountryId" id="employerCountryId" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerCountryId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Country --</option>
+                <option *ngFor="let country of countries" value="{{country.countryId}}">
+                  {{ country.countryName }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Office Phone
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="officePhone" formControlName="officePhone" [ngClass]="!customerEmploymentHistoryForm.controls['officePhone'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Employment Date
+            </label>
+            <div class="col-md-4">
+              <p-calendar id="employDate" formControlName="employDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050"
+                [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" [style]="{'width': '267px', 'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"></p-calendar>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Previous Employer
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="previousEmployer" formControlName="previousEmployer" [ngClass]="'valid-input'" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Active
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" name="active" formControlName="active" [ngClass]="'valid-input'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerEmploymentHistoryForm.invalid" (click)="submitCustomerEmploymentHistory(customerEmploymentHistoryForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayEmploymentHistory=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayCompanyDirectors" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerCompanyDirectorsForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Surname
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="surname" formControlName="surname" [ngClass]="!customerCompanyDirectorsForm.controls['surname'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Firstname
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="firstname" [ngClass]="!customerCompanyDirectorsForm.controls['firstname'].valid ? 'required-input' : 'valid-input'"
+                name="firstname" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Bank Verification Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="bankVerificationNumber" formControlName="bankVerificationNumber" [ngClass]="!customerCompanyDirectorsForm.controls['bankVerificationNumber'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Director Type
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="companyDirectorTypeId" formControlName="companyDirectorTypeId" id="companyDirectorTypeId" class="form-control"
+                [ngClass]="!customerCompanyDirectorsForm.controls['companyDirectorTypeId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Type --</option>
+                <option *ngFor="let type of directorsTypes" [value]="type.companyDirectorTypeId">
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Number Of Shares
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="numberOfShares" formControlName="numberOfShares" [ngClass]="'valid-input'" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="address" formControlName="address" [ngClass]="'valid-input'" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Phone Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="phoneNumber" formControlName="phoneNumber" [ngClass]="'valid-input'" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Email
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="email" formControlName="email" [ngClass]="'valid-input'" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Politically Exposed
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" name="isPoliticallyExposed" formControlName="isPoliticallyExposed" [ngClass]="'valid-input'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerCompanyDirectorsForm.invalid" (click)="submitDirectorInformation(customerCompanyDirectorsForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayCompanyDirectors=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayPhoneContact" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerPhoneContactForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Phone
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="phone" [ngClass]="'valid-input'" name="registrationNumber" class="form-control">
+            </div>
+
+            <label for="" class="control-label col-md-2">
+              Phone Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="phoneNumber" [ngClass]="'valid-input'" name="companyName" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Active
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" name="active" formControlName="active" [ngClass]="'valid-input'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerPhoneContactForm.invalid" (click)="submitCustomerPhoneContact(customerPhoneContactForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayPhoneContact=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddresses" id="add-modal" modal="modal" showEffect="fade" width="800">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{PanelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerAddressesForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Customer Addresses
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="address" [ngClass]="'valid-input'" name="address" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              State
+            </label>
+            <div class="col-md-4">
+              <select (change)="onChangeSelectedState($event.target.value)" name="stateId" id="stateId" formControlName="stateId" class="form-control"
+                [ngClass]="'valid-input'">
+                <option value="">-- Select State --</option>
+                <option *ngFor="let x of states" [value]="x.stateId">
+                  {{x.stateName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Home Town
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="homeTown" [ngClass]="'valid-input'" name="homeTown" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              City
+            </label>
+            <div class="col-md-4">
+              <select name="cityId" id="cityId" formControlName="cityId" class="form-control" [ngClass]="'valid-input'">
+                <option value="">-- Select City --</option>
+                <option *ngFor="let x of cities" [value]="x.cityId">
+                  {{x.cityName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Nearest Landmark
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="nearestLandmark" [ngClass]="'valid-input'" name="nearestLandmark" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Electric Meter Number
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="electricMeterNumber" [ngClass]="'valid-input'" name="electricMeterNumber" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Mailing Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="pobox" [ngClass]="'valid-input'" name="pobox" class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Address Type
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="addressTypeId" [ngClass]="'valid-input'" name="addressTypeId" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Active
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" formControlName="active" [ngClass]="'valid-input'" name="active">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerAddressesForm.invalid" (click)="submitCustomerAddresses(customerAddressesForm)"
+              class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayAddresses=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->

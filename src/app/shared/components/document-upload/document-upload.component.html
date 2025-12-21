@@ -1,0 +1,333 @@
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+    integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+<div style="text-align:left">
+    <i class="fa fa-file-word" title="Edit"></i>
+</div> -->
+<!-- C:\Access Bank Projects\FintrakBankingFrontEnd\src\assets\fontawesome -->
+<!-- <link href="../../../../../src/assets/fontawesome/css/all.css" rel="stylesheet"> -->
+    <!-- <i [ngClass]="fa fa-file-word" title="Edit"></i> -->
+<!--load all styles -->
+
+<div class="panel panel-default" *ngIf="showRequiredDocumentTypes == true">
+    <div class="panel-heading">
+        Documents For Upload
+    </div>
+    <div class="panel-body">
+
+        <p-dataTable #dt [value]="requiredDocumentTypes" [responsive]="true" [paginator]="true" [rows]="5">
+            <p-header>
+                <div class="ui-helper-clearfix">
+                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                </div>
+            </p-header> 
+            <p-column field="productClassName" [filter]="true" header="Product Class Name" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="productName" [filter]="true" header="Product Name" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="documentType" header="Document Type Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="sectorName" header="Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="subSectorName" header="Sub-Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="required" header="Is Required" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column [style]="{'width':'100px'}">
+                <ng-template pTemplate="header">Is uploaded</ng-template>
+                <ng-template pTemplate="body" let-col let-i="rowData">
+                    <b [innerHTML]="documentIsUploaded(i.documentTypeId)"></b>
+                        {{checkIfRequiredDocumentsAreUploaded()}}
+                </ng-template>
+            </p-column>
+        </p-dataTable>
+
+    </div>
+</div>
+
+<div class="panel-heading">
+<h2 class="panel-title">
+    {{ panelTitle }}
+</h2>
+</div>
+
+<div class="panel panel-default" *ngIf="showUploadForm">
+<form novalidate [formGroup]="documentUploadForm" autocomplete="off" >
+    <div class="panel-body">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                <label for="fileName" class="control-label col-md-3">Document Category</label>
+                <label for="fileName" class="control-label col-md-3">Document Type</label>
+                <label for="fileData" class="control-label col-md-3">Select Document</label>
+                <label *ngIf="showOriginalCopy == true" for="isOriginalCopy" class="control-label col-md-2">Is Original Copy</label>
+                <label for="isExternalParty" class="control-label col-md-2">Is External </label>
+                <div class="col-md-3">
+                    <select (change)="getDocumentTypesByCategory($event.target.value)" name="documentCategoryId" id="documentCategoryId"
+                        formControlName="documentCategoryId" class="form-control"
+                        [ngClass]="!documentUploadForm.controls['documentCategoryId'].valid ? 'required-input' : 'valid-input'">
+                        <option value="">-- Select Document Category --</option>
+                        <option *ngFor=" let x of documentCategories" [value]="x.documentCategoryId">{{x.documentCategoryName }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="documentTypeId" formControlName="documentTypeId"
+                        [ngClass]="!documentUploadForm.controls['documentTypeId'].valid ? 'required-input' : 'valid-input'"
+                        id="documentTypeId" class="form-control">
+                        <option value="">Select Document Type</option>
+                        <option *ngFor="let x of documentTypes" value="{{x.documentTypeId}}">{{x.documentTypeName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="file" (change)="onFileChange($event)" formControlName="fileData"
+                        [ngClass]="!documentUploadForm.controls['fileData'].valid ? 'required-input' : 'valid-input'"
+                        placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png" #fileInput
+                        name="fileInput" style="padding-top:2px;" class="form-control">
+                </div>
+                <div class="col-md-2" *ngIf="showOriginalCopy == true">
+                    <input type="checkbox" name="isOriginalCopy" 
+                        formControlName="isOriginalCopy"
+                        id="isOriginalCopy"style="box-shadow: none;margin-top: 10px;margin-left: 0px;"
+                        [ngClass]="!documentUploadForm.controls['isOriginalCopy'].valid ? 'required-input' : 'valid-input'"
+                    >
+                </div>
+                <div class="col-md-2">
+                    <input type="checkbox" name="isExternalParty" 
+                        formControlName="isExternalParty"
+                        id="isExternalParty"style="box-shadow: none;margin-top: 10px;margin-left: 0px;"
+                        [ngClass]="!documentUploadForm.controls['isExternalParty'].valid ? 'required-input' : 'valid-input'"
+                    >
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="documentDates">
+                <label for="issueDate" class="control-label col-md-6">Issue Date</label>
+                <label for="expiryDate" class="control-label col-md-6">Expiry Date</label>
+                <div class="col-md-6">
+                    <p-calendar id="issueDate" formControlName="issueDate" [monthNavigator]="true"
+                        [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                        [style]="{'width': '100%', 'z-index': '999'}"
+                        [ngClass]="!documentUploadForm.controls['issueDate'].valid ? 'required-input' : 'valid-input'">
+                    </p-calendar>
+                </div>
+                <div class="col-md-6">
+                    <p-calendar id="expiryDate" formControlName="expiryDate" [monthNavigator]="true"
+                        [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                        [style]="{'width': '100%', 'z-index': '999'}"
+                        [ngClass]="!documentUploadForm.controls['expiryDate'].valid ? 'required-input' : 'valid-input'">
+                    </p-calendar> 
+                </div>
+            </div>
+
+        </div>
+        <!-- <div class="form-horizontal">
+            <div class="form-group">
+               
+                <div class="col-md-3">
+                        <label for="fileName" class="control-label col-md-3">Required Document</label>
+                    <select (change)="getDocumentTypesByCategory($event.target.value)" name="requiredDocumentId" id="requiredDocumentId"
+                        formControlName="requiredDocumentId" class="form-control"
+                        [ngClass]="!documentUploadForm.controls['requiredDocumentId'].valid ? 'required-input' : 'valid-input'">
+                        <option value="">-- Select Required Document --</option>
+                        <option *ngFor=" let x of requiredDocuments" [value]="x.requiredDocumentId">{{x.requiredDocumentName }}</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </div> -->
+
+    </div>
+</form>
+
+<div class="panel-footer">
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" (click)="saveDocumentUpload(documentUploadForm)"
+                [disabled]="documentUploadForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-upload"></span> Upload</button>
+        </div>  
+    </div>
+</div>
+</div>
+
+<div class="panel panel-default" *ngIf="showUploadGrid">
+<div class="panel-body">
+
+    <p-dataTable #dt [value]="documentUploads" [responsive]="true" [paginator]="true" [rows]="5">
+        <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+            </div>
+        </p-header> 
+        <p-column header="DateTime Uploaded">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
+            </ng-template>
+        </p-column>
+        <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column header="File Name">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+                {{d.fileName}}
+            </ng-template>
+        </p-column>
+        <p-column *ngIf="showOriginalCopy == true" field="isOriginalCopy" header="Is An Original Copy" sortable="true" filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.isOriginalCopy == true ? 'Yes' : 'No' }}
+            </ng-template>
+        </p-column>
+        <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
+        <!-- <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column> -->
+        <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
+        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column  [style]="{'width':'120px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center" >
+                    <span *ngIf="d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a>
+                        <!-- <span *ngIf="deleteLink && d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a> -->
+                        <span style="padding:3px;"> | </span>
+                    </span>
+                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'" (click)="downloadDocument(d,true)" href="javascript:void(0)">View</a>
+                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d,true)" href="javascript:void(0)">View</a>
+                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'" (click)="downloadDocument(d)" href="javascript:void(0)">Download</a>
+                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d)" href="javascript:void(0)">Download</a>
+                </div>
+            </ng-template>
+        </p-column>
+        <!-- <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column> -->
+
+    </p-dataTable>
+
+</div>
+</div>
+
+<div class="panel panel-default" *ngIf="showUploadGrid">
+<div class="panel-body">
+
+    <p-dataTable #dt [value]="documentDeleted" [responsive]="true" [paginator]="true" [rows]="5">
+        <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+            </div>
+        </p-header> 
+        <p-column header="DateTime Deleted">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateTimeDeleted | date : 'MMM d, y, h:mm a' }}
+            </ng-template>
+        </p-column>
+        <p-column field="uploadedBy" header="Deleted By" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column header="File Name">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+                {{d.fileName}}
+            </ng-template>
+        </p-column>
+        
+        <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>        
+        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains"></p-column>                   
+
+    </p-dataTable>
+
+</div>
+</div>
+<div class="panel panel-default" *ngIf="showUploadGrid">
+<div class="panel-body">
+
+    <p-dataTable #dt [value]="documentUploads1" [responsive]="true" [paginator]="true" [rows]="5">
+        <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+            </div>
+        </p-header> 
+        <p-column header="DateTime Uploaded">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
+            </ng-template>
+        </p-column>
+        <p-column field="documentTitle" header="Document Title" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column header="File Name">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+                {{d.fileName}}
+            </ng-template>
+        </p-column>
+        <p-column *ngIf="showOriginalCopy == true" field="isOriginalCopy" header="Is An Original Copy" sortable="true" filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.isOriginalCopy == true ? 'Yes' : 'No' }}
+            </ng-template>
+        </p-column>
+        <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
+        <!-- <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column> -->
+        <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
+        <p-column field="fileExtension" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column  [style]="{'width':'120px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center" >
+                    <span *ngIf="d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a>
+                        <!-- <span *ngIf="deleteLink && d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a> -->
+                        <span style="padding:3px;"> | </span>
+                    </span>
+                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'" (click)="downloadDocument1(d,true)" href="javascript:void(0)">View</a>
+                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d,true)" href="javascript:void(0)">View</a>
+                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'" (click)="downloadDocument1(d)" href="javascript:void(0)">Download</a>
+                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d)" href="javascript:void(0)">Download</a>
+                </div>
+            </ng-template>
+        </p-column>
+        <!-- <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column> -->
+
+    </p-dataTable>
+
+</div>
+</div>
+<!-- [autoZIndex]="autoZIndex" [style]="{'z-index': 10}" -->
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+'max-height': '80vh','min-height':'500px','z-index': 1500}" width="1000" [style]="{'z-index': 1500}">
+<div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Document Title:
+            <strong>{{selectedDocument}}</strong>
+        </h2>
+        <div class="pull-right">
+            <a class="close" (click)="displayDocument=false">&times;</a>
+        </div>
+    </div>
+
+    <div class="panel-body" style="overflow:auto;height:1500;">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+        [src]="'data:image/jpg;base64,'+binaryFile" alt="">
+        <!-- <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" -->
+            <!-- [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail"> -->
+
+    </div>
+</div>
+</p-dialog>
+
+<!-- <pre>{{documentUploadForm.value | json}}</pre> -->

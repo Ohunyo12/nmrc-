@@ -1,0 +1,196 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <!--module header-->
+        <div *ngIf="showTitle" class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            All Requested Jobs Entries
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group btn-group-justified">
+                            <a href="javascript:;" (click)="getDetailData()" class="btn btn-primary">View Application Job Request Status</a>
+                            <!-- <a href="javascript:;" (click)="getLineData()" class="btn btn-primary">View Application Line Request</a> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <fieldset *ngIf="isApplicationLineRequest">
+                    <legend>Loan Application Details</legend>
+                    <p-dataTable #dt *ngIf="isApplicationLineRequest" [responsive]="true" [value]="baseLineData" [paginator]="true" [rows]="10">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header> 
+                        <p-column field="customerName" header="Customer Name" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column header="Job Count" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                <span class="label label-info">All ({{ row.allJobsCount }}) </span> |
+                                <span class="label label-success">Approved ({{ row.allApprovedJobsCount }}) </span> |
+                                <span class="label label-warning">Processing ({{ row.allProcessingJobsCount }}) </span> |
+                                <span class="label label-danger">Disapproved ({{ row.allDisapproveJobsCount }}) </span> |
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'210px'}" field="dateTimeCreated" header="Application Date" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                {{ row.dateTimeCreated | date : 'dd/MM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'93px'}">
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <div class="btn-group">
+                                    <a href="javascript:;" title="View Job Request.." (click)="getApplicationDetailRequest(row.loanApplicationDetailId)">View Request</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </fieldset>
+
+                <fieldset *ngIf="isApplicationDetailRequest">
+                    <legend>Loan Job Request Information</legend>
+                    <p-dataTable #dt *ngIf="isApplicationDetailRequest" [responsive]="true" [value]="baseLineJobRequests" [paginator]="true" [rows]="10"
+                        [selection]="specificJobEntry">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header> 
+                        <p-column field="jobRequestCode" header="Code" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="systemArrivalDate" header="Time" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                {{ row.systemArrivalDate | timeago }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="jobTypeId" header="Request" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                {{ getJobRequest(row.jobTypeId) }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="operationName" header="Sent At" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="fromSender" header="Sent From" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="to" header="Sent To" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="assignee" header="Reassigned To" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'45px'}" header="View">
+                            <ng-template pTemplate="header">Details</ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="getJobRequestDetail(d)" href="javascript:void(0)">View</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column field="requestStatusId" header="" [style]="{'width':'80px','text-align':'center'}">
+                            <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                <span [innerHTML]="getStatus(row.requestStatusId)"></span>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </fieldset>
+                <fieldset *ngIf="isApplicationDetailRequestInfo">
+                    <legend>Selected Job Request Information Detail</legend>
+                    <div class="panel-body">
+                        <table class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Job Sent At:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.operationName}}</td>
+                                    <td>
+                                        <strong>Sent By:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.fromSender}}</td>
+                                    <td>
+                                        <strong>Unit Sent to:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.recievingUnitName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Hub Sent To:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.recievingHub}}</td>
+                                    <td>
+                                        <strong>Staff Sent To:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.to}}</td>
+                                    <td>
+                                        <strong>Reassigned To:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.assignee}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Date Sent:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.arrivalDate | date : 'dd/MM/yyyy'}}</td>
+                                    <td>
+                                        <strong>Response Date:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.responseDate | date : 'dd/MM/yyyy'}}</td>
+                                    <td>
+                                        <strong>Acknowledgment Date:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.acknowledgementDate | date : 'dd/MM/yyyy'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Job Source:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.jobSourceName}}</td>
+                                    <td>
+                                        <strong>Job Type:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.jobTypeName}}</td>
+                                    <td>
+                                        <strong>Request Status:</strong>
+                                    </td>
+                                    <td>{{specificJobEntry.requestStatusname}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+                <fieldset *ngIf="isApplicationDetailRequestInfo">
+                    <legend>Request Note</legend>
+                    <div *ngIf="isApplicationDetailRequestInfo" class="panel-body col-md-12" style="min-height:200px;">
+                        <div [innerHTML]="specificJobEntry.senderComment" class="paper" style="overflow:auto;height:200px"></div>
+                    </div>
+                </fieldset>
+                <fieldset *ngIf="isApplicationDetailRequestInfo">
+                    <legend>Response Note</legend>
+                    <div *ngIf="isApplicationDetailRequestInfo" class="panel-body col-md-12" style="min-height:200px;">
+                        <div [innerHTML]="specificJobEntry.responseComment" class="paper" style="overflow:auto;height:200px"></div>
+                    </div>
+                </fieldset>
+                <fieldset *ngIf="isApplicationDetailRequestInfo && specificJobEntry != null && specificJobEntry.jobDocuments != null">
+                        <legend>Related Documents</legend>
+                            <p-dataTable [value]="specificJobEntry.jobDocuments" [paginator]="true" [rows]="5">
+                                <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"> </ng-template>
+                                    <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                        <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewJobDocument(d)" href="javascript:void(0)">View</a>
+                                        <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadJobDocument(d)" href="javascript:void(0)">Download</a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,185 @@
+<div *ngIf="displaySearch" class="ui-g">
+    <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                  FX REVOLVING Loan - Payment
+                </h2>
+                <!-- <div  class="pull-right">
+                    <button (click)="showPreviousInstructionsOrAddNew()" pButton type="button" label="{{maturityCommandText}}" icon="fa-plus"></button>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div >
+            <div class="form-horizontal">
+                <div class="panel-body">
+                    <div  class="form-group">
+                        <div class="col-md-12 pull-right">
+                            <div class="input-group">
+                                <input (focus)="openSearchBox()" type="text" class="form-control" placeholder="Search for running loan tranche with loan reference number" name="loanReferenceNo" [ngClass]="'valid-input'">
+                                <div class="input-group-btn">
+                                    <button (click)="openSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                                      <i class="glyphicon glyphicon-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form [formGroup]="prepaymentForm" autocomplete="off"> 
+                      <table class="table table-customer-information">
+                          <tbody>
+                              <tr>
+                                  <td><strong>Loan Reference Number</strong></td>
+                                  <td>{{loanReferenceNumber}}</td>
+                                  <td><strong>Customer Name</strong></td>
+                                  <td><span>{{customerName}} </span></td>
+                              </tr>
+                              <tr>
+                                  <td><strong>Principal Amount</strong></td>
+                                  <td>{{principalAmount | currency:selectedLoanRecord.currencyCode:true:'1.2-2'}}</td>
+                                  <td><strong>Interest Rate </strong></td>
+                                  <td>{{interestRate }}</td>
+                              </tr>
+                              <tr>
+                                  <td><strong>Interest At Maturity</strong></td>
+                                  <td>{{ interestAmount | currency:selectedLoanRecord.currencyCode:true:'1.2-2' }}</td>
+                                  <td><strong>Maturity Amount</strong></td>
+                                  <td>{{ maturityAmount | currency:selectedLoanRecord.currencyCode:true:'1.2-2'}}</td>
+                              </tr>
+                              <tr>
+                                  <td><strong>Loan Tenor (Days)</strong></td>
+                                  <td>{{ existingTenor }}</td>
+                                  <td><strong>Tenor Left (Days)</strong></td>
+                                  <td>{{ tenorLeft }}</td>
+                              </tr>
+                              <tr>
+                                  <td><strong>Effective Date</strong></td>
+                                  <td>{{ effectiveDate }}</td>
+                                  <td><strong>Maturity Date</strong></td>
+                                  <td>{{ maturityDate }}</td>
+                              </tr>
+                          </tbody>
+                      </table>
+                    <hr>
+                    <fieldset style="padding-left:14px">
+                      <legend>
+                        Loan Payment
+                      </legend>
+      
+                      <div class="form-group ">
+                          <label for="" class="control-label col-md-2">
+                              Payment Effective Date
+                          </label>
+                          <div class="col-md-2">
+                              <p-calendar id="effectiveDate" formControlName="effectiveDate" dateFormat="dd/mm/yy" [ngClass]="!prepaymentForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                  [responsive]="true" [style]="{'width': '100%', 'overflow': 'visible'  }"
+                                  [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030"
+                                  [showIcon]="true"></p-calendar>
+                          </div>
+                          <label for="" class="control-label col-md-2"> </label>
+                          <label for="" class="control-label col-md-2"> New Principal Balance</label>
+                          <div class="col-md-4 ">
+                              <input type="text" [attr.disabled]="true" name="principalBalance" formControlName="principalBalance" id="principalBalance" class="form-control" [ngClass]="!prepaymentForm.controls['principalBalance'].valid ? 'required-input' : 'valid-input'">
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <label for="amountToPay" class="control-label col-md-2">Amount To Pay</label>
+                          <div class="col-md-2">
+                            <input type="text" name="amountToPay" FormatM (blur)="calculateNewPrincipalBal()" formControlName="amountToPay" id="tempTenor" class="form-control" [ngClass]="!prepaymentForm.controls['amountToPay'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                            <label for="" class="control-label col-md-2"> </label>
+                            <label for="interestToDate" class="control-label col-md-2">Interest To Date</label>
+                          <div class="col-md-4 ">
+                            <input type="text" [attr.disabled]="true" name="interestToDate" formControlName="interestToDate" id="interestToDate" class="form-control" [ngClass]="!prepaymentForm.controls['interestToDate'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                      </div>
+                      <div class="form-group">
+                          <label for="amountToPay" class="control-label col-md-2">Reduce Principal</label>
+                            <div class="col-md-2">
+                              <input type="checkbox" name="reducePrincipal" formControlName="reducePrincipal" [ngClass]="'valid-input'" [defaultChecked]="true" >
+                            </div>
+                            <label for="" class="control-label col-md-2"> </label>
+                            <label for="interestAtMaturity" class="control-label col-md-2">Interest At Maturity</label>
+                            <div class="col-md-4 ">
+                              <input type="text" [attr.disabled]="true" name="interestAtMaturity" formControlName="interestAtMaturity" id="interestAtMaturity" class="form-control" [ngClass]="!prepaymentForm.controls['interestAtMaturity'].valid ? 'required-input' : 'valid-input'">
+                              </div>
+                      </div>
+                      <div class="form-group">
+                          <label for="amountToPay" class="control-label col-md-2"></label>
+                            <div class="col-md-2">
+                                <button (click)="addPayment(prepaymentForm, true)" class="btn btn-sm btn-primary" [disabled]="!prepaymentForm.valid"><span class="glyphicon glyphicon-plus"></span> Add Payment</button>
+                            </div>
+                            <label for="" class="control-label col-md-2"> </label>
+                            <label for="NewMaturityAmount" class="control-label col-md-2">New Maturity Amount</label>
+                            <div class="col-md-4 ">
+                              <input type="text" [attr.disabled]="true" name="NewMaturityAmount" formControlName="NewMaturityAmount" id="NewMaturityAmount" class="form-control" [ngClass]="!prepaymentForm.controls['NewMaturityAmount'].valid ? 'required-input' : 'valid-input'">
+                              </div>
+                      </div>
+                      </fieldset>
+                    <hr>
+                </form>
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search For Loan
+                </h2>
+                <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan Reference No</th>
+                                <th>Customer Name</th>
+                                <th>Loan Principal Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>
+                                    {{res.loanReferenceNumber}}
+                                </td>
+                                <td>
+                                    {{res.customerName}}
+                                </td>
+                                <td>
+                                    {{res.principalAmount}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+ <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

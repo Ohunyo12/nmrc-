@@ -1,0 +1,299 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <!--module header-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Review Offer Letter
+                        </h2>
+                        <h2 class="panel-title pull-right">
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                <p-tabPanel header="Loan Review Applications">
+                    <loan-review-application-list [isApraisal]="true" [reload]="reloadGrid" [isInRouteMode]="false" [operationId]="47" (selectedApplication)="onApplicationSelected($event)"></loan-review-application-list>
+                </p-tabPanel>
+
+                <p-tabPanel header="Application Information" [disabled]="disableApplicationInformationTab">
+
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title">
+                                        Application Details
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <table class="table table-casa-information">
+                                <tbody>
+                                    <tr>
+                                        <th>Application Date</th>
+                                        <td>{{ application?.applicationDate | date: 'dd-MM-yyyy' }}</td>
+                                        <th>Reference Number</th>
+                                        <td>{{ application?.referenceNumber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Approval Level</th>
+                                        <td>{{ application?.currentApprovalLevel }}</td>
+                                        <th>Approval Status</th>
+                                        <td>{{ application?.approvalStatus }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Customer Name</th>
+                                        <td>{{ application?.customerName }}</td>
+                                        <th>Branch Name</th>
+                                        <td>{{ application?.branchName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Comment</th>
+                                        <td colspan=3>{{ application?.lastComment }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Loan Details</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-6">
+                                <select (change)="onFacilityChange($event.target.value)" class="form-control" [ngClass]="reloadLoanDetails == null ? 'required-input' : 'valid-input'">
+                                    <option value="null">-- Select Facility --</option>
+                                    <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName
+                                        }} -- {{ x.obligorName }}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="panel-body">
+                            <app-disbursed-facility-detail [displayDetails]="loanSystemTypeId != 0 && loanSystemTypeId != 4" [LoadLoanDetails]="reloadLoanDetails" [loanSystemTypeId]="loanSystemTypeId"></app-disbursed-facility-detail>
+                            <app-loan-application-details-view *ngIf="loanSystemTypeId == 4" [loanApplicationDetailId]="reloadLoanDetails"> </app-loan-application-details-view>
+                        </div>
+                    </div>
+
+                    <app-approval-comments [operationId]="OPERATION_ID" [applicationId]="application?.loanReviewApplicationId"></app-approval-comments>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Refer Back to CAP</h2>
+                        </div>
+                        <div class="panel-body">
+                            <button type="button" class="btn btn-danger" (click)="referBack()"><i class="glyphicon glyphicon-chevron-left"></i>Refer
+                                Back to CAP</button>
+                        </div>
+
+                    </div>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Supporting Documents" [disabled]="disableSupportingDocumentsTab">
+
+                    <app-document-upload [reload]="reload" [databaseTable]="8" [applicationId]="application?.loanReviewApplicationId" [referenceNumber]="application?.referenceNumber"></app-document-upload>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Offer Letter" [disabled]="disableApplicationInformationTab">
+
+
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-bottom:5px" *ngIf="loadForm3800b">
+                            <app-form-3800b-lms [applicationReferenceNumber]="applicationReferenceNumber"></app-form-3800b-lms>
+                            <!-- <iframe [src]="reportSource" id="report" name="report" frameborder="2" height="500px" width="1000px" style="overflow:auto"></iframe> -->
+                            <!-- <div [innerHTML]="originalForm3800bSrc.documentTemplate" id="letter" class="paper" style="overflow:auto;height:400px"></div> -->
+                            <!-- <CKEDITOR *ngIf="editMode" [(content)]="originalForm3800bSrc.documentTemplate" [height]="250"></CKEDITOR> -->
+                        </div>
+                        <hr />
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <div class="btn-group">
+                                        <!-- <button (click)="print()" class="btn btn-default">
+                                                <i class="glyphicon glyphicon-print"></i> print</button> -->
+                                    <label *ngIf="showEditOfferLetterButton" for="isFinalOfferLetter" class="control-label col-md-4">Generate Original Offer
+                                        Letter
+                                    </label>
+                                    <div class="col-md-2">
+                                        <input *ngIf="showEditOfferLetterButton" type="checkbox" (change)="generateFinalOfferLetter($event.target.checked)" [(ngModel)]="isFinalOfferLetter" name="isFinalOfferLetter" id="isFinalOfferLetter">
+                                    </div>
+                                    <!-- <button type="button" class="btn btn-primary" (click)="displayWorkflowModal=true" [disabled]="disableApprovalBtn">
+                                            <i class="glyphicon glyphicon-eye-open"></i> View Offer Letter</button> -->
+                                    <button type="button" class="btn btn-primary" style="margin-right: 5px;" (click)="popoverSeeMore()">View
+                                        Offer Letter</button>
+
+                                    <!-- <button (click)="print(originalForm3800bSrc.documentTemplate)" class="btn btn-default"> -->
+                                    <!-- <i class="glyphicon glyphicon-print"></i> print</button> -->
+
+                                </div>
+                                <div *ngIf="application?.atInitiator == true" class="btn-group">
+                                    <button type="button" class="btn btn-success" style="margin-right: 5px;" (click)="showOfferLetterChecklist()">Offer
+                                        Letter Checklist
+                                    </button>
+                                    <!-- <button (click)="print(originalForm3800bSrc.documentTemplate)" class="btn btn-default"> -->
+                                    <!-- <i class="glyphicon glyphicon-print"></i> print</button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <app-approval-actions [operationId]="OPERATION_ID" [applicationId]="application?.loanReviewApplicationId" [levelId]="currentApprovalLevelId"
+                        (approvalStatusId)="approvalStatus($event)"></app-approval-actions>
+
+                </p-tabPanel>
+
+            </p-tabView>
+        </div>
+    </div>
+</div>
+
+<app-condition-checklist [isAvailmentChecklist]="false" [isLMSChecklist]="true" [showOrHideList]='false'></app-condition-checklist>
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="800" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        {{ReportType}}
+
+                    </h2>
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    <button *ngIf="showEditOfferLetterButton" type="button" (click)="enableOfferLetterContent=true; displayReport=false;" style="margin-right:5px" class="btn btn-primary pull-right">Edit Offer Letter</button>
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px" style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayBackToCAPModal" modal="modal" showEffect="fade" width="550">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Refer Back </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayBackToCAPModal=false">&times;</a>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="comments" class="col-md-4 control-label">Comments</label>
+                    <div class="col-md-8">
+                        <textarea name="" id="" [(ngModel)]="rmComment" class="form-control" [ngClass]="!rmComment ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+
+                <div *ngIf="!offerLetterAccepted" class="form-group">
+                    <label for="staffName" class="col-md-4">Target Staff / Level</label>
+                    <div class="col-md-8">
+                        <select (change)="onTargetStaffLevelChange($event.target.value)" type="text" name="trailId" [(ngModel)]="trailId" id="trailId"
+                            class="form-control">
+                            <option value="">-- Select Staff / Level --</option>
+                            <option *ngFor="let x of appraisalTrail" [value]="x.approvalTrailId">{{ x.fromApprovalLevelName
+                                }} -- {{ x.fromStaffName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="referBackForAppraisalReview()" class="btn btn-success pull-right">Submit</button>
+                    <button type="button" (click)="displayBackToCAPModal=false" style="margin-right: 5px;" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="enableOfferLetterContent" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'600px'}"
+    modal="modal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                <!-- New {{ sectionName }} -->
+            </h2>
+        </div>
+
+        <form novalidate autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-3">
+
+                            <select type="text" name="editOption" (change)="loadDocument()" [(ngModel)]="editOption" id="editOption" style="width:20"
+                                class="form-control" [ngClass]="'valid-input'">
+                                <option value="-1">-- Select Option --</option>
+                                <option value="2">Offer Letter Salutation</option>
+                                <option value="3">Offer Letter Clause</option>
+                                <option value="4">Offer Letter Acceptance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+
+        <!--as p-editor is buggy within form tag-->
+        <div class="panel-body" [style]="{'padding-top':'0px'}">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <!-- <label class="control-label">{{documentContent}} </label> -->
+
+                    <div class="col-md-12">
+                        <CKEDITOR [content]="documentContent" *ngIf="enableDocument" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" (click)="saveDocument()"  class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="enableOfferLetterContent=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<!-- <pre>{{ application | json }}</pre> -->

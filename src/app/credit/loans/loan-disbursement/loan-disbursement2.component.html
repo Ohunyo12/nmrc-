@@ -1,0 +1,68 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Loan Disbursement
+              </h2>
+              <div class="pull-right">
+                <button (click)="showLoanDisbursementForm()" pButton type="button" label="Disburse" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <p-dataTable [value]="disbursedLoanList">
+            <p-column field="lookupName" header="Reference No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="lookupName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="lookupName" header="Account Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="lookupName" header="Disbursed Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayLoanDisbursementForm" id="add-modal" modal="modal" showEffect="fade" width="500">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div style="padding:4px" class="panel-heading">
+      <h2 style="margin:0" class="panel-heading">
+        {{ entityName }}
+      </h2>
+    </div>
+    <!--form here-->
+    <form novalidate [formGroup]="loanDisbursementForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="accountNumber" class="control-label col-md-4">Account Number</label>
+            <div class="col-md-8">
+              <input type="text" formControlName="accountNumber" [ngClass]="'valid-input'" name="accountNumber" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="amountDisbursed" class="control-label col-md-4"> Amount Disburse</label>
+            <div class="col-md-8">
+              <input type="text" formControlName="amountDisbursed" [ngClass]="'valid-input'" name="amountDisbursed" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="loanDisbursementForm.invalid" (click)="submitLoanDisbursement(loanDisbursementForm)" class="btn btn-success pull-right">Save </button>
+            <button type="button" (click)="displayLoanDisbursementForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>

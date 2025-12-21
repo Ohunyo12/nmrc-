@@ -1,0 +1,316 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Staff Profile Issues
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="panel-body">
+                    <div class="ui-g ui-fluid">
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-9">
+                                <h4> Search</h4>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-15">
+                                <input type="text" name="searchString" placeholder="Staff NT/Staff Code"
+                                    [(ngModel)]="searchString" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-right:10px">
+                            <label for="searchItem" class=" col=md-3">
+
+                            </label>
+                            <div class="col=md-9">
+                                <button pButton type="button" (click)="popoverSeeMore()" label="Scan Records"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                        <p-tabPanel header="Staff">
+                            <p-dataTable [paginator]="true" [rows]="15" [value]="staffRecord" [responsive]=true
+                                selectionMode="single">
+                                <p-column field="staffCode" header="Staff Code" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="fullName" header="Staff Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="email" [style]="{'width':'360px'}" header="Email" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="staffRoleName" header="Staff Role Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'70px'}">
+                                    <ng-template pTemplate="header">
+                                    </ng-template>
+                                    <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="viewDetails(staff)">
+                                            View
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </p-tabPanel>
+                        <p-tabPanel header="Staff Record">
+                            <div style="margin-bottom:0" class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div *ngIf="staffDetails?.mainStaff == 1" style="margin-left:0" class="row">
+                                        <h2 class="panel-title pull-left">
+                                            Staff Record
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div *ngIf="staffDetails?.mainStaff == 1" class="panel-body">
+                                        <table class="table table-casa-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Staff Code:</strong>
+                                                    </td>
+                                                    <td>{{staffDetails?.staffCode}}</td>
+                                                    <td>
+                                                        <strong>Staff Name:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.fullName }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Supervisor:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.supervisorStaffName }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Staff Role:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.staffRoleName }}</td>
+                                                    <td>
+                                                        <strong>Phone Number:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.phone}}</td>
+                                                    <td>
+                                                        <strong>Email:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.email}}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Gender:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.gender}}</td>
+                                                    <td>
+                                                        <strong>Business Unit:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.businessUnitName }}</td>
+                                                    <td>
+                                                        <strong>Branch:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.branchName }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>Updated By:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.updatedBy }}</td>
+                                                    <td>
+                                                        <strong>Time Updated</strong>
+                                                    </td>
+                                                    <td> {{staffDetails?.timeUpdated}}</td>
+                                                    <td>
+                                                        <strong>Deleted:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.deleted }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Deleted By:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.deletedby}}</td>
+                                                    <td>
+                                                        <strong>Time Deleted:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.timeDeleted }}</td>
+                                                    <td>
+                                                        <strong>Mis Code:</strong>
+                                                    </td>
+                                                    <td>{{ staffDetails?.misCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <hr>
+                                    <div *ngIf="tempStaffRecord !=null" style="margin-bottom:0" class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div style="margin-left:0" class="row">
+                                                <h2 class="panel-title pull-left">
+                                                    Temp Staff Record
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <table class="table table-casa-information">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Staff Code:</strong>
+                                                        </td>
+                                                        <td>{{tempStaffRecord?.staffCode}}</td>
+                                                        <td>
+                                                            <strong>Staff Name:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.staffFullName }}
+                                                        </td>
+                                                        <td>
+                                                            <strong>Supervisor:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.supervisorStaffName }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Staff Role:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.staffRoleName }}</td>
+                                                        <td>
+                                                            <strong>Phone Number:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.phone}}</td>
+                                                        <td>
+                                                            <strong>Email:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.email}}</td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Gender:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.gender}}</td>
+                                                        <td>
+                                                            <strong>Business Unit:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.businessUnitName }}</td>
+                                                        <td>
+                                                            <strong>Branch:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.branchName }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Created By:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.createdByName }}</td>
+                                                        <td>
+                                                            <strong>Time Created: </strong>
+                                                        </td>
+                                                        <td> {{ tempStaffRecord?.dateTimeCreated | date:
+                                                            'dd-MM-yyyy' }}</td>
+                                                        <td>
+                                                            <strong>Approval Status:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.approvalStatusName }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>MIS Code:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.misCode}}</td>
+                                                        <td>
+                                                            <strong>Currently Undergoing Approval:</strong>
+                                                        </td>
+                                                        <td>{{ tempStaffRecord?.isCurrent }}</td>
+                                                        <td>
+                                                            <strong></strong>
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div  class="panel-footer">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" *ngIf="tempStaffRecord !=null && staffDetails?.mainStaff == 1" (click)="provideAction(tempStaffRecord)" style="margin-right:5px"
+                                                class="btn btn-primary pull-left">Provide Action</button>
+                                                <button type="button" *ngIf="staffDetails?.mainStaff != 1" (click)="info(tempStaffRecord)" style="margin-right:5px"
+                                                class="btn btn-success pull-left">Information</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p-dialog [responsive]=true [(visible)]="displayProvideAction" id="ad-modal" modal="modal" showEffect="fade" width="400">
+                                    <div style="margin-bottom:0" class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                Provide Action
+                                            </h2>
+                                        </div>
+                                        <form novalidate [formGroup]="provideActionForm" autocomplete="off">
+                                            <div class="panel-body">
+                                                <div class="form-horizontal">
+                                                    <div class="form-group">
+                                                        
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-3">
+                                                            <div class="checkbox-container">
+                                                                <input formControlName="isCurrent" id="isCurrent" type="checkbox">
+                                                            </div><label class="checkbox">Is Current</label>
+                                                        </div>
+                                                        <div class ="col-md-5">
+                                                            <label for="approvalStatus">Approval Status: </label>
+                                                            <select formControlName="approvalStatusId"
+                                                             id="approvalStatusId" class="form-control" 
+                                                            [ngClass]="!provideActionForm.controls['approvalStatusId'].valid ? 'required-input' : 'valid-input'">
+                                                                <option value="">--- Select Approval Status ---</option>
+                                                                <option value="2">Approve</option>
+                                                                <option value="3">Reject</option>
+
+                                                            </select>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel-footer">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <button type="button" (click)="submitActionForm(provideActionForm)"
+                                                            class="btn btn-success pull-right">Save</button>
+                                                        <button type="button" (click)="displayProvideAction=false" style="margin-right:5px"
+                                                            class="btn btn-danger pull-right">Cancel</button>
+                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </p-dialog>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,268 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Security Release Approval
+                </h2>
+            </div>
+        </div>
+    </div>
+    <p-tabView [activeIndex]="activeTabindex">
+        <p-tabPanel header="Approval Items">
+            <div class="panel-body">
+                <p-dataTable [value]="approvalReleases" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+                    <p-column field="systemArrivalDateTime" header="Arrival Time" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.systemArrivalDateTime | date: 'medium' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="divisionShortCode" header="Unit" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="customerAccount" header="Customer Account" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <p-column field="facilityAmount" header="Facility Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.facilityAmount | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="collateralCode" header="Collateral ID" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="documentDescription" header="Description" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <p-column field="documentReferenceNumber" header="Document Reference Number" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+
+                    <p-column field="isAmconList" header="Is On AMCON List" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <p-column field="perfectionStatus" header="Perfection Status" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <p-column field="litigationStatus" header="Litigation Status" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+
+
+                    <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="createdByName" header="Created By" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column>
+                    <!-- <p-column field="approvalDate" header="Date Approved" sortable="true" [filter]="true"
+              filterMatchMode="contains">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf=" d.approvalDate !=null">{{ d.approvalDate | date: 'dd-MM-yyyy' }}</span>
+                <span *ngIf="d.approvalDate == null">'n/a'</span>
+              </ng-template>
+          </p-column> -->
+                    <p-column [style]="{'width':'80px'}" header="">
+                        <!-- <ng-template pTemplate="header"> </ng-template> -->
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            <div style="text-align:center">
+                                <a (click)="viewDocuments(d)" href="javascript:void(0)">View </a>
+
+                            </div>
+                        </ng-template>
+                    </p-column>
+
+                </p-dataTable>
+            </div>
+
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<!-------------------------------------------------- Modal List------------------------------------>
+
+<p-dialog [responsive]=true [(visible)]="showUploadeddocument" modal="modal" width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+    <div class="panel-default">
+        <div class="panel-body">
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                <p-tabPanel header=" Uploaded Documents">
+                    <p-dataTable [value]="documentUploads" [responsive]="true" [paginator]="true" [rows]="5">
+                        <p-column header="File Name">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span> {{d.fileName}}
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column field="fileName" header="File Name" sortable="true" filterMatchMode="contains"></p-column> -->
+                        <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+                        <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column [style]="{'width':'120px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <!-- <span *ngIf="deleteLink && d.owner"><a (click)="deleteDocumentUpload(d)"
+                                      href="javascript:void(0)">Delete</a>
+                                  <span style="padding:3px;"> | </span>
+                              </span> -->
+                                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="downloadDocument(d,true)" href="javascript:void(0)">View</a>
+                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="downloadDocument(d)" href="javascript:void(0)">Download</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+
+                    <table *ngIf="isFinalApproval" class="table table-casa-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Perfection Status:</strong>
+                                </td>
+                                <td>{{ perfectionStatus }}</td>
+                                <td>
+                                    <strong>Litigation Status:</strong>
+                                </td>
+                                <td>{{ litigationStatus }}</td>
+                                <td>
+                                    <strong>Is On AMCON List:</strong>
+                                </td>
+                                <td>{{ isOnAmconList }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="well" style="margin-top: 10px;">
+                        <!-- <hr /> -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <textarea class="form-control" rows="4" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+                  <option value="0">--- Select Approval ---</option>
+                  <option value="2"> Approve </option>
+                  <option value="3"> Decline </option>
+                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form novalidate [formGroup]="perfectionForm" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group" *ngIf="showPerfectionStatus">
+                                    <label for="perfectionStatusId" class="control-label col-md-2">Perfection Status</label>
+                                    <div class="col-md-4">
+                                        <select name="perfectionStatusId" formControlName="perfectionStatusId" id="perfectionStatusId" class="form-control" [ngClass]="!perfectionForm.controls['perfectionStatusId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">-- Select Perfection Status --</option>
+                      <option *ngFor="let x of perfectionList" [value]="x.perfectionStatusId">
+                        {{ x.perfectionStatusName }}</option>
+                    </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" *ngIf="showLitigationStatus">
+                                    <label for="litigationStatusId" class="control-label col-md-2">Litigation Status</label>
+                                    <div class="col-md-4">
+                                        <select name="litigationStatusId" formControlName="litigationStatusId" id="litigationStatusId" class="form-control" [ngClass]="!perfectionForm.controls['litigationStatusId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">-- Select Litigation Status --</option>
+                      <option value="1">Ongoing Court Case</option>
+                      <option value="2">No Ongoing Court Case</option>
+                    </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" *ngIf="showIsOnAmconList">
+                                    <label for="isOnAmconList" class="control-label col-md-2">Is On AMCON List</label>
+                                    <div class="checkbox-container col-md-4">
+                                        <input name="isOnAmconList" formControlName="isOnAmconList" (change)="isOnAmconListChanged($event)" id="isOnAmconList" type="checkbox">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-danger" (click)="showCommentForm()" style="margin-right:5px">
+                    <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group pull-right">
+                                    <button type="button" (click)="showUploadeddocument=false" style="margin-right:5px" class="btn btn-danger" style="margin-right:5px">Close</button>
+                                    <button type="button" (click)="submitForApproval(perfectionForm)" [disabled]="(comment == null || comment =='' || (approvalStatusId != 2 && approvalStatusId != 3))" class="btn btn-success">
+                    Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>
+
+                <p-tabPanel *ngIf="(memoTargetId>0)" header="Approval Memo">
+                    <app-approval-memo
+                        [showControls]="true"
+                        [allowTemplateToLoad]="true"
+                        [referenceNumber]="REFERENCE_NUMBER"
+                        [label]="'Security Release'"
+                        [customerId]="CUSTOMER_ID"
+                        [OPERATION_ID]="OPERATION_ID"
+                        [targetIdForWorkFlow]="targetId"
+                        [targetId]="memoTargetId">
+                    </app-approval-memo>
+                </p-tabPanel>
+
+                <p-tabPanel header="Approval Comments">
+                    <div *ngIf="operationId">
+                        <approval-comment-tab [operationId]="operationId" [target]="targetId">
+                        </approval-comment-tab>
+                    </div>
+                </p-tabPanel>
+
+                <p-tabPanel header="Supporting Documents">
+                    <div class="panel panel-default">
+                        <document-upload [reload]="RELOAD" [operationId]="OPERATION_ID" [customerId]="CUSTOMER_ID" [customerGroupId]="GROUP_CUSTOMER_ID" [targetId]="TARGET_ID" [isOperationSpecific]="false" [isLms]="false" (requiredDocumentsUploadSatisfied)="true" [targetReferenceNumber]="REFERENCE_NUMBER">
+                        </document-upload>
+                    </div>
+                </p-tabPanel>
+
+            </p-tabView>
+        </div>
+        <div class="panel-footer">
+            <div class="row ">
+                <div class="col-md-12">
+                    <button type="button" (click)="showUploadeddocument = false;" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" [contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade" [contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+    <app-refer-back [referBackTargetId]="targetId" [referBackOperationId]="operationId" (notify)="modalControl($event)" (notifyAfterReferBack)="referBackResultControl($event)" *ngIf="rowSelected == true">
+    </app-refer-back>
+</p-dialog>

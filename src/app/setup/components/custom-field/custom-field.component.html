@@ -1,0 +1,173 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+<!--filter here-->
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Custom Field Filter by Host Page
+                                <!--{{riskTypes | json}}-->
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <form novalidate [formGroup]="filterForm" (keyup.enter)="submitForm(filterForm)" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    <label for="hostPageId" class="control-label col-md-2">Host Page</label>
+                                    <div class="col-md-4">
+                                        <select (change)="onHostPageChange($event.target.value)" type="text" name="hostPageId" formControlName="hostPageId"
+                                        id="hostPageId" class="form-control" [ngClass]="!filterForm.controls['hostPageId'].valid ? 'required-input' : 'valid-input'"
+                                        >
+                                            <option value="">-- Select Host Page --</option>
+                                            <option *ngFor="let x of hostPages" [value]="x.hostPageId">
+                                                {{ x.hostPage }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+        <!--end of card-->
+
+
+
+        <div *ngIf="displayFilteredList" class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Custom Fields
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="customFields" [paginator]="true" [rows]="20">
+                        <p-column field="labelName" header="Label Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="controlType" header="Control Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="hostPageId" header="Host Page" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}"> <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-data="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editCustomFields(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+                {{ row | json}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="hostPageId" class="control-label col-md-2">Host Page</label>
+                        <div class="col-md-4">
+                            <select type="text" name="hostPageId" formControlName="hostPageId" id="hostPageId" class="form-control" [ngClass]="!filterForm.controls['hostPageId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Host Page --</option>
+                                <option *ngFor="let x of hostPages" [value]="x.hostPageId">
+                                    {{ x.hostPage }}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="controlType" class="control-label col-md-2">Control Type</label>
+                        <div class="col-md-4">
+                            <select type="text" name="controlType" formControlName="controlType" id="controlType" class="form-control" [ngClass]="!createUpdateForm.controls['controlType'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Control Type --</option>
+                                <option *ngFor="let x of controlTypes" [value]="x.controlTypeId">
+                                    {{ x.controlTypeName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="labelName" class="control-label col-md-2">Label Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="labelName" formControlName="labelName" id="labelName" class="form-control" [ngClass]="!createUpdateForm.controls['labelName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="itemOrder" class="control-label col-md-2">Item Order</label>
+                        <div class="col-md-4">
+                            <input type="text" name="itemOrder" formControlName="itemOrder" id="itemOrder" class="form-control" [ngClass]="!createUpdateForm.controls['itemOrder'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="required" class="control-label col-md-2">Required Field</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="required" formControlName="required" id="required" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" (click)="submitForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                                <button type="button" (click)="displayModalForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

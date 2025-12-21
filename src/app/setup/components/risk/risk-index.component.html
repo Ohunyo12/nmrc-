@@ -1,0 +1,336 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Risk Assessment Title
+                                <!--{{riskTypes | json}}-->
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="displayTitleForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <form novalidate [formGroup]="filterForm" (keyup.enter)="submitForm(filterForm)" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    <label for="riskAssessmentTitleId" class="control-label col-md-2">Assessment Title</label>
+                                    <div class="col-md-4">
+                                        <select (change)="onAssessmentTitleChange($event.target.value)" type="text" name="riskAssessmentTitleId" formControlName="riskAssessmentTitleId"
+                                            id="riskAssessmentTitleId" class="form-control" [ngClass]="!filterForm.controls['riskAssessmentTitleId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Assessment Title --</option>
+                                        <option *ngFor="let title of assessmentTitles" [value]="title.riskAssessmentTitleId">
+                                            {{ title.riskTitle }}
+                                        </option>
+                                    </select>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+        <!--end of card-->
+
+    <!--{{ categories | json }}-->
+    <!--generate form here-->
+
+<div *ngIf="displayRiskIndexList" class="card no-padding">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Risk Assessment Index
+                        <!--{{ riskIndexes | json }}-->
+                    </h2>
+                    <div class="pull-right">
+                        <button (click)="displayIndexForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <div>
+                <table class="table table-striped table-bordered table-condensed">
+
+                    <thead class="thead-default" [ngStyle]="getColor(1)">
+                        <tr>
+                        <th>Top Level Factors</th>
+                        <th style="width:20px">Level</th>
+                        <th style="width:20px">Weight</th>
+                        <th style="width:20px"></th>
+                        </tr>
+                    </thead>
+
+                    <!--options-->
+                    <ng-container *ngFor="let factor of riskIndexes; let i = index;">
+                        <tr *ngIf="factor.parentId < 1 && factor.itemLevel==1">
+                            <td>
+                                {{ factor.name }}
+                            </td> 
+                            <td style="text-align:right;">
+                                {{ factor.itemLevel }}
+                            </td> 
+                            <td style="text-align:right;">
+                                {{ factor.weight }}
+                            </td> 
+                            <td style="text-align:center">
+                                <a (click)="editRiskIndex(i)" href="javascript:void(0)">Edit</a>
+                            </td>
+                        </tr>
+                    </ng-container>
+
+                </table>
+            </div>
+
+            <div *ngFor="let category of categories;">
+                <table class="table table-striped table-bordered table-condensed">
+
+                    <thead class="thead-default" [ngStyle]="getColor(category.level)">
+                        <tr>
+                        <th>{{ category.name }}</th>
+                        <th style="width:20px">Level</th>
+                        <th style="width:20px">Weight</th>
+                        <th style="width:20px">{{ category.weight }}</th>
+                        </tr>
+                    </thead>
+
+                    <!--options-->
+                    <ng-container *ngFor="let option of riskIndexes; let i = index;">
+                        <tr *ngIf="option.parentId == category.riskId">
+                            <td>
+                                {{ option.name }}
+                            </td> 
+                            <td style="text-align:right;">
+                                {{ option.itemLevel }}
+                            </td> 
+                            <td style="text-align:right;">
+                                {{ option.weight }}
+                            </td> 
+                            <td style="text-align:center">
+                                <a (click)="editRiskIndex(i)" href="javascript:void(0)">Edit</a>
+                            </td>
+                        </tr>
+                    </ng-container>
+
+                </table>
+            </div>
+        
+        </div><!--endof panel-->
+        <hr />
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--<div *ngIf="body">Form Vaues: {{ body | json }}</div>-->
+                    <!--<button type="button" (click)="previousTitle()" [disabled]="disablePrevious" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span> Previous</button>-->
+                    <!--<button type="button" (click)="nextTitle()" [disabled]="disableNext" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> Next</button>-->
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    <!--generate form here end-->
+
+    </div>
+</div>
+
+
+<!--forms-->
+
+<!--title modal-->
+<p-dialog [responsive]=true [(visible)]="showTitleForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Risk Assessment Title
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="titleForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="riskTitle" class="control-label col-md-4">Risk Assessment Name</label>
+                        <div class="col-md-8">
+                            <input type="text" name="riskTitle" formControlName="riskTitle" id="riskTitle" class="form-control" [ngClass]="!titleForm.controls['riskTitle'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="riskTypeId" class="control-label col-md-4">Risk Type</label>
+                        <div class="col-md-8">
+                            <select (change)="onRiskTypeChange($event.target.value)" name="riskTypeId" formControlName="riskTypeId" id="riskTypeId"
+                                class="form-control" [ngClass]="!titleForm.controls['riskTypeId'].valid ? 'required-input' : 'valid-input'">
+
+                                <option value="">-- Select Risk Type --</option>
+                                    <option *ngFor="let x of riskTypes" [value]="x.riskTypeId">
+                                        {{ x.riskTypeName }}
+                                    </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productId" class="control-label col-md-4">Product</label>
+                        <div class="col-md-8">
+                            <select [attr.disabled]="productIsSelected ? null : false" type="text" name="productId" formControlName="productId" id="productId"
+                                class="form-control" [ngClass]="!titleForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+
+                                <option value="">-- Select Product --</option>
+                                    <option *ngFor="let x of products" [value]="x.productId">
+                                        {{x.productName}}
+                                    </option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitTitleForm(titleForm)" [disabled]="titleForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="showTitleForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+
+
+<!--index modal-->
+<p-dialog [responsive]=true [(visible)]="showIndexForm" id="risk-index-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Risk Assessment Index
+                <!--{{ selectedId }}-->
+            </h2>
+        </div>
+
+
+        <form novalidate [formGroup]="riskIndexForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+
+                    <div class="form-group">
+                        <label for="riskAssessmentTitleId" class="control-label col-md-2">Risk Assessment Title</label>
+                        <div class="col-md-4">
+                            <select (change)="onAssessmentTitleChange($event.target.value)" type="text" name="riskAssessmentTitleId" formControlName="riskAssessmentTitleId"
+                                id="riskAssessmentTitleId" class="form-control" [ngClass]="!riskIndexForm.controls['riskAssessmentTitleId'].valid ? 'required-input' : 'valid-input'">
+                                 <option value="">-- Select Title --</option>
+                                <option *ngFor="let x of assessmentTitles" [value]="x.riskAssessmentTitleId">
+                                    {{ x.riskTitle }}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="indexTypeId" class="control-label col-md-2">Index Type</label>
+                        <div class="col-md-4">
+                            <select (change)="onIndexTypeChange($event.target.value)" name="indexTypeId" formControlName="indexTypeId" id="indexTypeId"
+                                class="form-control" [ngClass]="!riskIndexForm.controls['indexTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select index Type --</option>
+                                    <option *ngFor="let x of indexTypes" [value]="x.indexTypeId">
+                                        {{ x.indexTypeName }}
+                                    </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="control-label col-md-2">Description</label>
+                        <div class="col-md-4">
+                            <input type="text" name="description" formControlName="description" id="description" class="form-control" [ngClass]="!riskIndexForm.controls['description'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="itemLevel" class="control-label col-md-2">Item Level</label>
+                        <div class="col-md-4">
+                            <select (change)="onItemLevelChange($event.target.value)" name="itemLevel" formControlName="itemLevel" id="itemLevel"
+                                class="form-control" [ngClass]="!riskIndexForm.controls['itemLevel'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Level --</option>
+                                <option *ngFor="let x of itemLevels" [value]="x.id">
+                                    {{ x.levelName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name" class="control-label col-md-2">Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="name" formControlName="name" id="name" class="form-control" [ngClass]="!riskIndexForm.controls['name'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="parentId" class="control-label col-md-2">Parent</label>
+                        <div class="col-md-4">
+                            <select (change)="onParentChange($event.target.value)" name="parentId" formControlName="parentId" id="parentId" class="form-control" [ngClass]="!riskIndexForm.controls['parentId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Parent --</option>
+                                <option *ngFor="let x of filteredRiskIndexes" [value]="x.riskId">
+                                    {{ x.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight" class="control-label col-md-2">Weight</label>
+                        <div class="col-md-4">
+                            <input type="text" name="weight" formControlName="weight" formatM id="weight" class="form-control" [ngClass]="!riskIndexForm.controls['weight'].valid ? 'required-input' : 'valid-input'">
+                            <span *ngIf="availableWeight!==null"><i>Should not be more than {{availableWeight}}</i></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitIndexForm(riskIndexForm)" [disabled]="riskIndexForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="showIndexForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of index modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

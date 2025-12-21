@@ -1,0 +1,183 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Groups Activities
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Map Activity" icon="fa-plus"></button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table *ngFor="let grp of groupActivities" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {{grp.name}}
+                                </th>
+                                <th style="width: 15%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let act of grp.activities">
+                                <td>
+                                    {{act.activityName}}
+                                </td>
+                                <td style="width: 15%">
+                                    <a href="#" (click)="viewAccess($event,act,grp.name)">Manage Access</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]=true id="accessDialog" [(visible)]="showAccessDialog" modal="modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Manage Group Access
+            </h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="" class="control-label col-md-3">
+                        Group Name
+                    </label>
+                    <div class="col-md-3">
+                        <p class="form-control-static">{{grpName}} </p>
+                    </div>
+                    <label for="" class="control-label col-md-3">
+                        Activity Name
+                    </label>
+                    <div class="col-md-3">
+                        <p class="form-control-static">{{selectedAct?.activityName}} </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <fieldset style="padding-left:14px">
+                        <legend>
+                            Access Rights
+                        </legend>
+
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <label class="checkbox-inline actCheckBox">
+                            <input type="checkbox" [(ngModel)]="access.canEdit"
+                             name="canEdit" id="canEdit" value="{{selectedAct?.canEdit}}">Can Edit
+                             </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="checkbox-inline actCheckBox">
+                            <input type="checkbox" [(ngModel)]="access.canAdd"
+                             name="canAdd" id="canAdd" value="{{selectedAct?.canAdd}}">Can Add
+                             </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="checkbox-inline actCheckBox">
+                            <input type="checkbox" [(ngModel)]="access.canApprove"
+                             name="canApprove" id="canApprove" value="{{selectedAct?.canApprove}}">Can Approve
+                             </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="checkbox-inline actCheckBox">
+                            <input type="checkbox" [(ngModel)]="access.canDelete"
+                             name="canDelete" id="canDelete" value="{{selectedAct?.canDelete}}">Can Delete
+                             </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="checkbox-inline actCheckBox">
+                            <input type="checkbox" [(ngModel)]="access.canView"
+                             name="canView" id="canView" value="{{selectedAct?.canView}}">Can View
+                             </label>
+                            </div>
+
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" (click)="saveAccess(selectedAct?.groupActivityId)" class="btn btn-success pull-right">Save</button>
+                    <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="showAccessDialog=false">Close</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<!-- activity mapping form -->
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="1200">
+    <!-- <div style="margin-bottom:0" class="panel panel-default"> -->
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Add Activity To Group
+                <!-- {{groupForm.value | json}} -->
+            </h2>
+        </div>
+        <form [formGroup]="groupForm" (ngSubmit)="onSubmit(groupForm)" novalidate autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="groupName" class="control-label col-md-3">
+                            Group Name
+                        </label>
+                        <div class="col-md-8">
+                            <select (change)="onGroupChange()" name="groupId" id="groupId" formControlName="groupId" class="form-control">
+                                <option value="">Select Group</option>
+                                <option *ngFor="let grp of groups" value="{{grp.groupId}}">{{grp.groupName}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <p-accordion>
+                                <p-accordionTab *ngFor="let actP of allActivities; let idx = index" [selected]="idx==0" header="{{actP.activityParentName}}">
+                                    <div class="row">
+                                        <div *ngFor="let activity of actP.activities; let i = index" class="col-md-3">
+                                            <label class="checkbox-inline actCheckBox">
+                                                <input type="checkbox" formControlName="Activities" asList name="activityName" id="activity-{{i}}" value="{{activity.activityId}}">{{activity.activityName}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </p-accordionTab>
+                            </p-accordion>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="groupForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="display=false">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    <!-- </div> -->
+</p-dialog>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

@@ -1,0 +1,223 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    ATC Lodgement
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+            <p-tabPanel header="ATC Logdment" *ngIf="showLodgement==true">
+                <div class="panel-body">
+                    <p-dataTable [value]="AtcLodgments" [responsive]="true" [paginator]="true" [rows]="5">
+                        <p-column field="dateCreated" header="Date Lodged" sortable="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.dateCreated | date }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="atcType" header="ATC Type" [filter]="true" sortable="true"
+                            filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="customerName" header="Customer Name" [filter]="true"
+                            sortable="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="description" header="Description" sortable="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="depot" header="Depot" sortable="true" filterMatchMode="contains"></p-column>
+                        <p-column field="unitValue" header="Unit Value" sortable="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.unitValue | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="unitNumber" header="Unit Number" sortable="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="totalValue" header="Total Value" sortable="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.totalValue | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="currency" header="Currency" sortable="true"
+                                        filterMatchMode="contains"></p-column>
+                        <p-column field="approvalStatusName" header="Approval Status" sortable="true"
+                            filterMatchMode="contains">
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}" header="View">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="viewAdditionalInfo(d)" href="javascript:void(0)">Additional Detail</a>
+
+                                </div>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}" header="View">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="customerInfo(d)" href="javascript:void(0)">Cusotmer Info</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}" header="View">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="approval(d)" href="javascript:void(0)">Approval</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </p-tabPanel>
+            <p-tabPanel header="Customer Information">
+                <div class="panel-body">
+                    <app-customer-information-detail [loadWithCustomerId]="searchCustomerId">
+                    </app-customer-information-detail>
+                </div>
+                <div class="panel-footer">
+                    <div class="pull-right" *ngIf="searchCustomerId">
+                        <button (click)="activeTabindex=0" pButton type="button" label="Back to List"
+                            icon="fa-plus"></button>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Approval Comments">
+                <div *ngIf="operationId">
+                    <approval-comment-tab [operationId]="operationId" [target]="atcLodgmentId"></approval-comment-tab>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+
+    </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="showAdditionalDocument" id="ct-modal" modal="modal" showEffect="fade"
+    width="600">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                ATC Lodgement Detail
+
+            </h2>
+            <div class="pull-right">
+                <button (click)="showAdditionalDocument=false;" pButton type="button" label="Close"
+                ></button>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="AtcLodgmentDetailList" [responsive]="true" [paginator]="true" [rows]="5">
+
+                <p-column field="detail" header="Detail" sortable="true" filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="value" header="Value" sortable="true" filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.value | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+
+    </div>
+
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayAccountBalance" modal="modal" showEffect="fade" width="400">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Customer Account Balance
+            </h2>
+        </div>
+        <div class="panel-body" style="min-height:120px;">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p-dataTable [value]="accountBalances" [responsive]="true">
+                        <p-column field="AccountNumber" header="Account Number"></p-column>
+                        <p-column field="AccountBalance" header="Account Balance"></p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayAccountBalance=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="showApprovalBottun" id="ct-modal" modal="modal" showEffect="fade" width="600">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Approval Panel
+        </h2>
+    </div>
+    <div class="panel-body">
+        <div class="well">
+            <hr />
+            <div class="row">
+                <div class="col-md-9">
+                    <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment"
+                        [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" [(ngModel)]="approvalStatusId"
+                        [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+                        <option value="0">--- Select Approval ---</option>
+                        <option value="2"> Approve </option>
+                        <option value="3"> Decline </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+            <div class="col-md-6">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-danger" (click)="showCommentForm()" style="margin-right:5px">
+                        <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+                </div>
+            </div>
+                <div class="col-md-6">
+                    <div class="btn-group pull-right">
+                        <button type="button" (click)="showApprovalBottun=false" style="margin-right:5px"
+                            class="btn btn-danger" style="margin-right:5px">Close</button>
+                        <button type="button" (click)="submitForApproval()"
+                            [disabled]="(comment == null || comment =='' || (approvalStatusId != 2 && approvalStatusId != 3))"
+                            class="btn btn-success">
+                            Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="600">
+    <div style="margin-bottom:0" class="panel panel-default" *ngIf="rowSelected == true">
+        <app-refer-back [referBackTargetId]="targetId" [referBackOperationId]="operationId"
+            (notify)="modalControl($event)" (notifyAfterReferBack)="referBackResultControl($event)">
+        </app-refer-back>
+    </div>
+</p-dialog>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>

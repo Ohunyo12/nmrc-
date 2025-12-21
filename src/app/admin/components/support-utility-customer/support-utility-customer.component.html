@@ -1,0 +1,406 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Profile Issues
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="panel-body">
+                    <div class="ui-g ui-fluid">
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-9">
+                                <h4> Search</h4>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-15">
+                                <input type="text" name="customerName" placeholder="Customer Code/Customer Name"
+                                    [(ngModel)]="searchString" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="loggingStatus" class=" col=md-5">
+                            </label>
+
+                        </div>
+
+                        <div class="form-group" style="margin-right:10px">
+                            <label for="searchItem" class=" col=md-3">
+
+                            </label>
+                            <div class="col=md-9">
+                                <button pButton type="button" (click)="popoverSeeMore()" label="Scan Records"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                        <p-tabPanel header="Customer">
+                            <div class="panel-body">
+                                <p-dataTable [paginator]="true" [rows]="15" [value]="customerRecord" [responsive]=true
+                                    selectionMode="single">
+                                    <p-column field="customerCode" header="Customer Code" sortable="true"
+                                        [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="customerName" header="Customer Name" sortable="true"
+                                        [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="businessUnitName" header="Business Unit" sortable="Business Unit"
+                                        [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="customerTypeName" header="Customer Type" sortable="true"
+                                        [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'150px'}">
+                                        <ng-template pTemplate="header">
+                                        </ng-template>
+                                        <ng-template let-customer="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="viewDetails(customer)">
+                                                View
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </p-tabPanel>
+                        <p-tabPanel header="Customer Record">
+                            <div style="margin-bottom:0" class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div style="margin-left:0" class="row">
+                                        <h2 class="panel-title pull-left">
+                                            Customer Record
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="panel-body">
+                                        <table class="table table-casa-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer Code:</strong>
+                                                    </td>
+                                                    <td>{{customerDetails?.customerCode}}</td>
+                                                    <td>
+                                                        <strong>Customer Name:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.customerName }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Email:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.emailAddress }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer Type:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.customerTypeName }}</td>
+                                                    <td>
+                                                        <strong>Relationship Officer:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.relationshipOfficerName}}
+                                                    <td>
+                                                        <strong>Is Politically Exposed:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.isPoliticallyExposed}}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Is Investment Grade:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.isInvestmentGrade }}</td>
+                                                    <td>
+                                                        <strong>Is Related Party:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.isRealatedParty }}</td>
+                                                    <td>
+                                                        <strong>Account Creation Complete:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.accountCreationComplete }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>Subsector:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.subSectorName}}</td>
+                                                    <td>
+                                                        <strong>Prospect Customer Code</strong>
+                                                    </td>
+                                                    <td> {{customerDetails?.prospectCustomerCode }}</td>
+                                                    <td>
+                                                        <strong>Is Prospect:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.isProspect }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Created By:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.createdBy}}</td>
+                                                    <td>
+                                                        <strong>Last Update By:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.lastUpdatedByName }}</td>
+                                                    <td>
+                                                        <strong>Date Created:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.dateTimeCreated | date:
+                                                        'dd-MM-yyyy' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Date Updated:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.dateTimeUpdated | date:
+                                                        'dd-MM-yyyy' }}</td>
+                                                    <td>
+                                                        <strong>Deleted:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.deleted }}</td>
+                                                    <td>
+                                                        <strong>Business Unit::</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.businessUnitName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer ID:</strong>
+                                                    </td>
+                                                    <td>{{ customerDetails?.customerId }}</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <br>
+                                    <hr>
+                                    <div *ngIf="tempCustomerRecord !=null" style="margin-bottom:0"
+                                        class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div style="margin-left:0" class="row">
+                                                <h2 class="panel-title pull-left">
+                                                    Temp Customer Record
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <table class="table table-casa-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer Code:</strong>
+                                                    </td>
+                                                    <td>{{tempCustomerRecord?.customerCode}}</td>
+                                                    <td>
+                                                        <strong>Customer Name:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.customerName }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Email:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.emailAddress }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer Type:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.customerTypeName }}</td>
+                                                    <td>
+                                                        <strong>Relationship Officer:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.relationshipOfficerName}}
+                                                    <td>
+                                                        <strong>Is Politically Exposed:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.isPoliticallyExposed}}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Is Investment Grade:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.isInvestmentGrade }}</td>
+                                                    <td>
+                                                        <strong>Is Related Party:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.isRealatedParty }}</td>
+                                                    <td>
+                                                        <strong>Account Creation Complete:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.accountCreationComplete }}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Deleted:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.deleted }}</td>
+                                                    <td>
+                                                        <strong>Business Unit::</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.businessUnitName}}</td>
+
+                                                    <td>
+                                                       
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Created By:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.createdBy}}</td>
+
+                                                    <td>
+                                                        <strong>Date Created:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.dateTimeCreated | date:
+                                                        'dd-MM-yyyy' }}</td>
+                                                    <td>
+                                                        <strong>Currently Undergoing Approval:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.isCurrent }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>Customer ID:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.customerId }}</td>
+                                                    <td>
+                                                        <strong>Approval Status:</strong>
+                                                    </td>
+                                                    <td>{{ tempCustomerRecord?.approvalStatusName }}</td>
+                                                    <td>
+                                                        <strong></strong>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <br>
+                                <hr>
+                                <div  style="margin-bottom:0"
+                                    class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div style="margin-left:0" class="row">
+                                            <h2 class="panel-title pull-left">
+                                                Customer CASA Record
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <p-dataTable *ngIf="casaCustomerRecord != null" [paginator]="true" [rows]="15" [value]="casaCustomerRecord"
+                                        [responsive]=true selectionMode="single">
+                                        <p-column field="customerId" header="Customer ID" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="customerName" header="Customer Name" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="productName" header="Product Name" sortable="Product Name"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="productAccountNumber" header="Account Number" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="productAccountName" header="Account Type" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                    </p-dataTable>
+                                </div>
+                                <br>
+                                <div *ngIf="tempCustomerRecord !=null" class="panel-footer">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" (click)="provideAction(tempCustomerRecord)"
+                                                style="margin-right:5px" class="btn btn-primary pull-left">Provide
+                                                Action</button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <p-dialog [responsive]=true [(visible)]="displayProvideAction" id="ad-modal"
+                                    modal="modal" showEffect="fade" width="700">
+                                    <div style="margin-bottom:0" class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                Provide Action
+                                            </h2>
+                                        </div>
+                                        <form novalidate [formGroup]="provideActionForm" autocomplete="off">
+                                            <div class="panel-body">
+                                                <div class="form-horizontal">
+                                                    <div class="form-group">
+                                                        <div class="col-md-5">
+                                                            <div class="checkbox-container">
+                                                                <input formControlName="isProspect" id="isProspect"
+                                                                    type="checkbox">
+                                                            </div><label class="checkbox">Is Prospect</label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="checkbox-container">
+                                                                <input formControlName="accountCreationComplete"
+                                                                    id="accountCreationComplete" type="checkbox">
+                                                            </div><label class="checkbox">Account Creation
+                                                                Complete</label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="checkbox-container">
+                                                                <input formControlName="isCurrent" id="isCurrent"
+                                                                    type="checkbox">
+                                                            </div><label class="checkbox">Is Current</label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <label for="approvalStatus">Approval Status: </label>
+                                                            <select formControlName="approvalStatus"
+                                                                id="approvalStatus" class="form-control"
+                                                                [ngClass]="!provideActionForm.controls['approvalStatus'].valid ? 'required-input' : 'valid-input'">
+                                                                <option value="">--- Select Approval Status ---</option>
+                                                                <option value="2">Approve</option>
+                                                                <option value="3">Reject</option>
+                                                            </select>
+                                                           
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel-footer">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <button type="button"
+                                                            (click)="submitActionForm(provideActionForm)"
+                                                            class="btn btn-success pull-right">Save</button>
+                                                        <button type="button" (click)="displayProvideAction=false"
+                                                            style="margin-right:5px"
+                                                            class="btn btn-danger pull-right">Cancel</button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </p-dialog>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

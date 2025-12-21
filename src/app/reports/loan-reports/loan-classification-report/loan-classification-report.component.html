@@ -1,0 +1,90 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                <!-- Loan Workflow SLA for {{operationName}} Report -->
+                Loan Classification Report
+              </h2>
+
+              <!-- <div class="pull-right">
+                                <button pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="form-group">
+
+              <label for="searchItem" class="control-label col-md-2">
+                Classification Or Non-Classification?
+              </label>
+
+              <div class="col-md-4">
+
+                <select [(ngModel)]="classification" (ngModelChange)='onOptionSelected($event)' name="classification"
+                  id="classification" class="form-control">
+
+                  <option value="">-- Classification Or Non-Classification --</option>
+                  <option value="-1"> Non-Classification </option>
+                  <option *ngFor="let x of prudentialGuidelines" [value]="x.prudentialGuidelineId">
+                    {{x.statusName}}
+                </option> 
+                  <!-- <option value="6">Watchlist</option>
+                  <option value="1">Performing</option>
+                  <option value="2">Substandard</option>
+                  <option value="3">Doubtfull</option>
+                  <option value="4">Very Doubtfull</option>
+                  <option value="5">Lost</option> -->
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <button pButton type="button" (click)="popoverSeeMore()" label="Preview Report"></button>
+              </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="1200" modal="modal" showEffect="fade">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+            Loan Classification Report
+
+          </h2>
+          <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+        <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px" style="overflow:auto"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</p-dialog>

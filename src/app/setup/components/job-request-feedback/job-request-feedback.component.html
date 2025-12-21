@@ -1,0 +1,79 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">Job Request Feedback</h2>
+            <div class="pull-right">
+              <button type="button" (click)="showJobRequestFeedbackForm()" pButton icon="fa-plus" label="Add New Feedback"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <p-dataTable [value]="jobRequestFeedbackTableData" [rows]="15" [paginator]="true">
+          <p-column field="jobStatusFeedbackName" header="Job Request Feedback" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="jobTypeName" header="Job Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="requestStatusName" header="Request Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column [style]="{'width':'100px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template pTemplate="body" let-job="rowData" let-i="rowIndex">
+              <a (click)="editJobRequestFeedback(job)" href="javascript:void(0)">Edit</a>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]="true" [(visible)]="displayJobRequestFeedbackModal" id="job-request-feedback" modal="modal" showEffect="fade"
+  width="850">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="jobRequestFeedbackForm" (ngSubmit)="submitJobRequestFeedbackForm(jobRequestFeedbackForm)" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="jobStatusFeedbackName" class="col-md-2 control-label">Job Status Feedback</label>
+            <div class="col-md-4">
+              <input type="text" name="jobStatusFeedbackName" id="jobStatusFeedbackName" class="form-control" formControlName="jobStatusFeedbackName"
+                [ngClass]="jobRequestFeedbackForm.controls['jobStatusFeedbackName'].valid ? 'valid-input':'required-input'">
+            </div>
+            <label for="jobTypeId" class="col-md-2 control-label">Job Type</label>
+            <div class="col-md-4">
+              <select name="jobTypeId" id="jobTypeId" class="form-control" formControlName="jobTypeId" [ngClass]="jobRequestFeedbackForm.controls['jobTypeId'].valid ? 'valid-input':'required-input'">
+                <option value="">-- Select Job Type --</option>
+                <option *ngFor="let x of jobTypes" [value]="x.jobTypeId">{{ x.jobTypeName }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="requestStatusId" class="col-md-2 control-label">Request Status</label>
+            <div class="col-md-4">
+              <select name="requestStatusId" id="requestStatusId" class="form-control" formControlName="requestStatusId" [ngClass]="jobRequestFeedbackForm.controls['requestStatusId'].valid ? 'valid-input':'required-input'">
+                <option value="">--- Select Request Status ---</option>
+                <option *ngFor="let feq of requestStatus" value="{{feq.lookupId}}">
+                  {{feq.lookupName}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="jobRequestFeedbackForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayJobRequestFeedbackModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>

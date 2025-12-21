@@ -1,0 +1,114 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-7">
+                <h2 class="panel-title pull-left">
+                  Loan Performance
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="pull-right">
+                      <div  class="col-md-12">
+                          <div class="input-group">
+                              <input type="text" id="search" [(ngModel)]="searchString" class="form-control" placeholder="Type in your search parameter (LoanReferneceNo or CustomerName)">
+                            <div class="input-group-btn">
+                              <button (click)="searchDataBase()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+            
+          <p-dataTable [value]="loanData" [rowsPerPageOptions]="[10,20,30]" [lazy]="true" [rows]="10" [paginator]="true" [totalRecords]="itemTotal"
+            (onLazyLoad)="loanDataLazy($event)" [responsive]=true (onEditInit)="onEditInit($event)" (onEdit)="onEdit($event)"
+            (onEditCancel)="onEditCancel($event)" (onEditComplete)="onEditComplete($event)">
+
+
+            <!-- <p-header>
+              <label for="search" class="control-label">Search</label>
+              <input type="text" pInputText name="search" id="search" class="form-control" placeholder="Search through table..." #tableSearch>
+            </p-header> -->
+            <p-column field="loanReferenceNumber" header="Reference No." sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'125px'}"></p-column>
+            <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="productName" header="Facility Type" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'160px'}"></p-column>
+            <p-column field="outstandingPrincipal" header="Outstanding Principal" sortable="true" [filter]="true" filterMatchMode="contains"
+              [style]="{'width':'100px', 'text-align': 'right'}">
+              <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                {{k.outstandingPrincipal | number:'1.2'}}
+              </ng-template>
+            </p-column>
+            <p-column field="outstandingInterest" header="Outstanding Interest" sortable="true" [filter]="true" filterMatchMode="contains"
+              [style]="{'width':'100px', 'text-align': 'right'}">
+              <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                {{k.outstandingInterest | number:'1.2'}}
+              </ng-template>
+            </p-column>
+            <p-column field="maturityDate" header="Maturity Date" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'80px'}">
+              <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                {{k.maturityDate | date: 'dd/MM/yyyy'}}
+              </ng-template>
+            </p-column>
+            <p-column field="externalPrudentialGuidelineStatus" header="System Performance Status" sortable="true" [filter]="true" filterMatchMode="contains"
+              [style]="{'width':'80px'}"></p-column>
+            <!-- <p-column field="userPrudentialGuidelineStatus" header="User Performance Status" sortable="true" [filter]="true" filterMatchMode="contains"
+              [style]="{'width':'80px'}"></p-column> -->
+            <p-column field="userPrudentialGuidelineStatusId" [style]="{'width':'140px'}">
+              <ng-template pTemplate="header"> User Performance Status</ng-template>
+              <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                <select name="userPrudentialGuidelineStatusId" id="userPrudentialGuidelineStatusId" class="form-control" (change)="onPerformanceStatusChanged(k, $event.target.value)"
+                  [(ngModel)]="k.userPrudentialGuidelineStatusId" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                  <option value=" ">--- Select Performance Status ---</option>
+                  <option *ngFor="let item of prudentialGuildlineStatus " [value]="item.prudentialGuidelineId ">{{item.statusName}}</option>
+                </select>
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'70px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewLoanDetails(d)" href="javascript:void(0)">
+                  Details
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayDetailsModal" [draggable]="false" appendToBody="true" modal="modal" showEffect="fade"
+  width="1000">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Loan Details
+      </h2>
+    </div>
+    <div class="panel-body">
+      <app-disbursed-loan-details [selectedApplicationRefNumber]="selectedApplicationRefNumber" [selectedloanReviewApplicationId]=0 [loanSystemTypeId]="loanSystemTypeId" [displayDetails]="displayCustomerLoanDetails" [LoadLoanDetails]="termLoanId"></app-disbursed-loan-details>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group pull-right">
+            <button (click)="displayDetailsModal=false" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+            <!-- <button [disabled]="false" type="button" (click)="goForRestructure()" class="btn btn-success">Restructure</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

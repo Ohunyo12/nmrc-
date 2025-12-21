@@ -1,0 +1,577 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Post-Approval Documentation
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+
+        <!-- <expfacility [customerId]="33"></expfacility> -->
+
+
+
+
+        <!-- loan applications -->
+        <div class="card no-padding">
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Applications
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showSearchForm()" pButton type="button" label="Search"
+                                    icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                        <p-tabPanel header="Loan Applications" *ngIf="displaySearchTable">
+                            <p-dataTable [value]="applications" [paginator]="true" [rows]="10"
+                                [rowsPerPageOptions]="[10,20,30]" [responsive]="true">
+
+                                <p-column field="applicationDate" header="Date" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column header="Customer Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.firstName }} {{ d.middleName }} {{ d.lastName }}
+                                    </ng-template>
+                                </p-column>
+
+                                <p-column field="applicationReferenceNumber" header="Reference" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column field="applicationAmount" header="Amount" sortable="true" [filter]="true"
+                                    filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.applicationAmount | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+
+
+
+                                <p-column field="applicationStatus" header="Application Status" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column>
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="view(row)" href="javascript:void(0)"><i
+                                                class="glyphicon glyphicon-eye"></i>View</a>
+                                    </ng-template>
+                                </p-column>
+                              
+                               
+
+                            </p-dataTable>
+                        </p-tabPanel>
+                        <p-tabPanel header="Loan Application Details" *ngIf="displayApplicationDetail">
+                            <div *ngIf="displayApplicationDetail" style="margin-bottom:0" class="panel panel-default">
+
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">
+                                        Loan Application Information
+                                    </h2>
+                                    <div class="pull-right"><a class="close"
+                                            (click)="displayApplicationDetail=false; displaySearchTable=true;">&times;</a>
+                                    </div>
+                                </div>
+
+                                <div class="panel-body">
+                                    <p-tabView>
+                                        <p-tabPanel header="General Information" *ngIf="hideGeneralInfoPanel">
+                                            <!-- <p-accordion #accordion2 *ngIf="isAmongActivities('Reassign Loan') && currentApprovalLevelId > 0">
+                                                        <p-accordionTab header="Show Facility Routing">
+                                                            <app-workflow-routing [currentSelection]="workflowTarget" 
+                                                                [enableRoutePreset]="true" [enableReroute]="true" 
+                                                                [enableRoute]="true" [enableRouteOperation]="true"
+                                                                [panelLabel]="'Loan application Routing'"
+                                                                [referenceNumber]="application?.applicationReferenceNumber">
+                                                            </app-workflow-routing>
+                                                        </p-accordionTab>
+                                                    </p-accordion> -->
+                                            <h5>
+                                                <b>Source: </b>{{ loanSource }}
+                                            </h5>
+                                            <table class="table table-casa-information">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Application Reference Number:</strong></td>
+                                                        <td>{{ application.applicationReferenceNumber }}</td>
+                                                        <!-- <td><strong>Group Name:</strong></td> -->
+                                                        <td colspan="2" style="text-align:left">{{
+                                                            application.customerGroupName }}</td>
+                                                    </tr>
+                                                    <!-- <tr>
+                                                                <td><strong>Relationship Officer:</strong></td>
+                                                                <td>{{ application.relationshipOfficerName }}</td>
+                                                                <td><strong>Relationship Manager:</strong></td>
+                                                                <td>{{ application.relationshipManagerName }}</td>
+                                                                <td><strong></strong></td>
+                                                                <td></td>
+                                                            </tr> -->
+                                                    <tr>
+                                                        <td><strong>Account Officer:</strong></td>
+                                                        <td>{{ application.relationshipOfficerName }}</td>
+                                                        <td><strong>Amount:</strong></td>
+                                                        <td>{{ application.applicationAmount | number:'1.2' }}</td>
+                                                        <td><strong>Approved Amount:</strong></td>
+                                                        <td>{{ application.approvedAmount | number:'1.2' }}</td>
+                                                        <!-- <td><strong></strong></td>
+                                                                <td></td> -->
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Tenor:</strong></td>
+                                                        <td>{{ application.applicationTenor }}</td>
+                                                        <!-- <td><strong>Interest Rate:</strong></td>
+                                                                <td>{{ application.interestRate | number:'1.2' }}</td> -->
+                                                        <td><strong>Application Date:</strong></td>
+                                                        <td>{{ application.applicationDate | date:"dd-MM-yyyy" }}</td>
+                                                        <td><strong>Approval Application:</strong></td>
+                                                        <td>{{ application.applicationStatus }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Investment Grade:</strong></td>
+                                                        <td>{{ application.isInvestmentGrade ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Politically Exposed:</strong></td>
+                                                        <td>{{ application.isPoliticallyExposed ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Related Party:</strong></td>
+                                                        <td>{{ application.isRelatedParty ? 'Yes' : 'No' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Project Related:</strong></td>
+                                                        <td>{{ application.isProjectRelatedLoan ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>OnLending:</strong></td>
+                                                        <td>{{ application.isOnLending ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Intervention Funds:</strong></td>
+                                                        <td>{{ application.isInterventionFunds ? 'Yes' : 'No' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>ORR Based:</strong></td>
+                                                        <td>{{ application.isORRBasedApproval ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Is Already Approved Application:</strong></td>
+                                                        <td>{{ application.isadhocapplication ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Application WorkFlow:</strong></td>
+                                                        <td>{{ application.operationName }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Is Employer Related</strong></td>
+                                                        <td>{{ application?.isEmployerRelated ? 'Yes' : 'No' }}</td>
+                                                        <td><strong>Employer</strong></td>
+                                                        <td colspan="3">{{ application?.employer ? application?.employer
+                                                            : 'N/A' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Approval Status:</strong></td>
+                                                        <td>{{ getApprovalStatus(application.approvalStatusId) }}</td>
+                                                        <td><strong>Application Status:</strong></td>
+                                                        <td>{{ application.applicationStatus }}</td>
+                                                        <td><strong>submitted For Appraisal:</strong></td>
+                                                        <td>{{ application.submittedForAppraisal ? 'Yes' : 'No' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Open Stamp Duty Code</strong>
+                                                        </td>
+                                                        <td>{{ facilityStampDuty[0]?.osdc ? facilityStampDuty[0]?.osdc:
+                                                            'N/A' }}</td>
+                                                        <td>
+                                                            <strong>Approved Stamp Duty Code</strong>
+                                                        </td>
+                                                        <td>{{ facilityStampDuty[0]?.asdc ? facilityStampDuty[0]?.asdc:
+                                                            'N/A'}}</td>
+                                                        <td>
+                                                            <strong>Closed Stamp Duty Code</strong>
+                                                        </td>
+                                                        <td>{{ facilityStampDuty[0]?.csdc ? facilityStampDuty[0]?.csdc:
+                                                            'N/A' }}</td>
+                                                    </tr>
+                                                    <!-- <tr>
+                                                                    <td><strong>Approval Application:</strong></td>
+                                                                    <td>{{ application.applicationStatus }}</td>
+                                                                 <td><strong>Details:</strong></td>
+                                                                <td colspan="2" [innerHTML]="application.loanInformation"></td>
+                                                            </tr>  -->
+                                                </tbody>
+                                            </table>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h2 class="panel-title">Fee Rates & Concessions</h2>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-casa-information">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Facility</th>
+                                                                <th>Fee</th>
+                                                                <th>Default</th>
+                                                                <th>Recommended</th>
+                                                                <th>Status</th>
+                                                                <th>Concession</th>
+                                                                <th>Concession Reason</th>
+                                                            </tr>
+                                                            <tr *ngFor="let x of fees">
+                                                                <td>{{ x.productName }}</td>
+                                                                <td>{{ x.feeName }}</td>
+                                                                <td>{{ x.defaultFeeRate | number:'1.2' }}</td>
+                                                                <td>{{ x.recommendedFeeRate | number:'1.2' }}</td>
+                                                                <td>{{ x.approvalStatus }}</td>
+                                                                <td>{{ x.hasConcession ? 'Yes' : '' }}</td>
+                                                                <td>{{ x.concessionReason }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </p-tabPanel>
+                                        <p-tabPanel header="Customer Information" *ngIf="hideGeneralInfoPanel">
+                                            <div class="panel-body">
+                                                <app-customer-information-detail
+                                                    [loanApplicationId]="application?.loanApplicationId"></app-customer-information-detail>
+                                            </div>
+                                        </p-tabPanel>
+                                        <p-tabPanel header="Loan Information" *ngIf="hideGeneralInfoPanel">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="pull-right">
+                                                            <button (click)="previewDocumentation()"
+                                                                style="padding: 3px 6px 3px 6px;">
+                                                                <span class="glyphicon glyphicon-file"></span> Preview
+                                                                FAM Document</button>
+                                                            <!-- <button (click)="print()" style="padding: 3px 6px 3px 6px;">
+                                                                        <span class="glyphicon glyphicon-print"></span> Print</button> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <app-loan-application-details-view [isRecommendedInfo]="true"
+                                                    [loanApplicationId]="application?.loanApplicationId"
+                                                    [loanApplicationDetail]=loanApplicationDetail
+                                                    [loanInformation]="loanApplicationDetail?.loanInformation"
+                                                    [visible]="false"> </app-loan-application-details-view>
+                                            </div>
+                                        </p-tabPanel>
+
+                                        <p-tabPanel header="Deferred Documents" *ngIf="hideGeneralInfoPanel">
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="pull-right">
+                                                            <button (click)="addDeferredDocument()" pButton
+                                                                type="button" icon="fa-plus"
+                                                                label="Add Deffered Document">
+                                                            </button>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p-dataTable [value]="deferredDocs" [paginator]="true" [rows]="10"
+                                                    [rowsPerPageOptions]="[10,20,30]" [responsive]="true">
+
+                                                    <p-column field="datetimeCreated" header="Date" sortable="true"
+                                                        [filter]="true" filterMatchMode="contains">
+                                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                            {{ d.datetimeCreated | date: 'dd-MM-yyyy' }}
+                                                        </ng-template>
+                                                    </p-column>
+                                                    <p-column field="facilityTypeName" header="Facility Type" sortable="true" [filter]="true"
+                                                        filterMatchMode="contains">
+                                                        
+                                                    </p-column>
+
+                                                    <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true"
+                                                        filterMatchMode="contains">
+                                                       
+                                                    </p-column>
+
+                                                    <p-column field="documentTypeName" header="Document Type" sortable="true" [filter]="true"
+                                                        filterMatchMode="contains">
+                                                       
+                                                    </p-column>
+
+                                                    <p-column field="applicationReferenceNumber" header="Reference"
+                                                        sortable="true" [filter]="true"
+                                                        filterMatchMode="contains"></p-column>
+
+                                                    <p-column field="dueDate" header="Due Date" sortable="true"
+                                                        [filter]="true" filterMatchMode="contains">
+                                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                            {{ d.dueDate | date: 'dd-MM-yyyy' }}
+                                                        </ng-template>
+                                                    </p-column>
+
+                                                    <p-column>
+                                                        <ng-template pTemplate="header"></ng-template>
+                                                        <ng-template let-row="rowData" let-i="rowIndex"
+                                                            pTemplate="body">
+                                                            <a (click)="updateDeferredDocument(row)" href="javascript:void(0)">Edit</a>
+                                                            <a  href="javascript:void(0)">  |   </a>
+                                                            <a (click)="deleteDeferredDocument(row)" href="javascript:void(0)">Delete</a>
+                                                        </ng-template>
+                                                    </p-column>
+
+
+
+                                                </p-dataTable>
+                                            </div>
+                                        </p-tabPanel>
+
+                                        <p-tabPanel header="Supporting Documents" *ngIf="hideGeneralInfoPanel">
+
+                                           <document-upload [operationId]="OPERATION_ID" [isLms]="false"
+                                            [reload]="application?.loanApplicationId"
+                                            [reload]="application?.subBasicId"
+                                            [countryCode]="countryCode"
+                                            [customerId]="application?.customerId"
+                                            [customerGroupId]="application?.customerGroupId"
+                                            [targetId]="application?.loanApplicationId" [isOperationSpecific]="false"
+                                            (deferrDocsCount)="trigerValue($event)"
+                                            [targetReferenceNumber]="application?.relatedReferenceNumber == null ? application?.applicationReferenceNumber : application?.relatedReferenceNumber"
+                                            [reload]="loanApplicationId">
+                                            </document-upload>
+
+                                        </p-tabPanel>
+                                    </p-tabView>
+                                </div>
+                                <div class="panel-footer" *ngIf="!hideCancelPanel">
+                                    <div class="row">
+                                        <div class="col-md-12"
+                                            *ngIf="application.applicationStatusId != 22 && (application.owner)">
+                                            <button type="button" (click)="cancelLoan()" class="btn btn-danger"
+                                                style="margin-top: 20px; float: right;margin-right:20px">
+                                                <span class="glyphicon glyphicon-remove"
+                                                    style="padding-right:4px;"></span>Terminate Loan Contract</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+
+                    </p-tabView>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-3 col-md-offset-9 ">
+                            <!-- buttons -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- endof loan applications -->
+
+
+
+    </div>
+</div>
+
+<!--modal for obligor / Loan details starts-->
+
+<!-- <p-dialog [responsive]=true [(visible)]="displayApplicationDetail" modal="modal" showEffect="fade" width="1200">
+</p-dialog> -->
+
+<!--modal ends-->
+
+
+
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search Application
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="searchForm" autocomplete="off" (ngSubmit)="submitForm(searchForm)">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">Loan Application Reference Number /
+                            Customer Name</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString"
+                                class="form-control"
+                                [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid"
+                            class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayOwnerSearchForm" modal="modal" id="searchModal" showEffect="fade"
+    width="650" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displayOwnerSearchForm=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="staffSearch" #staffInPut (keyup)="searchApprover($event.target.value)"
+                        class="form-control" placeholder="Type in the staff name...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="availableApprovers" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                                <th>Staff Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedApprover(res)" style="cursor: pointer"
+                                *ngFor="let res of availableApprovers; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                                <td>{{res.staffRoleName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="deferredDocumentForm" modal="modal" id="searchModal" showEffect="fade"
+    width="800" [contentStyle]="{'overflow':'auto','max-height':'1000px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="deferredDocumentForm=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <form novalidate [formGroup]="stampDutyFormGroup" (ngSubmit)="submitStampSetupForm(stampDutyFormGroup)"
+            autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="collateralSubTypeId" class="control-label col-md-2" i18n>Document Category
+                            </label>
+                            <div class="col-md-4">
+                                <select (change)="getDocumentTypesByCategory($event.target.value)" name="documentCategoryId" id="documentCategoryId"
+                                    formControlName="documentCategoryId" class="form-control"
+                                    [ngClass]="!stampDutyFormGroup.controls['documentCategoryId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Document Category --</option>
+                                    <option *ngFor=" let x of documentCategories" [value]="x.documentCategoryId">{{x.documentCategoryName }}</option>
+                                </select>
+                            </div>
+                        <label for="tenor" class="control-label col-md-2"  i18n>Number of Days Deferred</label>
+                        <div class="col-md-4">
+                            <input type="number" min="1" max="1000" id="tenor" name="tenor" 
+                                class="form-control" formControlName="tenor" (change)="calculateTenor($event.target.value)"
+                                [ngClass]="!stampDutyFormGroup.controls['tenor'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+
+                        <label for="tenorMode" class="control-label col-md-2"  i18n>Document Type</label>
+                        <div class="col-md-4">
+                            <select name="documentTypeId" formControlName="documentTypeId"
+                                [ngClass]="!stampDutyFormGroup.controls['documentTypeId'].valid ? 'required-input' : 'valid-input'"
+                                id="documentTypeId" class="form-control">
+                                <option value="">Select Document Type</option>
+                                <option *ngFor="let x of documentTypes" value="{{x.documentTypeId}}">{{x.documentTypeName}}
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <label for="dutiableValue" class="control-label col-md-2" i18n>Due Date</label>
+                        <div class="col-md-4">
+                            <p-calendar id="dueDate"  formControlName="dueDate" (onSelect)="calculateDays()" dateFormat="dd/mm/yy" [ngClass]="!stampDutyFormGroup.controls['dueDate'].valid ? 'required-input' : 'valid-input'"
+                                 [monthNavigator]="true" [minDate]="currentDate" [yearNavigator]="true" 
+                                yearRange="1980:2050" [showIcon]="true"></p-calendar>
+                        </div>
+                       
+                        
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="stampDutyFormGroup.invalid"
+                            class="btn btn-success pull-right" i18n>Save</button>
+                        <button type="button" (click)="deferredDocumentForm=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right" i18n>Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+<!--modal ends-->

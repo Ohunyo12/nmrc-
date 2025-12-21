@@ -1,0 +1,545 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">Loan Information</h2>
+    </div>
+    <div class="panel-body">
+
+        <div class="row" style="padding:0 15px 0 15px;" *ngIf="visible">
+            <h6>
+                <strong>General Information</strong>
+            </h6>
+            <table class="table table-casa-information">
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Application Reference Number:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.applicationReferenceNumber }}</td>
+                        <td>
+                            <strong>Relationship Manager:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.relationshipOfficerName }}</td>
+                        <td>
+                            <strong>Business Manager:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.relationshipManagerName }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Amount:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.applicationAmount | number:'1.2' }}</td>
+                        <!-- <td>
+                            <strong>Tenor:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.tenorString }}</td> -->
+                        <td>
+                            <strong>Application Date:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.applicationDate | date:"dd-MM-yyyy" }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong>Investment Grade:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.isInvestmentGrade ? 'Yes' : 'No' }}</td>
+
+                        <!-- Below Columns To Be Handled at Point of Application -->
+
+
+                        <td>
+                            <strong>Politically Exposed:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.isPoliticallyExposed ? 'Yes' : 'No' }}</td>
+                        <td>
+                            <strong>Related Party:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.isRelatedParty ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Approval Status:</strong>
+                        </td>
+                        <td>{{ getApprovalStatus(loanApplicationDetail?.approvalStatusId) }}</td>
+                        <td>
+                            <strong>Application Status:</strong>
+                        </td>
+                        <td>{{ getLoanApplicationStatus(loanApplicationDetail?.applicationStatusId) }}</td>
+                        <td>
+                            <strong>Submitted For Appraisal:</strong>
+                        </td>
+                        <td>{{ loanApplicationDetail?.submittedForAppraisal ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Organisation/Management Profile:</strong>
+                        </td>
+                        <td colspan="5" [innerHTML]="loanApplicationDetail?.loanInformation"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Collateral Detail:</strong>
+                        </td>
+                        <td colspan="5">{{ loanApplicationDetail?.collateralDetail }}</td>
+                       
+                    </tr>
+                    <tr>
+                          <td>
+                               <strong>Facility Purpose:</strong>
+                          </td>
+                          <td colspan="3">{{ loanApplicationDetail?.loanPurpose }}</td>
+                          <td>
+                                <strong>Take Over Loan:</strong>
+                           </td>
+                           <td>{{ loanApplicationDetail?.isTakeOverApplication }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Is Employer Related</strong>
+                        </td>
+                        <td>
+                            {{ loanApplicationDetail?.isEmployerRelated ? 'Yes' : 'No' }}
+                        </td>
+                        <td>
+                            <strong>Employer</strong>
+                        </td>
+                        <td colspan="3">
+                            {{ loanApplicationDetail?.employer ? loanApplicationDetail?.employer : 'N/A' }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <strong>Open Stamp Duty Code</strong>
+                        </td>
+                        <td>{{ facilityStampDuty[0]?.osdc }}</td>
+                        <td>
+                            <strong>Approved Stamp Duty Code</strong>
+                        </td>
+                        <td>{{ facilityStampDuty[0]?.asdc ? facilityStampDuty[0]?.asdc: 'N/A'}}</td>
+                        <td>
+                            <strong>Closed Stamp Duty Code</strong>
+                        </td>
+                        <td>{{ facilityStampDuty[0]?.csdc ? facilityStampDuty[0]?.csdc: 'N/A' }}</td>
+                    </tr>
+                    <!-- <tr>
+                       
+                        <td>
+                            <strong>Stamp Duty Amount</strong>
+                        </td>
+                        <td>{{facilityStampDuty?.stampDutyAmount}}</td>
+                    </tr> -->
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row" style="padding:0 15px 0 15px;">
+            <h6>
+                <strong>{{ proposedLabel }}</strong>
+            </h6>
+            <p-dataTable [responsive]="true" [value]="proposedApplicationDetails">
+                <p-column field="obligorName" header="Customer Name"></p-column>
+                <p-column field="proposedProductName" header="Product Name"></p-column>
+                <p-column field="proposedTenorString" header="Tenor"></p-column>
+                <!-- <p-column field="proposedRate" header="Rate"></p-column> -->
+                <p-column field="proposedRate" header="Rate">
+                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                        {{loan[col.field] | number : '1.2' }} {{loan.liborInfo}}
+                    </ng-template>
+                </p-column>
+                <p-column field="proposedAmount" header="Amount">
+                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                        {{loan[col.field] | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="currencyCode" header="Currency"></p-column>
+                <p-column field="exchangeRate" header="Exchange Rate">
+                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                        {{loan[col.field] | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column *ngIf="showOrHideViewDetails" [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="viewApplicationDetails(d)" href="javascript:void(0)">
+                            View Details
+                        </a>
+                    </ng-template>
+                </p-column>
+                <p-column *ngIf="isForModification" [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="openForModification(d)" href="javascript:void(0)">
+                            Modify Details
+                        </a>
+                    </ng-template>
+                </p-column>
+                <!-- <p-column *ngIf="isAccountOfficer" [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="viewApplicationDetails(d)" href="javascript:void(0)">
+                            Remove Facility
+                        </a>
+                    </ng-template>
+                </p-column> -->
+            </p-dataTable>
+        </div>
+
+        <div *ngIf="isRecommendedInfo" class="row" style="padding:0 15px 0 15px;">
+            <h6>
+                <strong>Approved Application Information</strong>
+                <!-- <strong>Recommended/Approved Application Information</strong> -->
+            </h6>
+            <p-dataTable [responsive]="true" [value]="approvedApplicationDetails">
+                <p-column field="obligorName" header="Customer Name"></p-column>
+                <p-column field="approvedProductName" header="Product Name"></p-column>
+                <p-column field="approvedTenorString" header="Tenor" [style]="{'width': '70px'}"></p-column>
+                <p-column field="approvedRate" header="Rate" [style]="{'width': '70px'}"></p-column>
+                <p-column field="approvedAmount" header="Amount">
+                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                        {{loan[col.field] | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="currencyCode" header="Currency" [style]="{'width': '70px'}">
+                </p-column>
+                <p-column field="exchangeRate" header="Exchange Rate">
+                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                        {{loan[col.field] | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <!-- <p-column field="statusId" header="Approval Status">
+          <ng-template let-col let-loan="rowData" pTemplate="body">
+            {{ getApprovalStatus(loan[col.field]) }}
+          </ng-template>
+        </p-column> 
+        <p-column [style]="{'width':'100px'}">
+          <ng-template pTemplate="header"></ng-template>
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            <a (click)="viewApplicationDetails(i)" href="javascript:void(0)">
+              View Details
+            </a>
+          </ng-template>
+        </p-column-->
+            </p-dataTable>
+        </div>
+    </div>
+    <p-dialog [responsive]=true [(visible)]="displayMoreDetails" [modal]="true" [appendTo]="'body'" showEffect="fade" width="800">
+        <div *ngIf="displayMoreDetails" style="margin-bottom:0" class="panel panel-default">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        Loan Application Details
+                    </h2>
+                    <div class="pull-right">
+                        <a class="close" (click)="displayMoreDetails=false">&times;</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row" style="padding:0 15px 0 15px;">
+                        <table class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Obligor Name:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.obligorName }}</td>
+                                    <td>
+                                        <strong>Currency:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.currencyCode }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Proposed Product:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.proposedProductName }}</td>
+                                    <td>
+                                        <strong>Recommended Product:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.approvedProductName }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Proposed Amount:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.proposedAmount | number : '1.2'}}</td>
+                                    <td>
+                                        <strong>Recommended Amount:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.approvedAmount | number : '1.2'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Proposed Tenor:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.proposedTenorString }}</td>
+                                    <td>
+                                        <strong>Recommended Tenor:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.approvedTenorString }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Proposed Rate: </strong>
+                                    </td>
+                                    <td>{{ selectedDetails.proposedRate }}</td>
+                                    <td>
+                                        <strong>Recommended Rate:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.approvedRate }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Principal Repayment:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.schedule }}</td>
+                                    <td>
+                                        <strong>Interest Repayment:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.interestRepayment }}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Moratorium</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.moratorium }}</td>
+                                    <td>
+                                        <strong>Approved Cycle:</strong>
+                                    </td>
+                                    <td>{{ selectedDetails.approvedTradeCycleDays }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+    
+    
+                    <div *ngIf="SyndicatedLoanApplicationDetail" class="row" style="max-height: 250px; overflow: auto; padding:0 15px 0 15px;">
+                        <h6>
+                            <strong>Syndicated Loan Application Information</strong>
+                        </h6>
+                        <div class="form-group">
+                            <div class="col-md-4"> Syndication Name: <strong> {{selectedDetails.syndicationName}}</strong></div>
+                            <div class="col-md-4"> Syndication Ref No: <strong> {{selectedDetails.syndicationRefNo}}</strong></div>
+                            <div class="col-md-4"> Amount: <strong> {{selectedDetails.syndicationAmount}}</strong></div>
+                        </div><br /><br />
+                        <!-- <h6>
+                            <strong>Syndication Name: {{selectedDetails.syndicationName}}</strong><br />
+                            <strong>Syndication Ref No: {{selectedDetails.syndicationRefNo}}</strong>
+                        </h6>
+                        <h6>
+                            <strong> Amount: {{selectedDetails.syndicationAmount}}</strong>
+                        </h6> -->
+                        <p-dataTable [responsive]="true" [value]="SyndicatedLoanApplicationDetail">
+                            <p-column field="bankCode" header="Bank Code"></p-column>
+                            <p-column field="bankName" header="Bank Name"></p-column>
+                            <p-column field="typeName" header="Type"></p-column>
+                            <p-column field="amountContributed" header="Amount">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+    
+                        </p-dataTable>
+                    </div>
+    
+                    <!-- PRODUCT CLASS: {{ selectedDetails.proposedProductClassId }} -->
+                    <!-- Corporate = 1,
+                    Commercial = 2,
+                    Retail = 3,
+                    Individual = 4,
+                    CashBackedOnly = 5,
+                    InvoiceDiscountingFacility = 6,
+                    FirstEdu = 7,
+                    FirstTrader = 8,
+                    ImportFinance = 9,
+                    BondAndGuarantees = 10 -->
+    
+                    <div class="row" style="max-height: 250px; overflow: auto; padding:0 15px 0 15px;">
+                        <p-dataTable *ngIf="selectedDetails?.proposedProductClassId == 6" [responsive]="true" [value]="invoiceDiscountingDetails">
+                            <p-column field="principalName" header="Principal Name"></p-column>
+                            <!-- <p-column field="invoiceNo" header="Invoice No"></p-column> -->
+                            <p-column field="invoiceNo" header="Invoice No">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] }}
+                                    <span *ngIf="loan.reValidated" class="invoice-emphasis">Reconfirmed!</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="invoiceDate" header="Invoice Date">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    <span class="invoice-emphasis">{{loan[col.field] | date }}</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="invoiceCurrencyName" header="Invoice Currency"></p-column>
+                            <p-column field="contractStartDate" header="Contract Start Date">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | date }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="contractEndDate" header="Contract End Date">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | date }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="invoiceAmount" header="Invoice Amount" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="viewInvoiceDocument(d)" href="javascript:void(0)">
+                                        View Invoice
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                            <p-footerColumnGroup>
+                                <p-row>
+                                    <p-column footer="Totals:" colspan="6"></p-column>
+                                    <p-column [footer]="sumInvoiceAmount" [style]="{'text-align': 'right'}"></p-column>
+                                </p-row>
+                            </p-footerColumnGroup>
+                        </p-dataTable>
+    
+                        <p-dataTable *ngIf="firstEduDetails" [responsive]="true" [value]="firstEduDetails">
+                            <p-column field="numberOfStudents" header="Number Of Students"></p-column>
+                            <p-column field="averageSchoolFees" header="Average School Fees" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="totalPreviousTermSchoolFees" header="Total Previous Term School Fees" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-footerColumnGroup>
+                                <p-row>
+                                    <p-column footer="Totals:" colspan="1"></p-column>
+                                    <p-column [footer]="sumAverageSchoolFees" [style]="{'text-align': 'right'}"></p-column>
+                                    <p-column [footer]="sumTotalPreviousTermSchoolFees" [style]="{'text-align': 'right'}"></p-column>
+                                </p-row>
+                            </p-footerColumnGroup>
+                        </p-dataTable>
+    
+                        <p-dataTable *ngIf="firstTraderDetails" [responsive]="true" [value]="firstTraderDetails">
+                            <p-column field="marketName" header="Market Name"></p-column>
+                            <p-column field="averageMonthlyTurnover" header="Average Monthly Turnover" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-footerColumnGroup>
+                                <p-row>
+                                    <p-column footer="Totals:" colspan="1"></p-column>
+                                    <p-column [footer]="sumAverageMonthlyTurnover" [style]="{'text-align': 'right'}"></p-column>
+                                </p-row>
+                            </p-footerColumnGroup>
+                        </p-dataTable>
+    
+                        <p-dataTable *ngIf="bondsAndGuanranteesDetails" [responsive]="true" [value]="bondsAndGuanranteesDetails">
+                            <p-column field="principalName" header="Principal Name"></p-column>
+                            <p-column field="invoiceCurrencyCode" header="Currency"></p-column>
+                            <p-column field="contractStartDate" header="Contract Start Date">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | date }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="contractEndDate" header="Contract End Date">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | date }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="amount" header="Amount" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="principalName" header="Principal Name" [style]="{'text-align': 'right'}">
+                                <ng-template let-col let-loan="rowData" pTemplate="body">
+                                    {{loan[col.field] }}
+                                </ng-template>
+                            </p-column>
+                            <p-column *ngIf="hasBandGDocument" [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="viewBNGDocument(d)" href="javascript:void(0)">
+                                        View Document
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                            <p-footerColumnGroup>
+                                <p-row>
+                                    <p-column footer="Totals:" colspan="4"></p-column>
+                                    <p-column [footer]="sumAmount" [style]="{'text-align': 'right'}"></p-column>
+                                </p-row>
+                            </p-footerColumnGroup>
+                        </p-dataTable>
+                    </div>
+    
+                    <div *ngIf="invoiceDiscountingDetails" class="panel-body" class="invoice-emphasis">
+                        Kindly validate to ensure that the duration between the Invoice issuance date and presentation date
+                        does not exceed the predefined
+                        validity period.
+                    </div>
+    
+    
+    
+                </div>
+            </div>
+                       
+            <div class="panel panel-default" *ngIf="isFacilityRating">
+                <div class="panel-heading">
+                    <h2 class="panel-title">Facility Rating</h2>
+                </div>
+                <div class="panel-body">
+
+                    <p-dataTable [value]="facilityRatings" [paginator]="true" [rows]="5">
+                    <!-- <p-column field="customerId" header="Customer ID"></p-column> -->
+                    <p-column field="customer_ID" header="Customer Code" filterMatchMode="contains"
+                    [style]="{'width':'50px','text-align':'right'}">
+                    </p-column>
+
+                    <p-column field="probability_of_Default" header="Probability Of Default" [filter]="false"
+                        filterMatchMode="contains" [style]="{'width':'100px','text-align':'right'}">
+                    </p-column>
+
+                    <p-column field="remark" header="Remark" [style]="{'width':'180px'}">
+                    </p-column>
+
+                </p-dataTable>
+                   
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+        <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Document Title:
+                    <strong>{{ selectedDocument }}</strong>
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayUpload=false">&times;</a>
+                </div>
+            </div>
+
+            <div class="panel-body" style="overflow:auto;height:500px">
+                <div style="margin: auto; width: 50%">
+                    <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile"
+                        alt="" class="img-thumbnail">
+                </div>
+            </div>
+
+        </div>
+    </p-dialog>
+
+    <!-- 
+<pre>{{ proposedApplicationDetails | json }}</pre>
+<pre>{{ approvedApplicationDetails | json }}</pre> -->

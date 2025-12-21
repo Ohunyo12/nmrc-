@@ -1,0 +1,456 @@
+<div *ngIf="displaySearch" class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Recovery Operations
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="card no-padding">
+              <p-dataTable [paginator]="true" [value]="approvedLoanReviewData" [rows]="15" (onRowSelect)="onSelectedLoanChange($event)">
+                <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                <p-column [style]="{'width':'150px'}" field="loanTypeName" header="Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'150px'}" field="loanReferenceNumber" header="Loan Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="lmsApplicationReferenceNumber" header="Application Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                <p-column field="customerName" header="Obligor Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'130px'}" field="operationName" header="Operation Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'130px','text-align':'right'}" field="principalAmount" header="Amount" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'100px'}" field="interestRate" header="Interest" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'70px'}" field="tenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+              </p-dataTable>
+            </div>
+          </div>
+        </div>
+        <!--end of panel-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="displayData" class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Recovery Operations
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-horizontal">
+
+            <form novalidate [formGroup]="remedialOperationForm" autocomplete="off">
+              <div class="form-group">
+                <label for="operationTypeId" class="col-md-2 control-label">Operation Type</label>
+                <div class="col-md-4">
+                  <select (change)="OnOperationTypeChange($event.target.value)" name="operationTypeId" formControlName="operationTypeId" id="operationTypeId"
+                    class="form-control" [ngClass]="!remedialOperationForm.controls['operationTypeId'].valid ? 'required-input' : 'valid-input'">
+                    <option value="">--- Select Operation Type ---</option>
+                    <option *ngFor="let pc of operationTypes" value="{{pc.operationTypeId}}">
+                      {{pc.operationTypeName}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <hr/>
+              <div class="form-group">
+                <label for="loanReferenceNumber" class="control-label col-md-2">Loan Reference Number</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="loanReferenceNumber" formControlName="loanReferenceNumber" id="loanReferenceNumber"
+                    class="form-control" [ngClass]="!remedialOperationForm.controls['loanReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                </div>
+
+                <label for="" class="control-label col-md-2">Interest Accrued Amount</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="writtenOffAccruedAmount" formControlName="writtenOffAccruedAmount" id="writtenOffAccruedAmount" class="form-control"
+                    [ngClass]="!remedialOperationForm.controls['writtenOffAccruedAmount'].valid ? 'required-input' : 'valid-input'">
+                </div>
+
+                <!-- <label for="" class="control-label col-md-2">Principal Amount</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="approvedAmount" formControlName="approvedAmount" id="approvedAmount" class="form-control"
+                    [ngClass]="!remedialOperationForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+
+              </div>
+              <div class="form-group">
+                <!-- <label for="outstandingPrincipal" class="control-label col-md-2">Outstanding Principal</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="outstandingPrincipal" formControlName="outstandingPrincipal" id="outstandingPrincipal"
+                    class="form-control" [ngClass]="!remedialOperationForm.controls['outstandingPrincipal'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+                <label for="interestRate" class="control-label col-md-2">Interest Rate</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="interestRate" formControlName="interestRate" id="interestRate" class="form-control"
+                    [ngClass]="!remedialOperationForm.controls['interestRate'].valid ? 'required-input' : 'valid-input'">
+                </div>
+
+                <label for="currency" class="control-label col-md-2">Currency</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="currency" formControlName="currency" id="currency" class="form-control" [ngClass]="!remedialOperationForm.controls['currency'].valid ? 'required-input' : 'valid-input'">
+                </div>
+                
+              </div>
+
+              <div class="form-group">
+                <!-- <label for="teno" class="control-label col-md-2">Tenor</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="teno" formControlName="teno" id="teno" class="form-control" [ngClass]="!remedialOperationForm.controls['teno'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+
+               <!--  <label for="accrualedAmount" class="control-label col-md-2">Accrued Interest</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="accrualedAmount" formControlName="accrualedAmount" id="accrualedAmount" class="form-control"
+                    [ngClass]="!remedialOperationForm.controls['accrualedAmount'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+              </div>
+
+              <div class="form-group">
+                <!-- <label for="currency" class="control-label col-md-2">Currency</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="currency" formControlName="currency" id="currency" class="form-control" [ngClass]="!remedialOperationForm.controls['currency'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+<!-- 
+                <label for="pastDueTotal" class="control-label col-md-2">Past Due</label>
+                <div class="col-md-4 ">
+                  <input type="text" [attr.disabled]=true name="pastDueTotal" formControlName="pastDueTotal" id="pastDueTotal" class="form-control"
+                    [ngClass]="!remedialOperationForm.controls['pastDueTotal'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+              </div>
+
+              <div class="form-group">
+                  <label for="totalAmount" class="control-label col-md-2">WrittenOff Amount</label>
+                  <div class="col-md-4 ">
+                    <input type="text" [attr.disabled]=true name="writtenOffAmount" formControlName="writtenOffAmount" id="writtenOffAmount" class="form-control"
+                      [ngClass]="!remedialOperationForm.controls['writtenOffAmount'].valid ? 'required-input' : 'valid-input'">
+                  </div>
+
+
+                <label for="equityContribution" class="control-label col-md-2"> Amount To Recover</label>
+                <div class="col-md-4 ">
+                  <input type="text" formatM name="equityContribution" formControlName="equityContribution" id="equityContribution" class="form-control"
+                    (input)="calculateBalance($event.target.value)" [ngClass]="!remedialOperationForm.controls['equityContribution'].valid ? 'required-input' : 'valid-input'">
+                </div>
+
+                <!-- <label for="previousEffectiveDate" class="control-label col-md-2">Effective Date </label>
+                <div [ngClass]="'no-data-div'" class="col-md-4">
+                  <p-calendar id="previousEffectiveDate" formControlName="previousEffectiveDate" dateFormat="dd/mm/yy" [ngClass]="'valid-input'"
+                    [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true" readOnlyInputText="true"
+                    yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                </div> -->
+              </div>
+              <div class="form-group">
+               
+
+                  <label for="totalAmount" class="control-label col-md-2">Total Amount</label>
+                  <div class="col-md-4 ">
+                    <input type="text" [attr.disabled]=true name="totalAmount" formControlName="totalAmount" id="totalAmount" class="form-control"
+                      [ngClass]="!remedialOperationForm.controls['totalAmount'].valid ? 'required-input' : 'valid-input'">
+                  </div>
+
+                
+              </div>
+
+              <div class="form-group">
+                <!-- <label for="equityContribution" class="control-label col-md-2"> Amount</label>
+                <div class="col-md-4 ">
+                  <input type="text" formatM name="equityContribution" formControlName="equityContribution" id="equityContribution" class="form-control"
+                    (input)="calculateBalance($event.target.value)" [ngClass]="!remedialOperationForm.controls['equityContribution'].valid ? 'required-input' : 'valid-input'">
+                </div> -->
+                <!-- <label for="effectiveDate" class="control-label col-md-2">New Effective Date </label>
+                <div class="col-md-4">
+                  <p-calendar id="effectiveDate" formControlName="effectiveDate" dateFormat="dd/mm/yy" [ngClass]="!remedialOperationForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'"
+                    (onSelect)="calculateTenor()" [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                </div> -->
+              </div>
+              <div class="form-group">
+
+<!-- 
+                  <label for="effectiveDate" class="control-label col-md-2">New Effective Date </label>
+                  <div class="col-md-4">
+                    <p-calendar id="effectiveDate" formControlName="effectiveDate" dateFormat="dd/mm/yy" [ngClass]="!remedialOperationForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'"
+                      (onSelect)="calculateTenor()" 
+                      [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true"
+                      yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                  </div>  -->
+
+
+                  
+                  <!-- <label for="effectiveDate" class="control-label col-md-2">New Effective Date </label>
+                  <div class="col-md-4">
+                    <p-calendar id="effectiveDate" formControlName="effectiveDate" dateFormat="dd/mm/yy" [ngClass]="!remedialOperationForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'"
+                      
+                      [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true"
+                      yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                  </div>  -->
+
+                <!-- <div *ngIf="!displayIrregularSchedule">
+                  <label class="control-label col-md-2">Balance: </label>
+                  <div class="col-md-4">
+                    <span style="margin:0;text-align: right">
+                      {{principalValanceString | number:'1.2'}}
+                    </span>
+                  </div>
+                </div> -->
+
+                <!-- <div *ngIf="!displayIrregularSchedule">
+                  <label for="maturityDate" class="control-label col-md-2">Maturity Date </label>
+                  <div [ngClass]="'no-data-div'" class="col-md-4">
+                    <p-calendar id="maturityDate" formControlName="maturityDate" dateFormat="dd/mm/yy" [ngClass]="!remedialOperationForm.controls['maturityDate'].valid ? 'required-input' : 'valid-input'"
+                      (onSelect)="calculateTenor()" [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true"
+                      yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                  </div>
+                </div> -->
+              </div>
+              <div   *ngIf="displayLoanReviewList">
+                <hr/>
+                <div class="form-group">
+                  <label for="salesAgentId" class="col-md-2 control-label">Recovery Agent</label>
+                  <div class="col-md-4">
+                    <select name="salesAgentId" formControlName="salesAgentId" (change)="sendEmail($event.target.value)" id="salesAgentId" class="form-control" [ngClass]="!remedialOperationForm.controls['salesAgentId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">--- Select Recovery Agent ---</option>
+                      <option *ngFor="let sa of salesAgents" value="{{sa.accreditedConsultantId}}">
+                        {{sa.firmName}}
+                      </option>
+                    </select>
+                  </div>
+                  <label for="" class="control-label col-md-2" *ngIf="!saleRecovery"> Payment Mode</label>
+                  <div class="col-md-4" *ngIf="!saleRecovery">
+                    <select name="paymentModeId" formControlName="paymentModeId" id="paymentModeId" class="form-control" (change)="OnPaymentModeChange($event.target.value)"
+                      [ngClass]="!remedialOperationForm.controls['paymentModeId'].valid ? 'required-input' : 'valid-input'">
+                      <option value="">--- Select Payment Mode ---</option>
+                      <option value="1">Account Number</option>
+                      <option value="2">General Ledger</option>
+
+                      <!-- <option *ngFor="let pm of paymentMode" value="{{pm.id}}">
+                        {{pm.name}}
+                      </option> -->
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group" *ngIf="!saleRecovery">
+                  <label for="" class="control-label col-md-2"> {{paymentModeLabel}}</label>
+                  <div class="col-md-4">
+                    <div class="input-group">
+                      <input type="text" name="accountNumber" formControlName="accountNumber" id="searchString" class="form-control" placeholder=""
+                        [ngClass]="!remedialOperationForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'">
+                      <span (click)="searchForAccount()" class="input-group-addon btn btn-info">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                      </span>
+                    </div>
+                  </div>
+                  <label for="cASA_AccountId" class="control-label col-md-2"> {{accountNameLabel}}</label>
+                  <div class="col-md-4 ">
+                    <input type="text" name="cASA_AccountId" [attr.disabled]="true" formControlName="cASA_AccountId" id="cASA_AccountId" class="form-control"
+                      [ngClass]="!remedialOperationForm.controls['cASA_AccountId'].valid ? 'required-input' : 'valid-input'">
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div *ngIf="displayIrregularSchedule">
+              <fieldset>
+                <legend>New Payment Plan</legend>
+                <div class="form-group">
+                  <label for="" class="control-label col-md-2">
+                    Date
+                  </label>
+                  <div class="col-md-4">
+                    <p-calendar id="scateredDate" dateFormat="dd/mm/yy" [(ngModel)]="data.scateredDate" [monthNavigator]="true" [inputStyle]="{'width': '270px' }"
+                      [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                  </div>
+                  <label for="" class="control-label col-md-2">
+                    Amount
+                  </label>
+                  <div class="col-md-4">
+                    <input type="number" [(ngModel)]="data.amount" class="form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="col-md-10">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>S/No</th>
+                          <th>Date</th>
+                          <th style="text-align: right">Amount</th>
+                          <th></th>
+                        </tr>
+
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let p of scatterdPayments;let indx=index">
+                          <td>
+                            {{indx + 1}}
+                          </td>
+                          <td>
+                            {{p.paymentDate | date}}
+                          </td>
+                          <td style="text-align: right;width:120px">{{p.paymentAmount | number:'1.2'}}</td>
+                          <td style="padding: 0;width:50px">
+                            <a (click)="removeItem($event,indx)" style="color:#ff0000" href="#">
+                              <i class="fa fa-times" aria-hidden="true"></i>X</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="text-align: left" class="col-md-2">
+
+                    <button [disabled]="!data.amount && !data.scateredDate" (click)="addToList()" pButton type="button" label="Add To List" icon="fa-plus"></button>
+                    <br/>
+                    <br/> Balance:
+                    <span style="margin:0;text-align: right">
+                      {{principalValanceString | number:'1.2'}}
+                    </span>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="form-group">
+              <div *ngIf="displayIrregularSchedule" class="col-md-2 col-md-offset-10">
+                <button type="button" [disabled]="!scatterdPayments" (click)="generateIrregularSchedule()" class="btn btn-success btn-block">Generate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+              <button type="button" (click)="submitForm(remedialOperationForm)" [disabled]="remedialOperationForm.invalid" class="btn btn-success pull-right">Save</button>
+              <button type="button" (click)="backToSearch()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <!--end of panel-->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<p-dialog header="Loan Schedule" [responsive]=true resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal"
+  modal="modal" showEffect="fade" width="1200">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Schedule Details
+      </h2>
+    </div>
+    <div class="panel-body">
+      <fieldset>
+        <table style="margin-bottom: 20px">
+          <tr>
+            <td style="font-size: 12px;font-weight: bold;padding: 4px">Granted Amount</td>
+            <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.principalAmount}}</td>
+            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Interest Rate</td>
+            <td style="text-align: right;padding: 4px">{{scheduleHeader?.interestRate}} %</td>
+            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Effective Interest Rate</td>
+            <td style="text-align: right;padding: 4px">{{scheduleHeader?.effectiveInterestRate | number: '1.2-2'}} %</td>
+          </tr>
+          <tr>
+            <td style="font-size: 12px;font-weight: bold;padding: 4px">Effective Date</td>
+            <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.effectiveDate | date}}</td>
+            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Maturity Date</td>
+            <td style="text-align: right;padding: 4px">{{scheduleHeader?.maturityDate | date}}</td>
+          </tr>
+        </table>
+
+      </fieldset>
+
+
+      <p-dataTable scrollable="true" scrollHeight="400px" [value]="schedules" [responsive]=true selectionMode="single">
+        <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No"></p-column>
+        <p-column field="paymentDate" header="Payment Date">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span>{{schedule[col.field] | date}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="startPrincipalAmount" header="Start Principal">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="periodPaymentAmount" header="Periodic Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="periodPrincipalAmount" header="Principal Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="periodInterestAmount" header="Interest Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="endPrincipalAmount" header="Balance">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+
+        <p-column field="amortisedStartPrincipalAmount" header="AM Start Principal">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="amortisedPeriodPaymentAmount" header="AM Periodic Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="amortisedPeriodPrincipalAmount" header="AM Principal Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="amortisedPeriodInterestAmount" header="AM Interest Amount">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <p-column field="amortisedEndPrincipalAmount" header="AM Balance">
+          <ng-template let-col let-schedule="rowData" pTemplate="body">
+            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+          </ng-template>
+        </p-column>
+        <!-- <p-column field="internalRateOfReturn" header="IRR">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column> -->
+      </p-dataTable>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="displayScheduleModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

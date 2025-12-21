@@ -1,0 +1,244 @@
+<!-- <div class="panel-body">
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="suggestedConditions" [rows]="12" dataKey="suggestionid" (onRowSelect)="onSelectedSuggestion($event.data)"
+            (onRowUnselect)="removeSelectedSuggestion($event.data)" (onHeaderCheckboxToggle)="onSelectedAllSuggestions($event.data)"
+            [(selection)]="selectedSuggestions">
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="isAnalyst"></p-column>
+
+            <p-column field="description" header="Conditions" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="isSubsequent" header="Subsequent" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isSubsequent == true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column field="isExternal" header="Internal" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editCondition(d,true)" href="javascript:void(0)">Modify & Add</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+</div> -->
+
+<div class="panel-body">
+    <div class="col-md-6">  
+        <select (change)="onConditionsFacilityChange($event.target.value)" [(ngModel)]="selectedDetailId" class="form-control" [ngClass]="selectedDetailId == null ? 'required-input' : 'valid-input'">
+            <option value="null" selected="selected">-- Select Facility--</option>
+            <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+        </select>
+    </div>
+
+</div>
+
+<div class="panel-body" *ngIf="userIsAccountOfficer">
+
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="defaultConditions" [rows]="12" dataKey="conditionId" (onRowSelect)="onSelectedCondition($event.data)"
+            (onRowUnselect)="removeSelectedCondition($event.data)" (onHeaderCheckboxToggle)="onSelectedAllCondition($event.data)"
+            [(selection)]="selectedConditions">
+ 
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'38px'}" ></p-column>
+            <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="isAnalyst || isBusiness"></p-column> -->
+            <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="!displayedOnly"></p-column>
+            <!-- <p-column field="conditionId" header="conditionId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column> -->
+            <!-- <p-column field="product" header="Product" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column> -->
+
+            <p-column field="condition" header="Conditions" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="isSubsequent" header="Subsequent" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isSubsequent == true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column field="isExternal" header="Internal" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'110px'}" *ngIf="!displayedOnly">
+                <!-- <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst || isBusiness"> -->
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editCondition(d,true)" href="javascript:void(0)">Modify & Add</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+<div class="panel-body" *ngIf="userIsAccountOfficer">
+    
+        <div class="col-md-6" *ngIf="!displayedOnly">
+            <!-- <div class="col-md-6" *ngIf="isAnalyst || isBusiness"> -->
+            <button type="button" (click)="saveSelectConditionsChanges()" [disabled]="unsavedConditions == false || selectedDetailId == null"
+                class="btn btn-success">
+                Save Selected Changes</button>
+            <span *ngIf="unsavedConditions == true" style="margin:6px; font-size:17px; font-weight: 400; color: red; vertical-align: middle;">
+                Unsaved changes***</span>
+        </div>
+    
+    </div>
+
+<!-- additional -->
+
+<div class="panel-heading">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="panel-title pull-left">Loan Conditions</h2>
+        </div>
+    </div>
+</div>
+
+<div class="panel-body">
+
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="conditions"> 
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <!-- <p-column field="conditionId" header="conditionId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column>
+                                    <p-column field="loanConditionId" header="L conditionId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column> -->
+            <p-column field="condition" header="Conditions" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="isSubsequent" header="Subsequent" [style]="{'width':'100px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isSubsequent == true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+            <p-column field="isExternal" header="Internal" [style]="{'width':'100px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+                
+            
+    
+            <p-column [style]="{'width':'110px'}" *ngIf="!displayedOnly">
+                <!-- <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst || isBusiness"> -->
+                <ng-template pTemplate="header" let-d="rowData">
+                    <div class="pull-right">
+                        <button [disabled]="selectedDetailId == null" (click)="showConditionForm(d)" pButton type="button" label="Add New" icon="fa-plus"></button>
+                    </div>
+                </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editCondition(d)" href="javascript:void(0)">Edit</a>
+                        <span style="padding:3px;"> | </span>
+                        <a (click)="removeCondition(d.loanConditionId)" href="javascript:void(0)">Remove</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+<!-- <suggested-conditions *ngIf="applicationId && (isAnalyst == true || isBusiness == true)" [reload]="reload" [callerId]="1" [isAnalyst]="isAnalyst" [applicationId]="applicationId" 
+[isCondition]="isCondition" [proposedItems]="proposedItems" (addSuggestedCondition)="addSuggestedCondition($event)"></suggested-conditions> -->
+
+
+<!--condition form modal-->
+
+<p-dialog [responsive]=true [(visible)]="displayConditionForm" id="condition-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{ formState }} Condition</h2>
+        </div>
+
+        <form novalidate [formGroup]="conditionForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="position" class="control-label col-md-12">Facility</label>
+                        <div class="col-md-12">
+                            <select [attr.disabled]="true" name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                class="form-control" [ngClass]="!conditionForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="condition">Condition</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea style="height:120px;" name="condition" formControlName="condition" id="condition" class="form-control" [ngClass]="!conditionForm.controls['condition'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isExternal" id="isExternal" type="checkbox">
+                            </div>
+                            <label class="checkbox">External Condition</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input (change)="onSubsequentChange($event.target.checked)" formControlName="isSubsequent" id="isSubsequent" type="checkbox">
+                            </div>
+                            <label class="checkbox">Condition Subsequent</label>
+                        </div>
+                    </div>
+                    <div *ngIf="isSubsequent" class="form-group">
+                        <label for="position" class="control-label col-md-12">Timeline for Compliance</label>
+                        <div class="col-md-12">
+                            <select [attr.disabled]="isSubsequent == true ? null : true" name="timelineId" formControlName="timelineId" id="timelineId"
+                                class="form-control" [ngClass]="!conditionForm.controls['timelineId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Compliance Timeline--</option>
+                                <option *ngFor="let x of complianceTimelines" [value]="x.timelineId">{{ x.timeline }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- <pre>{{conditionForm.value | json}}</pre> -->
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveCondition(conditionForm)" [disabled]="conditionForm.invalid" class="btn btn-success pull-right">
+                            Save</button>
+                        <button type="button" (click)="displayConditionForm=false" style="margin-right:5px" class="btn btn-danger pull-right"> Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->

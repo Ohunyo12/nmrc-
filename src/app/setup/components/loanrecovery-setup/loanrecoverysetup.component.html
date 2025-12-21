@@ -1,0 +1,138 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Recovery Setup
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="loanRecoverySetups">
+                        <p-column field="loanRefNo" header=" loan" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productTypeName" header="Product Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="casaAccountName" header="Casa Account" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="agentName" header="Agent" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="amountOwed" header="Amount Owed" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="writeOffAmount" header="WriteOff Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                                Edit
+                            </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editLoanRecoverySetup(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="loanRecoverySetupForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="loanId" class="control-label col-md-2"> loan </label>
+                        <div class="col-md-4">
+                            <input type="text" name="loanId" formControlName="loanId" id="loanRefNo" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['loanId'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                      <label for="productTypeId" class="control-label col-md-2">Product Type</label>
+                        <div class="col-md-4">
+                            <select type="text" name="productTypeId" formControlName="productTypeId" id="productTypeId" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['productTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Product Type --</option>
+                                <option *ngFor="let type of productTypes" [value]="type.productTypeId">
+                                    {{ type.productTypeName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agentId" class="control-label col-md-2">Agent</label>
+                        <!-- <div class="col-md-4">
+                            <input type="text" name="agentId" id="agentId" class="form-control" formControlName="agentId" [ngClass]="loanRecoverySetupForm.controls['agentId'].valid ? 'valid-input' : 'required-input'">
+                        </div> -->
+
+                        <div class="col-md-4">
+                            <select type="text" name="agentId" formControlName="agentId" id="agentId" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['agentId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Agent --</option>
+                                <option *ngFor="let agent of agents" [value]="agent.agentId">
+                                    {{ agent.agentName}}
+                                </option>
+                            </select>
+                        </div>
+
+                          <label for="casaAccountId" class="control-label col-md-2">Casa Account</label>
+                        <!-- <div class="col-md-4">
+                            <select type="text" name="casaAccountId" formControlName="casaAccountId" id="casaAccountId" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select CasaAccount --</option>
+                                <option *ngFor="let casa of products" [value]="casa.casaAccountId">
+                                    {{ casa.casaAccountName}}
+                                </option>
+                            </select>
+                        </div> -->
+                        <div class="col-md-4">
+                                <input type="text" name="casaAccountId" id="casaAccountId" class="form-control" formControlName="casaAccountId" [ngClass]="loanRecoverySetupForm.controls['casaAccountId'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="amountOwed" class="control-label col-md-2">Amount Owed</label>
+                        <div class="col-md-4">
+                            <input type="text" name="amountOwed" formControlName="amountOwed" id="amountOwed" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['amountOwed'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    
+                     <label for="writeOffAmount" class="control-label col-md-2">WriteOff Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="writeOffAmount" formControlName="writeOffAmount" id="writeOffAmount" class="form-control" [ngClass]="!loanRecoverySetupForm.controls['writeOffAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(loanRecoverySetupForm)" [disabled]="loanRecoverySetupForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

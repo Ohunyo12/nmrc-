@@ -1,0 +1,384 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                End of Day Operations
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <p-tabView>
+                    <p-tabPanel header="Public  Holiday">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            Public Holidays
+                                        </h2>
+                                        <div class="pull-right">
+                                            <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <p-dataTable [value]="publicHolidays" [responsive]="true" [paginator]="true" [rows]="10" [(selection)]="EndOfDayData" selectionMode="single">
+                                    <p-column field="description" header="Holiday Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="date" header="Holiday Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.date | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column field="countryName" header="CountryName" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="editHoliday(i)" href="javascript:void(0)">Edit</a>
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a style="text-decoration: none;color:#ff0000" href="javascript:void(0)" (click)="delete(pGrp.publicHolidayId)"><i class="glyphicon glyphicon-remove"></i> </a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+
+                        </div>
+                        <!--end of panel-->
+                    </p-tabPanel>
+
+                    <p-tabPanel header="EOD">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            EOD Operation
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <form novalidate [formGroup]="eodForm"> -->
+                            <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group text-center" >
+                                            <blockquote>
+                                                <!-- <b>Next Application Date: </b> <br> -->
+                                                <b>Current Application Date: </b> <br>
+                                                <cite>{{nextCurrentDate | date:'fullDate' }}</cite>
+                                            </blockquote> <br>
+
+                                            <blockquote>
+                                                <!-- <b>Next Application Date: </b> <br> -->
+                                                <b>Last EOD Refresh Date: </b> <br>
+                                                <cite>{{lastEODRefreshDate | date:'medium' }}</cite>
+                                            </blockquote> <br>
+
+                                            <!-- <button type="button" (click)="logOutActiveUsers()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Logout Active Users</button> -->
+                                            <!-- <button type="button" (click)="changeApplicationDate()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Change Application Date</button> -->
+                                            <button type="button" (click)="runEodReload()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Start End Of Day Run</button>
+                                            
+                                            <!-- <button type="button" (click)="runEodBukPosting()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Refresh Finacle Bulk Posting</button>
+                                            <button type="button" (click)="deactivateInactiveUsers()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Deactivate Inactive Users</button>
+                                            <button type="button" (click)="refreshLoanClassification()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Refresh Loan Classification</button> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            <!-- </form> -->
+                            <!-- <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-12 text-center ">
+                                        <strong>NOTE:</strong> This process once started cannot be undone. Be sure you have made all the neccessary checks. Ensure your PC battery is connected to a power source.
+                                    </div>
+                                </div>
+                            </div> -->
+
+
+                            <div class="panel-body">
+                                <p-dataTable scrollable="true"  [value]="scheduleMonitoring" [responsive]=true selectionMode="single">
+                        
+                                    <p-column  [style]="{'width':'500px'}" field="eodOperation" header="EOD Operation"></p-column>
+                                    
+                                    <p-column field="startDateTime" header="Start Date">
+                                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                            <span>{{schedule[col.field] | date: 'dd-MM-yyyy hh:mm:ss' }}</span>
+                                        </ng-template>
+                                    </p-column>
+            
+                                    <p-column field="endDateTime" header="End Date">
+                                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                            <span style="text-align: right">{{schedule[col.field] | date: 'dd-MM-yyyy hh:mm:ss'}}</span>
+                                        </ng-template>
+                                    </p-column>
+            
+                                    <p-column field="eodDate" header="EOD Date">
+                                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                            <span style="text-align: right">{{schedule[col.field] | date}}</span>
+                                        </ng-template>
+                                    </p-column>
+            
+                                    <p-column  field="eodStatus" header="EOD Status"></p-column>
+
+                                    <p-column  field="errorInformation" header="Error Information"></p-column>
+            
+                                </p-dataTable>
+                            </div>
+                        
+
+
+                        </div>
+                    </p-tabPanel>
+
+                    <p-tabPanel header="Other Processes">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            Other Processes
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group text-center" >
+                                            <blockquote>
+                                                <!-- <b>Next Application Date: </b> <br> -->
+                                                <b>Current Application Date: </b> <br>
+                                                <cite>{{nextCurrentDate | date:'fullDate' }}</cite>
+                                            </blockquote> <br>
+                                            <button type="button" (click)="runEodBukPosting()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Refresh Staging Bulk Posting</button>
+                                            <button type="button" (click)="deactivateInactiveUsers()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Deactivate Inactive Users</button>
+                                            <button type="button" (click)="refreshLoanClassification()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Refresh Loan Classification</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                    </p-tabPanel>
+					
+                    <p-tabPanel header="EOD Process Information">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            End Of Day Information
+                                        </h2>
+                                        <!-- <div class="pull-right">
+                                            <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <p-dataTable [value]="endOfDay" [responsive]="true" [paginator]="true" [rows]="5">
+                                    <p-column field="date" header="Action Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.date | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+
+                                    <p-column field="startDateTime" header="EOD Start Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.startDateTime | date: 'dd-MM-yyyy hh:mm:ss' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="endDateTime" header="EOD End Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.endDateTime | date: 'dd-MM-yyyy hh:mm:ss' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="eodStatus" header="Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="editLog(d.date,$event)" href="javascript:void(0)">View Log</a>
+                                        </ng-template>
+                                    </p-column>
+
+                                </p-dataTable>
+                            </div>
+
+                        </div>
+                        <!--end of panel-->
+                    </p-tabPanel>
+
+                    <p-tabPanel header="Weekends">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            Year Weekends
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <form novalidate [formGroup]="eodForm" autocomplete="off">
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group text-center">
+                                            <blockquote>
+                                                <p> Current Year: </p>
+                                                <cite>{{currentDate |  date:'yyyy' }}</cite>
+                                            </blockquote>
+                                            <div class="col-md-12 ">
+                                                <button type="button" (click)="loadWeekends()" [disabled]="isProcessInStarted" class="btn btn-success pull-center">Generate Weekends</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-12 text-center ">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabPanel>
+                </p-tabView>
+
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--form modal-->
+    <!--section form modal-->
+    
+    <p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'800px'}" modal="modal" showEffect="fade" width="800">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {{ entityName }}
+                </h2>
+            </div>
+    
+            <form novalidate [formGroup]="holidayForm" autocomplete="off">
+    
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                            <div class="form-group">
+                                    <label for="date" class="control-label col-md-4">Holiday Date</label>
+                                    <div class="col-md-8">
+                                            <p-calendar id="date" formControlName="date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"></p-calendar> 
+
+                                        <!-- <input id="date" type="date" formControlName="date" class="form-control"/> -->
+                                      <!-- <p-calendar id="date" formControlName="date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}" [style]="{'width': '267px', 'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"></p-calendar>  -->
+                                    </div>
+                                </div>
+                            <div class="form-group">
+                                    <label for="description" class="control-label col-md-4">Description</label>
+                                    <div class="col-md-8">
+                                        <textarea rows="8" name="description" id="description" class="form-control" formControlName="description" [ngClass]="holidayForm.controls['description'].valid ? 'valid-input' : 'required-input'"></textarea>
+                                    </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    
+
+
+                    </div>
+                </div>
+                
+            </form>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(holidayForm)" [disabled]="holidayForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true  resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'800px'}" modal="modal" showEffect="fade" width="1200">
+    <!-- <p-dialog [responsive]=true resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal" modal="modal" showEffect="fade" width="1200" height="600"> -->
+        
+
+                    <div style="padding:3px" class="panel-body">
+
+                        <p-dataTable scrollable="true"  [value]="schedules" [responsive]=true selectionMode="single">
+                        
+                            <p-column  [style]="{'width':'500px'}" field="eodOperation" header="EOD Operation"></p-column>
+                            
+                            <p-column field="startDateTime" header="Start Date">
+                                <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                    <span style="text-align: right">{{schedule[col.field] | date: 'dd-MM-yyyy hh:mm:ss' }}</span>
+                                </ng-template>
+                            </p-column>
+    
+                            <p-column field="endDateTime" header="End Date">
+                                <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                    <span style="text-align: right">{{schedule[col.field] | date: 'dd-MM-yyyy hh:mm:ss'}}</span>
+                                </ng-template>
+                            </p-column>
+    
+                            <p-column field="eodDate" header="EOD Date">
+                                <ng-template let-col let-schedule="rowData" pTemplate="body">
+                                    <span style="text-align: right">{{schedule[col.field] | date}}</span>
+                                </ng-template>
+                            </p-column>
+    
+                            <p-column  field="eodStatus" header="EOD Status"></p-column>
+    
+                            <p-column  field="errorInformation" header="Error Information"></p-column>
+
+
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="ExportToExcel(d,$event)" href="javascript:void(0)">Download Status Record</a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="button" (click)="displayScheduleModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+        
+                   
+        
+                </p-dialog>
+    
+
+
+
+
+    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

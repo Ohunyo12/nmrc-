@@ -1,0 +1,112 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+
+            <div style="margin-bottom:0" class="panel panel-default">
+
+                <div class="panel-heading">
+                    <h2 class="panel-title"> Capture Fee </h2>
+                </div>
+        
+                <form novalidate [formGroup]="applicationForm" autocomplete="off">
+        
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+        
+                            <div class="form-group">
+                                <label class="control-label col-md-6">Charge Fee</label>
+                                <div *ngIf="isRate">
+                                        <label class="control-label col-md-3">Fee Rate</label>
+                                </div>
+                                <div *ngIf="!isRate">
+                                        <label class="control-label col-md-3">Fee Amount</label>
+                                </div>
+                                <label class="control-label col-md-3">.</label>
+                                <div class="col-md-6">
+                                    <select (change)="onChargeFeeChange($event.target.value)" name="chargeFee" formControlName="chargeFee"
+                                        id="chargeFee" class="form-control" [ngClass]="applicationForm.controls['chargeFee'].valid ? 'valid-input' : 'required-input'">
+                                        <option value="0">-- Select Fee --</option>
+                                        <option *ngFor="let x of feeCharges" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div>
+                                <div *ngIf="isRate">
+                                        <div class="col-md-3">
+                                                <input type="number" max="100" (blur)="restrictNumber($event)"  name="feeAmount" formControlName="feeAmount" id="feeAmount" class="numeric form-control"
+                                                    [ngClass]="!applicationForm.controls['feeAmount'].valid ? 'required-input' : 'valid-input'">
+                                            </div>
+                                </div>
+                                <div *ngIf="!isRate">
+                                        <div class="col-md-3">
+                                                <input type="text" formatM  name="feeAmount"  formControlName="feeAmount" id="feeAmount" class="numeric form-control"
+                                                    [ngClass]="!applicationForm.controls['feeAmount'].valid ? 'required-input' : 'valid-input'">
+                                            </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button style="width:100%;" (click)="validateSubAllocationTranche(applicationForm)" [disabled]="applicationForm.invalid" class="btn btn-primary form-control">
+                                        <i class="glyphicon glyphicon-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-6">CASA Chart Of Account</label>
+                                <label for="description" class="control-label col-md-6">Description</label>
+                                <div class="col-md-6">
+                                    <select name="casaAccount" formControlName="casaAccount"
+                                        id="casaAccount" class="form-control" [ngClass]="applicationForm.controls['casaAccount'].valid ? 'valid-input' : 'required-input'">
+                                        <option value="0">-- Select Fee --</option>
+                                        <option *ngFor="let x of casaAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <textarea style="height:50px;" name="description" formControlName="description" id="description" class="form-control"
+                                        [ngClass]="applicationForm.controls['description'].valid ? 'valid-input' : 'required-input'"></textarea>
+                                </div>
+                               
+                            </div>
+                            
+        
+                        </div>
+        
+                        <p-dataTable [value]="applicationCollection" [paginator]="true" [rows]="5"  dataKey="id" > 
+                            <p-column field="chargeFee" header="Charge Fee" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="description" header="Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="casaAccountName" header="CASA Account" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="feeAmount" header="Fee Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.feeAmount | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                            <p-column field="feeRate" header="Fee Rate(%)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                            <p-column [style]="{'width':'60px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">
+                                        <a (click)="removeApplicationCollection(d)" href="javascript:void(0)">Remove</a>
+                                    </div>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+        
+                    </div>
+                    <!-- <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" (click)="submitForm(applicationForm)" [disabled]="applicationCollection.length < 1 " class="btn btn-success pull-right">Submit Fee</button>
+                                <button type="button" (click)="showApplicationForm=false" style="margin-right:5px" class="btn btn-primary pull-right">Close</button>
+                            </div>
+                        </div>
+                    </div> -->
+                </form>
+                
+        
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+

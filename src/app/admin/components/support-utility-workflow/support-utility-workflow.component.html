@@ -1,0 +1,488 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Wokflow Issues
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="panel-body">
+                    <div class="ui-g ui-fluid">
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-9">
+                                <h4> Search</h4>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-right:15px">
+                            <label for="searchItem" class=" col=md-9">
+
+                            </label>
+                            <div class="col=md-15">
+                                <input type="text" name="searchString" placeholder="Reference Number"
+                                    [(ngModel)]="searchString" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-right:10px">
+                            <label for="searchItem" class=" col=md-3">
+
+                            </label>
+                            <div class="col=md-9">
+                                <button pButton type="button" (click)="popoverSeeMore()" label="Scan Records"></button>
+                            </div>
+                        </div>
+                        <div class="form-group pull-left" style="margin-right:10px">
+                            <label for="searchItem" class=" col=md-3">
+
+                            </label>
+                            <div class="col=md-9">
+                                <button pButton type="button" *ngIf="activeTabindex == 0" [disabled]="!wokrflowtrail" (click)="popoverSeeWorkflow()"
+                                    label="View Expected Workflow"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                        <p-tabPanel header="Trail">
+                            <p-dataTable [paginator]="true" [rows]="15" [value]="wokrflowtrail" [responsive]=true
+                                selectionMode="single">
+                                <p-column field="applicationReferenceNumber" header="Reference Number" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="oprationName" header="Operation" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="approvedAmount" header="Amount" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column field="transactionDate" header="Transaction Date" sortable="true"
+                                    [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.transactionDate | date: 'dd-MM-yyyy' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="approvalStatus" header="Aproval Status" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                    <p-column field="fromStaffName" header="Request Staff" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                    <p-column field="toStaffName" header="To Staff" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                    <p-column field="toApprovalLevelName" header="To Approval Level" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'150px'}">
+                                    <ng-template pTemplate="header">
+                                    </ng-template>
+                                    <ng-template let-trail="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="select(trail)">
+                                            View
+                                        </a> |
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                            <p-dialog [responsive]=true [(visible)]="displayOperationsModal" modal="modal"
+                                id="searchSchemeModal" showEffect="fade" width="600">
+                                <div style="margin-bottom:0" class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div style="margin-left:0" class="row">
+                                            <h2 class="panel-title pull-left">
+                                                Select Operation
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col=md-12">
+                                            <select class="form-control" [(ngModel)]="operationId" id="operationsId"
+                                                (change)="getExpectedWorkflow($event.target.value)">
+                                                <option value=""> -Select operation- </option>
+                                                <option *ngFor="let item of uniqueOperations"
+                                                    value="{{item.operationId}}">
+                                                    {{item.oprationName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="button" (click)="Cancel()" style="margin-right:5px"
+                                                    class="btn btn-danger pull-right">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-dialog>
+                            <p-dialog [contentStyle]="{'overflow':'auto','max-height':'600px'}" [responsive]=true
+                                [(visible)]="displayApprovalTrailModal" modal="modal" id="searchSchemeModal"
+                                showEffect="fade" width="1200">
+                                <div style="margin-bottom:0" class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div style="margin-left:0" class="row">
+                                            <h2 class="panel-title pull-left">
+                                                Expected Workflow Route
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p-dataTable [paginator]="true" [rows]="15" [value]="expectedworkflow"
+                                            [responsive]=true selectionMode="single">
+                                            <p-column field="operationName" header="Operation" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="levelName" header="Staff Level" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="position" header="Position" sortable="true" [filter]="true"
+                                                filterMatchMode="contains"></p-column>
+                                            <p-column field="productClassName" header="Product Class" sortable="true"
+                                                [filter]="true" filterMatchMode="contains">
+                                            </p-column>
+                                            <p-column field="productName" header="Product" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="businessRule" header="Business Rule" sortable="true"
+                                                [filter]="true" filterMatchMode="contains">
+                                            </p-column>
+                                            <p-column [style]="{'width':'150px'}">
+                                                <ng-template pTemplate="header">
+                                                </ng-template>
+                                                <ng-template let-flowtrail="rowData" let-i="rowIndex"
+                                                    pTemplate="body">
+                                                    <a (click)="viewBisRule(flowtrail)">
+                                                        View Business Rule
+                                                    </a> 
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" (click)="displayApprovalTrailModal=false"
+                                                style="margin-right:5px"
+                                                class="btn btn-danger pull-right">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-dialog>
+                            <p-dialog [contentStyle]="{'overflow':'auto','max-height':'600px'}" [responsive]=true
+                            [(visible)]="displayBusinessRuleModal" modal="modal" id="searchSchemeModal"
+                            showEffect="fade" width="1200">
+                            <div style="margin-bottom:0" class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div style="margin-left:0" class="row">
+                                        <h2 class="panel-title pull-left">
+                                            Business Rule
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="panel-body">
+                                        <table class="table table-casa-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Business Rule:</strong>
+                                                    </td>
+                                                    <td>{{businessRules?.description}}</td>
+                                                    <td>
+                                                        <strong>Minimum Amount:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.minimumAmount }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Insider Related:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.insiderRelated }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Maximum Amount:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.maximumAmount }}</td>
+                                                    <td>
+                                                        <strong>PEP Amount:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.pepAmount}}</td>
+                                                    <td>
+                                                        <strong>PEP:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.pep}}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Project Related:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.projectRelated}}</td>
+                                                    <td>
+                                                        <strong>On Lending:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.onLending }}</td>
+                                                    <td>
+                                                        <strong>Exclude Level:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.excludeLevel }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>Intervention Funds:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.interventionFunds }}</td>
+                                                    <td>
+                                                        <strong>ORR Based Approval </strong>
+                                                    </td>
+                                                    <td> {{ businessRules?.orrBasedApproval}}</td>
+                                                    <td>
+                                                        <strong>Insider Related:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.insiderRelated }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>With Instruction:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.withoutInstruction}}</td>
+                                                    <td>
+                                                        <strong>Domiciliation Not Inplace:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.domiciliationNotInPlace }}</td>
+                                                    <td>
+                                                        <strong>ESRM:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.esrm }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Is For Contingent Facility:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.isForContingentFacility }}</td>
+                                                    <td>
+                                                        <strong>Is For Revolving Facility:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.isForRevolvingFacility }}</td>
+                                                    <td>
+                                                        <strong>Is For Renewal:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.isForRenewal }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Exempt Contingent Facility:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.exemptContingentFacility }}</td>
+                                                    <td>
+                                                        <strong>Exempt Revolving Facility:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.exemptRevolvingFacility}}</td>
+                                                    <td>
+                                                        <strong>Exempt Renewal:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.exemptRenewal}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Exclude Level:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.excludeLevel }}</td>
+                                                    <td>
+                                                        <strong>Is Agric Related:</strong>
+                                                    </td>
+                                                    <td>{{ businessRules?.isAgricRelated}}</td>
+                                                    <td>
+                                                        <strong></strong>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button"
+                                                (click)="displayBusinessRuleModal=false; displayApprovalTrailModal = true"
+                                                style="margin-right:5px"
+                                                class="btn btn-danger pull-right">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-dialog>
+                        </p-tabPanel>
+                        <p-tabPanel header="Trail Details">
+                            <div style="margin-bottom:0" class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div style="margin-left:0" class="row">
+                                        <h2 class="panel-title pull-left">
+                                            Approval Trail
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="panel-body">
+                                        <table class="table table-casa-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Arrival Date:</strong>
+                                                    </td>
+                                                    <td>{{wokrflowtrailRecord?.arrivalDate | date: 'dd-MM-yyyy' }}</td>
+                                                    <td>
+                                                        <strong>System Arrival Date:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.systemArrivalDateTime | date:
+                                                        'dd-MM-yyyy' }}
+                                                    </td>
+                                                    <td>
+                                                        <strong>Response Date:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.responseDate | date: 'dd-MM-yyyy' }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>System Response Date:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.systemResponseDateTime | date:
+                                                        'dd-MM-yyyy' }}</td>
+                                                    <td>
+                                                        <strong>Request Staff:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.fromStaffName}}</td>
+                                                    <td>
+                                                        <strong>Response Staff:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.responsestaffName}}</td>
+
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>To Staff:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.toStaffName}}</td>
+                                                    <td>
+                                                        <strong>Relief Staff:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.reliefStaff }}</td>
+                                                    <td>
+                                                        <strong>From Approval Level:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.fromApprovalLevelName }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <strong>To Approval Level:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.toApprovalLevelName }}</td>
+                                                    <td>
+                                                        <strong>Approval State</strong>
+                                                    </td>
+                                                    <td>{{wokrflowtrailRecord?.approvalState}} </td>
+                                                    <td>
+                                                        <strong>Approval Status:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.approvalStatus }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Operation:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.oprationName}}</td>
+                                                    <td>
+                                                        <strong>Comment:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.comment }}</td>
+                                                    <td>
+                                                        <strong>Vote:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.vote }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <strong>Looped Staff:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.loopedStaff}}</td>
+                                                    <td>
+                                                        <strong>Looped Staff Role:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.loopedStaff }}</td>
+                                                    <td>
+                                                        <strong>Refer Back State:</strong>
+                                                    </td>
+                                                    <td>{{ wokrflowtrailRecord?.misCode }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+
+                                    <div class="panel-footer">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="button" style="margin-right:5px"
+                                                (click)="provideAction(wokrflowtrailRecord?.approvalTrailId)"  
+                                                class="btn btn-primary pull-left">Provide Action</button>
+
+                                                <button type="button" style="margin-right:5px"
+                                                (click)="deleteAction()"
+                                                class="btn btn-danger pull-left">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p-dialog [responsive]=true [(visible)]="displayProvideAction" id="ad-modal" modal="modal" showEffect="fade" width="300">
+                                    <div style="margin-bottom:0" class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                Provide Action
+                                            </h2>
+                                        </div>
+                                        <form novalidate [formGroup]="provideActionForm" autocomplete="off">
+                                            <div class="panel-body">
+                                                <div class="form-horizontal">
+                                                    <div class="form-group">
+                                                        <div class ="col-md-8">
+                                                            <label for="approvalStatus">To Approval Level ID: </label>
+                                                            <input type="text" formControlName="approvalLevelId" id="approvalLevelId" class="form-control">
+                                                            
+                                                            <!-- <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="selectedUserData.approvalStatusId" [ngClass]="!selectedUserData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                                                <option value="">--- Select Approval Status ---</option>
+                                                                <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                                                            </select> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel-footer">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <button type="button" (click)="submitActionForm(provideActionForm)"
+                                                            class="btn btn-success pull-right">Save</button>
+                                                        <button type="button" (click)="displayProvideAction=false" style="margin-right:5px"
+                                                            class="btn btn-danger pull-right">Cancel</button>
+                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </p-dialog>
+                            </div>
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

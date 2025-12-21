@@ -1,0 +1,192 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Collateral Insurance
+                </h2>
+                <div class="pull-right">
+                    <button (click)="showCusotmerSearch=true" pButton type="button" label="Search For Collateral"
+                        icon="fa-plus"></button>
+                </div>
+                <!-- <div class="pull-right">
+                    <button (click)="showInsuranceSearch=true" pButton type="button" label="Search For Insurance"
+                        icon="fa-plus"></button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<p-dialog [responsive]=true [(visible)]="showCusotmerSearch" id="ct-modal" modal="modal" showEffect="fade" width="900">
+  <customer-search (customer)="getCustomerDetail($event.customerId)" [showPhoneNumberSearch]="false">
+  </customer-search>
+  <div class="panel-footer">
+      <div class="row">
+          <div class="col-md-12">
+              <button type="button" (click)="showCusotmerSearch=false;" style="margin-right:5px"
+                  class="btn btn-danger pull-right">Back</button>
+          </div>
+      </div>
+  </div>
+</p-dialog>
+
+<p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+    <p-tabPanel header="Registered Collaterals">
+        <div class="panel-body coll-list">
+            <p-dataTable [value]="collateralList" [paginator]="true" [rows]="5">
+                        <p-column field="collateralCode" header="Collateral Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="collateralTypeName" header="Collateral Type" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                        </p-column>
+          
+                        <p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.collateralValue | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+          
+                        <p-column field="haircut" header="Hair Cut" sortable="true" [filter]="true" filterMatchMode="contains"
+                            [style]="{'width':'100px'}">
+                        </p-column>
+                        <p-column field="collateralReleaseStatusName" header="Status" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'width':'100px'}">
+                        </p-column>
+                        <p-column field="collateralUsageStatus" header="Usage Status" sortable="true" [filter]="true"
+                            filterMatchMode="contains" [style]="{'width':'100px'}">
+                        </p-column>
+                        <p-column [style]="{'width':'120px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="addInsurance(d)" href="javascript:void(0)">Request Insurance</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+          
+            </p-dataTable>
+        </div>
+    </p-tabPanel>
+    <p-tabPanel header="Insurance Requests">
+        <div class="panel-body coll-list">
+            <p-dataTable [value]="insuranceRequests" [paginator]="true" [rows]="5" >
+                <p-column field="requestNumber" header="Request No." sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column field="requestReason" header="Reason" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column field="requestComment" header="Comment" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column field="collateralCode" header="Collateral Code" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+                <p-column field="collateralTypeName" header="Collateral Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                </p-column>
+    
+                <p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.collateralValue | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+    
+                <p-column field="haircut" header="Hair Cut" sortable="true" [filter]="true" filterMatchMode="contains"
+                    [style]="{'width':'100px'}">
+                </p-column>
+                <p-column field="collateralReleaseStatusName" header="Status" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                </p-column>
+                <p-column field="collateralUsageStatus" header="Usage Status" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                </p-column>
+                <p-column field="statusName" header="Approval Status" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                </p-column>
+                <p-column [style]="{'width':'170px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <div *ngIf="d.approvalStatusId==3" style="text-align:center">
+                                <a (click)="reinitiateRequest(d)" href="javascript:void(0)">Reinitiate</a>
+                            </div>
+                        <div *ngIf="d.approvalStatusId==5" style="text-align:center">
+                            <a (click)="edit(d)" href="javascript:void(0)">Edit</a>
+                        </div>
+                        <div style="text-align:center" *ngIf="d.approvalStatusId==0">
+                            <a (click)="remove(d)" href="javascript:void(0)">Remove</a>
+                            <span style="padding:3px;">|</span>
+                            <a (click)="goForApproval(d)" href="javascript:void(0)">Go For Approval</a>
+                        </div>
+                    </ng-template>
+                </p-column>
+    
+            </p-dataTable>
+        </div>
+    </p-tabPanel>
+</p-tabView>
+
+<p-dialog [responsive]=true [(visible)]="insuranceRequest" id="ct-modal" modal="modal" showEffect="fade" width="800">
+   <p-tabView [activeIndex]=activeTabindex (onChange)="onTabChange($event)">
+     <p-tabPanel header="Request Insurance">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {{formState }} Insurance Request
+                </h2>
+            </div>
+            <div class="panel-body" style="min-height:120px;">
+                <form novalidate [formGroup]="insuranceRequestForm" autocomplete="off">
+    
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="requestNumber" class="control-label col-md-12">Request Number</label>
+                            <div class="col-md-12">
+                                <input type="text" name="requestNumber" [attr.disabled]="true" formControlName="requestNumber"
+                                    [ngClass]="insuranceRequestForm.controls['requestNumber'].valid ? 'valid-input' : 'required-input'"
+                                    id="requestNumber" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="requestReason" class="control-label col-md-12">Reason For Insurance</label>
+                            <div class="col-md-12">
+                                <input type="text" name="requestReason" formControlName="requestReason"
+                                    [ngClass]="insuranceRequestForm.controls['requestReason'].valid ? 'valid-input' : 'required-input'"
+                                    id="requestReason" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="requestComment" class="control-label col-md-12">Comment</label>
+                            <div class="col-md-12">
+                                <textarea type="text" name="requestComment" formControlName="requestComment"
+                                    [ngClass]="insuranceRequestForm.controls['requestComment'].valid ? 'valid-input' : 'required-input'"
+                                    id="requestComment" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+    
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveInsuranceRequest(insuranceRequestForm)"
+                            [disabled]="insuranceRequestForm.invalid" class="btn btn-success pull-right">Save and
+                            Close</button>
+                        <button type="button" (click)="insuranceRequest=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </p-tabPanel>
+   </p-tabView>
+</p-dialog>
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

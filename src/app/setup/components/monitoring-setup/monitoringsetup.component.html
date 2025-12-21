@@ -1,0 +1,128 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Trigger Setup
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="monitoringSetups">
+                        <p-column field="monitoringItemName" header="Trigger Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="messageTemplate" header="Message Template" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="messageTypeName" header="Message Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="notificationPeriod" header="Notification Period" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                                Edit
+                            </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editMonitoringSetup(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="monitoringSetupForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="monitoringItemName" class="control-label col-md-2">Trigger Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="monitoringItemName" formControlName="monitoringItemName" id="monitoringItemName" class="form-control" [ngClass]="!monitoringSetupForm.controls['monitoringItemName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                     <!--label for="messageTemplate" class="control-label col-md-2">Message Template</label>
+                        <div class="col-md-4">
+                            <input type="text" name="messageTemplate" formControlName="messageTemplate" id="messageTemplate" class="form-control" [ngClass]="!monitoringSetupForm.controls['messageTemplate'].valid ? 'required-input' : 'valid-input'">
+                        </div-->
+                      <label for="messageTypeId" class="control-label col-md-2">Message Type</label>
+                        <div class="col-md-4">
+                            <select type="text" name="messageTypeId" formControlName="messageTypeId" id="messageTypeId" class="form-control" [ngClass]="!monitoringSetupForm.controls['messageTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Message Type --</option>
+                                <option *ngFor="let type of messageTypes" [value]="type.messageTypeId">
+                                    {{ type.messageTypeName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notificationPeriod" class="control-label col-md-2">Notification Period</label>
+                        <div class="col-md-4">
+                            <input type="number" name="notificationPeriod" id="notificationPeriod" class="form-control" formControlName="notificationPeriod" [ngClass]="monitoringSetupForm.controls['notificationPeriod'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                          <label for="productId" class="control-label col-md-2">Product</label>
+                        <div class="col-md-4">
+                            <select type="text" name="productId" formControlName="productId" id="productId" class="form-control" [ngClass]="!monitoringSetupForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Product --</option>
+                                <option *ngFor="let product of products" [value]="product.productId">
+                                    {{ product.productName}}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <!--label for="messageTemplate" class="control-label col-md-2">Message Template</label>
+                        <div class="col-md-10">
+                        <p-editor  name="messageTemplate" id="messageTemplate" formControlName="messageTemplate" [style]="{'height':'60px'}" [ngClass]="monitoringSetupForm.controls['messageTemplate'].valid ? 'valid-input' : 'required-input'"></p-editor>
+                        </div-->
+                    
+                     <label for="messageTemplate" class="control-label col-md-2">Message Template</label>
+                        <div class="col-md-4">
+                            <input type="textArea" name="messageTemplate" formControlName="messageTemplate" id="messageTemplate" class="form-control" [ngClass]="!monitoringSetupForm.controls['messageTemplate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(monitoringSetupForm)" [disabled]="monitoringSetupForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

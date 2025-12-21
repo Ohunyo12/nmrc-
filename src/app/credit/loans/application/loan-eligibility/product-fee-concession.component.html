@@ -1,0 +1,154 @@
+<!-- *ngIf="showFees"  -->
+<div style="margin-bottom:0;" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Request for Fee Concession
+        </h2>
+    </div>
+
+
+    <div style="padding: 2px 15px 2px 15px">
+
+        <div class="panel-body">
+            <div class="row" *ngIf="allowForEdit">
+
+                <table class="table table-striped" style="margin-right:5px">
+                    <thead>
+                        <tr>
+
+                            <th>Obligor's Name</th>
+                            <th>Facility</th>
+                            <td>Fees</td>
+                            <th>Default Rate</th>
+                            <th>Rate</th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of feesDetails">
+                            <td>{{item.customerName | uppercase}}</td>
+                            <td>{{item.productName | uppercase}}</td>
+                            <td>{{item.feeName | uppercase}}</td>
+                            <td>{{item.defaultfeeRateValue}}</td>
+                            <td>{{item.rate}}</td>
+                            <td>
+                                <a (click)="updateFeeRate(item)" style="color:#ff0000" href="javascript:void(0)">Edit Rate</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row" *ngIf="!allowForEdit">
+                <div class="form-horizontal">
+                    <form [formGroup]="feesDetailForm" autocomplete="off">
+                        <div class="form-group">
+
+                            <label class="control-label col-md-2" for="customerName">Obligor's Name</label>
+
+                            <div class="col-md-9">
+
+                                <input type="text" [attr.disabled]="true" name="customerName" formControlName="customerName" class="form-control">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-md-2" for="proposedProductName">Product</label>
+
+                            <div class="col-md-9">
+                                <input type="text" [attr.disabled]="true" name="proposedProductName" formControlName="productName" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <label class=" col-md-2" for="proposedInterestRate">Default Rate</label>
+
+                            <div class="col-md-9">
+                                <input type="number" [attr.disabled]="true" name="proposedRate" formControlName="defaultfeeRateValue" class="form-control">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-md-2" for="proposedTenor">Proposed Rate</label>
+
+                            <div class="col-md-9">
+
+
+                                <input type="number" name="rate" formControlName="rate" class="form-control col-md-12 ">
+                                <!-- Edit -->
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+
+                            <label class="control-label col-md-2" for="proposedTenor">Reason for Concession</label>
+
+                            <div class="col-md-9">
+                                <textarea name="" id="" class="form-control" formControlName="consessionReason" cols="30" rows="5"></textarea>
+                                <!-- Edit -->
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="document" class="control-label col-md-2">Select Document</label>
+                            <div class="col-md-8">
+                                <input type="file"  placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                                    #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+        
+                            <label class="control-label col-md-4" for="proposedAmount">Loan Amount</label>
+        
+                            <div class="col-md-8" style="margin:5px;">
+                                <input type="text" name="proposedAmount" formatM formControlName="proposedAmount" class="form-control">
+                            </div>
+                        </div> -->
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="ui-dialog-buttonpane ui-helper-clearfix" *ngIf="!allowForEdit">
+                    <button type="button" style="margin-right:5px" class="btn  btn-danger pull-right" pButton icon="fa-close" (click)="closeUpdate()"
+                        label="Close"></button>
+                    <button type="button" style="margin-right:5px" class="btn  btn-success pull-right" pButton icon="fa-check" (click)="saveUpdate()"
+                        label="Update"></button>
+                </div>
+                <div class="ui-dialog-buttonpane ui-helper-clearfix" *ngIf="allowForEdit">
+                    <button type="button" style="margin-right:5px" class="btn  btn-danger pull-right" pButton icon="fa-close" (click)="ClickDone()"
+                        label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div *ngIf="!showFees" style="margin-bottom:0;" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Request for Fee Concession
+        </h2>
+    </div>
+
+
+    <div style="padding: 2px 15px 2px 15px">
+
+        <div class="panel-body">
+            <form>
+                <input type="number" name="" id="">
+                <input type="number" name="" id="">
+            </form>
+        </div>
+    </div>
+</div> -->

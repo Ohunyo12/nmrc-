@@ -1,0 +1,122 @@
+<!-- loan applications -->
+<div class="card no-padding">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Subsidiary Applications 
+                        <!-- {{operationId}} -->
+                        <small *ngIf="filteredProductClass != null && searching == false"> - {{filteredProductClass}}</small>
+                        <small *ngIf="searchString.length > 0 && searching == true"> - Search results for <i>{{searchString}}</i></small>
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+         <!-- this is hard coding and not configurable -->
+         <div style="margin-top:8px;margin-left:15px;">
+            <a (click)="reset()" href="javascript:void(0)" title="All">All</a>
+            <span *ngFor="let x of productPrograms; let i = index">
+                <span style="padding:3px;">|</span>
+                <a (click)="filterByProductClass(x.productClassId,x.productClassName)"
+                    href="javascript:void(0)"
+                    title="{{x.productClassName}}">{{ x.productClassName }}
+                    ({{ x.pendingNumber }})</a>
+            </span>
+            <span *ngIf="productPrograms.length == 0">loading...</span>
+        </div>
+
+        <div class="pull-left" style="margin-left:15px;margin-bottom:2px;">
+            <!-- <span *ngIf="searchString.length > 0 && searching == true"> - Search results for <i>{{searchString}}</i></span> -->
+        </div>
+
+        <div class="pull-right" style="margin-right:16px;margin-bottom:2px;">
+            <input type="search" [(ngModel)]="searchString" id="searchString" name="searchString"
+                placeholder="Search loan applications..." aria-label="Search" size="30"
+                minlength="4" maxlength="50">
+            <button (click)="getLoanApplications(0,20,null,true)">Search</button>
+            <button (click)="reset()" title="Refresh">
+                <span class="glyphicon glyphicon-refresh"></span>
+            </button>
+        </div>
+
+        <div class="panel-body">
+            <p-dataTable [value]="applications" [responsive]="true" [paginator]="true" [rows]="10" [(selection)]="applicationSelection" dataKey="loanReviewApplicationId" (onRowSelect)="onSelectedApplicationChange()" [rowsPerPageOptions]="[10,20,30]" [lazy]="true" [totalRecords]="itemTotal"
+                (onLazyLoad)="loadData($event)" [loading]="showLoadIcon">
+
+                <p-column *ngIf="selectable" [style]="{'width':'40px'}" selectionMode="single"></p-column>
+                <p-column field="dateTimeCreated" header="Date Created" [filter]="false" filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{d.dateTimeCreated | date: 'dd-MM-yyyy'}}
+                    </ng-template>
+                </p-column>
+                <p-column field="applicationReferenceNumber" header="Reference"></p-column>
+                <p-column [style]="{'width':'10%'}" field="facility" header="Facility"  [filter]="false" filterMatchMode="contains"></p-column>
+                <p-column field="countryCode" header="Country Code" [style]="{'width':'7%'}"> </p-column>
+                <p-column header="Customer Name/Group" [filter]="false" filterMatchMode="contains" [style]="{'width':'16%'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.customerName }} {{ d.customerGroupName }}
+                                        </ng-template>
+                                    </p-column>
+                <p-column field="applicationAmount" header="Amount" [filter]="false"
+                                    filterMatchMode="contains" [style]="{'width':'9%','text-align':'right'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.applicationAmount | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                
+                <p-column field="timeIn" header="Time In" [filter]="false"
+                                filterMatchMode="contains" [style]="{'width':'11%'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.timeIn | date: 'medium' }}
+                                </ng-template>
+                            </p-column>   
+
+                <p-column [style]="{'width':'5%'}" field="divisionShortCode" header="Division" [filter]="false" filterMatchMode="contains"></p-column>
+
+                <p-column header="SLA" [filter]="false" filterMatchMode="contains"
+                                [style]="{'width':'4%px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span class="label label-{{d.slaGlobalStatus}}">_</span> Global
+                                    <span class="label label-{{d.slaInduvidualStatus}}">_</span> Individual
+                                </ng-template>
+                            </p-column>
+                           
+                <!-- <p-column field="creditOperationType" header="Operation Type"></p-column> -->              
+                <!-- <p-column field="currentApprovalStatus" header="Status" [filter]="false"  filterMatchMode="contains" [style]="{'width':'8%'}"> </p-column>-->   
+                <!-- <p-column [style]="{'width':'9%'}">
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <div class="btn-group">
+                            <span class="label label-info"> {{row.currentApprovalStatus}} </span>
+                        </div>
+                    </ng-template>
+                </p-column> -->
+                 
+                  <p-column [style]="{'width':'9%'}">
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <div class="btn-group"
+                            [innerHtml]="getApplicationStatus2(row.currentApprovalStatus)">
+                        </div>
+                    </ng-template>
+                </p-column>-->
+                
+
+            </p-dataTable>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-3 col-md-offset-9 ">
+                    <!-- buttons -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- endof loan applications -->
+<!-- <pre>{{ applications | json }}</pre> -->
+
+<!-- <pre>{{ test | json }}</pre> -->

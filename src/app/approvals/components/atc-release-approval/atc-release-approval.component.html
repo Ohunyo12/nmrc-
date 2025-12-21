@@ -1,0 +1,552 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          ATC Release
+        </h2>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+      <p-tabPanel header="ATC Logdment">
+        <div class="panel-body">
+          <p-dataTable [value]="AtcLodgments" [responsive]="true" [paginator]="true" [rows]="5" 
+          [(selection)]="atcReleaseApprovals" (onRowUnselect)="checkAtcReleaseApprovalsLength()"
+          (onRowSelect)="checkAtcReleaseApprovalsLength()">
+            <p-column field="dateCreated" header="Date Approved" sortable="true" filterMatchMode="contains">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateCreated | date }}
+              </ng-template>
+            </p-column>
+            <p-column field="dateReleased" header="Date Released" [filter]="true" sortable="true" filterMatchMode="contains">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateReleased | date }}
+              </ng-template>
+            </p-column>
+            <p-column field="customerName" [filter]="true" header="Customer Name" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="description" [filter]="true" header="Description" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="atcType" [filter]="true" header="Atc Type" sortable="true" filterMatchMode="contains">
+              </p-column>
+            <p-column field="depot" header="Depot" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="unitValue" header="Unit Value" sortable="true" filterMatchMode="contains">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.unitValue | number : '1.2' }}
+              </ng-template>
+            </p-column>
+            <p-column field="unitNumber" header="Unit Number" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="unitToRelease" header="Unit To Release" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="totalValue" header="Total Value" sortable="true" filterMatchMode="contains">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.totalValue | number : '1.2' }}
+              </ng-template>
+            </p-column>
+            <p-column field="approvalStatusName" header="Approval Status" sortable="true" filterMatchMode="contains">
+              </p-column>
+            <p-column [style]="{'width':'100px'}" header="View">
+              <ng-template pTemplate="header"> </ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center">
+                  <a (click)="addAdditionalDetail(d)" href="javascript:void(0)">Additional Detail</a>
+
+                </div>
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'100px'}" header="View">
+              <ng-template pTemplate="header"> </ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center">
+                  <a (click)="select(d)" href="javascript:void(0)">Customer Info</a>
+                </div>
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'100px'}" header="View">
+              <ng-template pTemplate="header"> </ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div class="row" style="text-align:center" >
+                  <a (click)="editReferredAtcRelease(d)" href="javascript:void(0)"
+                  *ngIf="makeEditButtonVisible == true">Edit</a>
+                  <a *ngIf="makeEditButtonVisible == true">|</a>
+                  <a (click)="viewRowDetails(d)" href="javascript:void(0)">View</a>
+              </div>
+              </ng-template>
+            </p-column>
+            <p-column selectionMode="multiple"></p-column>
+          </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="pull-right">
+                <button (click)="approveModal()" pButton type="button" label="Go For Approval"
+                    [disabled]="atcReleaseApprovals.length <= 0"></button>
+            </div>
+          </div>
+
+      </p-tabPanel>
+      <p-tabPanel header="Customer Information">
+        <div class="panel-heading">
+          <div class="pull-right" *ngIf="searchCustomerId">
+            <button (click)="getCusotmerAccountBalance()" pButton type="button" label="Get Account Balance"
+              icon="fa-plus"></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <app-customer-information-detail [loadWithCustomerId]="searchCustomerId">
+          </app-customer-information-detail>
+        </div>
+      </p-tabPanel>
+      <p-tabPanel header="ATC Details">
+        <div class="panel-body">
+        <div class="well" *ngIf="approvalReleaseData != null || approvalReleaseData != undefined">
+          <div class="row" >
+              <table *ngIf="approvalReleaseData != null || approvalReleaseData != undefined" class="table table-casa-information">
+                <thead>
+                  <tr>
+                    <td>
+                        <strong>Date Approved</strong>
+                    </td>
+                    <td>
+                        <strong>Customer Name</strong>
+                    </td>
+                    <td>
+                        <strong>Description</strong>
+                    </td>
+                    <td>
+                        <strong>Atc Type</strong>
+                    </td>
+                    <td>
+                        <strong>Depot</strong>
+                    </td>
+                    <td>
+                        <strong>Unit Value</strong>
+                    </td>
+                    <td>
+                        <strong>Unit Number</strong>
+                    </td>
+                    <td>
+                        <strong>Unit To Release</strong>
+                    </td>
+                    <td>
+                        <strong>Total Value</strong>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      {{ approvalReleaseData.dateCreated | date }}
+                    </td>
+                      <td>
+                        {{ approvalReleaseData.customerName }}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.description }}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.atcType}}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.depot}}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.unitValue | number : '1.2' }}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.unitNumber }}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.unitToRelease }}
+                      </td>
+                      <td>
+                        {{ approvalReleaseData.totalValue | number : '1.2' }}
+                      </td>
+                </tbody>
+              </table>
+          </div>
+        </div>
+        
+          <div class="col-md-6">
+            <div class="btn-group" *ngIf="rowSelected == true">
+              <button type="button" class="btn btn-danger" (click)="showCommentForm()" >
+                <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="panel-body" *ngIf="rowSelected == true">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="panel-title pull-left">
+              Approval Comments
+            </h3>
+    
+          </div>
+        </div>
+        <br>
+          <div class="well" >
+              <div class="row">
+                <approval-comment-tab [operationId]="operationId" [target]="targetId"></approval-comment-tab>
+              </div>
+          </div>
+        </div>
+        <div class="panel-body" *ngIf="customerATC != null || customerATC != undefined">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="panel-title pull-left">
+              Customer's ATC
+            </h3>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+            <p-dataTable [value]="customerATC" [responsive]="true" [paginator]="true" [rows]="5" [scrollable]="true" scrollWidth="100%">
+
+                <p-column field="dateCreated" [filter]="true" header="Date Lodged" sortable="true"
+                    filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.dateCreated | date }}
+                    </ng-template>
+                </p-column>
+
+                <p-column field="customerName" header="Customer Name" [filter]="true" sortable="true"
+                    filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="branchName" [filter]="true" header="Branch" sortable="true"
+                filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="atcType" [filter]="true" header="ATC Type" sortable="true"
+                    filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="description" header="Description" sortable="true" filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="depot" header="Depot" sortable="true" filterMatchMode="contains"></p-column>
+                
+                <p-column field="unitValue" header="Unit Cost" sortable="true" filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.unitValue | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+
+                <p-column field="numberOfBags" header="Number Of Bags" sortable="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.numberOfBags }}
+                        </ng-template>
+                </p-column>
+
+                <p-column field="unitNumber" header="Unit Number" sortable="true" filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="totalValue" header="Total Value" sortable="true" filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.totalValue | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+
+                <p-column field="currency" header="Currency" sortable="true"
+                                filterMatchMode="contains"></p-column>
+
+                 <p-column field="localEquivalent" [style]="{'width':'120px'}" header="Local Equivalent" sortable="true" filterMatchMode="contains">
+                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.localEquivalent | number : '1.2' }}
+                      </ng-template>
+                </p-column>
+
+                <p-column field="approvalStatusName" header="Approval Status" sortable="true"
+                    filterMatchMode="contains">
+                </p-column>
+            </p-dataTable>
+            <br>
+            <div>
+              <h5>
+                <strong>
+                  Local Equivalent Sum Total: {{customerATCSum | number : '1.2'}}
+                </strong> 
+              </h5>
+            </div>
+        </div>
+        </div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <div class="btn-group">
+              <button type="button" class="btn btn-danger" (click)="activeTabindex=0;">
+                <i class="glyphicon glyphicon-chevron-left"></i> Back</button>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+
+  </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="showAdditionalDocument" id="ct-modal" modal="modal" showEffect="fade"
+  width="600">
+
+  <div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        ATC Lodgement Detail
+      </h2>
+    </div>
+    <div class="panel-body">
+      <p-dataTable [value]="AtcLodgmentDetailList" [responsive]="true" [paginator]="true" [rows]="5">
+
+        <p-column field="detail" header="Detail" sortable="true" filterMatchMode="contains">
+        </p-column>
+
+        <p-column field="value" header="Value" sortable="true" filterMatchMode="contains">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.value | number : '1.2' }}
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="showAdditionalDocument=false" style="margin-right:5px"
+            class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="showRelease" id="ct-modal" modal="modal" showEffect="fade" width="600">
+
+  <div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        ATC Release
+      </h2>
+    </div>
+    <form novalidate [formGroup]="atcReleaseForm" autocomplete="off">
+      <div class="panel-body">
+
+        <div class="form-group">
+          <label for="unitNumber" class="control-label col-md-12">Total Units</label>
+          <div class="col-md-12">
+            <input type="number" maxlength="10" [attr.disabled]="true" name="unitNumber" formControlName="unitNumber"
+              id="unitNumber" class="form-control"
+              [ngClass]="atcReleaseForm.controls['unitNumber'].valid ? 'valid-input' : 'required-input'">
+          </div>
+        </div>
+       
+        <div class="form-group">
+          <label for="unitToRelease" class="control-label col-md-12">Units to Release</label>
+          <div class="col-md-12">
+            <input type="number" maxlength="10" name="unitToRelease" formControlName="unitToRelease" id="unitToRelease"
+              class="form-control"
+              [ngClass]="atcReleaseForm.controls['unitToRelease'].valid ? 'valid-input' : 'required-input'">
+          </div>
+        </div>
+
+      </div>
+      <div class="panel-body">
+        <p-dataTable [value]="AtcReleaseDetail" [responsive]="true" [paginator]="true" [rows]="5">
+
+          <p-column field="unitNumber" header="Total Unit" sortable="true" filterMatchMode="contains">
+          </p-column>
+
+          <p-column field="unitToRelease" header="unit Released" sortable="true" filterMatchMode="contains">
+          </p-column>
+
+          <p-column field="releaseBalance" header="Unit Balance" sortable="true" filterMatchMode="contains">
+          </p-column>
+
+          <p-column field="dateCreated" header="Date Created" sortable="true" filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.dateCreated | date }}
+            </ng-template>
+          </p-column>
+          <p-column field="approvalStatusName" header="Approval Status" sortable="true" filterMatchMode="contains">
+          </p-column>
+
+        </p-dataTable>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="saveAtcRelase(atcReleaseForm)" [disabled]="atcReleaseForm.invalid"
+              class="btn btn-success pull-right">Save Request For Approval
+            </button>
+            <button type="button" (click)="showRelease=false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayAccountBalance" modal="modal" showEffect="fade" width="400">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Customer Account Balance
+      </h2>
+    </div>
+    <div class="panel-body" style="min-height:120px;">
+      <div class="form-group">
+        <div class="col-md-12">
+          <p-dataTable [value]="accountBalances" [responsive]="true">
+            <p-column field="AccountNumber" header="Account Number"></p-column>
+            <p-column field="AccountBalance" header="Account Balance"></p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="displayAccountBalance=false" style="margin-right:5px"
+            class="btn btn-danger pull-right">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="showApprovalBottun" id="ct-modal" modal="modal" showEffect="fade" width="700">
+    <div class="panel panel-default">
+        <div class="panel-body">
+          <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+            <p-tabPanel header="Approval Panel">
+              <div class="well">
+                <hr />
+                <div class="row">
+                  <div class="col-md-9">
+                    <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment"
+                      [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                  </div>
+                  <div class="col-md-3">
+                    <select class="form-control" [(ngModel)]="approvalStatusId"
+                      [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+                      <option value="0">--- Select Approval ---</option>
+                      <option value="2"> Approve </option>
+                      <option value="3"> Decline </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-body">
+                  <div class="row">
+                  <div class="col-md-6" >
+                    <div class="btn-group pull-right">
+                      <button type="button" (click)="showApprovalBottun=false" style="margin-right:5px" class="btn btn-danger"
+                        style="margin-right:5px">Close</button>
+                      <button type="button" (click)="submitForApproval()"
+                        [disabled]="(comment == null || comment =='' || (approvalStatusId != 2 && approvalStatusId != 3))" class="btn btn-success">
+                        Submit</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+      
+      </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade"
+  width="600">
+  <div style="margin-bottom:0" class="panel panel-default" *ngIf="rowSelected == true">
+      <app-refer-back [referBackTargetId]="targetId" [referBackOperationId]="operationId"
+      (notify)="modalControl($event)" (notifyAfterReferBack)="referBackResultControl($event)">
+      </app-refer-back>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="editModal" id="ct-modal" modal="modal" showEffect="fade" width="850">
+
+  <div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        ATC Release
+      </h2>
+    </div>
+    <div class="panel-body" *ngIf="editRowData != null || editRowData != undefined">
+        <p-dataTable [value]="editRowData" [responsive]="true" [paginator]="true" [rows]="5" [editable]="true"
+        [(selection)]="editSelection" (onRowSelect)="checkRow($event.data)" (onRowUnselect)="checkRowLength()">
+            <p-column field="dateCreated" header="Date Approved" [filter]="true" sortable="true"
+            filterMatchMode="contains" >
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateCreated | date }}
+              </ng-template>
+            </p-column>
+            <p-column field="customerName" header="Customer Name" [filter]="true" sortable="true"
+              filterMatchMode="contains">
+            </p-column>
+            <p-column field="branchName" [filter]="true" header="Branch" sortable="true"
+                        filterMatchMode="contains">
+            </p-column>
+            <p-column field="atcType" [filter]="true" header="Atc Type" sortable="true"
+                        filterMatchMode="contains">
+            </p-column>
+            <p-column field="description" header="Description" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="depot" header="Depot" sortable="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="unitValue" header="Unit Cost">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.unitValue | number : '1.2' }}
+              </ng-template>
+            </p-column>
+
+            <p-column field="unitNumber" header="Unit Number">
+            </p-column>
+            <p-column field="unitToRelease" header="Unit To Release" [editable]="true">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body" >
+                    <div style="text-align:center">
+                        <span *ngIf="d.unitToRelease == 0"><i class="glyphicon glyphicon-edit"> </i></span>
+                        <span *ngIf="d.unitToRelease != 0">{{d.unitToRelease}}</span>
+                    </div>
+                </ng-template>
+            </p-column>
+            <p-column field="numberOfBags" header="Number Of Bags" sortable="true">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                  {{ d.numberOfBags }}
+                </ng-template>
+            </p-column>
+
+            <p-column field="totalValue" header="Total Value" sortable="true">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.totalValue | number : '1.2' }}
+              </ng-template>
+            </p-column>
+            <p-column selectionMode="multiple"></p-column>
+          </p-dataTable>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="saveEditedAtcRelease()" class="btn btn-success pull-right"
+               [disabled]="editedLength <= 0">
+              Submit and Close
+            </button>
+            <button type="button" (click)="cancelEdit()" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+    </div>
+  </div>
+
+</p-dialog>

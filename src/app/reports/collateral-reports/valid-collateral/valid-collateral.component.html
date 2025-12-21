@@ -1,0 +1,90 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Valid Collaterals Report
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body" *ngIf="displayReportSearch">
+          <div class="form-horizontal">
+            <form novalidate [formGroup]="validCollateralsReportForm" autocomplete="off">
+
+              <div class="form-group">
+                <label for="startDate" class="control-label col-md-1">Start Date </label>
+                <div class="col-md-2">
+                  <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!validCollateralsReportForm.controls['startDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+
+                <label for="endDate" class="control-label col-md-1">End Date </label>
+                <div class="col-md-2">
+                  <p-calendar id="endDate" formControlName="endDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!validCollateralsReportForm.controls['endDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+                <div class="col-md-1 pull-left">
+                  <button type="button" (click)="popoverSeeMore(validCollateralsReportForm)"
+                    class="btn btn-success pull-left" [disabled]="!validCollateralsReportForm.valid">Preview Report
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+        <div class="panel-footer" *ngIf="displayReportSearch">
+          <div class="row">
+            <div class="col-md-12"></div>
+          </div>
+        </div>
+        <!-- end of panel-body element -->
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayReportArea" width="1200" modal="modal" showEffect="fade">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+          </h2>
+          <button type="button" (click)="clearInput()" style="margin-right:5px"
+            class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+        <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="600px" width="1500px"
+          style="overflow:auto"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="clearInput()" style="margin-right:5px"
+          class="btn btn-danger pull-right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</p-dialog>

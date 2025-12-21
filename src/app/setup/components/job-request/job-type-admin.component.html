@@ -1,0 +1,142 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              Job Request Setup
+                          </h2>
+                            <div class="pull-right">
+                                <button (click)="CreateNew()" pButton type="button" label="Add Admin" icon="fa-plus"></button>
+                            </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="panel-body">
+                  <p-dataTable [value]="jobTypeAdminStaffList">
+                      <p-column field="jobTypeName" header="Job Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="staffName" header="Job Type Admin Staff" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column [style]="{'width':'100px'}">
+                          <ng-template pTemplate="header"></ng-template>
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                              <a (click)="editEditJobTypeAdmin(i)" href="javascript:void(0)">Edit</a>
+                          </ng-template>
+                      </p-column>
+                  </p-dataTable>
+              </div>
+
+          </div>
+          <!--end of panel-->
+      </div>
+  </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"></fintrakbanking-message>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayJobAdminForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                  Add Hub Admin
+                </h2>
+            </div>
+            <form novalidate [formGroup]="jobAdminForm" autocomplete="off">
+                  <div class="panel-body">
+                      <div class="form-horizontal">
+                            <!-- <div class="form-group">
+                                <label for="staffId" class="control-label col-md-4">Staff</label>
+                                <div class="col-md-8">
+                                <input type="text" name="staffId" formControlName="staffId" id="staffId" class="form-control" [ngClass]="!jobAdminForm.controls['staffId'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div> -->
+                            <div class="form-group">
+                                <label for="searchedName" class="control-label col-md-4">Staff</label>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input (focus)="openSearchBox()" type="text" [(ngModel)]="selectedStaff" [ngClass]="!jobAdminForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchedName" placeholder="Search staff" name="searchedName">
+                                        <div class="input-group-btn">
+                                            <button (click)="openSearchBox()" style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div  class="form-group">
+                                <label for="staffId" class="control-label col-md-4">Selected Staff</label>
+                                <div class="col-md-8">
+                                {{searchedName ? searchedName : 'None'}}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="jobTypeId" class="control-label col-md-4">Job Type</label>
+                                <div class="col-md-8">
+                                <select name="jobTypeId" formControlName="jobTypeId" [(ngModel)]="jobTypeId" id="jobTypeId" class="form-control" [ngClass]="!jobAdminForm.controls['jobTypeId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Job Type --</option>
+                                    <option *ngFor="let x of jobTypeList" [value]="x.jobTypeId">{{ x.jobTypeName }}</option>
+                                </select>
+                                </div>
+                            </div>
+                      </div>
+                  </div>
+      
+                  <div class="panel-footer">
+                      <div class="row">
+                          <div class="col-md-12">
+                              <button type="button" (click)="submitForm()" [disabled]="jobAdminForm.invalid" class="btn btn-success pull-right">Save</button>
+                              <button type="button" (click)="clearForm()"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button></div>
+                      </div>
+                  </div>
+            </form>
+        </div>
+      </p-dialog>
+      <!--end of form modal-->
+
+      <p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <div style="margin-left:0" class="row">
+                        <h2 class="panel-title pull-left">
+                            Search Staff
+                        </h2>
+                        <div class="pull-right"><a class="close" style="margin: -10px 8px;" (click)="displaySearchModal=false">&times;</a></div>
+                    </div>
+                </div>
+                <div style="padding:3px" class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                        </div>
+                    </div>
+        
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <p>
+                                <!--{{mfacilityType}}-->
+                            </p>
+                            <table *ngIf="searchResults" class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Code</th>
+                                        <th>First Name</th>
+                                        <th>Middle Name</th>
+                                        <th>Last Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                        <td>{{res.staffCode}}</td>
+                                        <td>{{res.firstName}}</td>
+                                        <td>{{res.middleName}}</td>
+                                        <td>{{res.lastName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      </p-dialog>

@@ -1,0 +1,210 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Bulk Insurance Upload Awaiting Approval
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable #dt [paginator]="true" resizableColumns="true" [responsive]="true" [value]="records"
+                        [(selection)]="multipData" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                    (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header>
+                        <!-- <p-column field="iCustomerId" header="#" [style]="{width:'5%','text-align':'left'}">
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                {{i+1}}
+                            </ng-template>
+                        </p-column> -->
+                        <p-column [style]="{'width':'50px'}" selectionMode="multiple" suppressRowClickSelection="false"></p-column>
+
+                        <!-- <p-column field="isCollateral" header="Is Collateral" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column> -->
+                        <p-column field="customerId" header="Customer Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="collateralCode" header="Collateral Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="referenceNumber" header="Policy Number" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="policyType" header="Policy Type" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="insuranceCompany" header="Insurance Company" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="startDate" header="Policy Start Date" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.startDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="expiryDate" header="Policy Expiry Date" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.expiryDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="sumInsured" header="Sum Insured" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.sumInsured | number: '1.2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="premiumAmount" header="Premium Paid" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.premiumAmount | number: '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <!-- <p-column [style]="{'width':'100px', 'text-align':'left'}">
+                            <ng-template pTemplate="header">
+                                Action
+                            </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <button type="button" (click)="approval(row, $event)">
+                                    Approve
+                                </button>
+                            </ng-template>
+                        </p-column> -->
+                    </p-dataTable>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="approval()" [disabled]="totalRecords < 1"
+                                class="btn btn-success pull-right"><span
+                                style="padding-right:4px;">{{label}}</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayApprovalModal" widgetVar="ajaxDialog"
+    [contentStyle]="{'overflow':'scroll','max-height':'600px'}" modal="modal" showEffect="fade" width="900">
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <p-tabView>
+
+                <p-tabPanel header="Bulk Insurance Upload Approval">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Comment</strong>
+                                </td>
+                                <td>
+                                    <textarea [ngClass]="!loanSelectedData.comment ? 'required-input' : 'valid-input'"
+                                        class="form-control" [(ngModel)]="loanSelectedData.comment" name="comment"
+                                        cols="15" rows="3"></textarea>
+                                </td>
+                                <td>
+                                    <strong>Status</strong>
+                                </td>
+                                <td>
+                                    <select name="approvalStatusId" id="approvalStatusId" class="form-control"
+                                        [(ngModel)]="loanSelectedData.approvalStatusId"
+                                        [ngClass]="!loanSelectedData.approvalStatusId ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select Approval Status ---</option>
+                                        <option value="2">Approved</option>
+                                        <option value="3">Disapproved</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+
+            </p-tabView>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group pull-right">
+                            <button (click)="displayApprovalModal = false" type="button" class="btn btn-danger"
+                                style="margin-right:5px">Close</button>
+                            <button [disabled]="!loanSelectedData.comment || !loanSelectedData.approvalStatusId"
+                                type="button" (click)="promptToGoForApproval(loanSelectedData)" style="margin-right:5px"
+                                class="btn btn-success">Submit For
+                                Approval</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayBulkApprovalModal" widgetVar="ajaxDialog"
+    [contentStyle]="{'overflow':'scroll','max-height':'600px'}" modal="modal" showEffect="fade" width="900">
+    <form novalidate [formGroup]="bulkApprovalForm" autocomplete="off">
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <p-tabView>
+
+                <p-tabPanel header="Bulk Insurance Upload Approval">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Comment</strong>
+                                </td>
+                                <td>
+                                    <textarea [ngClass]="!bulkApprovalForm.controls['comment'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control" name="comment" cols="15" formControlName="comment"
+                                        rows="3"></textarea>
+                                </td>
+                                <td>
+                                    <strong>Status</strong>
+                                </td>
+                                <td>
+                                    <select name="approvalStatusId" id="approvalStatusId" class="form-control" formControlName="approvalStatusId"
+                                       [ngClass]="!bulkApprovalForm.controls['approvalStatusId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select Approval Status ---</option>
+                                        <option value="2">Approved</option>
+                                        <option value="3">Disapproved</option>
+                                        </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+
+            </p-tabView>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group pull-right">
+                            <button (click)="displayBulkApprovalModal = false" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                            <button [disabled]="bulkApprovalForm.invalid" type="button"
+                            (click)="goForBulkApproval(bulkApprovalForm)" style="margin-right:5px" class="btn btn-success">Submit For
+                            Approval</button>
+                          </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+</p-dialog>
+
+<app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message"
+    (approveEvent)="goForApproval(loanSelectedData)" (closeEvent)="cancelApproval()"></app-fintrakbanking-dialog>

@@ -1,0 +1,268 @@
+<div class="panel panel-default" *ngIf="rac != null && rac != undefined && rac != {}">
+
+    <div *ngIf="rac != null" class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Risk Acceptance Criteria
+                </h2>
+                <div class="pull-right">
+                    <!-- <button (click)="showRiskAcceptanceCriteriaForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <!-- RISK ACCEPTANCE CRITERIA
+        <pre>{{ racForm?.value | json }}</pre>
+        <pre>{{ racForm?.valid | json }}</pre> -->
+
+        <form  *ngIf="categoriesCount > 0" [formGroup]="racForm" class="form-horizontal" autocomplete="off">
+            <!-- <form (ngSubmit)="onSubmit.emit(this.form.value)" [formGroup]="form" class="form-horizontal"> -->
+
+            <table class="table table-bordered table-hover">
+
+                <tr>
+                    <!-- <th>Id</th> -->
+                    <th>SN</th>
+                    <!-- <th>Criteria</th> -->
+                    <th>Required</th>
+                    <th>Actual</th>
+                    <th></th>
+                    <!-- <th>Exception</th> -->
+                    <!-- <th>Pass</th> -->
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tbody *ngFor="let c of rac.categories;">
+
+                    <tr>
+                        <td colspan="7"><strong>{{c.name}}</strong></td>
+                    </tr>
+
+                    <tr *ngFor="let field of c.rows; let i = index;">
+                        <!-- <td>{{field.id}}</td> -->
+                        <td>{{i + 1}}</td>
+                        <!-- <td>{{field.criteria}}</td> -->
+                        <td>{{field.required}}</td>
+                        <td>
+                            <span *ngIf="checklistStatus > 0">
+                                <label class="radio-inline">
+                                    <input type="radio" id={{field.id}} name={{field.id}} formControlName={{field.id}}
+                                        [value]="2">Yes
+                                </label><label class="radio-inline">
+                                    <input type="radio" id={{field.id}} name={{field.id}} formControlName={{field.id}}
+                                        [value]="3">No
+                                </label><label class="radio-inline">
+                                    <input type="radio" id={{field.id}} name={{field.id}} formControlName={{field.id}}
+                                        [value]="4">Waived
+                                </label><label class="radio-inline">
+                                    <input type="radio" id={{field.id}} name={{field.id}} formControlName={{field.id}}
+                                        [value]="1">Deferred
+                                </label>
+                            </span>
+                            <!-- <span *ngIf="readonly">{{field.value}}</span> -->
+                            <div class="form-group row" [formGroup]="racForm" style="margin:0px">
+                                <div [formGroup]="racForm" [ngSwitch]="field.typeId">
+                                    <input *ngSwitchCase="1" [attr.disabled]="readonly == true ? true : null"
+                                        [attr.type]="field.type" class="form-control" [id]="field.id" [name]="field.id"
+                                        [formControlName]="field.id"
+                                        [ngClass]="racForm.controls[field.id].valid ? 'valid-input' : 'required-input'">
+                                    <input *ngSwitchCase="2" [attr.disabled]="readonly == true ? true : null"
+                                        [attr.type]="field.type" class="form-control" [id]="field.id" [name]="field.id"
+                                        formatM [formControlName]="field.id"
+                                        [ngClass]="racForm.controls[field.id].valid ? 'valid-input' : 'required-input'">
+                                    <select *ngSwitchCase="3" [attr.disabled]="readonly == true ? true : null"
+                                        class="form-control" id={{field.id}} name={{field.id}}
+                                        formControlName={{field.id}}
+                                        [ngClass]="racForm.controls[field.id].valid ? 'valid-input' : 'required-input'">
+                                        <option value="">-- Select --</option>
+                                        <option *ngFor=" let x of field.options" [value]="x.key">{{x.label}}</option>
+                                    </select>
+                                    <select *ngSwitchCase="7" [attr.disabled]="readonly == true ? true : null"
+                                    class="form-control" id={{field.id}} name={{field.id}}
+                                    formControlName={{field.id}}
+                                    [ngClass]="racForm.controls[field.id].valid ? 'valid-input' : 'required-input'">
+                                    <option value="">-- Select --</option>
+                                    <option *ngFor=" let x of field.options" [value]="x.label">{{x.label}}</option>
+                                </select>
+                                    <span *ngSwitchCase="4">
+                                        <label *ngFor="let o of field.options" class="radio-inline">
+                                            <input [attr.disabled]="readonly == true ? true : null" type="radio"
+                                                id={{field.id}} name={{field.id}} formControlName={{field.id}}
+                                                [checked]="field.value == o.key" [value]="o.key">{{o.label}}
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><a *ngIf="field.fileUpload" (click)="showUploads(field.id)" href="javascript:void(0)"><span
+                                    class="glyphicon glyphicon-upload"></span> Upload</a></td>
+                        <td><a *ngIf="field.viewUpload" (click)="viewUploads()" href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-upload"></span> View</a></td>
+                        <!-- <td>{{ field.hasException ? 'Yes' : 'No' }}</td> -->
+                        <!-- <td>
+                            <span *ngIf="field.status == 2" style="color:#1bc429;" class="glyphicon glyphicon-ok"></span>
+                            <span *ngIf="field.status == 3" style="color:#d42424;"
+                                class="glyphicon glyphicon-remove"></span>
+                        </td> -->
+                        <td><a (click)="showComments(field.id)" href="javascript:void(0)"> Comment</a></td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <!-- <button type="button" (click)="test()" style="margin-right:5px">test</button> -->
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="displayCriteriaCommentForm" id="ct-modal" modal="modal" showEffect="fade"
+    width="600">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Criteria Comments
+            </h2>
+        </div>
+
+        <div class="panel-body">
+
+            <p-dataTable [value]="criteriaComments" [responsive]="true" [paginator]="false" [rows]="5">
+
+                <p-column field="comment" header="Comment" sortable="true" filterMatchMode="contains"></p-column>
+
+            </p-dataTable>
+
+        </div>
+
+        <form novalidate [formGroup]="criteriaCommentForm" (ngSubmit)="saveCriteriaComment(criteriaCommentForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="comment" class="control-label col-md-12">Comment</label>
+                        <div class="col-md-12">
+                            <textarea name="comment" formControlName="comment" id="comment" class="form-control"
+                                [ngClass]="criteriaCommentForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="saveCriteriaComment(criteriaCommentForm)"
+                        [disabled]="criteriaCommentForm.invalid" class="btn btn-success pull-right">Save and
+                        Close</button>
+                    <button type="button" (click)="displayCriteriaCommentForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCriteriaUploadsForm" id="ct-modal" modal="modal" showEffect="fade"
+    width="900">
+
+    <document-upload [reload]="1" [autoZIndex]="false" [operationId]="operationId" [customerId]="customerId"
+        [targetId]="loanApplicationId" [customerId]="customerId" [targetReferenceNumber]="targetReferenceNumber">
+    </document-upload>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayCriteriaUploadsForm=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCriteriaDocumentDialog" id="ct-modal" modal="modal" showEffect="fade"
+width="900">
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+<div class="pull-right">
+    <a class="close" (click)="displayCriteriaDocumentDialog=false">&times;</a>
+</div>
+    <p-dataTable #dt [value]="creditBureauDocuments" [responsive]="true" [paginator]="true" [rows]="5">
+        <p-header>
+            <div class="ui-helper-clearfix">
+                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+            </div>
+        </p-header> 
+        <p-column header="DateTime Uploaded">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
+            </ng-template>
+        </p-column>
+        <!-- <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column> -->
+        <p-column header="File Name">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
+                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
+                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
+                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
+                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
+                {{d.fileName}}
+            </ng-template>
+        </p-column>
+        <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains"></p-column>
+        <p-column  [style]="{'width':'120px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center" >
+                    <span *ngIf="d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a>
+                        <span style="padding:3px;"> | </span>
+                    </span>
+                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d,true)" href="javascript:void(0)">View</a>
+                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d)" href="javascript:void(0)">Download</a>
+                </div>
+            </ng-template>
+        </p-column>
+    </p-dataTable>
+</div>
+</div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+'max-height': '80vh','min-height':'500px','z-index': 1500}" width="1000" [style]="{'z-index': 1500}">
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Document Title:
+            <strong>{{selectedDocument}}</strong>
+        </h2>
+        <div class="pull-right">
+            <a class="close" (click)="displayDocument=false">&times;</a>
+        </div>
+    </div>
+
+    <div class="panel-body" style="overflow:auto;height:1500;">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+        [src]="'data:image/jpg;base64,'+binaryFile" alt="">
+    </div>
+</div>
+</p-dialog>

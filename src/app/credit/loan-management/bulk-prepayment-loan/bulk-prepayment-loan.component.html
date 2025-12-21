@@ -1,0 +1,789 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{headerText}}
+                            </h2>
+                            <div class="pull-right">
+                                <!-- <button (click)="showDialog()" pButton type="button" label="Add New"
+                                    icon="fa-plus"></button> -->
+                                <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)" pButton
+                                    type="button" label="Collapse upload" icon="fa-arrow-up"></button>
+                                <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)" pButton
+                                    type="button" label="Bulk upload" icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="collapseForm==false" class="panel-body">
+                    <div class="form-group col-md-12">
+                        <div class="col-md-12">
+                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                                [accept]="'.xlsx, .xls, .xltx'" #fileInput name="fileInput" style="padding-top:2px;"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <div class="col-md-6">
+                            <button class="btn btn-sm btn-primary pull-left" (click)="requestPasswordBulk()"
+                                [disabled]="file==undefined ">
+                                <span class="glyphicon glyphicon-upload"></span> Upload File </button>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                                    <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                            <a href="assets/files/BulkPrepaymentReversalDocument.xlsx" target="_blank"
+                                class="btn btn-sm btn-primary pull-right">
+                                <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <button type="button" (click)="submitCustomerSearchForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                                        <button type="button" (click)="clearCustomerSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button> -->
+                        </div>
+                    </div>
+                </div>
+                <br>
+
+
+                <div *ngIf="collapseForm==false && (uploadedData != null && uploadedData.length > 0)"
+                    class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="uploadedData" [responsive]=true
+                        selectionMode="single">
+                        <p-column [style]="{'width':'210px'}" field="loanReferenceNumber" header="Loan Reference Number"
+                            sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="amount" header="Prepayment Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="branchCode" header="Branch Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="JobTitleName" header="Job Title" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="staffRoleCode" header="Role Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="staffRoleName" header="Role" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column> -->
+                        <p-column>
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <span style="color: green">{{staff.message}}</span>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+                <div *ngIf="collapseForm==false && (failedUpload != null && failedUpload.length > 0)"
+                    class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="failedUpload" [responsive]=true
+                        selectionMode="single">
+                        <p-column [style]="{'width':'210px'}" field="loanReferenceNumber" header="Loan Reference Number"
+                            sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="amount" header="Prepayment Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="branchCode" header="Branch Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="JobTitleName" header="Job Title" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="staffRoleCode" header="Role Code" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="staffRoleName" header="Role" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column> -->
+                        <p-column>
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <span style="color: red">{{staff.message}}</span>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <h2 class="panel-title">All Prepayments</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!collapseForm==false" class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="5" [value]="staffDataset" [responsive]=true
+                        selectionMode="single">
+                        <p-column [style]="{'width':'210px'}" field="batchCode" header="Batch Code" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="dateCreated" header="Date Created" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'dd MMM yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column field="processedDate" header="Processed Date" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'dd MMM yyyy' }}
+                            </ng-template>
+                        </p-column> -->
+                        <p-column field="amount" header="Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editStaff(staff)">
+                                    Edit
+                                </a> |
+                                <a (click)="confirmDelete(staff)">
+                                    Delete
+                                </a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </div>
+
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <h2 class="panel-title">Batch Prepayments</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!collapseForm==false" class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="5" [value]="batchPrepaymentData" [responsive]=true
+                        selectionMode="single">
+                        <p-column [style]="{'width':'210px'}" field="batchCode" header="Batch Code" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="dateCreated" header="Date Created" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'dd MMM yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column field="processedDate" header="Processed Date" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'dd MMM yyyy' }}
+                            </ng-template>
+                        </p-column> -->
+                        <p-column field="numberOfLoans" header="Number Of Loans" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="totalAmount" header="Total Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                        </p-column>
+
+                        <p-column field="comment" header="Comment" sortable="true" [filter]="true" filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="fromApprovalLevelName" header="Approval Level" sortable="true" [filter]="true"
+                          filterMatchMode="contains">
+                        </p-column>
+                        <p-column field="approvalStatus" header="Approval Status" sortable="true" filterMatchMode="contains"
+                          [filter]="true">
+                        </p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-batch="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="approveBatch(batch)">
+                                    Approve
+                                </a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--real time search form-->
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade"
+    width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displaySearchModal=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control"
+                        placeholder="Type in your search parameter">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer"
+                                *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.middleName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayOtherInformation" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Edit Other Information
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="otherInformationForm">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="field1" class="control-label col-md-2"> FIELD 1</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field1"
+                                [ngClass]="!otherInformationForm.controls['field1'].valid ? 'required-input' : 'valid-input'"
+                                name="field1" class="form-control">
+                        </div>
+                        <label for="field2" class="control-label col-md-2"> FIELD 2</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field2"
+                                [ngClass]="!otherInformationForm.controls['field2'].valid ? 'required-input' : 'valid-input'"
+                                name="field2" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="field3" class="control-label col-md-2"> FIELD 3</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field3"
+                                [ngClass]="!otherInformationForm.controls['field3'].valid ? 'required-input' : 'valid-input'"
+                                name="field3" class="form-control">
+                        </div>
+                        <label for="field4" class="control-label col-md-2"> FIELD 4</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field4"
+                                [ngClass]="!otherInformationForm.controls['field4'].valid ? 'required-input' : 'valid-input'"
+                                name="field4" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="field5" class="control-label col-md-2"> FIELD 5</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field5"
+                                [ngClass]="!otherInformationForm.controls['field5'].valid ? 'required-input' : 'valid-input'"
+                                name="field5" class="form-control">
+                        </div>
+                        <label for="field6" class="control-label col-md-2"> FIELD 6</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field6"
+                                [ngClass]="!otherInformationForm.controls['field6'].valid ? 'required-input' : 'valid-input'"
+                                name="field6" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="field7" class="control-label col-md-2"> FIELD 7</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field7"
+                                [ngClass]="!otherInformationForm.controls['field7'].valid ? 'required-input' : 'valid-input'"
+                                name="field7" class="form-control">
+                        </div>
+                        <label for="field8" class="control-label col-md-2"> FIELD 8</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field8"
+                                [ngClass]="!otherInformationForm.controls['field8'].valid ? 'required-input' : 'valid-input'"
+                                name="field8" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="field9" class="control-label col-md-2"> FIELD 9</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field9"
+                                [ngClass]="!otherInformationForm.controls['field9'].valid ? 'required-input' : 'valid-input'"
+                                name="field9" class="form-control">
+                        </div>
+                        <label for="field10" class="control-label col-md-2"> FIELD 10</label>
+                        <div class="col-md-4">
+                            <input type="text" formControlName="field10"
+                                [ngClass]="!otherInformationForm.controls['field10'].valid ? 'required-input' : 'valid-input'"
+                                name="field10" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--buttons-->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="otherInformationForm.invalid"
+                            (click)="submitcustomerOtherInformation(otherInformationForm)"
+                            class="btn btn-success pull-right">Save </button>
+                        <button type="button" (click)="displayOtherInformation=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="1100"
+    [contentStyle]="{'overflow':'auto','max-height':'500px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Edit Prepayment Amount
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="staffFormGroup" novalidate>
+
+            <div class="panel-body">
+                <p-tabView [activeIndex]="activeIndex" (onChange)="handleChange($event)">
+                    <p-tabPanel header="Prepayment Information">
+                        <div class="form-horizontal">
+
+
+                            <div class="form-group" *ngIf="!adActive">
+                                <label for="" class="control-label col-md-2">Batch Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" disabled [(ngModel)]="batchCode"
+                                        [ngClass]="!staffFormGroup.controls['BatchCode'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control" formControlName="BatchCode" name="batchCode">
+                                </div>
+                                <label for="" class="control-label col-md-2">Loan Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" disabled [(ngModel)]="loanReferenceNumber" class="form-control"
+                                        name="loanReferenceNumber"
+                                        [ngClass]="!staffFormGroup.controls['LoanReferenceNumber'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="LoanReferenceNumber">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" *ngIf="!adActive">
+
+                                <label class="col-md-2">Prepayment Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="processedDate" disabled="true" formControlName="PrepaymentDate"
+                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1055:2030"
+                                        [showIcon]="true"
+                                        [inputStyle]="staffFormGroup.controls['PrepaymentDate'].valid ? {'width': '100%','border-left':'3px solid #3cd225'} : {'width': '100%','border-left':'3px solid #ff0000'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'}"></p-calendar>
+                                </div>
+
+                                <label for="" class="control-label col-md-2">Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" [(ngModel)]="amount" class="form-control" name="amount"
+                                        [ngClass]="!staffFormGroup.controls['Amount'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="Amount">
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </p-tabPanel>
+
+                </p-tabView>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- <button style="margin-left:5px" type="button" *ngIf="activeIndex > 0"
+                            class="btn btn-primary pull-left" (click)="prevButton()">Previous</button>
+                        <button style="margin-left:5px" type="button" *ngIf="activeIndex < 5" (click)="nextButton()"
+                            class="btn btn-primary pull-left">Next</button> -->
+
+                        <button type="button" (click)="onSubmit(staffFormGroup)"
+                            class="btn btn-success pull-right">Save</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right"
+                            (click)="hideModal()">Close</button>
+
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayADAuth" id="auth-ad" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Active Directory User Authentication
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayADAuth=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <!-- <div class="form-group">
+                        <label for="adAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="adAuthStaffCode" [(ngModel)]="adAuthStaffCode" id="adAuthStaffCode" class="form-control">
+                        </div>
+                    </div> -->
+
+                <div class="form-group">
+                    <label for="adAuthPassCode" class="control-label col-md-12">Active Directory Password</label>
+                    <div class="col-md-12">
+                        <input type="password" name="adAuthPassCode" [(ngModel)]="adAuthPassCode" id="adAuthPassCode"
+                            class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel-footer ">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="form-group text-center">
+                        <div class="col-md-12">
+                            <button type="button" [disabled]="!adAuthPassCode" (click)="performAction()"
+                                style="margin-right:5px "
+                                class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">{{buttonText}}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="activitiesModal" id="activityM" modal="modal" showEffect="fade" width="800"
+    [contentStyle]="{'overflow':'auto','max-height':'500px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Activities
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="activitiesModal=false">&times;</a>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <p-dataTable [value]="activities" [responsive]=true [(selection)]="multipleActivities"
+                        dataKey="activityId">
+                        <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                        <p-column [style]="{'width':'90px'}" field="activityName" header="Activity Name"></p-column>
+                        <p-column [style]="{'width':'100px'}" header="Expiry Date">
+                            <ng-template let-activity="rowData" let-i="rowIndex" pTemplate="body">
+                                <p-calendar [(ngModel)]="activity.expireOn" dateFormat="dd/MM/yy" [showIcon]="true"
+                                    [responsive]="true" [inputStyle]="{'width': '100%' }"
+                                    [style]="{'width': '100%', 'overflow': 'visible'  }" [monthNavigator]="true"
+                                    [yearNavigator]="true" yearRange="1955:2030"></p-calendar>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="activeActivitiesModal" id="activeActivityM" modal="modal" showEffect="fade"
+    width="800" [contentStyle]="{'overflow':'auto','max-height':'500px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Activities
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="activeActivitiesModal=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <p-dataTable [value]="activeActivities" [responsive]=true>
+                    <p-column [style]="{'width':'110px'}" field="activityName" header="Activity Name">
+                    </p-column>
+                    <p-column [style]="{'width':'110px'}" field="expireOn" header="Expiring On"></p-column>
+                </p-dataTable>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <p-dataTable [value]="activeActivities" [responsive]=true>
+                <p-column [style]="{'width':'110px'}" field="activityName" header="Activity Name"></p-column>
+            </p-dataTable>
+
+        </div>
+    </div>
+
+</p-dialog>
+
+
+<p-dialog [responsive]="true" [(visible)]="showApprovalModal" id="limit-def-modal" modal="modal" showEffect="fade"
+    width="1000" scrollable="true" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+  'max-height': '80vh','min-height':'300px','z-index': 1000}">
+    <p-tabView [activeIndex]="activeIndex" (onChange)="approvalTabChange($event)">
+        <p-tabPanel header="Approval Memorandum">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+
+                                <select (change)="onDocumentSectionChange($event.target.value)" formControlName="sectionId" name="sectionId" id="sectionId"
+                                    class="form-control">
+                                    <option value="">-- Select Document Section --</option>
+                                    <option *ngFor="let x of documentationSections" [value]="x.sectionId">{{ x.staffRoleName }} :: {{ x.title }}</option>
+                                </select>
+
+                            </form>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="pull-right">
+                                <button (click)="previewDocumentation()" style="padding: 3px 6px 3px 6px;">
+                                    <span class="glyphicon glyphicon-file"></span> Preview</button>
+                                <!-- <button (click)="previewDocumentationLOS()" style="padding: 3px 6px 3px 6px;">
+                                    <span class="glyphicon glyphicon-file"></span> Preview Previous</button> -->
+                                <button (click)="print()" style="padding: 3px 6px 3px 6px;">
+                                    <span class="glyphicon glyphicon-print"></span> Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAM -->
+                <div class="panel-body" style="min-height:350px;">
+                    <CKEDITOR *ngIf="editMode" [content]="sectionContent" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>                                <div *ngIf="!editMode" [innerHTML]="sectionContent" style="overflow:auto;height:320px"></div>
+                    <div><i>{{ sectionDescription }}</i></div>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row" style="padding-left:inherit;">
+                        <div class="col-md-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+
+                                    <button type="button" (click)="getDocumentTemplate(true)" class="btn btn-warning">
+                                        <span class="glyphicon glyphicon-plus" style="padding-right:4px;"></span> Load Template</button>
+
+                                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(1)" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-chevron-left" style="padding-right:4px;"></span> Previous</button>
+
+                                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(2)" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-chevron-right" style="padding-right:4px;"></span> Next</button>
+
+                                    <button [disabled]="!canEditDocument() || !editMode" type="button" (click)="saveSection(true)" class="btn btn-success"
+                                        style="margin-right:10px;">
+                                        <span class="glyphicon glyphicon-floppy-disk" style="padding-right:4px;"></span> Save Changes</button>
+                                    
+                                    <button type="button" (click)="showApprovalModal = false;" style="margin-right:5px"
+                                        class="btn btn-danger pull-right">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="Supporting Documents">
+            <div class="panel panel-default">
+                <!-- <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Supporting Documents
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="panel-body">
+            
+                    </div> -->
+
+                <document-upload [reload]="RELOAD" [operationId]="OPERATION_ID" [customerId]="CUSTOMER_ID"
+                    [customerGroupId]="GROUP_CUSTOMER_ID" [targetId]="TARGET_ID" [isOperationSpecific]="false"
+                    [isLms]="true" (requiredDocumentsUploadSatisfied)="true" [targetReferenceNumber]="REFERENCE_NUMBER">
+                </document-upload>
+
+                <div class="panel-footer ">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <button type="button" (click)="showApprovalModal = false;" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="Send for Approval">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Send for Approval
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <textarea rows="4" name="comment" id="comment" class="form-control" [(ngModel)]="comment"
+                                [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" [(ngModel)]="approvalStatusId" name="approvalStatus"
+                                [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+                                <option value="0">--- Select Approval ---</option>
+                                <option value="2">Approve</option>
+                                <option value="3">Decline</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="row">
+                      <p-dataTable [paginator]="true" [rows]="5" [value]="batchLoansData" [responsive]=true
+                      selectionMode="single">
+                      <p-column [style]="{'width':'210px'}" field="batchCode" header="Batch Code" sortable="true"
+                          [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true"
+                          [filter]="true" filterMatchMode="contains"></p-column>
+                      <p-column field="dateCreated" header="Date Created" sortable="true" [filter]="true"
+                          filterMatchMode="contains">
+                          <ng-template let-col let-apr="rowData" pTemplate="body">
+                              {{apr[col.field] | date: 'dd MMM yyyy' }}
+                          </ng-template>
+                      </p-column>
+                     
+                      <p-column field="amount" header="Amount" sortable="true" [filter]="true"
+                          filterMatchMode="contains"></p-column>
+                  </p-dataTable>
+          
+                    </div>
+                    
+                  </div>
+                  
+                <div class="panel-footer ">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <button type="button" (click)="submitForApproval()" class="btn btn-success pull-right"
+                                [disabled]="comment == null || comment == '' || approvalStatusId != 2 && approvalStatusId != 3">
+                                Send for Approval</button>
+                            <button type="button" (click)="showApprovalModal = false;" style="margin-right:5px"
+                                class="btn btn-danger pull-right">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+
+</p-dialog>
+
+
+<!--append modal-->
+<p-dialog [responsive]=true [(visible)]="displayAppendModal" id="append-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Load Document Template</h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayAppendModal=false">&times;</a>
+            </div>
+        </div>
+
+        <form novalidate [formGroup]="appendForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="creditTemplateId" class="control-label col-md-4">Document Template</label>
+                        <div class="col-md-8">
+                            <select name="creditTemplateId" id="creditTemplateId" formControlName="creditTemplateId" class="form-control" [ngClass]="appendForm.controls['creditTemplateId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Document Template --</option>
+                                <option *ngFor="let x of documentTemplates" [value]="x.templateId">{{ x.templateName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="loadDocumentTemplate(appendForm)" [disabled]="appendForm.invalid" class="btn btn-warning pull-right">Load Document</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of append modal-->

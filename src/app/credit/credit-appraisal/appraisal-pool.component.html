@@ -1,0 +1,187 @@
+<!-- loan applications -->
+<div class="card no-padding">
+  <div class="panel panel-default">
+
+      <div class="panel-heading">
+          <div class="row">
+              <div class="col-md-12">
+                  <h2 class="panel-title pull-left">
+                      Loan Applications
+                      <small *ngIf="filteredProductClass != null && searching == false"> -
+                          {{filteredProductClass}}</small>
+                      <small *ngIf="searchString.length > 0 && searching == true"> - Search
+                          results for
+                          <i>{{searchString}}</i>
+                      </small>
+                  </h2>
+              </div>
+          </div>
+      </div>
+      <!-- this is hard coding and not configurable -->
+      <div style="margin-top:8px;margin-left:15px;">
+          <a (click)="reset()" href="javascript:void(0)" title="All">All</a>
+          <span *ngFor="let x of productPrograms; let i = index">
+              <span style="padding:3px;">|</span>
+              <a (click)="filterByProductClass(x.productClassId,x.productClassName)"
+                  href="javascript:void(0)"
+                  title="{{x.productClassName}}">{{ x.productClassName }}
+                  ({{ x.pendingNumber }})</a>
+          </span>
+          <span *ngIf="productPrograms.length == 0">loading...</span>
+      </div>
+
+		<div class="panel-body">
+
+			<p-dataTable [value]="applications" [responsive]="true"
+				[rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]">
+
+				<!-- for row selection -->
+
+				<p-column field="systemDateTime" header="Date Created" [filter]="false"
+					filterMatchMode="contains" [style]="{'width':'100px'}">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{d.systemDateTime | date: 'dd-MM-yyyy'}}
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'100px'}"  field="applicationReferenceNumber"
+                 sortable="true" [filter]="true" header="Reference" filterMatchMode="contains"></p-column>
+				<!-- <p-column [style]="{'width':'150px'}" field="productClassName" header="Product Class" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+				<p-column [style]="{'width':'70px'}" field="loanTypeName" header="Type"
+                    sortable="true" filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'100px'}" field="facility" header="Facility"
+					[filter]="false" sortable="true" filterMatchMode="contains"></p-column>
+
+				<p-column [style]="{'width':'100px'}" header="Customer Name/Group" [filter]="true" sortable="true" filterMatchMode="contains"
+					[style]="{'width':'16%'}">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.customerName }} {{ d.customerGroupName }}
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'text-align':'right','width':'100px'}" field="applicationAmount" header="Amount" [filter]="false"
+					filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.applicationAmount | number : '1.2' }}
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'50px'}" field="productClassId" header="CP">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						<span *ngIf="d.productClassProcessId == productProgramClassProcessId"
+							style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'100px'}" field="timeIn" header="Time In" [filter]="false"
+					filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						{{ d.timeIn | date: 'medium' }}
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'50px'}" field="divisionShortCode" header="Division" [filter]="true" sortable="true" filterMatchMode="contains" [style]="{'width':'10px'}"></p-column>
+
+				<p-column [style]="{'width':'100px'}" header="SLA" [filter]="false" filterMatchMode="contains">
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+						<span class="label label-{{d.slaGlobalStatus}}">_</span> Global
+						<span class="label label-{{d.slaInduvidualStatus}}">_</span> Individual
+					</ng-template>
+                </p-column>
+                
+                <p-column [style]="{'width':'100px'}" field="responsiblePerson" header="Currently With"
+					[filter]="true" filterMatchMode="contains"></p-column>
+				
+				<p-column [style]="{'width':'100px'}">
+					<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <a *ngIf="row.toStaffId == null" (click)="selfAssignApplication(row)" href="javascript:void(0)">
+                            Assign to Self
+                        </a>
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'100px'}">
+					<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="selectapprover(row)" href="javascript:void(0)">
+                            Select Staff To Assign
+                        </a>
+					</ng-template>
+				</p-column>
+
+				<p-column [style]="{'width':'100px'}">
+					<ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+						<div class="btn-group"
+							[innerHtml]="getApplicationStatus(row.submittedForAppraisal,row.approvalStatusId)">
+						</div>
+					</ng-template>
+				</p-column>
+
+			</p-dataTable>
+		</div>
+
+		<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-3 col-md-offset-9 ">
+					<!-- buttons -->
+				</div>
+			</div>
+		</div>
+
+  	</div>
+</div>
+<!-- endof loan applications -->
+
+<p-dialog [responsive]=true [(visible)]="displayApproverSearchForm" modal="modal" id="searchModal" showEffect="fade"
+    width="650" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displayApproverSearchForm=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="staffSearch" #staffInPut (keyup)="searchApprover($event.target.value)"
+                        class="form-control" placeholder="Type in the staff name...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="availableApprovers" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                                <th>Staff Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedApprover(res)" style="cursor: pointer"
+                                *ngFor="let res of availableApprovers; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                                <td>{{res.staffRoleName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

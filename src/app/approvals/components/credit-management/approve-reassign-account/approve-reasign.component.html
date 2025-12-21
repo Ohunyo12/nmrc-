@@ -1,0 +1,219 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Reassign Loan Account Manager
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <p-dataTable [paginator]="true" [rows]="15" [value]="dataList" [responsive]=true selectionMode="single" (onRowSelect)="onRowSelect($event.data)"
+                            [(selection)]="selectedData">
+                            <p-column [style]="{'width':'30px'}" selectionMode="single"></p-column>
+                            <p-column field="currentRMStaffName" header="Current Relationship Manager" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="newRMStaffName" header="New Relationship Manager" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="reasonForChange" header="Reason" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="endDate" header="Effective Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-col let-ln="rowData" pTemplate="body">
+                                    {{ln[col.field] | date }}
+                                </ng-template>
+                            </p-column>
+                            <!-- <p-column styleClass="col-button" [style]="{'width':'50px'}">
+                                <ng-template let-car="rowData" pTemplate="body">
+                                    <button type="button" pButton (click)="selectItemWithButton(car)" icon="fa fa-external-link-square"></button>
+                                </ng-template>
+                            </p-column> -->
+                        </p-dataTable>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displaydata" id="add-modal" modal="modal" showEffect="fade" width="1200">
+    <div class="ui-g">
+        <div class="ui-g-12 no-padding">
+            <div class="card no-padding">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Reassign Loan Account Manager
+                                </h2>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <form novalidate [formGroup]="runningLoansForm" autocomplete="off">
+                                <div class="form-group">
+                                    <label for="loanReferenceNumber" class="control-label col-md-2">Loan Reference Number</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="loanReferenceNumber" formControlName="loanReferenceNumber" id="loanReferenceNumber"
+                                            class="form-control" [ngClass]="!runningLoansForm.controls['loanReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <label for="" class="control-label col-md-2">Principal Amount</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="approvedAmount" formControlName="approvedAmount" id="approvedAmount" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="outstandingPrincipal" class="control-label col-md-2">Outstanding Principal</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="outstandingPrincipal" formControlName="outstandingPrincipal" id="outstandingPrincipal"
+                                            class="form-control" [ngClass]="!runningLoansForm.controls['outstandingPrincipal'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <label for="interestRate" class="control-label col-md-2">Interest Rate</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="interestRate" formControlName="interestRate" id="interestRate" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['interestRate'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="teno" class="control-label col-md-2">Tenor</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="teno" formControlName="teno" id="teno" class="form-control" [ngClass]="!runningLoansForm.controls['teno'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                    <label for="accrualedAmount" class="control-label col-md-2">Accrued Interest</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="accrualedAmount" formControlName="accrualedAmount" id="accrualedAmount" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['accrualedAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="currency" class="control-label col-md-2">Currency</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="currency" formControlName="currency" id="currency" class="form-control" [ngClass]="!runningLoansForm.controls['currency'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                    <label for="pastDueTotal" class="control-label col-md-2">Past Due</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="pastDueTotal" formControlName="pastDueTotal" id="pastDueTotal" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['pastDueTotal'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="totalAmount" class="control-label col-md-2">Total Amount</label>
+                                    <div class="col-md-4 ">
+                                        <input type="text" [attr.disabled]=true name="totalAmount" formControlName="totalAmount" id="totalAmount" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['totalAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                    <label *ngIf="displayEffectiveDate" for="previousEffectiveDate" class="control-label col-md-2">Effective Date </label>
+                                    <div *ngIf="displayEffectiveDate" class="col-md-4">
+                                        <p-calendar id="previousEffectiveDate" formControlName="previousEffectiveDate" dateFormat="dd/mm/yy" [ngClass]="'valid-input'"
+                                            [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true"
+                                            readOnlyInputText="true" yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                                    </div>
+
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="relationshipManagerName" class="col-md-2">Relationship Manager</label>
+                                    <div class="col-md-4">
+                                        <input type="text" [attr.disabled]=true name="relationshipManagerName" formControlName="relationshipManagerName" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['relationshipManagerName'].valid ? 'required-input' : 'valid-input'">
+
+                                    </div>
+
+
+                                    <label for="relationshipOfficerName" class="col-md-2">Relationship Officer</label>
+                                    <div class="col-md-4">
+                                        <input type="text" [attr.disabled]=true name="relationshipOfficerName" formControlName="relationshipOfficerName" class="form-control"
+                                            [ngClass]="!runningLoansForm.controls['relationshipOfficerName'].valid ? 'required-input' : 'valid-input'">
+
+                                    </div>
+                                </div>
+                                <div>
+                                    <fieldset>
+                                        <legend>
+                                            Assign Relationship Manager
+                                        </legend>
+
+
+                                        <p-row></p-row>
+                                        <div class="form-group">
+                                            <div class="col-md-4">
+                                                <label for="" class="col-md-6"> New Relationship Manager </label>
+                                                <label for="" class="col-md-6 form-control">
+                                                    {{runningLoansForm.value.newRMStaffName}} </label>
+
+
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="" class="col-md-6">Effective Date </label>
+                                                <label for="" class="col-md-6 form-control">
+                                                    {{runningLoansForm.value.startDate | date}} </label>
+
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="" class="control-label col-md-6">
+                                                    Reason For Change
+                                                </label>
+                                                <label for="" class="col-md-6 form-control">
+                                                    {{runningLoansForm.value.reasonForChange}}
+                                                </label>
+                                            </div>
+
+
+                                        </div>
+                                    </fieldset>
+                                    <hr>
+                                    <div class="form-group">
+                                            <div class="col-md-4"></div>
+                                        <label for="" class="control-label  col-md-1">
+                                                Status
+                                        </label>
+                                        <div class="col-md-2">
+                                            <select name="" id="" class="form-control" formControlName="approvalStatusId" [ngClass]="!runningLoansForm.controls['approvalStatusId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">Select Action...</option>
+                                                <option *ngFor="let item of approvalStatus" value="{{item.approvalStatusId}}">{{item.approvalStatusName}}</option>
+                                            </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-1">
+                                            Comment
+                                        </label>
+                                        <div class="col-md-4">
+                                            <textarea class="form-control" id="reasonForChange" formControlName="comment" rows="2" [ngClass]="!runningLoansForm.controls['comment'].valid ? 'required-input' : 'valid-input'">
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                   
+                    <!--end of panel-->
+                </div>
+            </div>
+            <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm()" [disabled]="runningLoansForm.invalid" class="btn btn-success pull-right">Save</button>
+                            <button type="button" (click)="close()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+       
+    </div>
+
+</p-dialog>

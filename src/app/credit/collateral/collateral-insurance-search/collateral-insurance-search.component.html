@@ -1,0 +1,281 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h2 class="panel-title pull-left">
+                          Insurance Search
+                      </h2>
+                  </div>
+              </div>  
+          </div>
+      </div>
+      <p-tabView [activeIndex]="activeTabindex" *ngIf='!showBottom' (onChange)="onTabChange($event)">
+          <p-tabPanel header="Insurance Search">
+
+              <div class="card no-padding">
+                  <div class="panel panel-default">
+
+                      <div class="panel-heading">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <h2 class="panel-title pull-left">
+                                      Insurance Search
+                                  </h2>
+          
+                                  <div class="pull-right">
+                                      <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="panel-body">
+                          <p-tabView>
+                              <p-tabPanel header="useSearch" *ngIf="displaySearchTable" >
+                                  <p-dataTable [value]="applications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]"
+                                  >
+                                  <p-column field="startDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.startDate | date: 'dd-MM-yyyy' }}
+                                    </ng-template>
+                                  </p-column>
+                                  <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> 
+                                  <p-column field="requestNumber" header="Request Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> 
+
+                                  <p-column field="currentApprovalLevel" header="Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>                               
+                              
+                                  <p-column field="approvalStatusName" header="Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'150px'}">
+                                    <ng-template pTemplate="header">
+                                        <div style="text-align:center">                                            
+                                        </div>
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div style="text-align:center">                                           
+                                            <a (click)="getInsuranceInformation(d)" href="javascript:void(0)">View</a>
+                     
+                                        </div>
+                                    </ng-template>
+                                </p-column>
+                              </p-dataTable>
+                              </p-tabPanel>
+                              
+                          </p-tabView>                         
+                      </div>
+
+                      <div class="panel-footer">
+                          <div class="row">
+                              <div class="col-md-3 col-md-offset-9 ">
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </p-tabPanel>        
+      </p-tabView>
+
+  </div>
+</div>
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+      <div style="margin-bottom:0" class="panel panel-default">
+          <div class="panel-heading">
+              <h2 class="panel-title">
+                  Search Application
+              </h2>
+          </div>
+  
+          <form novalidate [formGroup]="searchForm" autocomplete="off">
+  
+              <div class="panel-body">
+                  <div class="form-horizontal">
+                      <div class="form-group">
+                          <label for="searchString" class="control-label col-md-12">Request Number / Customer Name</label>
+                          <div class="col-md-12">
+                              <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+  
+              <div class="panel-footer">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                          <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                      </div>
+                  </div>
+              </div>
+  
+          </form>
+  
+      </div>
+  </p-dialog>
+  
+
+  <p-tabView [activeIndex]="0" *ngIf="mainInsuranceView">
+    <p-tabPanel header="Insurance Details">
+        <div>
+            <div class="panel-body">
+                <div *ngIf="mainInsuranceDetail != null" class="row" style="padding:0 15px 0 15px;">
+                    <h4>Main Insurance Detail</h4>
+                    <table *ngIf="mainInsuranceView" class="table table-casa-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Customer Name:</strong>
+                                </td>
+                                <td colspan="2" style="text-align:left">{{mainInsuranceDetail.customerName}}</td>
+                                <td>
+                                    <strong>Date Created:</strong>
+                                </td>
+                                <td>{{ mainInsuranceDetail.dateTimeCreated | date:"dd-MM-yyyy" }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Request Number:</strong>
+                                </td>
+                                <td>{{ mainInsuranceDetail.requestNumber }}</td>
+                                <td>
+                                    <strong>Collateral Type:</strong>
+                                </td>
+                                <td>{{ mainInsuranceDetail.collateralSubType }}</td>
+                                <td>
+                                    <strong>Collateral Sub Type:</strong>
+                                </td>
+                                <td>{{ mainInsuranceDetail.collateralSubType  }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Collateral Value:</strong>
+                                </td>
+                                <td>{{ mainInsuranceDetail.collateralValue | number:'1.2' }}</td>
+                                <td>
+                                    <strong></strong>
+                                </td>
+                                <td></td>
+                                <td>
+                                    <strong>:</strong>
+                                </td>
+                                <td></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                    <h4>Insurance Policy Detail</h4>
+                    <table class="table table-casa-information">
+                        <tbody>
+
+                            <tr>
+
+                                <td>
+                                    <strong>Policy Ref. No.:</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.referenceNumber }}</td>
+                                <td>
+                                    <strong>Insurance Type:</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.insuranceType}}</td>
+                                <td>
+                                    <strong>Insurance Company:</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.insuranceCompany }}</td>
+                            </tr>
+                            <tr>
+
+                                <td>
+                                    <strong>Insured Amount:</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.sumInsured | number:'1.2' }}
+                                </td>
+                                <td>
+                                    <strong>Start Date</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{insurancePolicy.startDate | date}}</td>
+                                <td>
+                                    <strong>Expiry Date</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{insurancePolicy.expiryDate | date }}</td>
+                            </tr>
+                            <tr>
+
+                                <td>
+                                    <strong>Description:</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">{{ insurancePolicy.description }}</td>
+                                <td>
+                                    <strong>Premium Amount</strong>
+                                </td>
+                                <td *ngIf="insurancePolicy!= null">
+                                    {{insurancePolicy.inSurPremiumAmount | number:'1.2'}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+              
+                <div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </p-tabPanel>
+
+    <p-tabPanel header=" Insurance Policy History">
+        <div class="row" style="padding:0 15px 0 15px;">
+            <h6><strong>Insurance Information</strong></h6>
+            <p-dataTable [responsive]="true" [value]="insurancePolicies">
+                <p-column field="referenceNumber" header="request Number"></p-column>
+                <p-column field="insuranceType" header="insurance Type"></p-column>
+                <p-column field="insuranceCompany" header="Insurance Comapny"></p-column>
+                <p-column field="sumInsured" header="Sum Amount"></p-column>
+                <p-column field="startDate" header="Start Date" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.startDate | date }}
+                    </ng-template>
+                </p-column>
+                <p-column field="expiryDate" header="Expiry Date" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.expiryDate | date }}
+                    </ng-template>
+                </p-column>
+                <p-column field="hasExpired" header="Has Expired"></p-column>
+
+                <p-column [style]="{'width':'100px'}" header="View">
+                    <ng-template pTemplate="header"> </ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <div style="text-align:center">
+                            <a (click)="deleteInsurance(d)" href="javascript:void(0)">Remove</a>
+                            <span style="padding:3px;">|</span>
+                            <a (click)="editInsurance(d)" href="javascript:void(0)">Edit</a>
+                        </div>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </p-tabPanel>
+
+    <p-tabPanel header="insurance Documents">
+        <document-upload [reload]="selection?.requestNumber" [operationId]="61" [customerId]="selection?.customerId"
+            [targetId]="selection?.insuranceRequestId"
+            [showUploadForm]= "false"
+            [targetReferenceNumber]="selection?.requestNumber">
+        </document-upload>
+    </p-tabPanel>
+
+    <button type="button" (click)="CancelDetails()" style="margin-right:5px"
+    class="btn btn-danger pull-right">Cancel</button>
+</p-tabView>
+
+  
+
+
+     

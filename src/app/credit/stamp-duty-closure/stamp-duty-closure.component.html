@@ -1,0 +1,597 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Stamp Duty Closure
+
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-g ui-fluid col=md-12">
+
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+
+                        Start Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [monthNavigator]="true"
+                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3 ">
+                        End Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="endDate" dateFormat="dd-MM-yy" [monthNavigator]="true"
+                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+                        .
+                    </label>
+                    <div class="col=md-9">
+                        <button pButton type="button" (click)="GetFacilities()" label="Fetch Record"></button>
+                    </div>
+                </div>
+
+                <div class="pull-right" style="margin-left:400px">
+                    <label for="searchItem" class="control-label col=md-3">
+                        .
+                    </label>
+
+                    <div *ngIf="showFacilityStampDutiesFiltered" class="col=md-5">
+                        <h6>
+                            <strong>
+                                Total Stamp Duty: {{TotalStampDuty | number : '1.2'}}
+                            </strong>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+
+
+            <p-tabView>
+                <p-tabPanel header="Stamd Duty Charge (Ad Valorem)">
+                    <p-tabView *ngIf="showFacilityStampDuties">
+                        <p-dataTable [scrollable]="true" [value]="facilityStampDuties" #dt [paginator]="true"
+                            [responsive]="true" [rows]="15" [(selection)]="multipleStampData" dataKey="facilityStampDutyId">
+                            <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                        (click)="dt.exportCSV()" style="float:left"></button>
+                                </div>
+                            </p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dateTimeCreated"
+                                header="Transaction Date" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-col let-apr="rowData" pTemplate="body">
+                                    {{apr[col.field] | date: 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="customerName" header="Customer Name"
+                                sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="loanAmount" header="Loan Amount"
+                                sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.loanAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="approvedTenor" header="Tenor"
+                                [filter]="true" filterMatchMode="contains">
+        
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.approvedTenor/30 | number : '1.0-0' }} months
+                                </ng-template>
+        
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dutiableValue"
+                                header="Dutiable Value" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.dutiableValue }} %
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="stampDutyAmount"
+                                header="Stamp Duty Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.stampDutyAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="fixedDutyCharge"
+                                header="Stamp Duty Fixed Charge" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.fixedDutyCharge | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+        
+        
+        
+                            <p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralSubType"
+                                header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+                            <p-column [style]="{'width':'70px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span>
+                                        <a (click)="viewRecord(x)" href="javascript:void(0)">Details</a>
+                                    </span>
+                                </ng-template>
+                            </p-column>
+        
+                        </p-dataTable>
+                        <p-footer>
+                            <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStamp()"
+                                class="btn btn-warning">Submit For Approval</button>
+                        </p-footer>
+                    </p-tabView>
+        
+                    <p-tabView *ngIf="showFacilityStampDutiesFiltered">
+                        <p-dataTable [scrollable]="true" [value]="facilityStampDutiesFiltered" #dt2 [paginator]="true"
+                            [responsive]="true" [rows]="15" [(selection)]="multipleStampData" dataKey="facilityStampDutyId">
+                            <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                        (click)="dt.exportCSV()" style="float:left"></button>
+                                </div>
+                            </p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dateTimeCreated"
+                                header="Transaction Date" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-col let-apr="rowData" pTemplate="body">
+                                    {{apr[col.field] | date: 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="customerName" header="Customer Name"
+                                sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="loanAmount" header="Loan Amount"
+                                sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.loanAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="approvedTenor" header="Tenor"
+                                [filter]="true" filterMatchMode="contains">
+        
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.approvedTenor/30 | number : '1.0-0' }} months
+                                </ng-template>
+        
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dutiableValue"
+                                header="Dutiable Value" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.dutiableValue }} %
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="stampDutyAmount"
+                                header="Stamp Duty Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.stampDutyAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="fixedDutyCharge"
+                            header="Stamp Duty Fixed Charge" sortable="true" [filter]="true" filterMatchMode="contains"
+                            [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.fixedDutyCharge | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+        
+        
+        
+                            <p-column [style]="{'width':'100px','font-size':'12px'}" field="collateralSubType"
+                                header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+                            <p-column [style]="{'width':'70px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span>
+                                        <a (click)="viewRecord(x)" href="javascript:void(0)">Details</a>
+                                    </span>
+                                </ng-template>
+                            </p-column>
+        
+                        </p-dataTable>
+                        <p-footer>
+                            <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStamp()"
+                                class="btn btn-warning">Submit For Approval</button>
+                        </p-footer>
+                    </p-tabView>
+                </p-tabPanel>
+                <p-tabPanel header="Stamd Duty Charge (Fixed)">
+                    <p-tabView *ngIf="showFacilityStampDuties">
+                        <p-dataTable [scrollable]="true" [value]="facilityStampDutiesFixed" #dt3 [paginator]="true"
+                            [responsive]="true" [rows]="15" [(selection)]="multipleStampData" dataKey="loanApplicationDetailId">
+                            <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                        (click)="dt.exportCSV()" style="float:left"></button>
+                                </div>
+                            </p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dateTimeCreated"
+                                header="Transaction Date" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-col let-apr="rowData" pTemplate="body">
+                                    {{apr[col.field] | date: 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="customerName" header="Customer Name"
+                                sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="loanAmount" header="Loan Amount"
+                                sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.loanAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="approvedTenor" header="Tenor"
+                                [filter]="true" filterMatchMode="contains">
+        
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.approvedTenor/30 | number : '1.0-0' }} months
+                                </ng-template>
+        
+                            </p-column>
+        
+                            <!-- <p-column [style]="{'width':'120px','font-size':'12px'}" field="dutiableValue"
+                                header="Dutiable Value" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.dutiableValue }} %
+                                </ng-template>
+                            </p-column> -->
+        
+                            <p-column [style]="{'width':'80px','font-size':'12px'}" field="stampDutyAmount"
+                                header="Stamp Duty Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.stampDutyAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <!-- <p-column [style]="{'width':'120px','font-size':'12px'}" field="fixedDutyCharge"
+                                header="Stamp Duty Fixed Charge" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.fixedDutyCharge | number : '1.2' }}
+                                </ng-template>
+                            </p-column> -->
+        
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="collateralSubType"
+                                header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+                            <!-- <p-column [style]="{'width':'70px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span>
+                                        <a (click)="viewRecord(x)" href="javascript:void(0)">Details</a>
+                                    </span>
+                                </ng-template>
+                            </p-column> -->
+        
+                        </p-dataTable>
+                        <p-footer>
+                            <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStamp()"
+                                class="btn btn-warning">Submit For Approval</button>
+                        </p-footer>
+                    </p-tabView>
+        
+                    <p-tabView *ngIf="showFacilityStampDutiesFiltered">
+                        <p-dataTable [scrollable]="true" [value]="facilityStampDutiesFiltered" #dt2 [paginator]="true"
+                            [responsive]="true" [rows]="15" [(selection)]="multipleStampData" dataKey="facilityStampDutyId">
+                            <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                        (click)="dt.exportCSV()" style="float:left"></button>
+                                </div>
+                            </p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="dateTimeCreated"
+                                header="Transaction Date" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-col let-apr="rowData" pTemplate="body">
+                                    {{apr[col.field] | date: 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="customerName" header="Customer Name"
+                                sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="loanAmount" header="Loan Amount"
+                                sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.loanAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="approvedTenor" header="Tenor"
+                                [filter]="true" filterMatchMode="contains">
+        
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.approvedTenor/30 | number : '1.0-0' }} months
+                                </ng-template>
+        
+                            </p-column>
+        
+                            <!-- <p-column [style]="{'width':'120px','font-size':'12px'}" field="dutiableValue"
+                                header="Dutiable Value" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.dutiableValue }} %
+                                </ng-template>
+                            </p-column> -->
+        
+                            <p-column [style]="{'width':'80px','font-size':'12px'}" field="stampDutyAmount"
+                                header="Stamp Duty Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                                [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.baseCurrencyCode}} {{ d.stampDutyAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <!-- <p-column [style]="{'width':'120px','font-size':'12px'}" field="fixedDutyCharge"
+                            header="Stamp Duty Fixed Charge" sortable="true" [filter]="true" filterMatchMode="contains"
+                            [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{d.baseCurrencyCode}} {{ d.fixedDutyCharge | number : '1.2' }}
+                            </ng-template>
+                        </p-column> -->
+        
+        
+        
+                            <p-column [style]="{'width':'120px','font-size':'12px'}" field="collateralSubType"
+                                header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+        
+                            <p-column [style]="{'width':'70px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span>
+                                        <a (click)="viewRecord(x)" href="javascript:void(0)">Details</a>
+                                    </span>
+                                </ng-template>
+                            </p-column>
+        
+                        </p-dataTable>
+                        <p-footer>
+                            <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStamp()"
+                                class="btn btn-warning">Submit For Approval</button>
+                        </p-footer>
+                    </p-tabView>
+                </p-tabPanel>
+            </p-tabView>
+           
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayfacilityStampDutyDetail" widgetVar="ajaxDialog"
+    [contentStyle]="{'overflow':'scroll','max-height':'700px'}" modal="modal" showEffect="fade" width="1200">
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <p-tabView>
+                <p-tabPanel header="Facility Stamp Duty Information">
+
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Applicaation Reference Number</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.applicationReferenceNumber}}
+                                </td>
+                                <td>
+                                    <strong>Loan Amount</strong>
+                                </td>
+                                <td>NGN {{ facilityStampDuty?.loanAmount | number : '1.2' }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Open Stamp Duty Code</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.osdc }}</td>
+                                <td>
+                                    <strong>Approved Stamp Duty Code</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.asdc ? facilityStampDuty?.asdc: 'N/A'}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Closed Stamp Duty Code</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.csdc ? facilityStampDuty?.csdc: 'N/A' }}</td>
+                                <td>
+                                    <strong>Stamp Duty Amount</strong>
+                                </td>
+                                <td>{{facilityStampDuty?.stampDutyAmount}}</td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>Collateral Type</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.collateralSubType }}</td>
+                                <td>
+                                    <strong>Dutiable Value</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.dutiableValue }} %</td>
+                            </tr>
+
+                            <tr>
+
+                                <td>
+                                    <strong>Stamp Duty Status</strong>
+                                </td>
+                                <td>{{ facilityStampDuty?.status }}</td>
+                                <td>
+                                    <strong></strong>
+                                </td>
+                                <td></td>
+                            </tr>
+
+
+                        </tbody>
+
+                    </table>
+                    <div>
+                        <form novalidate [formGroup]="stampDutySharingForm" autocomplete="off">
+
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-6">
+                                            <label for="comment">Comment/Recommendation</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="document">Select Document</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <textarea style="height:87px;" name="comment" formControlName="comment"
+                                                id="comment" class="form-control"
+                                                [ngClass]="!stampDutySharingForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                                        </div>
+                                        <!-- </div> -->
+
+                                        <!-- <div class="form-group"> -->
+                                        <label for="document" class="control-label col-md-3"></label>
+                                        <div class="col-md-6">
+                                            <input type="file" formControlName="fileData"
+                                                (change)="onFileChange($event)" placeholder="Upload file"
+                                                [ngClass]="!stampDutySharingForm.controls['fileData'].valid ? 'required-input' : 'valid-input'"
+                                                accept=".jpg,.jpeg,.png,.pdf" #fileInput name="fileInput"
+                                                style="padding-top:2px;" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="btn-group pull-right">
+                                        <button (click)="hideModal()" type="button" class="btn btn-danger"
+                                            style="margin-right:5px">Close</button>
+
+                                        <button [disabled]="stampDutySharingForm.invalid" type="button"
+                                            (click)="uploadFile(stampDutySharingForm)" style="margin-right:5px"
+                                            class="btn btn-success">Submit</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </p-tabPanel>
+            </p-tabView>
+
+        </div>
+    </div>
+
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayMultipleModel" id="multiStaff" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Close Multiple Stamp Duties
+            </h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p-dataTable [paginator]="true" [rows]="10" [value]="multipleStampData" [responsive]=true
+                            selectionMode="single">
+                            <p-column field="asdc" header="Stamp Duty Code"></p-column>
+                            <p-column field="customerName" header="Customer Name"></p-column>
+                            <p-column field="loanAmount" header="Amount"></p-column>
+                            <p-column field="dutiableValue" header="Dutiable Value"></p-column>
+                            <p-column field="stampDutyAmount" header="Stamp Duty Amount"></p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="control-label col-md-2">Comment</label>
+                    <div class="col-md-4">
+                        <textarea [ngClass]="!multipleData.comment ? 'required-input' : 'valid-input'"
+                            class="form-control" [(ngModel)]="multipleData.comment" name="comment" cols="30"
+                            rows="3"></textarea>
+                    </div>
+                    <label for="" class="control-label col-md-2">Status</label>
+                    <div class="col-md-4">
+                        <input type="file"  (change)="onFileChange($event)"
+                            placeholder="Upload file" [(ngModel)]="multipleData.fileData"
+                            [ngClass]="!multipleData.fileData ? 'required-input' : 'valid-input'"
+                            accept=".jpg,.jpeg,.png,.pdf" #fileInput name="fileInput" 
+                            class="form-control">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="displayMultipleModel=false" type="button" class="btn btn-danger"
+                            style="margin-right:5px">Close</button>
+                        <button [disabled]="!multipleData.comment || !multipleData.fileData" type="button"
+                            (click)="approveBulk()" class="btn btn-success">Submit For Approval</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+`

@@ -1,0 +1,183 @@
+
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="card no-padding" *ngIf="showCustomerCollaterals">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Collateral
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showMappingModalForm()" style="margin:5px; width:150.168px" pButton type="button" label="Map Collateral" icon="fa-plus"></button>
+								<button (click)="showModalForm()" style="margin:5px; width:150.168px" pButton type="button" label="Add New" icon="fa-plus"></button>
+							</div>
+                        </div>
+                    </div>
+				</div>
+				
+			
+               
+				<div class="panel-body coll-list">
+					<p-tabView>
+						<p-tabPanel header="Registered Collateral">
+							<p-dataTable [value]="customerCollaterals">
+
+								<p-column field="collateralTypeId" header="Collateral Type" sortable="true" 
+								[filter]="true" filterMatchMode="contains">
+									<ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+										{{ getCollateralTypeName(d.collateralTypeId) }}
+									</ng-template>
+								</p-column>
+
+								<!-- <p-column field="collateralTypeId" header="Sub Type" sortable="true" [filter]="true" filterMatchMode="contains">
+																			<ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+																				{{ getCollateralSubTypeName(d.collateralSubTypeId) }}
+																			</ng-template>
+																		</p-column> -->
+
+								<p-column field="collateralCode" header="Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+								<p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+										{{ d.collateralValue | number : '1.2' }}
+									</ng-template>
+								</p-column>
+
+								<p-column field="haircut" header="Hair Cut" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+								<!-- <p-column field="camRefNumber" header="Cam Ref Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+								<p-column field="securityCollateralValue" header="Security Value" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+										{{ d.securityCollateralValue - (d.securityCollateralValue * (d.haircut * 0.01) ) | number : '1.2' }}
+									</ng-template>
+								</p-column>
+
+								<p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+										{{ getApprovalStatus(d.approvalStatus) }}
+									</ng-template>
+								</p-column>
+
+								<!-- <p-column [style]="{'width':'100px'}">
+																	<ng-template pTemplate="header"></ng-template>
+																	<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+																		<a  (click)="editCustomerCollateral(d)" href="javascript:void(0)">Edit</a>
+																	</ng-template>
+																</p-column> -->
+
+							</p-dataTable>
+							
+						</p-tabPanel>
+
+						<p-tabPanel header="Mapped Collateral" [headerStyle]="{'width': '200px'}">
+							
+							<p-dataTable [value]="mappedCollateral">
+
+								<p-column field="applicationReferenceNumber" header="Sub Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+								<p-column field="collateralType" header="Collateral Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+								<p-column field="collateralReferenceNumber" header="Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+								<p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+										{{ d.collateralValue | number : '1.2' }}
+									</ng-template>
+								</p-column>
+
+								<p-column field="haircut" header="Hair Cut" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+								<!-- <p-column field="camRefNumber" header="Cam Ref Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+								<p-column field="securityCollateralValue" header="Security Value" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+										{{ d.collateralValue - (d.collateralValue * (d.haircut * 0.01) ) | number : '1.2' }}
+									</ng-template>
+								</p-column>
+
+								<!-- <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains">
+									<ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+										{{ getApprovalStatus(d.approvalStatus) }}
+									</ng-template>
+								</p-column> -->
+
+								<!-- <p-column [style]="{'width':'100px'}">
+																	<ng-template pTemplate="header"></ng-template>
+																	<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+																		<a  (click)="editCustomerCollateral(d)" href="javascript:void(0)">Edit</a>
+																	</ng-template>
+																</p-column> -->
+
+							</p-dataTable>
+						</p-tabPanel>
+					</p-tabView>
+
+
+				</div>
+
+               
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-md-12">
+ 
+							<button style="margin-right:5px" type="button" class="btn btn-primary pull-right" (click)="onDone()">Done</button>
+						</div>
+					</div>
+				</div>
+            </div>
+            <!--end of panel-->
+
+			
+        </div>
+    </div>
+</div>
+  
+<p-dialog [responsive]=true [(visible)]="addNewCollateral" modal="modal" [style]="{'z-index': '1000'}" showEffect="fade" width="850">
+	<app-collateral-creation [collateralId]="selectedSustomerCollaterals" [customerId]="customerId" (hideForm)="showModalForm()" ></app-collateral-creation>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="showCollateralMapping" modal="modal" showEffect="fade" width="850">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="row">
+				<div class="col-md-12">
+					<h2 class="panel-title pull-left">
+						Customer Collateral
+					</h2>
+					<div class="pull-right">
+							Total Security Value :	{{totalSecurityValue | number : '1.2'}}
+				 	</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body">
+			<p-pickList [source]="registeredCollateral" (onMoveToSource)="removeCalculateTotalSecurity($event)" (onMoveAllToSource)="removeCalculateTotalSecurity($event)"
+			 (onMoveAllToTarget)="calculateTotalSecurity($event)" (onMoveToTarget)="calculateTotalSecurity($event)" [target]="selectedCollateral"
+			 sourceHeader="Available" targetHeader="Selected" [responsive]="true" dragdrop="true" dragdropScope="cars" sourceFilterPlaceholder="Search by brand"
+			 targetFilterPlaceholder="Search by brand" [sourceStyle]="{'height':'300px'}" [showSourceControls]="false" [showTargetControls]="false"
+			  [targetStyle]="{'height':'300px'}">
+				<ng-template let-c pTemplate="item">
+
+					<div class="ui-helper-clearfix">
+						<div style="font-size:14px; display:inline-block;margin:5px 5px 0 0">{{c.collateralCode}} - {{c.collateralType}}</div>
+						<div style="font-size:14px;float:right;margin:5px 5px 0 0"> {{c.collateralValue - (c.collateralValue * (c.haircut * 0.01) ) | number : '1.2' }} </div>
+					</div>
+
+				</ng-template>
+
+
+			</p-pickList>
+		</div>
+	<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-12">
+
+					<button style="margin-right:5px" type="button" class="btn btn-primary pull-right" (click)="onSaveCollateralsMapping()">Save</button>
+					<button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="showCollateralMapping = false">Close</button>
+						
+				</div>
+			</div>
+		</div>
+		</div>
+
+</p-dialog>

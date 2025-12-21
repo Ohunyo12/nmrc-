@@ -1,0 +1,178 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Accredited Consultants Awaiting Approval
+              </h2>
+              <div class="pull-right">
+                <!-- <button (click)="showForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui-g ui-fluid">
+
+          <div class="form-group" style="margin-left:30px">
+            <label for="searchItem" class="control-label col=md-3 ">
+              Consultant Type
+            </label>
+
+            <div class="col=md-9">
+              <select name="accreditedConsultantType" (change)="getAllSolicitor()" [(ngModel)]="accreditedConsultantType" id="accreditedConsultantType"
+                class="form-control">
+                <option value="">-- Select Consultant --</option>
+                <option *ngFor="let ci of consultants" [value]="ci.accreditedConsultantTypeId">{{ ci.name }}</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="panel-body">
+          <p-dataTable [value]="solicitors" [rows]="15" [paginator]=true>
+            <p-column field="registrationNumber" header="Registration Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="name" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="firmName" header="Firm Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="accreditedConsultantName" header="Accredited Consultant" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="address" header="Office Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                  <a (click)="view(d)" href="javascript:void(0)">
+                      View Details
+                  </a>
+              </ng-template>
+          </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+      <!--end of panel-->
+
+
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">{{panelHeader}}
+            </h2>
+          <div class="pull-right">
+              <a class="close" (click)="displayModalForm=false">&times;</a>
+          </div>
+      </div>
+
+      <div class="panel-body">
+
+          <table *ngIf="selected !== null" class="table table-casa-information">
+              <tbody>
+                  <tr>
+                      <td>
+                          <strong>Registration Number:</strong>
+                      </td>
+                      <td>{{ selected.registrationNumber }}</td>
+                      <td>
+                          <strong>Name:</strong>
+                      </td>
+                      <td>{{ selected.name }}</td>
+                      <td>
+                        <strong>Firm Name:</strong>
+                    </td>
+                    <td>{{ selected.firmName }}</td>
+                  </tr>
+                  <tr>
+
+                      <td>
+                          <strong>Account Number:</strong>
+                      </td>
+                      <td>{{ selected.accountNumber }}</td>
+                      <td>
+                          <strong>Solicitor BVN:</strong>
+                      </td>
+                      <td>{{ selected.solicitorBVN }}</td>
+                       <td>
+                          <strong>Email:</strong>
+                      </td>
+                      <td>{{ selected.emailAddress }}</td>
+                     
+                  </tr>
+                  <tr>
+                      <td>
+                          <strong>Phone Number:</strong>
+                      </td>
+                      <td>{{ selected.phoneNumber}}</td>                     
+                      <td>
+                          <strong>Address:</strong>
+                      </td>
+                      <td>{{ selected.address}}</td>
+                     <td>
+                          <strong>Consultant Name:</strong>
+                      </td>
+                      <td>{{ selected.accreditedConsultantName}}</td>
+                  </tr>
+              </tbody>
+          </table>
+          <table *ngIf="selected !== null" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>State Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="cursor: pointer" *ngFor="let res of selected.accreditedConsultantStates; let i = index">
+                <td>
+                  {{res.stateName}}
+                </td>                   
+              </tr>
+            </tbody>
+          </table>
+          <hr />
+
+          <div class="well">
+              <div class="row">
+
+                  <label class="col-md-2">Comment</label>
+                  <div class="col-md-4">
+                      <!-- <textarea type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"> -->
+                      <textarea style="height:60px;" name="comment" [(ngModel)]="comment" id="comment" class="form-control" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+
+                      </div>
+                  <label class="col-md-2">Status</label>
+                  <div class="col-md-4">
+                      <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="!approvalStatusId? 'required-input' : 'valid-input'">
+                          <option selected value="0">--- Select Approval ---</option>
+                          <option value="2"> Approve </option>
+                          <option value="3"> Decline </option>
+                      </select>                        
+
+              </div>
+          </div>
+          </div>
+
+      </div>
+
+      <div class="panel-footer">
+          <div class="row">
+              <div class="col-md-12">
+                  <button type="button" (click)="forward()" [disabled]="comment == null || comment == '' || !approvalStatusId" class="btn btn-success pull-right">
+                      Submit</button>
+                  <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+              </div>
+          </div>
+      </div>
+
+  </div>
+</p-dialog>
+<!--end of form modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

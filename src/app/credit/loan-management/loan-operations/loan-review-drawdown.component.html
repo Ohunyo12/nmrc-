@@ -1,0 +1,464 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <!--module header-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Review Drawdown 
+                        </h2>
+                        <h2 class="panel-title pull-right">
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <p-tabView  [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                <p-tabPanel *ngIf='showList' header="Loan Review Applications">
+                    <loan-review-application-list [reload]="reloadGrid" [isInRouteMode]="false" 
+                    [availment]="false" 
+                    [isDrawdown]="true" 
+                    [operationId]="OPERATION_ID"
+                    [isAccountOfficerDrawdown]="true"
+                    [isDrawdown]='true'
+                        (selectedApplication)="onApplicationSelected($event)">
+                    </loan-review-application-list>
+                </p-tabPanel>
+
+                <p-tabPanel header="Application Information" [disabled]="disableApplicationInformationTab">
+                    <!-- <div class="panel-body">
+                        <p-accordion #accordion2>
+                            <p-accordionTab header="Show Facility Routing">
+                                <app-workflow-routing [currentSelection]="workflowTarget" [enableRoutePreset]="false"
+                                    [enableReroute]="enableReroute" [panelLabel]="'Facility Booking Routing'"
+                                    [referenceNumber]="application?.referenceNumber" (rerouted)="resetGrid($event)">
+                                </app-workflow-routing>
+                            </p-accordionTab>
+                        </p-accordion>
+                    </div> -->
+
+                    <app-customer-information-detail [isLMS]="true"
+                        [reviewApplicationId]="application?.loanReviewApplicationId"></app-customer-information-detail>
+
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title">
+                                        Application Details
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-casa-information">
+                                <tbody>
+                                    <tr>
+                                        <th>Application Date</th>
+                                        <td>{{ application?.applicationDate | date: 'dd-MM-yyyy' }}</td>
+                                        <th>Reference Number</th>
+                                        <td>{{ application?.referenceNumber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Approval Level</th>
+                                        <td>{{ application?.currentApprovalLevel }}</td>
+                                        <th>Approval Status</th>
+                                        <td>{{ application?.approvalStatus }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Customer Name</th>
+                                        <td>{{ application?.customerName }}</td>
+                                        <th>Branch Name</th>
+                                        <td>{{ application?.branchName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Comment</th>
+                                        <td colspan=3>{{ application?.lastComment }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Activity Type</th>
+                                        <td>{{ application?.operationTypeName }}</td>
+                                        <th>Review Details</th>
+                                        <td>{{ operationTypeNames }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Loan Details</h2>
+                        </div>
+                        <div class="panel-body">
+
+                            <div class="col-md-6">
+                                <select (change)="onFacilityChange($event.target.value)" class="form-control"
+                                    [ngClass]="reloadLoanDetails == null ? 'required-input' : 'valid-input'">
+                                    <option value="null">-- Select Facility --</option>
+                                    <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName
+                                        }} -- {{ x.obligorName }}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="panel-body">
+                            <app-disbursed-facility-detail
+                                [displayDetails]="loanSystemTypeId != 0 && loanSystemTypeId != 4"
+                                [loanSystemTypeId]="loanSystemTypeId" [LoadLoanDetails]="reloadLoanDetails">
+                            </app-disbursed-facility-detail>
+                            <app-loan-application-details-view *ngIf="loanSystemTypeId == 4"
+                                [loanApplicationDetailId]="reloadLoanDetails"> </app-loan-application-details-view>
+                        </div>
+                    </div>
+
+                    <!-- ASP Related Info -->
+                    <div *ngIf="cantingentUsedTab" class="panel panel-default">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">ASP Information</h2>
+                            </div>
+
+                        </div>
+                        <div class="panel-body">
+                            <p-tabView>
+                                <p-tabPanel header="Used Contingent">
+                                    <app-all-contingent-used [loanId]="reloadLoanDetails"></app-all-contingent-used>
+                                </p-tabPanel>
+                                <p-tabPanel header="Mapped Collateral Details">
+                                    <app-mapped-loan-collateral [loanId]="reloadLoanDetails"
+                                        [loanSystemTypeId]="loanSystemTypeId">
+                                    </app-mapped-loan-collateral>
+                                </p-tabPanel>
+                                <p-tabPanel header="Documents">
+                                    <app-contingent-used-document [loanId]="reloadLoanDetails">
+                                    </app-contingent-used-document>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+
+                    <app-approval-comments [operationId]="lmsOperationId"
+                    [reviewApplicationId]="lmsApplicationId"></app-approval-comments>
+                    <!-- <app-approval-comments [operationId]="operationId"
+                        [applicationId]="loanReviewApplicationId"></app-approval-comments> -->
+
+                        <div class="panel-body">
+                            <app-approval-actions 
+                                [operationId]="operationId"
+                                [applicationId]="application?.loanReviewApplicationId" 
+                                [levelId]="currentApprovalLevelId"
+                                [enableReferBackButton]="false"
+                                (approvalStatusId)="approvalStatus($event)">
+                            </app-approval-actions>
+
+                        </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Refer Back</h2>
+                        </div>
+                        <div *ngIf="application?.atInitiator == false" class="btn-group">
+                            <button type="button" class="btn btn-danger" (click)="displayReferBackForm=true" style="margin-right:5px">
+                                <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+                        </div>
+                    </div>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Supporting Documents" [disabled]="disableSupportingDocumentsTab">
+                    <document-upload 
+                    [deleteLink]="false"
+                    [panelTitle]="CREDITAPPRIASALDOC" 
+                    [isLms]="true"
+                    [showUploadForm]="isCreator()" 
+                    [reload]="reload" 
+                    [operationId]="lmsOperationId"
+                    [customerId]="application?.customerId" 
+                    [customerGroupId]="application?.customerGroupId"  
+                    [isOperationSpecific]="false"
+                    [targetId]="lmsApplicationId" 
+                    [targetReferenceNumber]="application?.referenceNumber">
+                </document-upload> 
+
+                    <!-- <document-upload [reload]="reload" [applicationId]="application?.loanReviewApplicationId"
+                        [customerId]="application?.customerId"
+                        [customerGroupId]="application?.customerGroupId"
+                        [referenceNumber]="application?.referenceNumber"></document-upload> -->
+
+                </p-tabPanel>
+
+                 <!-- <p-tabPanel header="Availment" [disabled]="disableApplicationInformationTab"
+                    (change)="onTabChange($event)">
+
+                    <div class="row">
+                        <div class="card no-padding">
+                            <div class="panel panel-default">
+    
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+    
+                                                <select (change)="onDocumentSectionChange($event.target.value)" formControlName="sectionId" name="sectionId" id="sectionId"
+                                                    class="form-control">
+                                                    <option value="">-- Select Document Section --</option>
+                                                    <option *ngFor="let x of documentationSections" [value]="x.sectionId">{{ x.staffRoleName }} :: {{ x.title }}</option>
+                                                </select>
+    
+                                            </form>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="pull-right">
+                                                <button (click)="previewDocumentation()" style="padding: 3px 6px 3px 6px;">
+                                                    <span class="glyphicon glyphicon-file"></span> Preview</button>
+                                                    <button (click)="previewDocumentationLOS()" style="padding: 3px 6px 3px 6px;">
+                                                        <span class="glyphicon glyphicon-file"></span> Preview Previous</button>
+                                                <button (click)="print()" style="padding: 3px 6px 3px 6px;">
+                                                    <span class="glyphicon glyphicon-print"></span> Print</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                
+                                <div class="panel-body" style="min-height:350px;" id="print-section">
+                                    <CKEDITOR id="print-section"  *ngIf="editMode" [content]="sectionContent" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>
+                                    <div id="print-section" *ngIf="!editMode" [innerHTML]="sectionContent" style="overflow:auto;height:320px"></div>
+                                    <div><i>{{ sectionDescription }}</i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <div class="btn-group">
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-tabPanel>  -->
+
+                <p-tabPanel header="Checklists & Collateral" [disabled]="disableApplicationInformationTab">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Checklists</h2>
+                        </div>
+                        <div class="panel-body">
+                            <app-condition-checklist [isAvailmentChecklist]="true" [isLMSChecklist]="true"
+                                [AvailChecklist]="true" [loanReviewApplicationId]="loanReviewApplicationId"
+                                [showOrHideList]='false'></app-condition-checklist>
+                        </div>
+                    </div>
+
+                    <div class="panel-heading">
+                        <h2 class="panel-title">Collateral</h2>
+                    </div>
+
+                    <select (change)="onFacilityChange($event.target.value)" class="form-control"
+                        [ngClass]="reloadLoanDetails == null ? 'required-input' : 'valid-input'">
+                        <option value="null">-- Select Facility --</option>
+                        <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">
+                            {{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                    </select>
+
+                    <br />
+                    <collateral-information [reload]="detail?.loanApplicationId"
+                        [applicationCustomerId]="application?.customerId" [canEditExternally]="false"
+                        [applicationCustomerName]="application?.customerName" [autoMapNew]="true"
+                        proceedEvent="refreshCollateral()" [hideCreateButton]="true" [selectedModule]="1">
+                    </collateral-information>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Job Request" [disabled]="disableApplicationInformationTab">
+                    <div *ngIf="reloadLoanDetails != null">
+                        <job-request-template [targetId]=reloadLoanDetails [jobSourceId]=jobSourceId
+                            [operationAvailable]="true" [moduleReferenceNumber]=applicationReferenceNumber
+                            [operationsId]="operationId" [isApplicationLevel]="false"
+                            [useFacilityDropdownToDetermineTarget]="false" [onPage]="true"></job-request-template>
+                    </div>
+                </p-tabPanel>
+
+                <p-tabPanel header="Approval Memorandum" [disabled]="disableApplicationInformationTab">
+                    <div class="row">
+                        <div class="card no-padding">
+                            <div class="panel panel-default">
+    
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+                                                <select (change)="onDocumentSectionChange($event.target.value)" formControlName="sectionId" name="sectionId" id="sectionId"
+                                                    class="form-control">
+                                                    <option value="">-- Select Document Section --</option>
+                                                    <option *ngFor="let x of documentationSections" [value]="x.sectionId">{{ x.staffRoleName }} :: {{ x.title }}</option>
+                                                </select>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="pull-right">
+                                                <button (click)="previewDocumentation(false)" style="padding: 3px 6px 3px 6px;">
+                                                    <span class="glyphicon glyphicon-file"></span> Preview</button>
+                                                    <button (click)="previewDocumentationLOS(false)" style="padding: 3px 6px 3px 6px;">
+                                                        <span class="glyphicon glyphicon-file"></span> Preview Previous</button>
+                                                <button (click)="previewDocumentation(true)" style="padding: 3px 6px 3px 6px;">
+                                                    <span class="glyphicon glyphicon-print"></span> Print</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <!-- CAM -->
+                                <div class="panel-body" style="min-height:350px;">
+                                    <CKEDITOR id="print-section"  *ngIf="editMode" [content]="sectionContent" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>
+                                    <div id="print-section" *ngIf="!editMode" [innerHTML]="sectionContent" style="overflow:auto;height:320px"></div>
+                                    <div><i>{{ sectionDescription }}</i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="col-md-12">
+                            <div class="text-center">
+                                <div class="btn-group">
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </p-tabPanel>
+
+            </p-tabView>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayBackToCAPModal" modal="modal" showEffect="fade" width="550">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Refer Back </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayBackToCAPModal=false">&times;</a>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="comments" class="col-md-4 control-label">Comments</label>
+                    <div class="col-md-8">
+                        <textarea name="" id="" [(ngModel)]="rmComment" class="form-control"
+                            [ngClass]="!rmComment ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+
+                <div *ngIf="!offerLetterAccepted" class="form-group">
+                    <label for="staffName" class="col-md-4">Target Staff / Level</label>
+                    <div class="col-md-8">
+                        <select (change)="onTargetStaffLevelChange($event.target.value)" type="text" name="trailId"
+                            [(ngModel)]="trailId" id="trailId" class="form-control">
+                            <option value="">-- Select Staff / Level --</option>
+                            <option *ngFor="let x of appraisalTrail" [value]="x.approvalTrailId">{{ x.fromApprovalLevelName
+                                }} -- {{ x.fromStaffName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="sendApplicationForReview()"
+                        class="btn btn-success pull-right">Submit</button>
+                    <button type="button" (click)="displayBackToCAPModal=false" style="margin-right: 5px;"
+                        class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- <pre>{{ detail | json }}</pre> -->
+
+
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <!-- <div class="panel-heading">
+            <h2 class="panel-title">Refer back</h2>
+        </div> -->
+       
+        <app-refer-back [referBackOperationId]="operationId" [referBackTargetId]="loanReviewApplicationId"
+            (notify)="displayStatus($event)" (notifyAfterReferBack)="afterReferBackSuccess($event)">
+        </app-refer-back>
+        
+        <!-- <form novalidate [formGroup]="commentForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Comment</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea name="comment" formControlName="comment" id="comment" class="form-control"
+                                [ngClass]="!commentForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="returnBackToPrevious(commentForm)" [disabled]="commentForm.invalid" class="btn btn-success pull-right">Submit</button>
+                        <button type="button" (click)="displayCommentForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form> -->
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Appraisal Documentation for REFERENCE:
+                <strong>{{ application?.applicationReferenceNumber }}</strong> of OBLIGOR:
+                <strong>{{ application?.customerName }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="closeDocumentation()">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+            <div *ngFor="let x of documentations">
+                <p><strong>{{x.title}}</strong></p>
+                <span [innerHtml]="x.templateDocument"></span>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog  [responsive]=true [(visible)]="displayReferBackForm" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <!-- <h2 class="panel-title">Refer back</h2> -->
+        </div>
+        <app-refer-back [referBackOperationId]="operationId" [isClassified]="true" 
+            [forbidExternalNotification]="true" [referBackTargetId]="loanReviewApplicationId" 
+            [isLMSCrossWorkflow]="true" (notify)="displayStatus($event)" 
+            (notifyAfterReferBack)="afterReferBackSuccess($event)">
+        </app-refer-back>
+    </div>
+</p-dialog> 

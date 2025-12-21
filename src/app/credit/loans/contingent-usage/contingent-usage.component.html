@@ -1,0 +1,269 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Contingent Loans Usage :: {{selectedContingentData.loanReferenceNumber}}
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-g">
+            <div class="ui-g-12 no-padding">
+                <div class="panel panel-default">
+
+                    <p-tabView>
+                        <p-tabPanel header="Request Form">
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label style="padding-top: 13px" for=""
+                                            class="control-label col-md-2">Obligor</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control" for="">{{selectedContingentData.customerName}}
+                                            </label>
+                                        </div>
+
+                                        <label style="padding-top: 13px" for=""
+                                            class="control-label col-md-2">Principal</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control" for="">{{selectedContingentData.principalName}}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label style="padding-top: 13px" for="" class="control-label col-md-2">Account
+                                            Number</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.casaAccountNumber}} </label>
+                                        </div>
+
+                                        <label style="padding-top: 13px" for=""
+                                            class="control-label col-md-2">Contingent Amount</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.contingentAmount}}
+                                                {{selectedContingentData.currencyCode}} </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label style="padding-top: 13px" for="" class="control-label col-md-2">Book
+                                            Date</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.effectiveDate | date}} </label>
+                                        </div>
+
+                                        <label style="padding-top: 13px" for="" class="control-label col-md-2">Maturity
+                                            Date</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.maturityDate | date}} </label>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label style="padding-top: 13px" for="" class="control-label col-md-2">Amount
+                                            Used</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.usedAmount | number : '1.2'}}
+                                            </label>
+                                        </div>
+
+                                        <label style="padding-top: 13px input-group " for=""
+                                            class="control-label col-md-2">Percentage Used</label>
+                                        <div class="col-md-4">
+                                            <label class="form-control"
+                                                for="">{{selectedContingentData.percentageUsed }} % </label>
+                                        </div>
+
+                                    </div>
+
+                                    <form [formGroup]="formData" autocomplete="off">
+
+                                        <!-- <div class="form-group">
+                                                        <label style="padding-top: 13px" for="" class="control-label col-md-2">Amount Used</label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" name="amountRequested"  class="form-control"
+                                                             (blur)="getExchangeRate()"
+                                                            [ngClass]="!formData.controls['amountRequested'].valid ? 'required-input' : 'valid-input'"
+                                                            formatM  formControlName="amountRequested" id="">
+                                                        </div>
+                                                
+                                                        <label style="padding-top: 13px input-group " for="" class="control-label col-md-2">Currency Used</label>
+                                                        <div class="col-md-4">
+                                                            <select id="currencyId" formControlName="currencyId" [attr.disabled]="true"
+                                                            [ngClass]="!formData.controls['currencyId'].valid ? 'required-input' : 'valid-input'"
+                                                                class="form-control">
+                                                                <option value=""> Select Currency</option>
+                                                                <option *ngFor="let curr of allowedCurrencies" value="{{curr.currencyId}}"> {{curr.currencyCodeName}}</option>
+                                                            </select>
+                                                        </div>
+                                                
+                                                    </div>    -->
+                                        <div class="form-group">
+                                            <!-- <label style="padding-top: 13px" for=""
+                                                class="control-label col-md-2">Amount Requested</label>
+                                            <div class="col-md-4">
+                                                <label class="form-control"
+                                                    for="">{{selectedContingentData.amountRequested | number : '1.2'}}
+                                                </label>
+                                            </div> -->
+                                            <label style="padding-top: 13px" for="" class="control-label col-md-2">Amount Requested</label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" name="amountRequested" class="form-control" (blur)="getExchangeRate()"
+                                                                [ngClass]="!formData.controls['amountRequested'].valid ? 'required-input' : 'valid-input'"
+                                                                formatM formControlName="amountRequested" id="">
+                                                        </div>
+
+                                            <label style="padding-top: 13px input-group " for=""
+                                                class="control-label col-md-2">Percentage
+                                                Requested</label>
+                                            <div class="col-md-4">
+                                                <label class="form-control"
+                                                    for="">{{selectedContingentData.percentageRequested }} %
+                                                </label>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="" class="control-label col-md-2">
+                                                Exchange Rate
+                                            </label>
+                                            <div class="col-md-4">
+                                                <label class="form-control"> {{exchangeRate}} </label>
+                                            </div>
+                                            <label for="" class="control-label col-md-2">
+                                                Exchange Amount
+                                            </label>
+                                            <div class="col-md-4">
+                                                <label class="form-control"> {{exchangeValue| number : '1.2'}} </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label class="col-md-2" for="remark">Purpose</label>
+                                            <div class="col-md-4">
+                                                <textarea name="" class="form-control" formControlName="remark"
+                                                    id="remark" rows="4"
+                                                    [ngClass]="!formData.controls['remark'].valid ? 'required-input' : 'valid-input'"></textarea>
+                                            </div>
+
+                                            <!-- <label for="remark" class="control-label col-md-2">Primary Document</label>
+                                                        <div class="col-md-4">
+                                                            <label class="checkbox" ng-style="isPrimaryLabel === 'Required'}" style="color:red">{{isPrimaryLabel}}</label>
+                                                            <button type="button" (click)="displayFileUpload=true" style="margin-left:60" class="btn btn-success pull-right">Upload</button>
+                                                        </div> -->
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+                        <p-tabPanel header="Collateral Details">
+                            <app-mapped-loan-collateral [loanId]="loanId" [loanSystemTypeId]="loanSystemTypeId">
+                            </app-mapped-loan-collateral>
+                        </p-tabPanel>
+                        <p-tabPanel header="Used Contingent">
+                            <app-all-contingent-used [loanId]="loanId"></app-all-contingent-used>
+                        </p-tabPanel>
+                        <p-tabPanel header="Documents">
+                            <document-upload 
+                                [reload]="reload" 
+                                [operationId]="6" 
+                                [targetId]="selectedContingentData?.contingentLoanId" 
+                                [deleteLink]="deleteLink" 
+                                [showUploadForm]="showUploadForm"
+                                [targetReferenceNumber]="selectedContingentData?.loanApplicationNumber">
+                            </document-upload>
+                        </p-tabPanel>
+                    </p-tabView>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <button type="button" (click)="onSubmit()" class="btn btn-success pull-right" [disabled]="formData.invalid">
+                        Submit</button>
+
+                    <button type="button" (click)="closeDataForm()" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Close</button>
+
+                </div>
+                <!--  {{proposedProductId}}
+                 {{principalId}}
+              {{facilityDetailsForm.value | json}} -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayFileUpload" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Primary Document
+            </h2>
+        </div>
+
+
+        <form novalidate [formGroup]="DocumentForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Title</label>
+                        <div class="col-md-8">
+                            <input type="text" formControlName="documentTitle" name="documentTitle" id="documentTitle"
+                                maxlength="100" required class="form-control"
+                                [ngClass]="!DocumentForm.controls['documentTitle'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-4">Select Document</label>
+                        <div class="col-md-8">
+                            <input type="file" id="documentFile" (change)="onFileChange($event)"
+                                formControlName="documentFile" name="documentFile" placeholder="Upload file"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" style="padding-top:2px;"
+                                class="form-control"
+                                [ngClass]="!DocumentForm.controls['documentFile'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- {{ casaForm.value | json }} -->
+                        <button type="button" (click)="AcceptImage()"
+                            [disabled]="(DocumentForm.invalid || DocumentForm.invalid || (DocumentForm.invalid || file==undefined))"
+                            class="btn btn-success pull-right">Add</button>
+                        <button type="button" (click)="displayFileUpload=false;" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+</p-dialog>

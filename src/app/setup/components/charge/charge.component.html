@@ -1,0 +1,468 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Fees and Charges
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="charges"  [paginator]="true" [rows]="10" [responsive]=true>
+                        <p-column field="chargeName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains" ></p-column>
+                        <!-- <p-column field="amount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.amount | number : '1.2' }}
+                            </ng-template>
+                        </p-column> -->
+                        <!-- <p-column field="rate" header="Rate" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}"></p-column> -->
+                        <p-column field="recurring" header="Recurring" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="isIntegral" header="Integral" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editCharge(d)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayForm" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'500px'}" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+                <!--{{taxes | json}}-->
+            </h2>
+        </div>
+
+        <p-tabView>
+            <p-tabPanel header="Charge Information">
+
+                <form novalidate [formGroup]="chargeForm" *ngIf="showChargeForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="chargeName" class="control-label col-md-2">Charge Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="chargeName" formControlName="chargeName" id="chargeName" class="form-control" [ngClass]="chargeForm.controls['chargeName'].valid ? 'valid-input' : 'required-input'">
+                                </div>
+                                <label for="productId" class="control-label col-md-2">Product</label>
+                                <div class="col-md-4">
+                                    <select name="productId" formControlName="productId" id="productId" class="form-control" [ngClass]="!chargeForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Product Type --</option>
+                                        <option *ngFor="let x of products" [value]="x.productTypeId">{{ x.productTypeName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="valueSource" class="control-label col-md-2">Fee Type</label>
+                                <div class="col-md-4">
+                                    <select (change)="onSourceChange($event.target.value)" name="valueSource" formControlName="valueSource" id="valueSource"
+                                        class="form-control" [ngClass]="!chargeForm.controls['valueSource'].valid ? 'required-input' : 'valid-input'">
+                                        <option *ngFor="let x of sources" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div>
+                                <label for="operationId" class="control-label col-md-2">Operation</label>
+                                <div class="col-md-4">
+                                    <select name="operationId" formControlName="operationId" id="operationId" class="form-control" [ngClass]="!chargeForm.controls['operationId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Operation --</option>
+                                        <option *ngFor="let x of operations" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount" class="control-label col-md-2">Amount</label>
+                                <div class="col-md-4">
+                                    <input [attr.disabled]="disableAmount ? true : null" type="text" name="amount" formControlName="amount" formatM id="amount"
+                                        class="numeric form-control" [ngClass]="chargeForm.controls['amount'].valid ? 'valid-input' : 'required-input'">
+                                </div>
+                                <label for="targetId" class="control-label col-md-2">Target</label>
+                                <div class="col-md-4">
+                                    <select name="targetId" id="targetId" formControlName="targetId" class="form-control" [ngClass]="!chargeForm.controls['targetId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Target --</option>
+                                        <option *ngFor="let x of targets" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="rate" class="control-label col-md-2">Rate</label>
+                                <div class="col-md-4">
+                                    <input [attr.disabled]="disableRate ? true : null" type="text" name="rate" formControlName="rate" id="rate" class="numeric form-control"
+                                        [ngClass]="chargeForm.controls['rate'].valid ? 'valid-input' : 'required-input'">
+                                </div>
+                                <label for="amortisationTypeId" class="control-label col-md-2">Amortisation Type</label>
+                                <div class="col-md-4">
+                                    <select name="amortisationTypeId" id="amortisationTypeId" formControlName="amortisationTypeId" class="form-control" [ngClass]="!chargeForm.controls['amortisationTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Amortisation Type --</option>
+                                        <option *ngFor="let x of amortisationTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="frequencyTypeId" class="control-label col-md-2">Recurring Interval</label>
+                                <div class="col-md-4">
+                                    <select name="frequencyTypeId" formControlName="frequencyTypeId" id="frequencyTypeId" class="form-control" [ngClass]="!chargeForm.controls['frequencyTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Interval --</option>
+                                        <option *ngFor="let x of frequencies" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                    </select>
+                                </div>
+
+                                <label for="includeCutOffDay" class="control-label col-md-2">Include Cut-Off Day</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="cutOffDay" formControlName="cutOffDay" id="cutOffDay" class="form-control" [ngClass]="!chargeForm.controls['cutOffDay'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                    <label for="includeCutOffDay" class="control-label col-md-2">Is Integral</label>
+                                    <div class="col-md-4">
+                                            <div class="col-md-4 checkbox-container">
+                                                    <input formControlName="isIntegral" id="isIntegral" type="checkbox">
+                                                </div>
+                                    </div>
+    
+                                    <label for="crmsRegulatoryId" class="control-label col-md-2">CRMS Fee Type</label>
+                                    <div class="col-md-4">
+                                            <select name="crmsRegulatoryId" formControlName="crmsRegulatoryId" id="crmsRegulatoryId" class="form-control" [ngClass]="!chargeForm.controls['crmsRegulatoryId'].valid ? 'required-input' : 'valid-input'">
+                                                    <option value="">-- Select CRMS Fee Type --</option>
+                                                    <option *ngFor="let x of crmsFeeTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                                </select>
+                                            </div>
+                                </div>
+
+                            <div class="form-group">
+                                    <div class="col-md-6">
+                                        <div>
+                                            <button (click)="showChargeFeeDetailForm()" pButton type="button" label="Add Details" icon="fa-plus"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="form-group">
+                                <div class="col-md-12" style="max-height: 170px; overflow: auto">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>S/No</th>
+                                                <th>Description</th>
+                                                <th>Fee Type</th>
+                                                <th>Fee Detail Type</th>
+                                                <th>Posting Type</th>
+                                                <th>Value</th>
+                                                <th></th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let p of chargeFeeDetailsList;let indx=index">
+                                                <td>
+                                                    {{indx + 1}}
+                                                </td>
+                                                <td>
+                                                    {{p.description}}
+                                                </td>
+                                                <td>
+                                                    {{getFeeTypeById(p.feeTypeId)}}
+                                                </td>
+                                                <td>
+                                                    {{getFeeDetailTypeById(p.detailTypeId)}}
+                                                </td>
+                                                <td>
+                                                    {{getPostingTypeById(p.postingTypeId)}}
+                                                </td>
+                                                <td style="text-align: right;width:120px"> {{p.rate | number: '1.2'}} </td>
+                                                <td *ngIf="!editMode" style="padding: 3px;width:50px">
+                                                    <a (click)="removeChargeFeeDetail($event,p)" style="color:#ff0000" href="#">
+                                                        Remove</a>
+                                                </td>
+                                                <td *ngIf="editMode" style="padding: 3px;width:50px">
+                                                    <a (click)="editChargeFeeDetail($event,p)" style="color:blue" href="#">
+                                                        Edit</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </p-tabPanel>
+            <p-tabPanel header="Charge Ranges" [disabled]="disableRange">
+
+                <form novalidate [formGroup]="rangeForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="row">
+
+                            <div class="col-md-5">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label for="minimum" class="control-label col-md-4">Minimum</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="minimum" formControlName="minimum" formatM id="minimum" class="numeric form-control" [ngClass]="!rangeForm.controls['minimum'].valid ? 'required-input' : 'valid-input'">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maximum" class="control-label col-md-4">Maximum</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="maximum" formControlName="maximum" formatM id="maximum" class="numeric form-control" [ngClass]="!rangeForm.controls['maximum'].valid ? 'required-input' : 'valid-input'">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="rate" class="control-label col-md-4">Rate</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="rate" formControlName="rate" id="rate" class="numeric form-control" [ngClass]="!rangeForm.controls['rate'].valid ? 'required-input' : 'valid-input'">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <button type="button" (click)="addRange(rangeForm)" [disabled]="rangeForm.invalid" class="btn btn-success pull-right">Add</button>
+                                            <!--<button type="button" (click)="displayRangeForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-7" style="border-left:solid 1px #ccc;height:394px;">
+                                <div class="table-label">Ranges </div>
+                                <div style="height:355px;overflow-y:auto;">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <td>Minimum</td>
+                                                <td>Maximum</td>
+                                                <td>Rate</td>
+                                                <td></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let x of ranges; let i = index">
+                                                <td>{{ x.minimum | number : '2.2-2' }}</td>
+                                                <td>{{ x.maximum | number : '2.2-2' }}</td>
+                                                <td>{{ x.rate }}</td>
+                                                <td style="width:100px;font-weight:700em;">
+                                                    <a (click)="removeRange(i)" style="text-decoration: none;color:#ff0000" href="javascript:void(0)">
+                                                        <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+
+            </p-tabPanel>
+        </p-tabView>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(chargeForm)" [disabled]="chargeForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- {{chargeForm.value | json }} -->
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayRangeForm" id="add-modal" modal="modal" showEffect="fade" width="450" [contentStyle]="{'overflow':'auto','max-height':'800px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Range
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="rangeForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="minimum" class="control-label col-md-4">Minimum</label>
+                        <div class="col-md-8">
+                            <input type="text" name="minimum" formControlName="minimum" id="minimum" class="numeric form-control" [ngClass]="!rangeForm.controls['minimum'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maximum" class="control-label col-md-4">Maximum</label>
+                        <div class="col-md-8">
+                            <input type="text" name="maximum" formControlName="maximum" id="maximum" class="numeric form-control" [ngClass]="!rangeForm.controls['maximum'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rate" class="control-label col-md-4">Rate</label>
+                        <div class="col-md-8">
+                            <input type="text" name="rate" formControlName="rate" id="rate" class="numeric form-control" [ngClass]="!rangeForm.controls['rate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="addRange(rangeForm)" [disabled]="rangeForm.invalid" class="btn btn-success pull-right">Add</button>
+                    <button type="button" (click)="displayRangeForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayFeeDetailsForm" id="add-modal" modal="modal" showEffect="fade" width="900" [contentStyle]="{'overflow':'auto','max-height':'800px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityNameDetails }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="chargeFeeDetailsForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="detailTypeId" class="control-label col-md-2">Fee Detail Type</label>
+                        <div class="col-md-4">
+                            <select name="detailTypeId" id="detailTypeId" formControlName="detailTypeId" class="form-control" (change)="onFeeDetailTypeChanged($event.target.value)"
+                                [ngClass]="!chargeFeeDetailsForm.controls['detailTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Fee Detail Type --</option>
+                                <option *ngFor="let x of chargeFeeDetailType" [value]="x.lookupId">{{ x.lookupName }}</option>
+                            </select>
+                        </div>
+                        <label for="rate" class="control-label col-md-2">Value</label>
+                        <div class="col-md-4">
+                            <input type="text" name="rate" formControlName="rate" id="rate" class="numeric form-control" [ngClass]="chargeFeeDetailsForm.controls['rate'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <!-- <label for="detailClassId" class="control-label col-md-2">Fee Detail Class</label>
+                        <div class="col-md-4">
+                            <select name="detailClassId" id="detailClassId" formControlName="detailClassId" class="form-control" [ngClass]="!chargeFeeDetailsForm.controls['detailClassId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Detail Class --</option>
+                                <option *ngFor="let x of chargeFeeDetailClass" [value]="x.lookupId">{{ x.lookupName }}</option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="form-group">
+                        <label for="feeTypeId" class="control-label col-md-2">Fee Type</label>
+                        <div class="col-md-4">
+                            <select name="feeTypeId" id="feeTypeId" formControlName="feeTypeId" (change)="OnFeeTypeChanged($event.target.value)" class="form-control"
+                                [ngClass]="!chargeFeeDetailsForm.controls['feeTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Fee Type --</option>
+                                <option *ngFor="let x of feeTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                            </select>
+                        </div>
+                        <label for="postingTypeId" class="control-label col-md-2">Posting Type</label>
+                        <div class="col-md-4">
+                            <select name="postingTypeId" id="postingTypeId" formControlName="postingTypeId" class="form-control" [ngClass]="!chargeFeeDetailsForm.controls['postingTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Posting Type --</option>
+                                <option *ngFor="let x of postingTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label for="amount" class="control-label col-md-2">Amount</label>
+                        <div class="col-md-4">
+                            <input [attr.disabled]="disableDetailAmount ? true : null" type="text" name="amount" formControlName="amount" formatM id="amount"
+                                class="numeric form-control" [ngClass]="chargeFeeDetailsForm.controls['amount'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="rate" class="control-label col-md-2">Rate</label>
+                        <div class="col-md-4">
+                            <input [attr.disabled]="disableDetailRate ? true : null" type="text" name="rate" formControlName="rate" id="rate" class="numeric form-control"
+                                [ngClass]="chargeForm.controls['rate'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div> -->
+                    <div *ngIf="isBankFeeDetails" class="form-group">
+                        <label for="accountCategoryId" class="control-label col-md-2">Account Category</label>
+                        <div class="col-md-4">
+                            <select (change)="onAccountCategoryChange($event.target.value)" name="accountCategoryId" id="accountCategoryId" formControlName="accountCategoryId"
+                                class="form-control" [ngClass]="!chargeFeeDetailsForm.controls['accountCategoryId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Account Category --</option>
+                                <option *ngFor="let x of accountCategories" [value]="x.accountCategoryId">{{ x.accountCategoryName }}</option>
+                            </select>
+                        </div>
+                        <label for="requireAmortization" class="control-label col-md-2">Require Amortisation</label>
+                        <div class="col-md-1">
+                            <input type="checkbox" name="requireAmortization" formControlName="requireAmortization" id="requireAmortization" style="box-shadow: none;margin-top: 10px;margin-left: 0px;"
+                                (change)="onRequireAmortizationChanged()">
+                        </div>
+                    </div>
+                    <div *ngIf="isBankFeeDetails" class="form-group">
+                        <label for="glAccountId1" class="control-label col-md-2">Ledger Account</label>
+                        <div class="col-md-4">
+                            <select [attr.disabled]="disableFeeGlSelect ? true : null" name="glAccountId1" formControlName="glAccountId1" id="glAccountId1"
+                                class="form-control" [ngClass]="!chargeFeeDetailsForm.controls['glAccountId1'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Ledger Account --</option>
+                                <option *ngFor="let x of filteredGLAccounts" [value]="x.accountId">{{ x.accountCode }} - {{ x.accountName }}</option>
+                            </select>
+                        </div>
+                        <label for="glAccountId2" class="control-label col-md-2">Amortisation Account</label>
+                        <div class="col-md-4">
+                            <select [attr.disabled]="showAmortizationGL ? true : null" name="glAccountId2" formControlName="glAccountId2" id="glAccountId2"
+                                class="form-control" [ngClass]="!chargeFeeDetailsForm.controls['glAccountId2'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Amortisation Account --</option>
+                                <option *ngFor="let x of filteredGLAccounts" [value]="x.accountId">{{ x.accountCode }} - {{ x.accountName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="glAccountId1" class="control-label col-md-2">Posting Group</label>
+                        <div class="col-md-4">
+                            <input type="number" name="postingGroup" formControlName="postingGroup" id="postingGroup" class="numeric form-control" [ngClass]="chargeFeeDetailsForm.controls['postingGroup'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="description" class="control-label col-md-2">Description</label>
+                        <div class="col-md-4">
+                            <textarea row="4" name="description" formControlName="description" id="description" class="form-control" [ngClass]="chargeFeeDetailsForm.controls['description'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="addToList(chargeFeeDetailsForm)" [disabled]="chargeFeeDetailsForm.invalid" class="btn btn-success pull-right">Add To List</button>
+                    <button type="button" (click)="displayFeeDetailsForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- {{chargeForm.value | json }} -->
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!-- <pre>{{ charges | json }}</pre> -->
+<!-- <pre>{{ accounts | json }}</pre> -->

@@ -1,0 +1,163 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class=" no-padding">
+            <div class="panel panel-default">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Customer Information
+    
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4 pull-right" style="padding-bottom: 9px">
+                                <input type="text" id="search" (keyup)="searchDB($event.target.value)" (input)="lookupEvent.emit({search:'yes'})" class="form-control"
+                                    placeholder="Type in your search parameter ...">
+                            </div>
+                        </div>
+    
+                        <p-dataTable [value]="customers" [responsive]=true [paginator]="true" [rows]="10" [(selection)]="customerSelection" dataKey="customerId"
+                            (onRowSelect)="onSelectedCustomerDetailsChanged()" [rowsPerPageOptions]="[10,20,30]">
+                            <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+                            <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="customerTypeName" header="Customer Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="branchName" header="Customer Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        </p-dataTable>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayUploadScreen" modal="modal" showEffect="fade" width="1000">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    {{pagetitle}}
+                </h2>
+                <div class="pull-right">
+                    <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)" pButton
+                        type="button" label="Collapse upload" icon="fa-arrow-up"></button>
+                    <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)" pButton
+                        type="button" label="Bulk upload" icon="fa-search"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div *ngIf="collapseForm==false" class="panel-body">
+        <div class="form-group col-md-12">
+            <div class="col-md-12">
+                <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                    [accept]="'.xslx, .xlsx,.xls, .xltx'" #fileInput name="fileInput" style="padding-top:2px;"
+                    class="form-control">
+            </div>
+        </div>
+        <div class="form-group col-md-12">
+            <div class="col-md-6" *ngIf="collapseForm==false">
+                <button class="btn btn-sm btn-primary pull-left" (click)="requestFsCaptionBulk(); fileInput.value=''"
+                    [disabled]="file==undefined">
+                    <span class="glyphicon glyphicon-upload"></span> Upload </button>
+            </div>
+            <div class="col-md-6">
+                <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                        <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                <a href="./../../../../assets/files/BulkFsCaptionSampleDocument.xlsx" target="_blank"
+                    class="btn btn-sm btn-primary pull-right">
+                    <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="collapseForm==false" class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+            </div>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="collapseForm==false && (uploadedData != null && uploadedData.length > 0)">
+        <div class="panel-body">
+            <p-dataTable [value]="uploadedData" [responsive]="true" [paginator]="true" [rows]="10"
+                [(selection)]="uploadSelection" dataKey="customerId" [rowsPerPageOptions]="[10,20,30]">
+                <!-- <p-column [style]="{'width':'50px'}" selectionMode="multiple"
+                    suppressRowClickSelection="false"></p-column> -->
+                <p-column field="customerId" header="#" [style]="{width:'5%','text-align':'left'}">
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        {{i+1}}
+                    </ng-template>
+                </p-column>
+
+                <p-column field="fsGroup" header="Financial Statement Group" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="fsItem" header="Financial Statement Item" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="fsValue" header="Financial Statement Value" sortable="true" [filter]="true"
+                    filterMatchMode="contains"><ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.fsValue | number: '1.2' }}
+                    </ng-template></p-column>
+                    <p-column field="validityStatus" header="Validity Status" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+            </p-dataTable>
+        </div>
+        <div class="col-md-12">
+            <button class="btn btn-sm btn-primary pull-right" (click)="saveRecords()">Save Records </button>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="collapseForm==false" class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+
+            </div>
+        </div>
+    </div>
+    <br>
+    <div *ngIf="collapseForm==false && (uploadedFailedError != null && uploadedFailedError.length > 0)">
+        <div class="panel-body">
+            <p-dataTable [value]="uploadedFailedError" [responsive]="true" [paginator]="true" [rows]="10"
+                [(selection)]="failedErrorSelection" dataKey="customerId" [rowsPerPageOptions]="[10,20,30]">
+                <p-column field="customerId" header="#"
+                    [style]="{width:'5%','text-align':'left','background-color': 'red !important'}">
+                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                        {{i+1}}
+                    </ng-template>
+                </p-column>
+
+                <p-column field="errorMessages" header="Error" sortable="true" filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body" >
+                        <div [style]="{color: 'red', overflow:'auto'}" [innerHTML]="d.errorMessages"></div>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+        
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <a class="close" (click)="displayUploadScreen=false">&times;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)">
+</fintrakbanking-message>

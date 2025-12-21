@@ -1,0 +1,107 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Custom Chart of Accounts
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+<!-- LIST -->
+                    <p-dataTable [value]=" chartOfAccounts">
+                        <p-column field="accountId" header="Account ID" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="accountName" header="Account Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="currencyCode" header="Currency Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="placeholderId" header="Placeholder" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editChartOfAccount(d)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+            </h2>
+        </div>
+        
+        <form novalidate [formGroup]="chartOfAccountForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="accountName" class="control-label col-md-12">Account Name</label>
+                        <div class="col-md-12">
+                            <input type="text" name="accountName" formControlName="accountName" id="accountName" class="form-control" [ngClass]="!chartOfAccountForm.controls['accountName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="currencyCode" class="control-label col-md-12">Currency Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="currencyCode" formControlName="currencyCode" id="currencyCode" class="form-control" [ngClass]="!chartOfAccountForm.controls['currencyCode'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountId" class="control-label col-md-12">Account ID</label>
+                        <div class="col-md-12">
+                            <input type="text" name="accountId" formControlName="accountId" id="accountId" class="form-control" [ngClass]="!chartOfAccountForm.controls['accountId'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="placeholderId" class="control-label col-md-12">Placeholder</label>
+                        <div class="col-md-12">
+                            <input type="text" name="placeholderId" formControlName="placeholderId" id="placeholderId" class="form-control" [ngClass]="!chartOfAccountForm.controls['placeholderId'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <label for="isNostroAccount" class="control-label col-md-4">ISNOSTROACCOUNT</label>
+                            <div class="col-md-6">
+                                            <label class="checkbox-inline">
+                                                    <input type="checkbox" formControlName="isNostroAccount" name="isNostroAccount" id="isNostroAccount" value="">
+                                                </label>
+</div>
+                        </div>
+    
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm( chartOfAccountForm)" [disabled]=" chartOfAccountForm.invalid" class="btn btn-success pull-right">
+                        Save</button>
+                    <button type="button" (click)="displayForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

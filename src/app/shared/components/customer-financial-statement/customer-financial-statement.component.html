@@ -1,0 +1,373 @@
+<div *ngIf="viewCustomerFinancialStatement || !isAnalyst">
+  <p-dataTable [value]="fsRatioValueData" [sortMode]="multiple" sortField="fsGroupCaption" rowGroupMode="subheader"
+    groupField="fsGroupCaption" [style]="{'overflow': 'auto', 'max-height': '400px', 'width':'100%'}">
+    <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['fsGroupCaption']}}</ng-template>
+    <p-column field="ratioCaptionName" header="Caption" filter="true" sortable="true"></p-column>
+    <p-column *ngFor="let col of fsRatioValueTableCols" [field]="col.field" [header]="col.header" [filter]="true"
+      [sortable]="true" [style]="{'text-align': 'right'}"></p-column>
+  </p-dataTable>
+</div>
+<div *ngIf="isAnalyst">
+    <div class="ui-g">
+        <div class="ui-g-12 no-padding">
+          <div style="margin-bottom:0;" class="panel panel-default">
+            <div class="panel-heading">
+              <div class="row">
+                <div class="col-md-12">
+                  <h2 class="panel-title pull-left">Set Caption Details</h2>                 
+                </div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <p-tabView [(activeIndex)]="activeIndex" (onChange)="handleChange($event)">
+                <p-tabPanel *ngIf="canDoFinancialEntry" header="View Mapped Financial Caption" [disabled]="hideCaptionDetails">
+                  <div style="margin-bottom:10px;" class="pull-right">
+                    <button (click)="showMapping()" pButton type="button" label="Add New Entry" icon="fa-plus"></button>
+                  </div>
+                  <p-dataTable [value]="mappedFSCaptionDetailTableData" [style]="{'overflow': 'auto', 'max-height': '400px', 'width':'100%'}">
+                    <p-column *ngFor="let col of mappedFSCaptionTableCols" [field]="col.field" [header]="col.header"
+                      [editable]="false"></p-column>
+                    <p-column field="fsDate" header="Date">
+                      <ng-template let-col let-caption="rowData" pTemplate="body">
+                        <span>{{caption[col.field] | date : 'dd-MMM-yyyy'}}</span>
+                      </ng-template>
+                    </p-column>
+                    <p-column field="amount" header="Amount" [style]="{'text-align': 'right'}">
+                      <ng-template let-col let-caption="rowData" pTemplate="body">
+                        <span>{{caption[col.field] | number :'1.2'}}</span>
+                      </ng-template>
+                    </p-column>
+                  </p-dataTable>
+                </p-tabPanel>
+                <p-tabPanel *ngIf="canDoFinancialEntry" header="Set Financial Caption Amounts">
+                  <form novalidate autocomplete="off">
+                    <div class="form-horizontal">
+                      <div class="form-group">
+                        <label for="captionDate" class="control-label col-md-2">Reporting Year</label>
+                        <div class="col-md-4">
+                            <p-calendar id="captionDate" dateFormat="yy/mm/dd"  [monthNavigator]="true"
+                            (onSelect)="onCaptionDateSelect(selectedDate)" [(ngModel)]="selectedDate" [yearNavigator]="true" yearRange="2000:2050"
+                             [showIcon]="true" [ngModelOptions]="{standalone: true}"
+                            [style]="{'width': '100%', 'overflow': 'visible'  }" [ngClass]="!selectedDate ? 'required-input' : 'valid-input'"></p-calendar>
+                          </div>
+                          <!-- 
+                                                    <div class="col-md-4">
+                        <p-calendar id="captionDate" dateFormat="yy/mm/dd" [inputStyle]="{'width': '259px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999999'}"
+                            [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                            [ngModelOptions]="{standalone: true}" [showIcon]="true" (onSelect)="onCaptionDateSelect(selectedDate)"
+                            [ngClass]="!selectedDate ? 'required-input' : 'valid-input'"></p-calendar>
+                        </div> -->
+                        <label for="fsCaptionGroups" class="control-label col-md-2">FS Caption Group</label>
+                        <div class="col-md-4">
+                          <select [disabled]="!selectedDate" id="fsCaptionGroups" name="fsCaptionGroups" class="form-control"
+                            (change)="onFSCaptionGroupSelect($event.target.value)" [ngClass]="!fsCaptionGroups ? 'required-input' : 'valid-input'">
+                            <option value="">--- Select FS Caption Group ---</option>
+                            <option *ngFor="let item of customerFsCaptionGroups" [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  <div class="row">
+                    <div class="col-md-6" style="overflow-y: scroll; height:350px;">
+                      <fieldset>
+                        <legend>Unmapped FS Captions</legend>
+                        <table class="table table-striped table-hover">
+                          <thead>
+                            <tr>
+                              <td>FS Caption Name</td>
+                              <td>FS Caption Group</td>
+                              <td>Parent FS Caption</td>
+                              <td>Account Category</td>
+                              <!--<td>Position</td>-->
+                              <td style="width: 15%">
+    
+                              </td>
+                            </tr>
+                          </thead>
+                          <!-- *ngIf="displaySearchResults" -->
+                          <tbody>
+                            <tr *ngFor="let item of unMappedFsCaptionsTableData; let i = index">
+                              <td>{{item.fsCaptionName}}</td>
+                              <td>{{item.fsCaptionGroupName}}</td>
+                              <td>{{item.parentIdFSCaptionName}}</td>
+                              <td>{{item.accountCategoryName}}</td>
+                              <!--<td>{{item.position}}</td>-->
+                              <td>
+                                <a style="text-decoration: none;" href="#" (click)="createCustomerFsMap(i,$event)">
+                                  <i class="glyphicon glyphicon-plus"></i> Map</a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </fieldset>
+                    </div>
+                    <div class="col-md-6" style="overflow-y: scroll; height:350px;">
+                      <fieldset>
+                        <legend>Mapped FS Captions</legend>
+                        <table class="table table-striped table-hover">
+                          <thead>
+                            <tr>
+                              <td>Customer Code</td>
+                              <td>FS Caption Name</td>
+                              <td>FS Date</td>
+                              <td>Amount</td>
+                              <td style="width: 15%">
+    
+                              </td>
+                            </tr>
+                          </thead>
+                          <!-- *ngIf="displayMappedCaptions" -->
+                          <tbody>
+                            <tr *ngFor="let item of mappedFSCaptionTableData; let i = index">
+                              <td>{{item.customerCode}}</td>
+                              <td>{{item.fsCaptionName}}</td>
+                              <td>{{item.fsDate | date : 'dd-MMM-yyyy'}}</td>
+                              <td>{{item.amount | number}}</td>
+                              <td>
+                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeCustomerFsMap(i, $event)">
+                                  <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </fieldset>
+                    </div>
+                  </div>
+                </p-tabPanel>
+                <p-tabPanel header="View Financial Statement">
+                  <p-dataTable [value]="fsRatioValueData" [sortMode]="multiple" sortField="fsGroupCaption" rowGroupMode="subheader"
+                    groupField="fsGroupCaption" [style]="{'overflow': 'auto', 'max-height': '400px', 'width':'100%'}">
+                    <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['fsGroupCaption']}}</ng-template>
+                    <p-column field="ratioCaptionName" header="Caption" filter="true" sortable="true"></p-column>
+                    <p-column *ngFor="let col of fsRatioValueTableCols" [field]="col.field" [header]="col.header" [filter]="true"
+                      [sortable]="true" [style]="{'text-align': 'right'}"></p-column>
+                  </p-dataTable>
+                </p-tabPanel>
+              </p-tabView>
+            </div>
+            <!-- <div class="panel-footer">
+              <div class="row">
+                <div class="col-md-12">
+                  <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="displayFinancialStatement=false">Close</button>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+</div>
+<p-dialog header="Financial Statement" [(visible)]="displayFinancialStatement" [responsive]="true" showEffect="fade"
+  [modal]="true" width="900">
+  <div class="ui-g">
+    <div class="ui-g-12 no-padding">
+      <div style="margin-bottom:0;" class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">Set Caption Details</h2>
+              <a href="" (click)="displayFinancialStatement = false" class="pull-right remove-btn">
+                <i class="glyphicon glyphicon-remove-sign">
+                </i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p-tabView [(activeIndex)]="activeIndex" (onChange)="handleChange($event)">
+            <p-tabPanel *ngIf="canDoFinancialEntry" header="View Mapped Financial Caption" [disabled]="hideCaptionDetails">
+              <div style="margin-bottom:10px;" class="pull-right">
+                <button (click)="showMapping()" pButton type="button" label="Add New Entry" icon="fa-plus"></button>
+              </div>
+              <p-dataTable [value]="mappedFSCaptionDetailTableData" [style]="{'overflow': 'auto', 'max-height': '400px', 'width':'100%'}">
+                <p-column *ngFor="let col of mappedFSCaptionTableCols" [field]="col.field" [header]="col.header"
+                  [editable]="false"></p-column>
+                <p-column field="fsDate" header="Date">
+                  <ng-template let-col let-caption="rowData" pTemplate="body">
+                    <span>{{caption[col.field] | date : 'dd-MMM-yyyy'}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="amount" header="Amount" [style]="{'text-align': 'right'}">
+                  <ng-template let-col let-caption="rowData" pTemplate="body">
+                    <span>{{caption[col.field] | number :'1.2'}}</span>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </p-tabPanel>
+            <p-tabPanel *ngIf="canDoFinancialEntry" header="Set Financial Caption Amounts">
+              <form novalidate autocomplete="off">
+                <div class="form-horizontal">
+                  <div class="form-group">
+                    <label for="captionDate" class="control-label col-md-2">Reporting Year</label>
+                    <div class="col-md-4">
+                      <p-calendar id="captionDate" dateFormat="yy/mm/dd" [inputStyle]="{'width': '259px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999999'}"
+                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                        [ngModelOptions]="{standalone: true}" [showIcon]="true" (onSelect)="onCaptionDateSelect(selectedDate)"
+                        [ngClass]="!selectedDate ? 'required-input' : 'valid-input'"></p-calendar>
+                    </div>
+                    <label for="fsCaptionGroups" class="control-label col-md-2">FS Caption Group</label>
+                    <div class="col-md-4">
+                      <select [disabled]="!selectedDate" id="fsCaptionGroups" name="fsCaptionGroups" class="form-control"
+                        (change)="onFSCaptionGroupSelect($event.target.value)" [ngClass]="!fsCaptionGroups ? 'required-input' : 'valid-input'">
+                        <option value="">--- Select FS Caption Group ---</option>
+                        <option *ngFor="let item of customerFsCaptionGroups" [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="row">
+                <div class="col-md-6" style="overflow-y: scroll; height:350px;">
+                  <fieldset>
+                    <legend>Unmapped FS Captions</legend>
+                    <table class="table table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <td>FS Caption Name</td>
+                          <td>FS Caption Group</td>
+                          <td>Parent FS Caption</td>
+                          <td>Account Category</td>
+                          <!--<td>Position</td>-->
+                          <td style="width: 15%">
+
+                          </td>
+                        </tr>
+                      </thead>
+                      <!-- *ngIf="displaySearchResults" -->
+                      <tbody>
+                        <tr *ngFor="let item of unMappedFsCaptionsTableData; let i = index">
+                          <td>{{item.fsCaptionName}}</td>
+                          <td>{{item.fsCaptionGroupName}}</td>
+                          <td>{{item.parentIdFSCaptionName}}</td>
+                          <td>{{item.accountCategoryName}}</td>
+                          <!--<td>{{item.position}}</td>-->
+                          <td>
+                            <a style="text-decoration: none;" href="#" (click)="createCustomerFsMap(i,$event)">
+                              <i class="glyphicon glyphicon-plus"></i> Map</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </fieldset>
+                </div>
+                <div class="col-md-6" style="overflow-y: scroll; height:350px;">
+                  <fieldset>
+                    <legend>Mapped FS Captions</legend>
+                    <table class="table table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <td>Customer Code</td>
+                          <td>FS Caption Name</td>
+                          <td>FS Date</td>
+                          <td>Amount</td>
+                          <td style="width: 15%">
+
+                          </td>
+                        </tr>
+                      </thead>
+                      <!-- *ngIf="displayMappedCaptions" -->
+                      <tbody>
+                        <tr *ngFor="let item of mappedFSCaptionTableData; let i = index">
+                          <td>{{item.customerCode}}</td>
+                          <td>{{item.fsCaptionName}}</td>
+                          <td>{{item.fsDate | date : 'dd-MMM-yyyy'}}</td>
+                          <td>{{item.amount | number}}</td>
+                          <td>
+                            <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeCustomerFsMap(i, $event)">
+                              <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </fieldset>
+                </div>
+              </div>
+            </p-tabPanel>
+            <p-tabPanel header="View Financial Statement">
+              <p-dataTable [value]="fsRatioValueData" [sortMode]="multiple" sortField="fsGroupCaption" rowGroupMode="subheader"
+                groupField="fsGroupCaption" [style]="{'overflow': 'auto', 'max-height': '400px', 'width':'100%'}">
+                <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['fsGroupCaption']}}</ng-template>
+                <p-column field="ratioCaptionName" header="Caption" filter="true" sortable="true"></p-column>
+                <p-column *ngFor="let col of fsRatioValueTableCols" [field]="col.field" [header]="col.header" [filter]="true"
+                  [sortable]="true" [style]="{'text-align': 'right'}"></p-column>
+              </p-dataTable>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+              <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="displayFinancialStatement=false">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+<p-dialog [responsive]="true" [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="750">
+  <div class="panel panel-default" *ngIf="customerModel" style="margin-bottom:0">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">Caption Details for
+            <strong>{{customerModel.customerName}}</strong>
+          </h2>
+          <button type="button" class="close pull-right" (click)="displayCreateEditModal=false">
+            <span style="margin-bottom: 0" aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <form [formGroup]="setCaptionAmountsForm" (ngSubmit)="submitForm(setCaptionAmountsForm)" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="custName" class="col-md-2 control-label">Customer Name</label>
+            <div class="col-md-4">
+              <input type="text" class="form-control" [value]="customerModel.customerName" [ngClass]="customerModel.customerName ? 'valid-input':'required-input'"
+                [attr.disabled]="true">
+            </div>
+            <label for="custCode" class="col-md-2 control-label">Customer Code</label>
+            <div class="col-md-4">
+              <input type="text" class="form-control" [value]="customerModel.customerCode" [ngClass]="customerModel.customerCode ? 'valid-input':'required-input'"
+                [attr.disabled]="true">
+            </div>
+          </div>
+          <div class="form-group" *ngIf="selectedUnmappedFsCaption">
+            <label for="fsCaption" class="col-md-2 control-label">FS Caption</label>
+            <div class="col-md-4">
+              <input type="text" class="form-control" [value]="selectedUnmappedFsCaption.fsCaptionName" [ngClass]="selectedUnmappedFsCaption.fsCaptionName ? 'valid-input':'required-input'"
+                [attr.disabled]="true">
+            </div>
+            <label for="fsDate" class="col-md-2 control-label">FS Date</label>
+            <div class="col-md-4">
+              <p-calendar id="captionDate" dateFormat="yy/mm/dd" [inputStyle]="{'width': '259px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999999999'}"
+                [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                [ngModelOptions]="{standalone: true}" [showIcon]="true" [ngClass]="selectedDate ? 'valid-input':'required-input'"
+                [disabled]="true"></p-calendar>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="fsAmount" class="col-md-2 control-label">Amount</label>
+            <div class="col-md-4">
+              <input type="text" class="form-control" formControlName="amount" formatM [ngClass]="setCaptionAmountsForm.controls['amount'].valid ? 'valid-input':'required-input'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="setCaptionAmountsForm.invalid" class="btn btn-success pull-right">Save FS
+              Caption Detail</button>
+            <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>

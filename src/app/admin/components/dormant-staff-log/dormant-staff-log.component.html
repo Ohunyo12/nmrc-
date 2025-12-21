@@ -1,0 +1,55 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-7">
+                                <h2 class="panel-title pull-left">
+                                    Dormant Staff Log
+                                </h2>
+                            </div>
+                            <!--div class="col-md-5">
+                                <input type="text" [(ngModel)]="searchBox" #globalSearch class="form-control">
+                            </div-->
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <!-- <p-dataTable [value]="audits" [rowsPerPageOptions]="[10,20,30]" [lazy]="true" [rows]="10" [paginator]="true" [totalRecords]="itemTotal"
+                        (onLazyLoad)="loadData($event)" [responsive]=true (onEditInit)="onEditInit($event)" (onEdit)="onEdit($event)"
+                        (onEditCancel)="onEditCancel($event)" (onEditComplete)="onEditComplete($event)" #dt [globalFilter]="tableSearch"> -->
+                        <p-dataTable [paginator]="true" [rowsPerPageOptions]="[20,40,60,80,100]" [rows]="15" [value]="dormantStaffs" #dt [responsive]=true >
+
+                        <!-- <p-header>
+                            <label for="search" class="control-label">Search</label>
+                            <input type="text" pInputText name="search" id="search" class="form-control" placeholder="Search through table..." #tableSearch>
+                        </p-header> -->
+                        <p-header>
+                            <div class="ui-helper-clearfix">
+                                <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                            </div>
+                        </p-header>
+                        <p-column field="staffName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="staffCode" header="Staff Code"  sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column  field="lastLoginDate" header="Last Login Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-con="rowData" pTemplate="body">
+                                <div *ngIf="con.lastLoginDate == null">
+                                     User Has Never Logged In Before
+                                </div>
+                                <div *ngIf="con.lastLoginDate != null">
+                                        {{con.lastLoginDate | date: 'dd/MM/yyyy'}}
+                                </div>
+                            </ng-template>
+                          </p-column>    
+                    </p-dataTable>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

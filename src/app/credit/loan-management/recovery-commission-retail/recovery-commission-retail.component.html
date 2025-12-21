@@ -1,0 +1,317 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Recovery Commission For External Agents
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <form novalidate [formGroup]="retailReportForm" autocomplete="off">
+              <div class="form-group">
+                <label for="startDate" class="control-label col-md-1">Month </label>
+                <div class="col-md-2">
+                  <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!retailReportForm.controls['startDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+
+                <div class="col-md-1 pull-left">
+                  <button type="button" (click)="submitForm(retailReportForm)" class="btn btn-success pull-left"
+                    [disabled]="!retailReportForm.valid">Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12"></div>
+          </div>
+        </div>
+
+        <div class="panel-body" *ngIf="loanOperationApprovalData.length > 0">
+          <p-tabView>
+            <p-tabPanel header="List Of Assigned Recovery Loans">
+              <p-dataTable [paginator]="true" [rows]="10" [value]="loanOperationApprovalData" [responsive]="true"
+                [(selection)]="schemeSelection" dataKey="loanReferenceNumber" selectionMode="single">
+                <p-column field="loanReferenceNumber" header="Reference Number" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="casaAccount" header="Customer Account" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="relationshipManagerName" header="Relationship Manager" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <!-- <p-column field="effectiveDate" header="Effective Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ln[col.field] | date : 'medium' }}
+                  </ng-template>
+                </p-column>
+                <p-column field="maturityDate" header="Maturity Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ln[col.field] | date : 'medium' }}
+                  </ng-template>
+                </p-column> -->
+                <p-column field="assignedDate" header="Assigned Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ ln[col.field] | date: "medium" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="expCompletionDate" header="Expected Completion Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ ln[col.field] | date: "medium" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="accreditedConsultantCompany" header="Consultant" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="totalAmountRecovery" header="Total Amount Due" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.totalAmountRecovery | number: "1.2" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="category" header="Category" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column [style]="{ width: '95px', 'text-align': 'center' }" header="Capture Commission">
+                  <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                    <button type="button" (click)="commission(row)">
+                      <i class="glyphicon glyphicon-pencil"></i>
+                    </button>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </p-tabPanel>
+
+            <!-- <p-tabPanel header="Recovery Reporting">
+              <app-recovery-reporting-retail> </app-recovery-reporting-retail>
+            </p-tabPanel> -->
+
+            <p-tabPanel header="Recovery Commission Reporting">
+              <p-dataTable #dt [paginator]="true" [rows]="10" [value]="recoveryCommissionData" [responsive]="true"
+                [(selection)]="commissionSelection" dataKey="loanReferenceNumber" selectionMode="single">
+                <p-header>
+                  <div class="ui-helper-clearfix">
+                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                      (click)="dt.exportCSV()" style="float: left"></button>
+                  </div>
+                </p-header>
+                <p-column field="loanReferenceNumber" header="Reference Number" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="casaAccount" header="Customer Account" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="relationshipOfficerName" header="Relationship Manager" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="expCompletionDate" header="Expected Completion Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ ln[col.field] | date: "medium" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="collectionDate" header="Collection Date" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                  <ng-template let-col let-ln="rowData" pTemplate="body">
+                    {{ ln[col.field] | date: "medium" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="modeOfCollection" header="Mode Of Collection" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                </p-column>
+
+                <p-column field="accreditedConsultantCompany" header="Consultant" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="agentAccountNumber" header="Agent Account Number" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="totalRecoveryAmount" header="Total Amount Due" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.totalRecoveryAmount | number: "1.2" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="amountRecovered" header="Amount Recovered" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.amountRecovered | number: "1.2" }}
+                  </ng-template>
+                </p-column>
+                <p-column field="commissionPayable" header="Commission Payable" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.commissionPayable | number: "1.2" }}
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [responsive]="true" [(visible)]="displayCommissionForm" modal="modal" id="searchModal" showEffect="fade"
+    width="1200" [contentStyle]="{ overflow: 'auto', 'max-height': '600px' }">
+    <div style="margin-bottom: 0" class="panel panel-default">
+      <div class="panel-heading">
+        <div style="margin-left: 0" class="row">
+          <h2 class="panel-title pull-left">Payment Of Recovery Commission</h2>
+          <a href="" (click)="displayCommissionForm = false" class="pull-right remove-btn">
+            <i class="glyphicon glyphicon-remove-sign"> </i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 0" class="panel panel-default">
+      <form novalidate [formGroup]="recoveryCommissionForm" autocomplete="off">
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <br>
+            <br>
+            <br>
+            <div class="form-group">
+              <label for="collectionDate" class="control-label col-md-2">Date Of Collection</label>
+              <div class="col-md-4">
+                <p-calendar id="collectionDate" [maxDate]='currentDate' formControlName="collectionDate"
+                  [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true" [inputStyle]="{
+                    width: '100%',
+                    'border-left': '3px solid #3cd225'
+                  }" [style]="{ width: '100%', 'z-index': '999' }" [ngClass]="
+                    recoveryCommissionForm.controls['collectionDate'].valid
+                      ? 'valid-input'
+                      : 'required-input'
+                  ">
+                </p-calendar>
+              </div>
+              <label for="modeOfCollection" class="control-label col-md-2">Mode Of Collection</label>
+              <div class="col-md-4">
+                <select id="modeOfCollection" formControlName="modeOfCollection" name="modeOfCollection"
+                  class="form-control" [ngClass]="
+                    !recoveryCommissionForm.controls['modeOfCollection'].valid
+                      ? 'required-input'
+                      : 'valid-input'
+                  ">
+                  <option value="">Select Collection Mode</option>
+                  <option value="Cheque">Cheque</option>
+                  <option value="Direct Transfer">Direct Transfer</option>
+                  <option value="Collateral">Collateral</option>
+                  <option value="Cash">Cash</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="totalRecoveryAmount" class="control-label col-md-2">Total Amount Due</label>
+              <div class="col-md-4">
+                <input type="text" readonly name="totalRecoveryAmount" formControlName="totalRecoveryAmount"
+                  id="totalRecoveryAmount" formatM class="numeric form-control" [ngClass]="
+                    recoveryCommissionForm.controls['totalRecoveryAmount'].valid
+                      ? 'valid-input'
+                      : 'required-input'
+                  " />
+              </div>
+
+              <label for="amountRecovered" class="control-label col-md-2">Amount Recovered</label>
+              <div class="col-md-4">
+                <input id="amountRecovered" formatM formControlName="amountRecovered" name="amountRecovered"
+                  class="numeric form-control" (blur)="computeComission()" [ngClass]="
+                    !recoveryCommissionForm.controls['amountRecovered'].valid
+                      ? 'required-input'
+                      : 'valid-input'
+                  " />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="totalAmountRecovered" class="control-label col-md-2"> Total Amount Recovered</label>
+              <div class="col-md-4">
+                <input id="totalAmountRecovered" readonly formatM formControlName="totalAmountRecovered" name="totalAmountRecovered"
+                  class="numeric form-control" [ngClass]="
+                    !recoveryCommissionForm.controls['totalAmountRecovered'].valid
+                      ? 'required-input'
+                      : 'valid-input'
+                  " />
+              </div>
+              <label for="totalAmountLeft" class="control-label col-md-2">Total Recovery Left</label>
+              <div class="col-md-4">
+                <input id="totalAmountLeft" readonly formatM formControlName="totalAmountLeft" name="totalAmountLeft"
+                  class="numeric form-control" [ngClass]="
+                    !recoveryCommissionForm.controls['totalAmountLeft'].valid
+                      ? 'required-input'
+                      : 'valid-input'
+                  " />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="commissionRate" class="control-label col-md-2">Commission Rate</label>
+              <div class="col-md-4">
+                <input id="commissionRate" readonly formControlName="commissionRate" name="commissionRate"
+                  class="form-control" [ngClass]="
+                    !recoveryCommissionForm.controls['commissionRate'].valid
+                      ? 'required-input'
+                      : 'valid-input'
+                  " />
+              </div>
+              <label for="commissionPayable" class="control-label col-md-2">Commission Payable
+              </label>
+              <div class="col-md-4">
+                <input type="text" readonly name="commissionPayable" formControlName="commissionPayable"
+                  id="commissionPayable" class="form-control" [ngClass]="
+                    recoveryCommissionForm.controls['commissionPayable'].valid
+                      ? 'valid-input'
+                      : 'required-input'
+                  " />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comment" class="control-label col-md-2">Comment
+              </label>
+              <div class="col-md-10">
+                <textarea type="text" name="comment" formControlName="comment" id="comment" class="form-control"
+                  [ngClass]="
+                    recoveryCommissionForm.controls['comment'].valid
+                      ? 'valid-input'
+                      : 'required-input'
+                  "></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="saveRecoveryCommissionForm(recoveryCommissionForm)"
+              [disabled]="recoveryCommissionForm.invalid" class="btn btn-success pull-right">
+              Save and Close
+            </button>
+            <button type="button" (click)="displayCommissionForm = false" style="margin-right: 5px"
+              class="btn btn-danger pull-right">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+</div>

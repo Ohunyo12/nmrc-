@@ -1,0 +1,109 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                States
+                            </h2>
+                            <!--div class="pull-right">
+                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+              </div-->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="states" [responsive]="true" [paginator]="true" [rows]="15">
+                        <p-column field="stateName" header="State Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="countryName" header="Country" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="collateralSearchChargeAmount" header="Collateral Search Charge" sortable="true" [filter]="true" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.collateralSearchChargeAmount | number : '1.2-2'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="chartingAmount" header="Charting Amount" sortable="true" [filter]="true" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.chartingAmount | number : '1.2-2'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="verificationAmount" header="Verification Amount" sortable="true" [filter]="true" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.verificationAmount | number : '1.2-2'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editState(d, $event)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayStateChargeModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Edit State
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="statesForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="stateName" class="control-label col-md-2">State Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="stateName" formControlName="stateName" id="stateName" class="form-control" [attr.disabled]="true" [ngClass]="!statesForm.controls['stateName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="collateralSearchChargeAmount" class="control-label col-md-2">Collateral Search Charge Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="collateralSearchChargeAmount" formControlName="collateralSearchChargeAmount" formatM id="collateralSearchChargeAmount" class="form-control" [ngClass]="!statesForm.controls['collateralSearchChargeAmount'].valid ? 'required-input' : 'valid-input'"
+                                style="text-align:right;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="chartingAmount" class="control-label col-md-2">Charting Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="chartingAmount" formControlName="chartingAmount" formatM id="chartingAmount" class="form-control" [ngClass]="!statesForm.controls['chartingAmount'].valid ? 'required-input' : 'valid-input'" style="text-align:right;">
+                        </div>
+                        <label for="verificationAmount" class="control-label col-md-2">Verification Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="verificationAmount" formControlName="verificationAmount" formatM id="verificationAmount" class="form-control" [ngClass]="!statesForm.controls['verificationAmount'].valid ? 'required-input' : 'valid-input'" style="text-align:right;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(statesForm)" [disabled]="statesForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayStateChargeModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<!-- <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message> -->

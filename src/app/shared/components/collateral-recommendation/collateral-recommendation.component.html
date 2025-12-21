@@ -1,0 +1,158 @@
+<!-- Proposed Collateral -->
+<div class="panel panel-default" *ngIf="isAnalyst == true">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Proposed Collateral</h2>
+                <div class="pull-right">
+                    <button (click)="showRecommendedCollateralForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-dataTable [value]="recommendedCollaterals" [paginator]="true" [rows]="5" selectionMode="single">
+            <p-column field="productCustomerName" header="Facility"></p-column>
+            <p-column field="collateralDetail" header="Collateral Detail"></p-column>
+
+            <p-column field="collateralValue" header="Collateral Value" [filter]="false" filterMatchMode="contains" [style]="{'width':'120px','text-align':'right'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.collateralValue | number : '1.2' }}
+                </ng-template>
+            </p-column>
+
+            <p-column field="stampedToCoverAmount" header="Stamped To Cover" [filter]="false" filterMatchMode="contains" [style]="{'width':'120px','text-align':'right'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.stampedToCoverAmount | number : '1.2' }}
+                </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'130px'}">
+                <ng-template pTemplate="header">
+
+                </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center" *ngIf="d.owner">
+                        <a (click)="editRecommendedCollateral(d)" href="javascript:void(0)">Edit</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+    
+
+    <div style="margin: 0px 15px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Proposed Collateral History</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-dataTable [value]="recommendedCollateralsHistory" [paginator]="true" [rows]="5" selectionMode="single">
+            <p-column field="productCustomerName" header="Facility"></p-column>
+            <p-column field="collateralDetail" header="Collateral Detail"></p-column>
+
+            <p-column field="collateralValue" header="Collateral Value" [filter]="false" filterMatchMode="contains" [style]="{'width':'120px','text-align':'right'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.collateralValue | number : '1.2' }}
+                </ng-template>
+            </p-column>
+
+            <p-column field="stampedToCoverAmount" header="Stamped To Cover" [filter]="false" filterMatchMode="contains" [style]="{'width':'120px','text-align':'right'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.stampedToCoverAmount | number : '1.2' }}
+                </ng-template>
+            </p-column>
+            
+            <p-column field="staffName" header="Staff Name"></p-column>
+        </p-dataTable>
+    </div>
+
+
+</div>
+<!-- end Proposed Collateral -->
+
+
+
+
+<!-- recommended collateral form modal-->
+<p-dialog [responsive]=true [(visible)]="displayRecommendedCollateralForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="450">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{formState}} Proposed Collateral</h2>
+        </div>
+
+        <form novalidate [formGroup]="recommendedCollateralForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="collateralDetail">Facility</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId" class="form-control"
+                                [ngClass]="!recommendedCollateralForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="collateralDetail">Collateral Detail</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea style="height:120px;" name="collateralDetail" formControlName="collateralDetail" id="collateralDetail" class="form-control"
+                                [ngClass]="!recommendedCollateralForm.controls['collateralDetail'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="collateralValue">Collateral Value</label>
+                        </div>
+                        <div class="col-md-12">
+                            <input name="collateralValue" formControlName="collateralValue" formatM id="collateralValue" class="form-control" [ngClass]="!recommendedCollateralForm.controls['collateralValue'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="stampedToCoverAmount">Stamped To Cover Amount</label>
+                        </div>
+                        <div class="col-md-12">
+                            <input name="stampedToCoverAmount" formControlName="stampedToCoverAmount" formatM id="stampedToCoverAmount" class="form-control"
+                                [ngClass]="!recommendedCollateralForm.controls['stampedToCoverAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveRecommendedCollateral(recommendedCollateralForm)" [disabled]="recommendedCollateralForm.invalid"
+                            class="btn btn-success pull-right">
+                            Save and Close</button>
+                        <button type="button" (click)="displayRecommendedCollateralForm=false" style="margin-right:5px" class="btn btn-danger pull-right">
+                            Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of recommended collateral form modal-->

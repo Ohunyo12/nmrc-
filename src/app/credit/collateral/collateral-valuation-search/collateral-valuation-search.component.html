@@ -1,0 +1,188 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Collateral Valuation Search
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p-tabView>
+            <p-tabPanel header="Collateral Valuation">
+
+                <!-- loan applications -->
+                <div class="card no-padding">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title pull-left">
+                                        Collateral Valuation
+                                    </h2>
+
+                                    <div class="pull-right">
+                                        <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <p-tabView>
+                                <p-tabPanel header="Collateral Valuation">
+                                    <p-dataTable [value]="collateralValuations" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+
+                                        <p-column field="arrivalDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.arrivalDate | date: 'dd-MM-yyyy' }}
+                                            </ng-template>
+                                        </p-column>
+
+                                        <p-column field="referenceNumber" header="Reference Number">
+                                        </p-column>
+                                        <p-column field="customerName" header="Customer Name">
+                                        </p-column>
+                                        <p-column field="collateralCode" header="Collateral Code">
+                                        </p-column>
+                                        <p-column field="collateralType" header="Collateral Type">
+                                        </p-column>
+                                        <p-column field="valuationName" header="Valuation Name">
+                                        </p-column>
+                                        <p-column field="valuationReason" header="Valuation Reason">
+                                        </p-column>
+
+                                        <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                        <p-column field="currentApprovalLevel" header="Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="responsiblePerson" header="Responsible Person" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                        <!-- <p-column>
+                                      <ng-template pTemplate="header"></ng-template>
+                                      <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                          <a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+                                      </ng-template>
+                                  </p-column>   -->
+
+                                    </p-dataTable>
+                                </p-tabPanel>
+                            </p-tabView>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-9 ">
+                                    <!-- buttons -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </p-tabPanel>
+        </p-tabView>
+
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search Collateral Valuation
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="searchForm" autocomplete="off" (ngSubmit)="submitForm(searchForm)">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">Reference Number/ Customer Name/ Customer Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!-- <p-dialog *ngIf="selectedLCApplication != null" [responsive]=true [(visible)]="showLCDetailsDialog" modal="modal" width="1200px"
+  [contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+      <div style="margin-bottom:0" class="panel panel-default">
+          <div class="panel-heading">
+              <h2 class="panel-title">
+                  LC Search
+              </h2>
+          </div>
+  
+          <div class="panel-body" *ngIf="!isForLMSSearch || isLcCancelation">
+              <lc-issuance [isLCSearch]=true
+                  [lcIssuanceId]="selectedLCApplication.lcIssuanceId"
+                  [isForLMSSearch]="isForLMSSearch"
+                  [isLcCancelation]="isLcCancelation"
+                  [lcReleaseAmountId]="selectedLCApplication.lcReleaseAmountId"
+                  [lcUssanceId]="selectedLCApplication.lcUssanceId"
+                  [releaseAmount]="selectedLCApplication.releaseAmount"
+                  [totalUsanceAmount]="selectedLCApplication.totalUsanceAmount"
+                  [lcReleases]="selectedLCApplication.lcReleases"
+                  [lcUsances]="selectedLCApplication.lcUsances"
+                  [reload]="selectedLCApplication.lcIssuanceId"
+                  [showButtons]="false"
+                  [resetTabs]="reload">
+              </lc-issuance>
+          </div>
+  
+          <div class="panel-body" *ngIf="isForLMSSearch && !isLcCancelation">
+              <lc-issuance 
+                  [isLCSearch]=true
+                  [isForLMSSearch]=true
+                  [isLCEnhancement]="isLCEnhancement"
+                  [isLCExtension]="isLCExtension"
+                  [lcIssuanceId]="selectedLCApplication.lcIssuanceId"
+                  [tempLcIssuanceId]="selectedLCApplication.tempLcIssuanceId"
+                  [lcReleaseAmountId]="selectedLCApplication.lcReleaseAmountId"
+                  [lcUssanceId]="selectedLCApplication.lcUssanceId"
+                  [releaseAmount]="selectedLCApplication.releaseAmount"
+                  [totalUsanceAmount]="selectedLCApplication.totalUsanceAmount"
+                  [reload]="selectedLCApplication.tempLcIssuanceId"
+                  [lcReleases]="selectedLCApplication.lcReleases"
+                  [lcUsances]="selectedLCApplication.lcUsances"
+                  [showButtons]="false"
+                  [resetTabs]="selectedLCApplication.tempLcIssuanceId">
+              </lc-issuance>
+          </div>
+  
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button (click)="closeLcDetailsDialog()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </p-dialog> -->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

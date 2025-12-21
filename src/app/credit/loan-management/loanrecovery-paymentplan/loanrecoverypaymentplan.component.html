@@ -1,0 +1,129 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Recovery Payment Plan
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div class="panel-body">
+<!-- 
+                    <div>
+                            <label for="recoveryPlanId" class="control-label col-md-2">Recovery Plan</label>
+                            <div class="col-md-4">
+                                <select type="text" name="recoveryPlanId" formControlName="recoveryPlanId" id="recoveryPlanId" class="form-control" [ngClass]="!loanRecoveryPaymentPlanForm.controls['recoveryPlanId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select recovery Plan --</option>
+                                    <option *ngFor="let type of recoveries" [value]="type.recoveryPlanId">
+                                        {{ type.loanRefNo}}
+                                    </option>
+                                </select>
+                            </div>
+                    </div> -->
+
+                    <p-dataTable [value]="loanRecoveryPaymentPlans">
+                        <p-column field="loanRefNo" header=" loan" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="paymentDate" header="Payment Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{ d.paymentDate | date: 'dd-MM-yyyy' }}
+                                    </ng-template>
+                        </p-column>
+                        <p-column field="paymentAmount" header="Payment Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header">
+                                Edit
+                            </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editLoanRecoveryPaymentPlan(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="loanRecoveryPaymentPlanForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <!-- <label for="recoveryPlanId" class="control-label col-md-2"> loan </label>
+                        <div class="col-md-4">
+                            <input type="text" name="recoveryPlanId" formControlName="recoveryPlanId" id="loanRefNo" class="form-control" [ngClass]="!loanRecoveryPaymentPlanForm.controls['recoveryPlanId'].valid ? 'required-input' : 'valid-input'">
+                        </div> -->
+
+                        <label for="recoveryPlanId" class="control-label col-md-2">Recovery Plan</label>
+                        <div class="col-md-4">
+                            <select type="text" name="recoveryPlanId" formControlName="recoveryPlanId" id="recoveryPlanId" class="form-control" [ngClass]="!loanRecoveryPaymentPlanForm.controls['recoveryPlanId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select recovery Plan --</option>
+                                <option *ngFor="let type of recoveries" [value]="type.recoveryPlanId">
+                                    {{ type.loanRefNo}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentAmount" class="control-label col-md-2">Payment Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="paymentAmount" formControlName="paymentAmount" id="paymentAmount" class="form-control" [ngClass]="!loanRecoveryPaymentPlanForm.controls['paymentAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    
+                     <label for="paymentDate" class="control-label col-md-2">Payment Date</label>
+                        <!-- <div class="col-md-4">
+                            <input type="text" name="paymentDate" formControlName="paymentDate" id="paymentDate" class="form-control" [ngClass]="!loanRecoveryPaymentPlanForm.controls['paymentDate'].valid ? 'required-input' : 'valid-input'">
+                        </div> -->
+
+                        <div class="col-md-4">
+                            <p-calendar id="paymentDate" formControlName="paymentDate" dateFormat="dd/mm/yy" [ngClass]="!loanRecoveryPaymentPlanForm.controls['paymentDate'].valid ? 'required-input' : 'valid-input'"
+                              [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                          </div>
+                    
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(loanRecoveryPaymentPlanForm)" [disabled]="loanRecoveryPaymentPlanForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

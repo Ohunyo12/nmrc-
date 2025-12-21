@@ -1,0 +1,181 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Application Users
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+                    <p-dataTable [value]="users" [responsive]="true" [paginator]="true" [rows]="13" selectionMode="single">
+                        <p-column field="staffName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="username" header="Username" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="email" header="Email" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'60px'}">
+                            <ng-template pTemplate="header">
+                                Edit
+                            </ng-template>
+                            <ng-template let-user="rowData" pTemplate="body">
+                                <a (click)="editUser(user, $event)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'120px'}">
+                            <ng-template pTemplate="header">
+                                Account Status
+                            </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <div class="btn-group">
+                                    <a (click)="changeAccountStatus(row, $event)" style="display: block" href="#">
+                                        <i class="glyphicon glyphicon-wrench">Change</i>
+                                    </a>
+                                </div>
+                                ||
+                                <div class="btn-group">
+                                    <span [class]="row.isLocked ? 'label label-danger' : 'label label-success'" [innerHTML]="row.isLocked ? 'Locked' : 'Active'"></span>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+
+            <p-dialog [responsive]=true [(visible)]="display" id="createUserModal" modal="modal" showEffect="fade" width="800">
+
+                <div style="margin-bottom:0" class="panel panel-default">
+                    <div style="padding:4px" class="panel-heading">
+                        <h2 style="margin:0" class="panel-heading">
+                            New User
+                        </h2>
+
+                    </div>
+
+                    <form novalidate (ngSubmit)="onUserFormSubmitted(user)" [formGroup]="user" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <p-tabView [activeIndex]="activeIndex" (change)="handleChange($event)">
+                                    <p-tabPanel header="User Profile">
+                                        <div class="form-group">
+                                            <label for="staffName" class="control-label col-md-2">
+                                                Staff Name
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+
+                                                <select [ngClass]="!user.controls['staffId'].valid ? 'required-input' : 'valid-input'" name="staffId" formControlName="staffId"
+                                                    class="form-control">
+                                                    <option value="">Select Staff</option>
+                                                    <option *ngFor="let sta of staffs" value="{{sta.staffId}}">
+                                                        {{sta.staffFullName}}
+                                                    </option>
+
+                                                </select>
+                                            </div>
+
+                                            <label for="username" class="control-label col-md-2">
+                                                Username
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+                                                <input [ngClass]="!user.controls['username'].valid ? 'required-input' : 'valid-input'" type="text" name="username" formControlName="username"
+                                                    id="username" class="form-control">
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="password" class="control-label col-md-2">
+                                                Password
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+                                                <input type="password" [ngClass]="!user.controls['password'].valid ? 'required-input' : 'valid-input'" name="password" formControlName="password"
+                                                    id="password" class="form-control">
+                                            </div>
+
+                                            <label for="confirmPass" class="control-label col-md-2">
+                                                Confirm Password
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+                                                <input type="password" name="confirmPassword" [ngClass]="!user.controls['confirmPassword'].valid ? 'required-input' : 'valid-input'"
+                                                    formControlName="confirmPassword" id="confirmPassword" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="secquest" class="control-label col-md-2">
+                                                Secret Question
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+                                                <input type="text" name="securityQuestion" formControlName="securityQuestion" id="securityQuestion" [ngClass]="!user.controls['securityQuestion'].valid ? 'required-input' : 'valid-input'"
+                                                    class="form-control">
+                                            </div>
+
+                                            <label for="secAnswer" class="control-label col-md-2">
+                                                Secret Answer
+                                            </label>
+                                            <div [ngClass]="!isUpdate ? '':'no-data-div'" class="col-md-4">
+                                                <input type="text" name="securityAnswer" formControlName="securityAnswer" [ngClass]="!user.controls['securityAnswer'].valid ? 'required-input' : 'valid-input'"
+                                                    id="securityAnswer" class="form-control">
+                                            </div>
+                                        </div>
+                                    </p-tabPanel>
+                                    <p-tabPanel header="User Groups">
+                                        <div class="form-group">
+
+                                            <div class="col-md-12">
+                                                <div *ngFor="let group of groups; let i = index" class="col-md-3">
+                                                    <label class="checkbox-inline">
+                                                        <input type="checkbox" formControlName="group" asList name="groupname" id="group-{{i}}" value="{{group.groupId}}">{{group.groupName}}
+                                                    </label>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </p-tabPanel>
+                                    <p-tabPanel header="Additional Activities">
+                                        <p-accordion>
+                                            <p-accordionTab *ngFor="let actP of allActivities; let idx = index" [selected]="idx==0" header="{{actP.activityParentName}}">
+                                                <div class="row">
+                                                    <div *ngFor="let activity of actP.activities; let i = index" class="col-md-4">
+                                                        <label class="checkbox-inline actCheckBox">
+                                                            <input type="checkbox" formControlName="activities" asList name="activityName" id="activity-{{i}}" value="{{activity.activityId}}">{{activity.activityName}}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </p-accordionTab>
+                                            <!--formControlName="Activities"-->
+                                        </p-accordion>
+                                    </p-tabPanel>
+                                </p-tabView>
+
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!--{{ user.value | json }} [disabled]="user.invalid"(click)="saveUser(user)"-->
+                                    <button type="submit" [disabled]="user.invalid" class="btn btn-success pull-right">Save</button>
+                                    <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="display=false">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+            </p-dialog>
+
+        </div>
+    </div>
+</div>

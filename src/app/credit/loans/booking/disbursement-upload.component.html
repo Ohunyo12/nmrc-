@@ -1,0 +1,203 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class=" no-padding">
+            <div class="panel panel-default">
+               
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{pagetitle}}
+                            </h2>
+                            <div class="pull-right">
+                                <button *ngIf="collapseForm==false" (click)="collapseSearchForm(true)" pButton
+                                    type="button" label="Collapse upload" icon="fa-arrow-up"></button>
+                                <button *ngIf="collapseForm==true" (click)="collapseSearchForm(false)" pButton
+                                    type="button" label="Bulk upload" icon="fa-search"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div *ngIf="collapseForm==false" class="panel-body">
+                    <div class="form-group col-md-12">
+                        <div class="col-md-12">
+                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                                [accept]="'.xslx, .xls, .xltx'" #fileInput name="fileInput" style="padding-top:2px;"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <div class="col-md-6">
+                            <button class="btn btn-sm btn-primary pull-left"  (click)="requestPasswordBulk()"
+                                [disabled]="file==undefined ">
+                                <span class="glyphicon glyphicon-upload"></span> Upload </button>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                                    <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                            <a href="./../../../../assets/files/BulkDisbursementSampleDocument.xlsx" target="_blank"
+                                class="btn btn-sm btn-primary pull-right">
+                                <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="collapseForm==false" class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- <button type="button" (click)="submitCustomerSearchForm(customerSearchForm)" [disabled]="customerSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                                        <button type="button" (click)="clearCustomerSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button> -->
+                        </div>
+                    </div>
+                </div>              
+               <br> 
+                <div *ngIf="collapseForm==false && (uploadedData != null && uploadedData.length > 0)">
+                    <div class="panel-body">
+                        <p-dataTable [value]="uploadedData" [responsive]=true [paginator]="true" [rows]="15"
+                                         [(selection)]="disburseSelection" dataKey="customerId"
+                                          [rowsPerPageOptions]="[10,20,30]">
+                        <p-column  [style]="{'width':'50px'}"  selectionMode="multiple" suppressRowClickSelection="false"></p-column> 
+                        
+                        <p-column field="customerCode" header="Customer" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="productTypeName" header="Product Type" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="loanAmount" header="Loan Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="accountNumber" header="Account Number" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="repaymentScheduleMethodName" header="Schedule Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                         <p-column field="interestRepaymentFrequencyName" header="Interest Freq." sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="principalRepaymentFrequencyName" header="Principal Freq." sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column> 
+                        <p-column field="passed" header="Passed" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template pTemplate="header">Status</ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <span *ngIf="d.passed == true " style="color: green">Success</span>
+                                            <span *ngIf="d.passed == false" style="color: red">Failed</span>
+                                    </ng-template>
+                        </p-column>   
+                        <p-column [style]="{'width':'150px'}" header="Action">
+                            <ng-template pTemplate="header">Action</ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a  href="javascript:void(0)" (click)="getSchedules(d)" >View Schedule</a> 
+                                </ng-template>
+                            </p-column>              
+                        </p-dataTable>
+                        </div>
+                        <div class="col-md-12">
+                            <button class="btn btn-sm btn-primary pull-right" (click)="disburseChanged()">Submit For Approval </button>
+                        </div>
+                </div>   
+            </div>
+        </div>
+        <!-- <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>
+
+<!-- <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)">
+</fintrakbanking-message> -->
+
+
+
+<!--modal ends-->
+
+
+
+
+<p-dialog [responsive]=true resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal" modal="modal" showEffect="fade" width="1200" height="600">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div style="margin-left:0" class="row">
+                    <h2 class="panel-title pull-left">
+                        Schedule Details
+                    </h2>
+                    <a href="" (click)="displayScheduleModalForm=false" class="pull-right remove-btn">
+                        <i class="glyphicon glyphicon-remove-sign">
+                        </i>
+                    </a>
+                </div>
+            </div>
+            <div style="padding:3px" class="panel-body">
+                <fieldset>
+                    <!-- <legend style="width: 45%">
+                        Details
+                    </legend> -->
+                    <table style="margin-bottom: 20px">
+                        <tr>
+                            <td style="font-size: 12px;font-weight: bold;padding: 4px">Granted Amount</td>
+                            <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.principalAmount}}</td>
+                            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Interest Rate</td>
+                            <td style="text-align: right;padding: 4px">{{scheduleHeader?.interestRate}} %</td>
+                            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Effective Interest Rate</td>
+                            <td style="text-align: right;padding: 4px">{{scheduleHeader?.effectiveInterestRate | number: '1.2-2'}} %</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;font-weight: bold;padding: 4px">Effective Date</td>
+                            <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.effectiveDate | date}}</td>
+                            <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Maturity Date</td>
+                            <td style="text-align: right;padding: 4px">{{scheduleHeader?.maturityDate | date}}</td>
+                        </tr>
+                    </table>
+                </fieldset>
+    
+                <p-dataTable scrollable="true" #dt scrollHeight="300px" [value]="schedules" [responsive]=true selectionMode="single">
+                        <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                    <!-- <button type="button" pButton icon="fa-file" iconPos="left" label="Export to Excel" (click)="DownloadSchedule(scheduleGroupForm)" style="float:right"></button> -->
+                                </div>
+                            </p-header>
+                    <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No"></p-column>
+                    <p-column field="paymentDate" header="Payment Date">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span>{{schedule[col.field] | date}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="startPrincipalAmount" header="Start Principal">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="periodPaymentAmount" header="Periodic Amount">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="periodPrincipalAmount" header="Principal Amount">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="periodInterestAmount" header="Interest Amount">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column field="endPrincipalAmount" header="Balance">
+                        <ng-template let-col let-schedule="rowData" pTemplate="body">
+                            <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                        </ng-template>
+                    </p-column>
+
+                </p-dataTable>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="displayScheduleModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+    

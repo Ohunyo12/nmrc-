@@ -1,0 +1,158 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Lien Application Search
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+
+        <p-tabView>
+            <p-tabPanel header="Loan Lien Applications">
+
+                <div class="card no-padding">
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title pull-left">
+                                        Lien Applications
+                                    </h2>
+
+                                    <div class="pull-right">
+                                        <button (click)="showSearchForm()" pButton type="button" label="Search"
+                                            icon="fa-search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-padding">
+                            <div class="panel panel-default">
+                                <div class="panel body">
+                          <p-tabView>
+                                <p-tabPanel header="Lien Applications">
+                                    <p-dataTable [value]="lienSearch" [responsive]=true [paginator]="true" [rows]="10"
+                                        [(selection)]="customerSelection"
+                                        (onRowSelect)="onSelectedChanged($event)" [rowsPerPageOptions]="[10,20,30]">
+                                        <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+                                        <p-column field="customerCode" header="Customer Code" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                        </p-column>
+                                        <p-column field="customerName" header="Customer Name" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                        </p-column>
+                                        <p-column field="productAccountNumber" header="Product Account Number" sortable="true" 
+                                        [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="lienAmount" header="Lien Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                {{item.lienAmount | number:'1.2'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="lienReferenceNumber" header="Lien Reference" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="responsiblePerson" header="Currently With" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="currentApprovalLevel" header="Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> 
+                                        <p-column field="applicationStatus" header="Application Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+        
+                                        <p-column [style]="{'width':'80px'}" header="">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <div style="text-align:center">
+                                                <a (click)="viewDocuments(d)" href="javascript:void(0)">View Memo</a>
+                    
+                                            </div>
+                                            </ng-template>
+                                        </p-column>
+                                        </p-dataTable>
+                                </p-tabPanel>
+                                </p-tabView>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--form modal-->
+                    <p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal"
+                        showEffect="fade" width="450">
+                        <div style="margin-bottom:0" class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">
+                                    Search Application
+                                </h2>
+                            </div>
+
+                            <form novalidate [formGroup]="searchForm" autocomplete="off">
+
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="searchString" class="control-label col-md-12">Lien Reference
+                                                Number/Account Number/ Customer Name</label>
+                                            <div class="col-md-12">
+                                                <input type="text" name="searchString" formControlName="searchString"
+                                                    id="searchString" class="form-control"
+                                                    [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="panel-footer">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" (click)="submitForm(searchForm)"
+                                                [disabled]="searchForm.invalid"
+                                                class="btn btn-success pull-right">Search</button>
+                                            <button type="button" (click)="displaySearchForm=false"
+                                                style="margin-right:5px"
+                                                class="btn btn-danger pull-right">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </p-dialog>
+                    <!--end of form modal-->
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</div>
+
+<!--form modal-->
+
+<p-dialog [responsive]=true [(visible)]="displayDetail" id="add-modal" modal="modal" showEffect="fade" width="900"
+[contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+  <div class="panel-heading">
+    <div style="margin-left:0" class="row">
+        <div class="pull-right">
+            <a class="close" style="margin: -10px 8px;" (click)="displayDetail=false">&times;</a>
+        </div>
+    </div>
+  </div>
+  <p-tabView>
+    <p-tabPanel *ngIf="(TARGET_ID>0)" header="Approval Memo">
+        <app-approval-memo
+            [showControls]="true"
+            [allowTemplateToLoad]="false"
+            [referenceNumber]="REFERENCE_NUMBER"
+            [label]="'lien Removal'"
+            [customerId]="CUSTOMER_ID"
+            [OPERATION_ID]="OPERATION_ID"
+            [targetId]="TARGET_ID">
+        </app-approval-memo>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>
+
+<!--form modal ends-->

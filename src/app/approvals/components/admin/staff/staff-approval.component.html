@@ -1,0 +1,313 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Staff
+                            </h2>
+
+                            <!-- <div class="pull-right">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">View By Status
+                                        <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a (click)="viewNewStaff($event)" href="#">New Staff</a></li>
+                                        <li><a (click)="viewUpdatedStaff($event)" href="#">Updated Staff</a></li>
+
+                                    </ul>
+                                </div>
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                            <!--<button (click)="showDialog()" class="btn btn-primary pull-right">Add New</button>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="staffDataset" [responsive]=true [(selection)]="multipleStaffData" dataKey="staffCode"
+                        selectionMode="multiple">
+                        <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                        <p-column [style]="{'width':'110px'}" field="staffCode" header="Staff Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="staffFullName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="departmentName" header="Department" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="email" header="Email" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'60px'}">
+
+                            <ng-template pTemplate="header">
+                                View
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewDetails($event, i)" style="display: block" href="#">
+                                    <i class="glyphicon glyphicon-eye-open"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                        <p-footer>
+                            <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStaff()" class="btn btn-warning">Submit For Approval</button>
+                        </p-footer>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="display" id="approvalModal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Staff Approval
+            </h2>
+        </div>
+
+        <div class="panel-body">
+
+            <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                <p-tabPanel header="Staff Info">
+                    <div class="form-horizontal">
+                        <table class="table table-customer-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>Branch</strong>
+                                    </td>
+                                    <td>{{data.branchName}}</td>
+                                    <td>
+                                        <strong>Staff Code</strong>
+                                    </td>
+                                    <td>{{data.staffCode}}</td>
+                                    <td>
+                                        <strong>Delegate</strong>
+                                    </td>
+                                    <td>{{data.delegateName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>First Name</strong>
+                                    </td>
+                                    <td>{{data.firstName}}</td>
+                                    <td>
+                                        <strong>Middle Name</strong>
+                                    </td>
+                                    <td>{{data.middleName}}</td>
+                                    <td>
+                                        <strong>Last Name</strong>
+                                    </td>
+                                    <td>{{data.lastName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>MIS Code</strong>
+                                    </td>
+                                    <td>{{data.misInfoCode}}</td>
+                                    <td>
+                                        <strong>Department</strong>
+                                    </td>
+                                    <td>{{data.departmentName}}</td>
+                                    <td>
+                                        <strong>Job Title</strong>
+                                    </td>
+                                    <td>{{data.jobTitleName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Gender</strong>
+                                    </td>
+                                    <td>{{data.gender == 'f' ? 'Female' : 'Male'}}</td>
+                                    <td>
+                                        <strong>Phone</strong>
+                                    </td>
+                                    <td>{{data.phone}}</td>
+                                    <td>
+                                        <strong>Email</strong>
+                                    </td>
+                                    <td>{{data.email}}</td>
+                                </tr>
+                                <tr>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Staff Role</strong>
+                                    </td>
+                                    <td>{{data.staffRoleName}}</td>
+                                    <td>
+                                        <strong>Sensitivity Level</strong>
+                                    </td>
+                                    <td>{{data.sensitivityLevel}}</td>
+                                    <td>
+                                        <strong>Date of Birth</strong>
+                                    </td>
+                                    <td>{{data.dateOfBirth | date: 'dd/MM/yyyy'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Address</strong>
+                                    </td>
+                                    <td>{{data.address}}</td>
+                                    <td>
+                                        <strong>State</strong>
+                                    </td>
+                                    <td>{{data.stateName}}</td>
+                                    <td>
+                                        <strong>City</strong>
+                                    </td>
+                                    <td>{{data.cityName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Comment</strong>
+                                    </td>
+                                    <td colspan=3>
+                                        <textarea [ngClass]="!data.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="data.comment" name="comment"
+                                            cols="30" rows="3"></textarea>
+                                    </td>
+                                    <td>
+                                        <strong>Status</strong>
+                                    </td>
+                                    <td>
+                                        <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="data.approvalStatusId" [ngClass]="!data.approvalStatusId ? 'required-input' : 'valid-input'">
+                                            <option value="">--- Select Approval Status ---</option>
+                                            <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </p-tabPanel>
+                <p-tabPanel header="Next of Kin">
+                    <table class="table table-customer-information">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Name</strong>
+                                </td>
+                                <td>{{data.nameOfNok}}</td>
+                                <td>
+                                    <strong>Telephone</strong>
+                                </td>
+                                <td>{{data.phoneOfNok}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Email</strong>
+                                </td>
+                                <td>{{data.emailOfNok}}</td>
+                                <td>
+                                    <strong>Address</strong>
+                                </td>
+                                <td>{{data.addressOfNok}}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Gender</strong>
+                                </td>
+                                <td>{{data.genderOfNok}}</td>
+                                <td>
+                                    <strong>Relationship</strong>
+                                </td>
+                                <td>{{data.nokrelationShip}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p-tabPanel>
+                <p-tabPanel header="View Approval Workflow">
+                    <p-dataTable [value]="approvalWorkflowData" [paginator]="true" [rows]="15" [responsive]="true">
+                        <p-column field="requestStaffName" header="Intiated From"></p-column>
+                        <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
+                        <p-column field="responseStaffName" header="Directed To"></p-column>
+                        <p-column field="responseApprovalLevel" header="Response Approval Level"></p-column>
+                        <p-column field="approvalStatus" header="Approval Status"></p-column>
+                        <p-column field="comment" header="Comment"></p-column>
+                        <p-column field="systemArrivalDate" header="Date of Arrival">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium'}}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="systemResponseDate" header="Date of Response">
+                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                {{apr[col.field] | date: 'medium' }}
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--[disabled]="groupForm.invalid"-->
+                    <div class="btn-group pull-right">
+                        <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                        <button [disabled]="!data.comment || !data.approvalStatusId" type="button" (click)="goForApproval(data)" class="btn btn-success">Submit For Approval</button>
+                        <!--(click)="approveStaff(data.staffId)"-->
+                        <!--<button [disabled]="!data.comment" type="button" class="btn btn-warning">Disapprove</button>-->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayMultipleModel" id="multiStaff" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Approve Multiple Staff Details
+            </h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p-dataTable [paginator]="true" [rows]="10" [value]="multipleStaffData" [responsive]=true selectionMode="single">
+                            <p-column [style]="{'width':'110px'}" field="staffCode" header="Staff Code"></p-column>
+                            <p-column field="staffFullName" header="Staff Name"></p-column>
+                            <p-column field="departmentName" header="Department"></p-column>
+                            <p-column field="email" header="Email"></p-column>
+                            <p-column field="branchName" header="Branch"></p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="control-label col-md-2">Comment</label>
+                    <div class="col-md-4">
+                        <textarea [ngClass]="!multipleData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="multipleData.comment"
+                            name="comment" cols="30" rows="3"></textarea>
+                    </div>
+                    <label for="" class="control-label col-md-2">Status</label>
+                    <div class="col-md-4">
+                        <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="multipleData.approvalStatusId" [ngClass]="!multipleData.approvalStatusId ? 'required-input' : 'valid-input'">
+                            <option value="">--- Select Approval Status ---</option>
+                            <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="displayMultipleModel=false" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+                        <button [disabled]="!multipleData.comment || !multipleData.approvalStatusId" type="button" (click)="goForBulkApproval()"
+                            class="btn btn-success">Submit For Approval</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message" (approveEvent)="goForApproval(data)"
+    (closeEvent)="cancelApproval()"></app-fintrakbanking-dialog>

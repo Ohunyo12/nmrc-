@@ -1,0 +1,152 @@
+<p-tabView>
+    <p-tabPanel header="Batch Posting Details">
+        <div class="panel-body">
+            <div class="ui-g ui-fluid">
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+
+                        Start Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3 ">
+                        End Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="endDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span
+                            style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3 ">
+                        Search Parameter
+                    </label>
+
+                    <div class="col=md-9">
+                        <input type="text" name="searchInfo" maxlength="50" [(ngModel)]="searchInfo" id="crmsCode" placeholder="Any Parameter"
+                            class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-right:30px" *ngIf="!isLms">
+                    <label for="searchItem" class="control-label col=md-3">
+                        Any Parameter
+                    </label>
+                    <div class="col=md-9">
+                        <button pButton type="button" (click)="getBatchPostingDetails()" label="Get Posting"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll">
+                <div class="hack1">
+                    <div class="hack2">
+                        <p-dataTable #dt [value]="batchPostingList" [paginator]="true" [rows]="5">
+                            <p-header>
+                                <div class="ui-helper-clearfix">
+                                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                                        (click)="dt.exportCSV()" style="float:left"></button>
+                                </div>
+                            </p-header>
+                            <p-column field="sid" header="SID" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="batchId" header="BATCH ID" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="batchRefId" header="BATCH REF ID" sortable="true" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="trancType" header="TRAN_TYPE" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="amt" header="AMT" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="drAccount" header="DR_ACCT" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="crAccount" header="CR_ACCT" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="currencyCode" header="REF_CRNCY_CODE" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+
+                            <p-column field="rateCode" header="RATE_CODE" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="rate" header="RATE" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="naration" header="NARRATION" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="status" header="STATUS" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="tranactionId" header="TRAN_ID" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="postedFlag" header="PSTD_FLG" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains" [style]="{'width':'100px'}">
+                               
+                            </p-column>
+                            <p-column field="postedDate" header="PSTD_DATE" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="rcreDate" header="RCRE_DATE" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="postedUserId" header="PSTD_USR_ID" sortable="true" [filter]="true" [style]="{'width':'300px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="failedFlag" header="FAIL_FLG" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="failureReasonCode" header="FAILURE_REASON_CODE" sortable="true" [filter]="true" [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="failureReason" header="FAILURE_REASON" sortable="true" [filter]="true" [style]="{'width':'100px'}"
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="amountCollected" header="AMT_COLLECTED" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="lienAmount" header="LIEN_AMT" sortable="true" [filter]="true" filterMatchMode="contains"  [style]="{'width':'100px'}" >
+                            </p-column>
+                            <p-column field="lienFlg" header="LIEN_FLG" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            </p-column>
+                            <p-column field="TodFlg" header="TOD_FLG" sortable="true" [filter]="true"  [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="valueDateNumber" header="VALUE_DATE_NUM" sortable="true" [filter]="true"  [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="loanAccount" header="LOAN_ACCT" sortable="true" [filter]="true"  [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="fintrakFlag" header="FINTRAK_FLG" sortable="true" [filter]="true"  [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column field="bankId" header="BANK_ID" sortable="true" [filter]="true"  [style]="{'width':'100px'}" 
+                                filterMatchMode="contains">
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                    <a  (click)="ExportToExcel(d)" href="javascript:void(0)">Daily Accrual Detail</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </p-tabPanel>
+</p-tabView>

@@ -1,0 +1,193 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Chart of Account
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                        <p-dataTable [rows]="20" [paginator]="true" [value]="charts" [responsive]=true selectionMode="single">
+                                <p-column field="accountName" header="Account Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="accountCode" header="Account Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="accountTypeName" header="Account Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="accountCategoryName" header="Account Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editChartOfAccount(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+
+
+
+                    <!-- <p-dataTable [rows]="20" [paginator]="true" [value]="charts" [responsive]=true selectionMode="single">
+                        <p-column field="accountName" header="Account Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="accountCode" header="Account Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="accountTypeName" header="Account Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="accountCategoryName" header="Account Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'60px'}">
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editChart(i, $event)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{panelHeader}}
+            </h2>
+        </div>
+
+        <form (ngSubmit)="onSubmit(chartFormGroup)" [formGroup]="chartFormGroup" novalidate autocomplete="off">
+            <div class="panel-body">
+                <p-tabView (onChange)="handleChange($event)" [activeIndex]="index">
+                    <p-tabPanel header="Chart of Account Details" [selected]="true">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Account Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" formControlName="accountName" class="form-control" [ngClass]="chartFormGroup.controls['accountName'].valid ? 'valid-input':'required-input'">
+                                </div>
+                                <label for="" class="control-label col-md-2">Account Type</label>
+                                <div class="col-md-4">
+                                    <select name="accountType" formControlName="accountTypeId" id="accountType" class="form-control" [ngClass]="chartFormGroup.controls['accountTypeId'].valid ? 'valid-input':'required-input'">
+                                        <option value="">-- Select Account Type --</option>
+                                        <option *ngFor="let accType of accounttypes" value="{{accType.accountTypeId}}">{{accType.accountTypeDetail}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Sub Account</label>
+                                <div class="col-md-4">
+                                    <label style="padding-top:0 !important;margin-top:-9px" class="checkbox-inline">
+                                        <input type="checkbox" formControlName="isSubAccount" value="true" name="isSubAccount" id="isSubAccount">
+                                    </label>
+                                </div>
+                                <label for="" [hidden]="!chartFormGroup.value.isSubAccount" class="control-label col-md-2">Main Account</label>
+                                <div [hidden]="!chartFormGroup.value.isSubAccount" class="col-md-4">
+                                    <select name="mainAccountId" formControlName="mainAccountId" id="mainAccountId" class="form-control" [ngClass]="chartFormGroup.controls['mainAccountId'].valid ? 'valid-input':'required-input'">
+                                        <option value="">-- Select Account --</option>
+                                        <option *ngFor="let chart of charts" value="{{chart.accountId}}">{{chart.accountDetail}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Account Number </label>
+                                <div class="col-md-4">
+                                    <input type="text" formControlName="accountCode" class="form-control" [ngClass]="chartFormGroup.controls['accountCode'].valid ? 'valid-input':'required-input'">
+                                </div>
+                                <label for="" class="control-label col-md-2">Fin. Stmt Caption:</label>
+                                <div class="col-md-4">
+                                    <select name="stmtCaption" formControlName="fsCaptionId" id="stmtCaption" class="form-control" [ngClass]="chartFormGroup.controls['fsCaptionId'].valid ? 'valid-input':'required-input'">
+                                        <option value="">-- Select Fin Statement Caption --</option>
+                                        <option *ngFor="let finStm of finStatementCaptions" value="{{finStm.lookupId}}">{{finStm.lookupName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Account Status </label>
+                                <div class="col-md-4">
+                                    <select name="accountStatusId" formControlName="accountStatusId" id="accountStatusId" class="form-control" [ngClass]="chartFormGroup.controls['accountStatusId'].valid ? 'valid-input':'required-input'">
+                                        <option value="">-- Select Status --</option>
+                                        <option value="1">Active</option>
+                                        <option value="2">Inactive</option>
+                                        <option value="3">Closed</option>
+                                    </select>
+                                </div>
+                                <label for="" class="control-label col-md-2">GL Class </label>
+                                <div class="col-md-4">
+                                    <select name="glClassId" formControlName="glClassId" id="glClassId" class="form-control" [ngClass]="chartFormGroup.controls['glClassId'].valid ? 'valid-input':'required-input'">
+                                        <option value="">-- Select GL Class --</option>
+                                        <option *ngFor="let glClass of chartClasses" value="{{glClass.glClassId}}">{{glClass.glClassName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Branch Specific</label>
+                                <div class="col-md-4">
+                                    <label style="padding-top:0 !important;margin-top:-9px" class="checkbox-inline">
+                                        <input type="checkbox" formControlName="branchSpecific" value="true" name="branchSpecific" id="branchSpecific">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Currencies</label>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-info" (click)="displayCurrencies=true">Select Currencies</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <p-chips [(ngModel)]="mappedCurrencies" [ngModelOptions]="{standalone: true}" (onRemove)="removeCurrency($event.value)"></p-chips>
+                                </div>
+                            </div>
+                        </div>
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="!chartFormGroup.valid || selectedCurrencies == null" class="btn btn-success pull-right">Save</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="hideDialog()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCurrencies" modal="modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Chart of Account Currencies
+            </h2>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="coaCurrencies" [(selection)]="selectedCurrencies" dataKey="currencyId">
+                <p-column field="currencyId" header="Currency ID" hidden="true" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="currencyName" header="Currency Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'60px'}" selectionMode="multiple"></p-column>
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" [disabled]="selectedCurrencies == null" class="btn btn-success pull-right" (click)="hideCurrencyDialog()">Save</button>
+                    <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="displayCurrencies=false">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

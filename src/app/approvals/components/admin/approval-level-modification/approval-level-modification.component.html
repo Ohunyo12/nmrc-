@@ -1,0 +1,232 @@
+<div class="panel panel-default">
+    <div class="panel-heading" >
+        <h2 class="panel-title">Approval Workflow Level</h2>
+    </div>
+    <div class="panel-body">
+  
+  <div  class="row">
+    <p-dataTable [value]="approvalLevelList" [paginator]="true" [rows]="5">
+  
+        <p-column field="levelName" header="Level Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+        <p-column field="position" header="Position" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+  
+  
+        <p-column field="tenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains">
+  
+        </p-column>
+  
+        <p-column field="maximumAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.maximumAmount | number : '1.2' }}
+            </ng-template>
+        </p-column>
+  
+        <p-column field="numberOfUsers" header="Number Of Users" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+        <p-column field="numberOfApprovals" header="Number Of Approvals" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+       
+        <p-column [style]="{'width':'110px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center">
+                    <a *ngIf="loanApplicationId == null" (click)= "getApprovalWorkflowLevel(d)"  href="javascript:void(0)">View</a>
+                </div>
+            </ng-template>
+        </p-column>
+  
+    </p-dataTable>
+  </div>
+  </div>
+<!--   
+  <p-tabView [activeIndex]="0"  *ngIf="groupLevelList">
+  <p-tabPanel header="Approval Workflow Level">
+
+  </p-tabPanel> 
+
+  </p-tabView>
+   -->
+  
+
+  
+  </div>
+  
+  
+  <p-dialog [responsive]=true [(visible)]="displayModal" modal="modal" showEffect="fade" width="1200">
+      <div >
+          <div style="margin-bottom:0" class="panel panel-default" *ngIf="groupLevelList">
+              <div class="panel-heading">
+                <h2 class="panel-title">
+                    Approval Workflow Level
+                </h2>
+      
+              </div>
+              <div class="panel-body" *ngIf="groupLevelList">
+                  <table class="table table-casa-information">
+                      <tbody>
+                        <tr>
+                            <td>
+                                <strong><h5>{{operationLevel}}</h5></strong>
+                            </td>
+                        </tr>
+                          <tr>
+                              <td>
+                                  <strong>Level Name:</strong>
+                              </td>
+                              <td>{{ groupLevelList.levelName }}</td>
+                              <td>
+                                  <strong>Position:</strong>
+                              </td>
+                              <td>{{ groupLevelList.position }}</td>
+                              <td>
+                                  <strong>Group Name:</strong>
+                              </td>
+                              <td>{{ groupLevelList.groupName  }}</td>
+                          </tr>
+                          <tr>
+                              <td>
+                                  <strong>Tenor:</strong>
+                              </td>
+                              <td>{{ groupLevelList.tenor }}</td>
+                              <td>
+                                  <strong>Maximum Amount:</strong>
+                              </td>
+                              <td>{{ groupLevelList.maximumAmount | number:'1.2' }}</td>
+                              <td>
+                                  <strong>Investment Grade Amount:</strong>
+                              </td>
+                              <td>{{ groupLevelList.investmentGradeAmount | number:'1.2' }}</td>
+                          </tr>
+                          <tr>
+                              <td>
+                                  <strong>Fee Rate:</strong>
+                              </td>
+                              <td>{{ groupLevelList.feeRate }}</td>
+                              <td>
+                                  <strong>Interest Rate:</strong>
+                              </td>
+                              <td>{{ groupLevelList.interestRate }}</td>
+                              <td>
+                                  <strong>Number Of Users:</strong>
+                              </td>
+                              <td>{{ groupLevelList.numberOfUsers }}</td>
+                          </tr>                     
+                          <tr>
+                              <td>
+                                  <strong>Number Of Approvals:</strong>
+                              </td>
+                              <td>{{ groupLevelList.numberOfApprovals }}</td>
+                              <td>
+                                  <strong>SLA Interval:</strong>
+                              </td>
+                              <td>{{ groupLevelList.slaInterval }}</td>
+                              <td>
+                                  <strong>is Politically Exposed:</strong>
+                              </td>
+                              <td>{{ groupLevelList.isPoliticallyExposedValue }}</td>
+                          </tr>  
+                          <tr>
+                              <td>
+                                  <strong>Can Escalate:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canEscalateValue }}</td>
+                              <td>
+                                  <strong>Can Approve Untenored:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canApproveUntenoredValue }}</td>
+                              <td>
+                                  <strong>Can Resolve Dispute:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canResolveDisputeValue }}</td>
+                          </tr>  
+                          <tr>
+                              <td>
+                                  <strong>Is Active:</strong>
+                              </td>
+                              <td>{{ groupLevelList.isActiveValue }}</td>
+                              <td>
+                                  <strong>SLA Notification Interval:</strong>
+                              </td>
+                              <td>{{ groupLevelList.slaNotificationInterval }}</td>
+                              <td>
+                                  <strong>Can View Document Value:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canViewDocumentValue }}</td>
+                          </tr>  
+                          <tr>
+                              <td>
+                                  <strong>Can Edit Value:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canEditValue }}</td>
+                              <td>
+                                  <strong>Can View Uploaded File:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canViewUploadedFileValue }}</td>
+                              <td>
+                                  <strong>Can Upload File:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canUploadFileValue }}</td>
+                          </tr>  
+                          <tr>
+                              <td>
+                                  <strong>Can View Approval:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canViewApprovalValue }}</td>
+                              <td>
+                                  <strong>Can Approve Value:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canApproveValue }}</td>
+                              <td>
+                                  <strong>Can Recieve Email:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canRecieveEmailValue }}</td>
+                          </tr>  
+                          <tr>
+                              <td>
+                                  <strong>Can Recieve SMS:</strong>
+                              </td>
+                              <td>{{ groupLevelList.canRecieveSmsValue }}</td>
+                              <td>
+                                  <strong>Route Via Staff Organogram:</strong>
+                              </td>
+                              <td>{{ groupLevelList.routeViaStaffOrganogram }}</td>
+                              <!-- <td>
+                                  <strong>Number Of Users:</strong>
+                              </td>
+                              <td>{{ mainCollateralDetail.numberOfUsers }}</td> -->
+                          </tr>  
+  
+                      </tbody>
+                  </table>
+
+              </div>
+            </div>
+
+      </div>
+      <div class="well" >
+          <hr />
+      <div class="row">
+              <div class="col-md-9">
+              <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+          </div>
+          <div class="col-md-3">
+              <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId < 0 ? 'required-input' : 'valid-input'">
+                  <option value="0">--- Select Approval ---</option>
+                  <option value="2"> Approve </option>
+                  <option value="3"> Decline </option>
+              </select>
+          </div>
+      </div>
+    </div>
+    <div  class="panel-body">
+          <div class="row">
+                  <div class="col-md-6">
+                      </div>
+          <div class="col-md-6">
+                  <div class="btn-group pull-right">
+                          <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger" style="margin-right:5px">Close</button>
+                          <button type="button" (click)="forwardLevelApproval()" [disabled]="comment == null || comment == '' || approvalStatusId < 1" class="btn btn-success">
+                                  Submit</button>
+                      </div>
+          </div>
+      </div>
+      </div>
+  </p-dialog>
+  

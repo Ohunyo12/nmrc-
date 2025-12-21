@@ -1,0 +1,65 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Custom Field Form
+                            </h2>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+                    <form [formGroup]="myForm" novalidate (ngSubmit)="save(myForm)" autocomplete="off">
+                        <h5>Predefined Fields</h5>
+                        <hr style="margin: 0">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">First Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" formControlName="firstName" class="form-control">
+                                </div>
+                                <label for="" class="control-label col-md-2">Last Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" formControlName="lastName" class="form-control">
+                                </div>
+                            </div>
+                            <h5>Custom Fields</h5>
+                            <hr style="margin: 0">
+                            <div formArrayName="customFields">
+
+                                <div class="form-group" *ngFor="let i of rows">
+                                    <div *ngFor="let ctrl of myForm.controls.customFields.controls | slice:(i*2):(i+1)*2; let i=index">
+                                        <div [formGroupName]="i">
+                                            <label class="control-label col-md-2">{{ctrl.value.labelName}}</label>
+                                            <div class="col-md-4">
+                                                <input class="form-control" type="text" formControlName="dataDetails">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+
+                            <div class="form-group">
+                                <div *ngIf="payload">
+                                    Form Vaues: {{payload | json}}
+                                </div>
+
+                                <div class="col-md-2 pull-right">
+                                    <button type="submit" [disabled]="myForm.invalid" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

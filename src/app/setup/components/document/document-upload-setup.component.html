@@ -1,0 +1,154 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h2 class="panel-title pull-left">document Upload</h2>
+                      <div class="pull-right">
+                          <button type="button" (click)="showDocumentCategoryForm()" pButton icon="fa-plus" label="Add New Document Category"></button>
+                         
+                          <button type="button" (click)="showDocumentTypeForm()" pButton icon="fa-plus" label="Add New Document Type"></button>
+
+                          <!-- <button type="button" (click)="showChecklistTypeMappingForm()" pButton icon="fa-plus" label="Add New Product Document Mapping"></button> -->
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="panel-body">
+                <p-tabView>
+                    <p-tabPanel header="Document Category" [selected]="true">
+                        <p-dataTable [value]="documentCategoriesData" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="documentCategoryName" header="Checklist Item" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="documentCategoryId" header="documentCategoryId Item" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="dateTimeCreated" header="Date Created" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.dateTimeCreated | date : 'dd/MM/yyyy' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editDocumentCategory(i)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                    
+                    <p-tabPanel header="Document Types">
+                        <p-dataTable [value]="documentTypesData" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="documentTypeName" header="Document Type Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <!-- <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span *ngIf="d.validateChecklist">Yes</span>
+                                    <span *ngIf="!d.validateChecklist">No</span>
+                                </ng-template> -->
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editDocumentType(i)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+
+                    <!-- <p-tabPanel header="Product Document Mappings">
+                        <p-dataTable [value]="productDocumentMappingsData" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="documentCategory" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="documentType" header="Document Type Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editDocumentType(i, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel> -->
+                </p-tabView>
+          </div>
+      </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentCategoryForm" [modal]=true showEffect="fade"
+  width="500">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              {{itemPanelHeader}}
+          </h2>
+      </div>
+
+      <form novalidate [formGroup]="documentCategoryForm" (ngSubmit)="submitDocumentCategoryForm(documentCategoryForm)" autocomplete="off">
+          <div class="panel-body">
+              <div class="form-horizontal">
+                  <div class="form-group">
+                      <label for="documentCategoryName" class="control-label col-md-4">Category Name</label>
+                      <div class="col-md-8">
+                        <input type="text" name="documentCategoryName" id="documentCategoryName" class="form-control" formControlName="documentCategoryName"
+                              [ngClass]="documentCategoryForm.controls['documentCategoryName'].valid ? 'valid-input' : 'required-input'">
+                      </div>
+                  </div>   
+              </div>
+          </div>
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="submit" [disabled]="documentCategoryForm.invalid" class="btn btn-success pull-right">{{buttonTitle}}</button>
+                      <button type="button" (click)="displayDocumentCategoryForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentTypeForm" [modal]=true showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{itemPanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentTypeForm" (ngSubmit)="submitDocumentTypeForm(documentTypeForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="documentCategoryId" class="control-label col-md-4">Select Document Category</label>
+                        <div class="col-md-8">
+                            <select name="documentCategoryId" id="documentCategoryId" class="form-control" formControlName="documentCategoryId" [ngClass]="documentTypeForm.controls['documentCategoryId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Document Category ---</option>
+                                <option *ngFor="let category of documentCategoriesData" [value]="category.documentCategoryId">{{category.documentCategoryName}}</option>
+                            </select>
+                        </div>   
+                    </div>
+                    <div class="form-group">
+                        <label for="documentTypeName" class="control-label col-md-4">Document Type Name</label>
+                        <div class="col-md-8">
+                            <input type="text" name="documentTypeName" id="documentTypeName" class="form-control" formControlName="documentTypeName"
+                            [ngClass]="documentTypeForm.controls['documentTypeName'].valid ? 'valid-input' : 'required-input'">
+                        </div>  
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="documentTypeForm.invalid" class="btn btn-success pull-right">{{buttonTitle}} document type</button>
+                        <button type="button" (click)="displayDocumentTypeForm=false" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

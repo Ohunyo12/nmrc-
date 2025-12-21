@@ -1,0 +1,101 @@
+<div class="ui-g">
+        <div class="ui-g-12 no-padding">
+            <div class="card no-padding">
+    
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Transaction Dynamics
+                                </h2>
+                                <div class="pull-right">
+                                    <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="panel-body">
+                        <p-dataTable [value]="list" [responsive]=true [paginator]="true" [rows]="10">
+
+                            <p-column field="dynamics" header="Transaction Dynamics" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="productName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="isExternal" header="Is External" [style]="{'width':'90px'}"></p-column>
+
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="edit(row)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>                    
+                        
+                        </p-dataTable>
+                    </div>
+    
+                </div>
+                <!--end of panel-->
+    
+    
+            </div>
+        </div>
+    </div>
+    
+    <!--form modal-->
+    <p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    New {{ entityName }} 
+                </h2>
+            </div>
+    
+            <form novalidate [formGroup]="addForm" autocomplete="off">
+    
+                <div class="panel-body">
+                    <div class="form-horizontal">
+    
+                        <div class="form-group">
+                            <label for="dynamics" class="control-label col-md-2">Dynamics </label>
+                            <div class="col-md-10">
+                                <textarea rows="5" name="dynamics" formControlName="dynamics" id="dynamics" class="form-control" [ngClass]="!addForm.controls['dynamics'].valid ? 'required-input' : 'valid-input'"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="stateId" class="control-label col-md-2">Product</label>
+                            <div class="col-md-10">
+                                <select name="productId" id="productId" formControlName="productId" class="form-control" [ngClass]="!addForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Product --</option>
+                                    <option *ngFor="let x of products" [value]="x.productId">{{ x.productName }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="checkbox-container">
+                                    <input formControlName="isExternal" id="isExternal" type="checkbox">
+                                </div><label class="checkbox">Is External</label>
+                            </div>
+                          
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm(addForm)" [disabled]="addForm.invalid" class="btn btn-success pull-right">Save</button>
+                            <button type="button" (click)="displayAddModal=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </form>
+    
+        </div>
+    </p-dialog>
+    <!--end of form modal-->
+    
+    
+    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

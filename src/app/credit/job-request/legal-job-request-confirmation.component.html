@@ -1,0 +1,299 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Solicitor's Collateral Search Confirmation
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <!-- <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Request List <small> {{ operationTitle }}</small>
+                        </h2>
+                        <div class="pull-right">
+                            <button (click)="showRequestForm()" pButton type="button" label="Create New" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="panel-body">
+                <p-dataTable  [responsive]="true" [value]="legalConsultantJobs" [paginator]="true" [rows]="10" >
+                    <p-column [style]="{'width':'85px'}" field="systemArrivalDate" header="Time" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            {{ row.dateTimeCreated | date }}
+                        </ng-template>
+                    </p-column> 
+                    <p-column [style]="{'width':'260px'}" field="customerName" header="Customer" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'100px'}" field="applicationReferenceNumber" header="Application Ref" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'90px'}" field="jobRequestCode" header="Request Code" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'160px'}" field="accreditedConsultantName" header="Consultant" [filter]="true" filterMatchMode="contains"></p-column>
+                    <!-- <p-column field="jobTypeName" header="Job" [filter]="true" filterMatchMode="contains"></p-column> -->
+                    <p-column [style]="{'width':'110px'}" field="jobSubTypeName" header="Search Type" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="amount" header="Amount" [style]="{'width':'70px','text-align':'right'}">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            {{ row.amount | number:'1.2-2'}}
+                        </ng-template>
+                    </p-column>
+                    <p-column  [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header">Charge Status</ng-template>
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            <span  *ngIf="row.accountNumber != null" >Acc# Debited</span>
+                            <span *ngIf="row.accountNumber == null">Pending</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'80px'}">
+                        <ng-template pTemplate="header">Confirm Search</ng-template>
+                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                            <a *ngIf="row.accountNumber != null" (click)="StartConfirmation(row)"  href="javascript:void(0)">
+                                <span class="label label-info">Confirm Search</span>
+                            </a>
+                            <span *ngIf="row.accountNumber == null" class="label label-warning">Confirm Search</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header">Reverse Search</ng-template>
+                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                            <a *ngIf="row.accountNumber != null" (click)="endConfirmation(row)"  href="javascript:void(0)">
+                                <span  class="label label-info">Reverse Transaction</span>
+                            </a>
+                            <span *ngIf="row.accountNumber == null" class="label label-warning">Reverse Transaction</span>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+
+                <div class="panel-body"  style="overflow:auto;height:400px">
+                    <div class="form-horizontal">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayResponseModal" id="searchModal" showEffect="fade" width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Job Request Response Comment
+                </h2>
+                <a href="" (click)="displayResponseModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+    
+                    </i>
+                </a>
+            </div>
+        </div>
+        <div  class="panel-body">
+            <form [formGroup]="replyForm" autocomplete="off">
+                <div class="panel-body" style="overflow:auto;height:390px;width:600px;">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <p-editor placeholder="Message Body" formControlName="responseComment" id="responseComment" [ngClass]="replyForm.controls['responseComment'].valid ? 'valid-input' : 'required-input'" name="responseComment"
+                                    [style]="{'height':'145px'}" >
+                                    <p-header>
+                                        <span class="ql-formats">
+                                        <select class="ql-header">
+                                        <option value="1">Heading</option>
+                                        <option value="2">Subheading</option>
+                                        <option selected>Normal</option>
+                                        </select>
+                                        <select class="ql-font">
+                                        <option selected>Sans Serif</option>
+                                        <option value="serif">Serif</option>
+                                        <option value="monospace">Monospace</option>
+                                        </select>
+                                        </span>
+                                        <span class="ql-formats">
+                                        <button class="ql-bold" aria-label="Bold"></button>
+                                        <button class="ql-italic" aria-label="Italic"></button>
+                                        <button class="ql-underline" aria-label="Underline"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                        <select class="ql-color"></select>
+                                        <select class="ql-background"></select>
+                                        </span>
+                                        <span class="ql-formats">
+                                        <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                        <button class="ql-list" value="bullet" aria-label="Unordered List"></button>
+                                        <select class="ql-align">
+                                        <option selected></option>
+                                        <option value="center"></option>
+                                        <option value="right"></option>
+                                        <option value="justify"></option>
+                                        </select>
+                                        </span>
+                                        <span class="ql-formats">
+                                        <button class="ql-link" aria-label="Insert Link"></button>
+                                        <button class="ql-code-block" aria-label="Insert Code Block"></button>
+                                        </span>
+                                        <span class="ql-formats">
+                                        <button class="ql-clean" aria-label="Remove Style"></button>
+                                        </span>
+                                    </p-header>
+                                </p-editor>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Status" class="control-label col-md-3">Request Status</label>
+                            <div class="col-md-9">
+                                <select (change)="onApprovalStatusChange($event.target.value)" formControlName="statusId" [ngClass]="replyForm.controls['statusId'].valid ? 'valid-input' : 'required-input'" class="form-control">
+                                    <option *ngFor="let x of jobApprovalStatus" [value]="x.approvalStatusId">{{ (x.approvalStatusName == 'Approved') ? 'Submit' : (x.approvalStatusName == 'Disapproved') ? 'Reject' : x.approvalStatusName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div *ngIf="isRejection" class="form-group">
+                            <label for="Status" class="control-label col-md-2">Reason For Disapproval </label>
+                            <div *ngIf="isRejection" class="col-md-4 ">
+                                <select name="feedBackId" id="feedBackId" formControlName="feedBackId" [ngClass]="replyForm.controls['feedBackId'].valid ? 'valid-input' : 'required-input'" class="form-control" >
+                                    <option value="">-- Select Reason --</option>
+                                    <option *ngFor="let x of statusFeedbackList" [value]="x.jobStatusFeedbackId">{{ x.jobStatusFeedbackName }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="documentTitle" class="control-label col-md-3">Document Description</label>
+                            <div class="col-md-9">
+                                <input type="text" [(ngModel)]="uploadFileTitle" onblur="mandateFileAttachment()" class="form-control" name="description" formControlName="description" [ngClass]="replyForm.controls['description'].valid ? 'valid-input' : 'required-input'" placeholder="Document title..." >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="document" class="control-label col-md-3">Supporting Document</label>
+                            <div class="col-md-9">
+                                <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" formControlName="fileInput" style="padding-top:2px;" class="form-control" >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="document" class="control-label col-md-3"></label>
+                            <div class="col-md-4">
+                                <button (click)="validateUpload()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null || file==undefined"><span class="glyphicon glyphicon-upload"></span>  Upload</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="panel-body col-md-12 ">
+                                <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                    <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                    <p-column [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d)" href="javascript:void(0)">View</a>
+                                            <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d)" href="javascript:void(0)">Download</a>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                        <div class="input-group">
+                            <span class=" input-group-btn ">
+                                <button type="button" (click)="promptToGoForApproval(row)" [disabled]="replyForm.invalid"  class="btn btn-warning btn-sm pull-right"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span>Send</button>
+                            </span>
+                        </div>
+                    </div>
+            </form>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Authentication Token
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div *ngIf="!userSpecific" class="form-group">
+                        <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                        <div class="col-md-12">
+                            <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer ">
+                <div class="row ">
+                    <div class="col-md-12 ">
+                        <div class="form-group text-center">
+                            <div class="col-md-12">
+                                <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="confirmCollateralSearch()" style="margin-right:5px "
+                                    class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth2" id="auth-token" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Authentication Token
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayTwoFactorAuth2=false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div *ngIf="!userSpecific" class="form-group">
+                    <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                    <div class="col-md-12">
+                        <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                    <div class="col-md-12">
+                        <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer ">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="form-group text-center">
+                        <div class="col-md-12">
+                            <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="reverseCollateralSearch()" style="margin-right:5px "
+                                class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- <pre>{{jobRequests | json }}</pre> -->

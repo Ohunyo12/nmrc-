@@ -1,0 +1,387 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Approval Level Rules
+                        </h2>
+                        <div class="pull-right">
+                            <button (click)="showAddModal()" pButton type="button" label="Add Dynamic Rule" icon="fa-plus"></button>
+                        </div>
+                    <div class="pull-right">
+                        <button (click)="showModalForm()" pButton type="button" label="Add Static Rule" icon="fa-plus"></button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <p-tabView [activeTabIndex]="activeTabIndex" (change)="handleChange($event)">
+                    <p-tabPanel header="Static Rule"  [selected]="true">
+                        
+                        <p-dataTable [value]="businessRuleTableData" [sortMode]="multiple" [rows]="20"
+                            [paginator]="true">
+                            <p-column *ngFor="let col of businessRuleTableCols" [field]="col.field"
+                                [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                                    <a (click)="editBusinessRule(col)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'70px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                                    <a (click)="deleteBusinessRule(col)" href="javascript:void(0)">Delete</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                       
+                    </p-tabPanel>
+                    <p-tabPanel header="Dynamic Rule">
+                       
+                        <p-dataTable [value]="workflowExpressions" [rows]="10" [paginator]="true">
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">S/N</ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{i+1}}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="contextName" header="Context" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="dataItemName" header="Data Item" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                           
+                            <p-column field="value" header="Value" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="workflowExpression" header="Rule Expression" sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="approvalBusinessRule" header="Approval Business Rule" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <!-- <p-column field="branchName" header="" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editWorkflow(d)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'70px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                                <a (click)="deleteDynamicBusinessRule(col)" href="javascript:void(0)">Delete</a>
+                            </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+                       
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="1000"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            {{panelHeader}}
+        </h2>
+    </div>
+    <div style="margin-bottom:0" class="panel panel-default">
+        <form novalidate [formGroup]="businessRuleForm" (ngSubmit)="submitGroupForm(businessRuleForm)"
+            autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="description" class="control-label col-md-12">Description</label>
+                        <div class="col-md-12">
+                            <input type="text" id="description" name="description" class="form-control"
+                                formControlName="description"
+                                [ngClass]="this.businessRuleForm.controls['description'].valid ? 'valid-input':'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="minimumAmount" class="control-label col-md-6">Minimum Amount</label>
+                        <label for="maximumAmount" class="control-label col-md-6">Maximum Amount</label>
+                        <div class="col-md-6">
+                            <input type="text" id="minimumAmount" name="minimumAmount" class="form-control"
+                                formControlName="minimumAmount" formatM
+                                [ngClass]="this.businessRuleForm.controls['minimumAmount'].valid ? 'valid-input':'required-input'">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" id="maximumAmount" name="maximumAmount" class="form-control"
+                                formControlName="maximumAmount" formatM
+                                [ngClass]="this.businessRuleForm.controls['maximumAmount'].valid ? 'valid-input':'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tenor" class="control-label col-md-6">Tenor</label>
+                        <label for="" class="control-label col-md-6" style="color: white;">.</label>
+                        <div class="col-md-6">
+                            <input type="text" id="tenor" name="tenor" class="form-control" formControlName="tenor"
+                                formatM
+                                [ngClass]="this.businessRuleForm.controls['tenor'].valid ? 'valid-input':'required-input'">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="projectRelated" id="projectRelated" type="checkbox">
+                            </div>
+                            <label for="projectRelated" class="checkbox">Is Project Related</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-6" style="color: white;">.</label>
+                        <label for="pepAmount" class="control-label col-md-6">PEP Amount</label>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input (change)="isPoliticallyExposedPersonChange($event.target.checked)"
+                                    formControlName="pep" id="pep" type="checkbox">
+                            </div>
+                            <label for="pep" class="checkbox">Is Politically Exposed Person</label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" id="pepAmount" name="pepAmount" class="form-control"
+                                formControlName="pepAmount" formatM>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <!-- <label for="" class="control-label col-md-6" style="color: white;">.</label>
+                                                        <label for="" class="control-label col-md-6" style="color: white;">.</label> -->
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="insiderRelated" id="insiderRelated" type="checkbox">
+                            </div>
+                            <label for="insiderRelated" class="checkbox">Insider Related</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="onLending" id="onLending" type="checkbox">
+                            </div>
+                            <label for="onLending" class="checkbox">On Lending</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <!-- <label for="" class="control-label col-md-6" style="color: white;">.</label>
+                                                        <label for="" class="control-label col-md-6" style="color: white;">.</label> -->
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="interventionFunds" id="interventionFunds" type="checkbox">
+                            </div>
+                            <label for="interventionFunds" class="checkbox">Intervention Funds</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="orrBasedApproval" id="orrBasedApproval" type="checkbox">
+                            </div>
+                            <label for="orrBasedApproval" class="checkbox">orrBased Approval</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <!-- <label for="" class="control-label col-md-6" style="color: white;">.</label>
+                                                        <label for="" class="control-label col-md-6" style="color: white;">.</label> -->
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="withoutInstruction" id="withoutInstruction" type="checkbox">
+                            </div>
+                            <label for="withoutInstruction" class="checkbox">With Instruction</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="domiciliationNotInPlace" id="domiciliationNotInPlace"
+                                    type="checkbox">
+                            </div>
+                            <label for="domiciliationNotInPlace" class="checkbox">Domiciliation Not In
+                                Place</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isForContingentFacility" id="isForContingentFacility"
+                                    type="checkbox">
+                            </div>
+                            <label for="isForContingentFacility" class="checkbox">Is For Only
+                                Contingents</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="exemptContingentFacility" id="exemptContingentFacility"
+                                    type="checkbox">
+                            </div>
+                            <label for="exemptContingentFacility" class="checkbox">Exclude All
+                                Contingents</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="excludeLevel" id="excludeLevel" type="checkbox">
+                            </div>
+                            <label for="excludeLevel" class="checkbox">Exclude Level</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isAgricRelated" id="isAgricRelated" type="checkbox">
+                            </div>
+                            <label for="isAgricRelated" class="checkbox">Is Agric Related</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isForRenewal" id="isForRenewal" type="checkbox">
+                            </div>
+                            <label for="isForRenewal" class="checkbox">Is Only For Renewals</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="exemptRenewal" id="exemptRenewal" type="checkbox">
+                            </div>
+                            <label for="exemptRenewal" class="checkbox">Exempt All Renewals</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="esrm" id="esrm" type="checkbox">
+                            </div>
+                            <label for="esrm" class="checkbox">Is ESR</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isSyndicated" id="isSyndicated" type="checkbox">
+                            </div>
+                            <label for="isSyndicated" class="checkbox" i18n>Is Syndicated</label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="businessRuleForm.invalid"
+                            class="btn btn-success pull-right">Save Business Rule</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayDynamicModalForm" id="add-modal" modal="modal" showEffect="fade"
+    width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            {{panelHeader}}
+        </h2>
+    </div>
+
+    <form novalidate [formGroup]="addForm" autocomplete="off">
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+
+                <div class="form-group">
+                    <label for="contextId" class="control-label col-md-2">Context/Source</label>
+                    <div class="col-md-4">
+                        <select name="contextId" id="contextId" formControlName="contextId" class="form-control"
+                            (change)="onContextChange($event.target.value)"
+                            [ngClass]="!addForm.controls['contextId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Context/Source --</option>
+                            <option *ngFor="let x of context" value="{{x.contextId}}">
+                                {{x.contextName}}
+                            </option>
+                        </select>
+                    </div>
+                    <label for="dataItemId" class="control-label col-md-2">Data Item</label>
+                    <div class="col-md-4">
+                        <select name="dataItemId" id="dataItemId" formControlName="dataItemId" class="form-control"
+                            (change)="onItemChange($event.target.value)"
+                            [ngClass]="!addForm.controls['dataItemId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Data Item --</option>
+                            <option *ngFor="let x of filteredItems" value="{{x.dataItemId}}">
+                                {{x.dataItemName}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comparisonId" class="control-label col-md-2">Comparison</label>
+                    <div class="col-md-4">
+                        <select name="comparisonId" id="contextId" formControlName="comparisonId" class="form-control"
+                            [ngClass]="!addForm.controls['comparisonId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Comparison --</option>
+                            <option *ngFor="let x of allOperators" value="{{x.operatorId}}">
+                                {{x.operators}}
+                            </option>
+                        </select>
+                    </div>
+                    <label for="valueId" class="control-label col-md-2">Value</label>
+                    <div *ngIf="filteredValue?.valueTypeId == 3 " class="col-md-4">
+                        <input type="text" name="textValue" formControlName="textValue"
+                            [ngClass]="!addForm.controls['textValue'].valid ? 'required-input' : 'valid-input'"
+                            class="form-control">
+
+                    </div>
+                    <div *ngIf="filteredValue?.valueTypeId == 1 " class="col-md-4">
+                        <select name="idValue" id="idValue" formControlName="idValue" class="form-control"
+                            [ngClass]="!addForm.controls['idValue'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Data Item --</option>
+                            <option *ngFor="let x of keyValues" value="{{x.id}}">
+                                {{x.value}}
+                            </option>
+                        </select>
+                    </div>
+                    <div *ngIf="filteredValue?.valueTypeId == 2 " class="col-md-4">
+                        <select name="boolValue" id="boolValue" formControlName="boolValue" class="form-control"
+                            [ngClass]="!addForm.controls['boolValue'].valid ? 'required-input' : 'valid-input'">
+                            <option [value]="0"> False </option>
+                            <option [value]="1"> True </option>
+
+                        </select>
+                    </div>
+                </div>
+               
+                <div class="form-group">
+                    <label for="approvalBusinessRuleId" class="control-label col-md-2">Business Rule</label>
+                    <div class="col-md-4">
+                        <select name="approvalBusinessRuleId" id="approvalBusinessRuleId"
+                            formControlName="approvalBusinessRuleId" class="form-control"
+                            [ngClass]="!addForm.controls['approvalBusinessRuleId'].valid ? 'required-input' : 'valid-input'">
+                            <option value="">-- Select Static Rule --</option>
+                            <option *ngFor="let x of businessRuleTableData" [value]="x.levelBusinessRuleId">
+                                {{x.description}}
+                            </option>
+                        </select>
+                    </div>
+                    <label class="col-md-2"></label>
+                    <div class="col-md-4"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(addForm)" [disabled]="addForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayDynamicModalForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</p-dialog>
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage()"></fintrakbanking-message>
+
+
+<!-- <pre>{{ businessRuleTableData | json }}</pre> -->

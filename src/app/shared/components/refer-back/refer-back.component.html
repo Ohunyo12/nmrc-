@@ -1,0 +1,91 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+      <div class="row">
+          <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                  Refer Back
+              </h2>
+          </div>
+      </div>
+  </div>
+
+  <form novalidate [formGroup]="commentForm" autocomplete="off">
+      <div class="panel-body">
+          <div class="form-horizontal">
+                  <div class="form-group">
+                          <div class="col-md-12">
+                              <label>Comment</label>
+                          </div>
+                          <div class="col-md-12">
+                              <textarea name="comment" formControlName="comment" id="comment" class="form-control"
+                                  [ngClass]="!commentForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                          </div>
+                      </div>
+                  <div class="form-group">
+                      <label class="control-label col-md-6">Approval Level</label>
+                      <div class="col-md-12">
+                          <select name="approvalLevelId" [attr.disabled]="loopIn ? true : null" formControlName="approvalLevelId" id="approvalLevelId" class="form-control" [ngClass]="commentForm.controls['approvalLevelId'].valid ? 'valid-input' : 'required-input'">
+                              <option value="">-- Select Approval Level --</option>
+                              <option *ngFor="let x of trailApprovalLevels" [value]="x.fromApprovalLevelId">{{ x.fromApprovalLevelName }}</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="form-group" *ngIf="displayLoopInFeature">
+                      <div class="control-label col-md-12">
+                          <p-checkbox (onChange)="loopStaff($event)" label="Loop In"></p-checkbox>
+                      </div>
+                  </div>
+                  <div class="form-group" *ngIf="loopIn">
+                      <label for="searchedName" class="control-label col-md-6">Target Staff</label>
+                      <div class="col-md-12">
+                          <div class="input-group">
+                              <input type="text" (click)="displaySearchModal = true" [(ngModel)]="searchedName" (keyup)="searchDB($event.target.value)" [ngClass]="!commentForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="searchedName" placeholder="Search staff" name="searchedName">
+                              <div class="input-group-btn">
+                                  <button  style="padding-top:8px;padding-bottom:0px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div *ngIf="displaySearchModal && searchResults" style="overflow-y: scroll; height:100px;" class="form-group">
+                          <div class="col-md-10 pull-right">
+                              <table *ngIf="searchResults" class="table table-striped table-hover">
+                                  <thead>
+                                      <tr>
+                                          <th>Staff Code</th>
+                                          <th>First Name</th>
+                                          <th>Middle Name</th>
+                                          <th>Last Name</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                          <td>{{res.staffCode}}</td>
+                                          <td>{{res.firstName}}</td>
+                                          <td>{{res.middleName}}</td>
+                                          <td>{{res.lastName}}</td>
+                                      </tr>
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+          </div>
+      
+      </div>
+      <div class="panel-footer">
+          <div class="row">
+              <div class="col-md-12">
+                  <button type="button" (click)="returnBack(commentForm)"
+                      [disabled]="commentForm.invalid" class="btn btn-success pull-right">Submit</button>
+                  <button type="button"  style="margin-right:5px"
+                      class="btn btn-danger pull-right" (click)="notifyContainer()">Cancel</button>
+              </div>
+          </div>
+      </div>
+  </form>
+
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+  (closeEvent)="hideMessage($event)"></fintrakbanking-message>

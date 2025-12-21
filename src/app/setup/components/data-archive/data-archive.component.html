@@ -1,0 +1,155 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Data Archive Setup
+        </h2>
+        <!-- <div class="pull-right">
+            <button (click)="ShowAddDataArchiveForm()" pButton type="button" label="Add Data Archive" icon="fa-plus">
+            </button>
+          </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <form novalidate [formGroup]="mainForm" autocomplete="off">
+      <div class="panel panel-default">
+        <div class="panel-heading" style="overflow: auto;">
+          <h5>
+            <div class="col-md-0"style="width: 20px; float: left !important;">
+              <input type="checkbox" name="isPeriodicArchive" formControlName="isPeriodicArchive"
+                (click)="periodicArchive($event)" id="isPeriodicArchive"
+                [ngClass]="!mainForm.controls['isPeriodicArchive'].valid ? 'required-input' : 'valid-input'"
+                style="box-shadow: none; margin: 0px;">
+            </div>
+            <label for="isPeriodicArchive" class="control-label col-md-4">
+              Allow Periodic Archive
+            </label>
+          </h5>
+        </div>
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="triggerId" class="control-label col-md-1">Archive Trigger</label>
+              <div class="col-md-3">
+                <select id="triggerId" formControlName="triggerId" name="triggerId" class="form-control"
+                  [ngClass]="!mainForm.controls['triggerId'].valid ? 'required-input' : 'valid-input'">
+                  <option value="">Select Trigger</option>
+                  <option value="1">Automatic</option>
+                  <option value="2">Manual</option>
+                  <!-- <option *ngFor="let curr of currencies" value="{{curr.currencyId}}">
+                                {{curr.currencyName}}</option> -->
+                </select>
+              </div>
+              <label for="periodId" class="control-label col-md-1">Period</label>
+              <div class="col-md-3">
+                <select id="periodId" formControlName="periodId" name="periodId" class="form-control"
+                  [ngClass]="!mainForm.controls['periodId'].valid ? 'required-input' : 'valid-input'">
+                  <option value="">Select Period</option>
+                  <option value="1">Daily</option>
+                  <option value="2">Weekly</option>
+                  <option value="3">Monthly</option>
+                  <option value="4">Quarterly</option>
+                  <option value="5">Yearly</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-1">
+                <input type="radio" name="isUtilisedPeriodic" formControlName="isUtilisedPeriodic"
+                  (click)="utilisedPeriodic($event)" id="isUtilisedPeriodic"
+                  [ngClass]="!mainForm.controls['isUtilisedPeriodic'].valid ? 'required-input' : 'valid-input'"
+                  style="box-shadow: none;margin-top: 10px; margin-left: 0px;">
+              </div>
+              <label for="isUtilisedPeriodic" class="control-label col-md-6">
+                Archive all Utilised Loans
+              </label>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-1">
+                <input type="radio" name="isBatchUtilisedPeriodic" formControlName="isBatchUtilisedPeriodic"
+                  (click)="batchUtilisedPeriodic($event)" id="isBatchUtilisedPeriodic"
+                  [ngClass]="!mainForm.controls['isBatchUtilisedPeriodic'].valid ? 'required-input' : 'valid-input'"
+                  style="box-shadow: none; margin-top: 10px; margin-left: 0px;">
+              </div>
+              <label for="isBatchUtilisedPeriodic" class="control-label col-md-6">
+                Archive a single batch of Utilised Loans
+              </label>
+            </div>
+            <!-- <div class="form-group">
+                    <label for="validTill" class="control-label col-md-2">Valid Till</label>
+                    <div class="col-md-4">
+                        <p-calendar id="validTill" formControlName="validTill" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                            [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                            [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="mainForm.controls['validTill'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+                    </div>
+                </div> -->
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading" style="overflow: auto;">
+          <h5>
+            <div class="col-md-0" style="width: 20px; float: left !important;">
+              <input type="checkbox" name="isManualArchive" formControlName="isManualArchive"
+                (click)="manualArchive($event)" id="isManualArchive"
+                [ngClass]="!mainForm.controls['isManualArchive'].valid ? 'required-input' : 'valid-input'"
+                style="box-shadow: none; margin: 0px; text-align: left;">
+            </div>
+            <label for="isManualArchive" class="control-label col-md-3">
+              Allow Manual Archive
+            </label>
+          </h5>
+        </div>
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <div class="col-md-1">
+                <input type="radio" name="isUtilisedManual" formControlName="isUtilisedManual"
+                  (click)="utilisedManual($event)" id="isUtilisedManual"
+                  [ngClass]="!mainForm.controls['isUtilisedManual'].valid ? 'required-input' : 'valid-input'"
+                  style="box-shadow: none; margin-top: 10px; margin-left: 0px;">
+              </div>
+              <label for="isUtilisedManual" class="control-label col-md-6">
+                Archive all Utilised Loans
+              </label>
+            </div>
+
+            <div class="form-group">
+              <div class="col-md-1">
+                <input type="radio" name="isBatchUtilisedManual" formControlName="isBatchUtilisedManual"
+                  (click)="batchUtilisedManual($event)" id="isBatchUtilisedManual"
+                  [ngClass]="!mainForm.controls['isBatchUtilisedManual'].valid ? 'required-input' : 'valid-input'"
+                  style="box-shadow: none; margin-top: 10px; margin-left: 0px;">
+              </div>
+              <label for="isBatchUtilisedManual" class="control-label col-md-6">
+                Archive batch transactions (fully Utilised Loans)
+              </label>
+            </div>
+          
+            <div class="form-group">
+              <label for="processingTime" class="control-label col-md-1">Processing Time</label>
+              <div class="col-md-3">
+                <input type="text" name="processingTime" 
+                  [ngClass]="!mainForm.controls['processingTime'].valid ? 'required-input' : 'valid-input'"
+                      formControlName="processingTime" class="form-control">
+              </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>

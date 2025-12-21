@@ -1,0 +1,777 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Approval Level Setup
+                                <span *ngIf="selectedGroupName.length > 0">of group <b>{{ selectedGroupName
+                                        }}</b></span>
+                                <span *ngIf="selectedLevelName.length > 0">and level <b>{{ selectedLevelName
+                                        }}</b></span>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- tabs here -->
+                <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                    <!-- GROUP list -->
+                    <p-tabPanel header="Approval Groups">
+
+                        <p-dataTable [value]="groups" [paginator]="true" [rows]="10"
+                            [(selection)]="approvalGroupSelection" dataKey="groupId"
+                            (onRowSelect)="onSelectedGroupChange()">
+
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+
+                            <p-column field="groupName" header="Group Name" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <!-- <p-column field="isCommittee" header="Committee" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'110px'}"></p-column> -->
+
+                            <p-column [style]="{'width':'103px'}">
+                                <ng-template pTemplate="header">
+                                    <!-- <button (click)="showOperationGroupForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <!-- <a (click)="editOperationGroup(i)" href="javascript:void(0)" title="Edit Group">Edit</a>
+                                    <span style="padding:3px;">|</span> -->
+                                    <a (click)="activateLevelTab(d.groupId)" href="javascript:void(0)"
+                                        title="View Approval Levels"><i class="glyphicon glyphicon-eye-open"></i></a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                    </p-tabPanel>
+
+
+                    <!-- LEVEL list -->
+                    <p-tabPanel header="Group Approval Levels" [disabled]="disableLevelTab">
+
+                        <p-dataTable [value]="approvalLevels" [paginator]="true" [rows]="10"
+                            [(selection)]="approvalLevelSelection" dataKey="approvalLevelId"
+                            (onRowSelect)="onSelectedApprovalLevelChange()">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column field="levelName" header="Approval Level Name" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="position" header="Position" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column>
+
+                            <p-column field="maximumAmount" header="Maximum Amount" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.maximumAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+
+                            <p-column field="investmentGradeAmount" header="Investment Grade" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.investmentGradeAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column i18n-header field="standardGradeAmount" header="Standard Grade" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.standardGradeAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column i18n-header field="renewalLimit" header="Renewal Limit" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.renewalLimit | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="numberOfUsers" header="Users" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column>
+                            <p-column field="numberOfApprovals" header="Approvals" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'70px'}"></p-column>
+                            <p-column field="tenor" header="Tenor" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column>
+                            <p-column field="isActive" header="Active" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'55px'}"></p-column>
+
+                            <p-column [style]="{'width':'103px'}">
+                                <ng-template pTemplate="header">
+                                    <button (click)="showApprovalLevelForm()" pButton type="button" label="Add New"
+                                        icon="fa-plus"></button>
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">
+                                        <a (click)="deleteLevel(d.approvalLevelId)" href="javascript:void(0)"
+                                            title="Remove Level"><i class="glyphicon glyphicon-remove"></i></a>
+                                        <span style="padding:3px;">|</span>
+                                        <a (click)="editApprovalLevel(d.approvalLevelId)" href="javascript:void(0)"
+                                            title="Edit Level">Edit</a>
+                                        <span style="padding:3px;">|</span>
+                                        <a (click)="activateStaffTab(d.approvalLevelId)" href="javascript:void(0)"
+                                            title="View Level Staff"><i class="glyphicon glyphicon-eye-open"></i></a>
+                                    </div>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                    </p-tabPanel>
+
+
+
+                    <!-- STAFF list -->
+                    <p-tabPanel header="Approval Level Staff" [disabled]="disableStaffTab">
+
+                        <p-dataTable [value]="levelStaff" [paginator]="true" [rows]="10">
+                            <p-column field="approvalLevelName" header="Approval Level Name" sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="staffLevelName" header="Staff Name" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column *ngIf="selectedLevelApprovals > 1" field="position" header="Position"
+                                [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+
+                            <p-column field="maximumAmount" header="Maximum Amount" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.maximumAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="investmentGradeAmount" header="Investment Grade" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.investmentGradeAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column i18n-header field="standardGradeAmount" header="Standard Grade" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.standardGradeAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column i18n-header field="renewalLimit" header="Renewal Limit" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.renewalLimit | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column i18n-header field="baseMinimumAmount" header="Base Minimum Amount" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'120px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.baseMinimumAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="canApprove" header="Approver" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'65px'}"></p-column>
+                            <p-column field="processViewScope" header="Scope" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'50px'}"></p-column>
+                            <p-column field="vetoPower" header="Veto" [filter]="true" filterMatchMode="contains"
+                                [style]="{'width':'50px'}"></p-column>
+                            <!-- <p-column field="staffLevelId" header="staffLevelId" [filter]="true" filterMatchMode="contains" [style]="{'width':'50px'}"></p-column> -->
+
+                            <p-column [style]="{'width':'103px'}">
+                                <ng-template pTemplate="header">
+                                    <button (click)="showLevelStaffForm()" pButton type="button" label="Add New"
+                                        icon="fa-plus"></button>
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="deleteStaff(d.staffLevelId)" href="javascript:void(0)"
+                                        title="Remove Staff"><i class="glyphicon glyphicon-remove"></i></a>
+                                    <span style="padding:3px;">|</span>
+                                    <a (click)="editLevelStaff(d.staffLevelId)" href="javascript:void(0)"
+                                        title="Edit Staff">Edit</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+
+                    </p-tabPanel>
+
+                </p-tabView>
+                <!-- end tabs here -->
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel2-->
+
+        </div>
+        <!--end of card2-->
+
+
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal forms starts here-->
+
+
+<!--approval-level modal form-->
+<p-dialog [responsive]=true [(visible)]="displayApprovalLevelModal" id="approval-level-modal" modal="modal"
+    showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Approval Level
+                <!--{{ approvalLevelForm.value | json }}-->
+            </h2>
+        </div>
+        <form novalidate [formGroup]="approvalLevelForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <p-tabView (onChange)="onTabChange($event)">
+                        <p-tabPanel i18n-header header="General">
+                            <div class="form-group">
+                                <label for="levelName" class="control-label col-md-2">Level Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="levelName" formControlName="levelName" id="levelName"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['levelName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isActive" id="isActive" type="checkbox">
+                                    </div><label class="checkbox">Is Active</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="routeViaStaffOrganogram" id="routeViaStaffOrganogram"
+                                            type="checkbox">
+                                    </div><label class="checkbox">Via Staff Organogram</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="position" class="control-label col-md-2">Position</label>
+                                <div class="col-md-4">
+                                    <select type="text" name="position" formControlName="position" id="position"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['position'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Position--</option>
+                                        <option *ngFor="let x of positions" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canRecieveSms" id="canRecieveSms" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">SMS Notification</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canRecieveEmail" id="canRecieveEmail" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Email Notification</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="numberOfUsers" class="control-label col-md-2">Number of Users</label>
+                                <div class="col-md-1">
+                                    <input type="text" name="numberOfUsers" formControlName="numberOfUsers"
+                                        id="numberOfUsers" class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['numberOfUsers'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="numberOfApprovals" class="control-label col-md-2">Number of
+                                    Approvals</label>
+                                <div class="col-md-1">
+                                    <input type="text" name="numberOfApprovals" formControlName="numberOfApprovals"
+                                        id="numberOfApprovals" class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['numberOfApprovals'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canViewDocument" id="canViewDocument" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can View Document</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canEdit" id="canEdit" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can Edit</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="slaInterval" class="control-label col-md-2">SLA Interval (hrs)</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="slaInterval" formControlName="slaInterval" id="slaInterval"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['slaInterval'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canViewUploadedFile" id="canViewUploadedFile"
+                                            type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can View UploadedFile</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canUploadFile" id="canUploadFile" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can Upload File</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="maximumAmount" class="control-label col-md-2">Maximum Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="maximumAmount" formControlName="maximumAmount" formatM
+                                        formatM id="maximumAmount" class="numeric form-control"
+                                        [ngClass]="!approvalLevelForm.controls['maximumAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canViewApproval" id="canViewApproval" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can View Approval</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canApprove" id="canApprove" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can Approve</label>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="roleId" class="control-label col-md-2">SLA Notification Interval
+                                    (hrs)</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="slaNotificationInterval"
+                                        formControlName="slaNotificationInterval" id="slaNotificationInterval"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['slaNotificationInterval'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isPostApprovalReviewer" id="isPostApprovalReviewer"
+                                            type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Is Post Approval Reviewer</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="roleId" class="control-label col-md-2"></label>
+                                <div class="col-md-4">
+                                    
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="roleId" class="control-label col-md-2">Default Role</label>
+                                <div class="col-md-4">
+                                    <select type="text" name="roleId" formControlName="roleId" id="roleId"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['roleId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Role--</option>
+                                        <option *ngFor="let rank of roles" value="{{rank.staffRoleId}}">
+                                            {{rank.staffRoleName}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="checkbox-container">
+                                        <input formControlName="canEscalate" id="canEscalate" type="checkbox">
+                                    </div>
+                                    <label class="checkbox">Can Escalate</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="levelTypeId" class="control-label col-md-2">Level Type</label>
+                                <div class="col-md-4">
+                                    <select type="text" name="levelTypeId" formControlName="levelTypeId"
+                                        id="levelTypeId" class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['levelTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Level Type --</option>
+                                        <option *ngFor="let x of levelTypes" value="{{x.id}}">{{x.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="levelBusinessRuleId" class="control-label col-md-2">Business Rule</label>
+                                <div class="col-md-4">
+                                    <select type="text" name="levelBusinessRuleId" formControlName="levelBusinessRuleId"
+                                        id="levelBusinessRuleId" class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['levelBusinessRuleId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Business Rule --</option>
+                                        <option *ngFor="let x of businessRules" value="{{x.levelBusinessRuleId}}">
+                                            {{x.description}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="routeInitiatorRoleId" class="control-label col-md-2">Route Via Only
+                                    Initiator</label>
+                                <div class="col-md-4">
+                                    <select type="text" name="routeInitiatorRoleId"
+                                        formControlName="routeInitiatorRoleId" id="routeInitiatorRoleId"
+                                        class="form-control"
+                                        [ngClass]="!approvalLevelForm.controls['routeInitiatorRoleId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Route Initiator Role --</option>
+                                        <option *ngFor="let x of allRoles" value="{{x.staffRoleId}}">{{x.staffRoleName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                </div>
+                            </div>
+
+                            <br />
+
+                        </p-tabPanel>
+                        <p-tabPanel i18n-header header="Credit Appraisal Related">
+                            <fieldset>
+
+                                <legend i18n>Credit Appraisal Related</legend>
+
+                                <div class="form-group">
+                                    <label for="investmentGradeAmount" class="control-label col-md-2" i18n>Investment
+                                        Grade Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="investmentGradeAmount"
+                                            formControlName="investmentGradeAmount" formatM id="investmentGradeAmount"
+                                            class="numeric form-control"
+                                            [ngClass]="!approvalLevelForm.controls['investmentGradeAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox-container">
+                                            <input formControlName="isPoliticallyExposed" id="isPoliticallyExposed"
+                                                type="checkbox">
+                                        </div>
+                                        <label class="checkbox" i18n>See Politically Exposed</label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox-container">
+                                            <input formControlName="canResolveDispute" id="canResolveDispute"
+                                                type="checkbox">
+                                        </div>
+                                        <label class="checkbox" i18n>Can Resolve Dispute</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="standardGradeAmount" class="control-label col-md-2" i18n>Standard Grade
+                                        Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="standardGradeAmount"
+                                            formControlName="standardGradeAmount" formatM id="standardGradeAmount"
+                                            class="numeric form-control"
+                                            [ngClass]="!approvalLevelForm.controls['standardGradeAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="checkbox-container">
+                                            <input formControlName="canApproveUntenored" id="canApproveUntenored"
+                                                type="checkbox">
+                                        </div>
+                                        <label class="checkbox" i18n>Can Approve Untenored</label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox-container">
+                                            <input formControlName="ignoreIfApprovalLevelStaff" id="ignoreIfApprovalLevelStaff" type="checkbox">
+                                        </div>
+                                        <label class="checkbox">Ignore If Approver Level Staff</label>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="renewalLimit" class="control-label col-md-2" i18n>Renewal Limit</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="renewalLimit" formControlName="renewalLimit" formatM
+                                            id="renewalLimit" class="numeric form-control"
+                                            [ngClass]="!approvalLevelForm.controls['renewalLimit'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tenor" class="control-label col-md-2" i18n>Maximum Tenor (days)</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="tenor" formControlName="tenor" id="tenor"
+                                            class="form-control"
+                                            [ngClass]="!approvalLevelForm.controls['tenor'].valid ? 'required-input' : 'valid-input'"
+                                            i18n-placeholder placeholder="Tenor in days">
+                                    </div>
+                                </div>
+
+
+                            </fieldset>
+                        </p-tabPanel>
+                    </p-tabView>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitApprovalLevelForm(approvalLevelForm)"
+                            [disabled]="approvalLevelForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayApprovalLevelModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--END approval-level modal form-->
+
+
+<!--staff-level modal form-->
+<p-dialog [responsive]=true [(visible)]="displayLevelStaffModal" id="staff-level-modal" modal="modal" showEffect="fade"
+    width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Level Staff
+                <!-- {{ levelStaffForm.value | json }} -->
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="levelStaffForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="searchedName" class="control-label col-md-4">Staff</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input (focus)="openSearchBox()" type="text"
+                                    [ngClass]="!levelStaffForm.controls['searchedName'].valid ? 'required-input' : 'valid-input'"
+                                    class="form-control" formControlName="searchedName" placeholder="Search staff"
+                                    name="searchedName">
+                                <div class="input-group-btn">
+                                    <button (click)="openSearchBox()" style="padding-top:8px;padding-bottom:0px"
+                                        class="btn btn-default" type="button"><i
+                                            class="glyphicon glyphicon-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maximumAmount" class="control-label col-md-4">Maximum Amount</label>
+                        <div class="col-md-8">
+                            <input type="text" name="maximumAmount" formControlName="maximumAmount" formatM
+                                id="maximumAmount" class="numeric form-control"
+                                [ngClass]="!levelStaffForm.controls['maximumAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="investmentGradeAmount" class="control-label col-md-4">Investment Grade Limit</label>
+                        <div class="col-md-8">
+                            <input type="text" name="investmentGradeAmount" formControlName="investmentGradeAmount"
+                                formatM id="investmentGradeAmount" class="numeric form-control"
+                                [ngClass]="!levelStaffForm.controls['investmentGradeAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="standardGradeAmount" class="control-label col-md-4">Standard Grade Limit</label>
+                        <div class="col-md-8">
+                            <input type="text" name="standardGradeAmount" formControlName="standardGradeAmount" formatM
+                                id="standardGradeAmount" class="numeric form-control"
+                                [ngClass]="!levelStaffForm.controls['standardGradeAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="renewalLimit" class="control-label col-md-4">Renewal Limit</label>
+                        <div class="col-md-8">
+                            <input type="text" name="renewalLimit" formControlName="renewalLimit" formatM
+                                id="renewalLimit" class="numeric form-control"
+                                [ngClass]="!levelStaffForm.controls['renewalLimit'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="baseMinimumAmount" class="control-label col-md-4">Base Minimum Amount</label>
+                        <div class="col-md-8">
+                            <input type="text" name="baseMinimumAmount" formControlName="baseMinimumAmount" formatM
+                                id="renewalLimit" class="numeric form-control"
+                                [ngClass]="!levelStaffForm.controls['baseMinimumAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-4">View Scope</label>
+                        <div class="col-md-8">
+                            <select name="processViewScope" formControlName="processViewScope"
+                                [ngClass]="!levelStaffForm.controls['processViewScope'].valid ? 'required-input' : 'valid-input'"
+                                id="processViewScope" class="form-control">
+                                <option value="">Select View Scope</option>
+                                <option value="1">Approval Level</option>
+                                <option value="2">Within Group</option>
+                                <option value="3">The Entire Process</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="selectedLevelApprovals>1">
+
+                        <label for="position" class="control-label col-md-4">Position</label>
+                        <div class="col-md-8">
+                            <select type="text" name="position" formControlName="position" id="position"
+                                class="form-control"
+                                [ngClass]="!levelStaffForm.controls['position'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Position--</option>
+                                <option *ngFor="let x of staffPositions" [value]="x.id">{{ x.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canViewDocument" id="canViewDocument" type="checkbox">
+                            </div><label class="checkbox">Can View Document</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canViewUploadedFile" id="canViewUploadedFile" type="checkbox">
+                            </div><label class="checkbox">Can View UploadedFile</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canViewApproval" id="canViewApproval" type="checkbox">
+                            </div><label class="checkbox">Can View Approval</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canApprove" id="canApprove" type="checkbox">
+                            </div><label class="checkbox">Can Approve</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canUploadFile" id="canUploadFile" type="checkbox">
+                            </div><label class="checkbox">Can Upload File</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canSendRequest" id="canSendRequest" type="checkbox">
+                            </div><label class="checkbox">Can Send Request</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="canEdit" id="canEdit" type="checkbox">
+                            </div><label class="checkbox">Can Edit</label>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="vetoPower" id="vetoPower" type="checkbox">
+                            </div><label class="checkbox">Has Veto Power</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitLevelStaffForm(levelStaffForm)"
+                            [disabled]="levelStaffForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayLevelStaffModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--END staff-level modal form-->
+
+
+<!--real time search form-->
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade"
+    width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right"><a class="close" style="margin: -10px 8px;"
+                        (click)="displaySearchModal=false">&times;</a></div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control"
+                        placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer"
+                                *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.middleName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+
+
+
+
+
+
+
+
+<!--<p-column field="maximumAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.maximumAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column>-->

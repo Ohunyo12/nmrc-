@@ -1,0 +1,1056 @@
+<!-- <customer-search (notify)="getCustomerCollateral($event)"></customer-search> -->
+<!--{{activeTabIndex}}-->
+<!-- <button type="button" (click)="development()" class="btn btn-danger pull-right">Fire Development Test</button> -->
+
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="card no-padding" *ngIf="showCustomerCollaterals">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Customer Collateral
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body coll-list">
+                    <p-dataTable [value]="customerCollaterals">
+
+                        <p-column field="collateralTypeId" header="Collateral Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getCollateralTypeName(d.collateralTypeId) }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="collateralTypeId" header="Sub Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getCollateralSubTypeName(d.collateralSubTypeId) }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="collateralCode" header="Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column field="collateralValue" header="Collateral Value" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.collateralValue | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="haircut" header="Hair Cut" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+                        <!-- <p-column field="camRefNumber" header="Cam Ref Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                        <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getApprovalStatus(d.approvalStatus) }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editCustomerCollateral(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="gotoLoanEligibility()">Back To Eligibility</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+                <!--{{row | json}}-->
+                <!--{{ selectedId }}-->
+            </h2>
+        </div>
+
+        <p-tabView [activeIndex]="activeTabIndex">
+            <p-tabPanel header="Customer Collateral">
+
+                <form novalidate [formGroup]="mainForm" autocomplete="off">
+
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+
+                            <div class="form-group">
+                                <label for="collateralTypeId" class="control-label col-md-2">Collateral Type</label>
+                                <div class="col-md-4">
+                                    <select (change)="onCollateralTypeChange($event.target.value)" name="collateralTypeId" id="collateralTypeId" formControlName="collateralTypeId" class="form-control" [ngClass]="!mainForm.controls['collateralTypeId'].valid ? 'required-input' : 'valid-input'">
+                                            <option value="">-- Select Collateral Type --</option>
+                                            <option *ngFor="let x of collateralTypes" [value]="x.collateralTypeId">{{ x.collateralTypeName }}</option>
+                                    </select>
+                                </div>
+                                <label for="collateralSubTypeId" class="control-label col-md-2">Collateral Sub Type</label>
+                                <div class="col-md-4">
+                                    <select (change)="onSubTypeChange($event.target.value)" name="collateralSubTypeId" formControlName="collateralSubTypeId" id="collateralSubTypeId" class="form-control" [ngClass]="!mainForm.controls['collateralSubTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value="">-- Select Sub Type --</option>
+                                        <option *ngFor="let x of filteredSubTypes" [value]="x.collateralSubTypeId">{{ x.collateralSubTypeName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="collateralCode" class="control-label col-md-2">Collateral Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="collateralCode" formControlName="collateralCode" id="collateralCode" class="form-control" [ngClass]="!mainForm.controls['collateralCode'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="haircut" class="control-label col-md-2">Haircut (%)</label>
+                                <div class="col-md-4">
+                                    <input [attr.disabled]="currentHaircut == null ? true : null" type="text" name="haircut" formControlName="haircut" id="haircut" class="form-control" [ngClass]="!mainForm.controls['haircut'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="collateralValue" class="control-label col-md-2">Collateral Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="collateralValue" formControlName="collateralValue" id="collateralValue" class="form-control" [ngClass]="!mainForm.controls['collateralValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="valuationCycle" class="control-label col-md-2">Valuation Cycle</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="valuationCycle" formControlName="valuationCycle" id="valuationCycle" class="form-control" [ngClass]="!mainForm.controls['valuationCycle'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="camRefNumber" class="control-label col-md-2">FAM Ref Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="camRefNumber" formControlName="camRefNumber" id="camRefNumber" class="form-control" [ngClass]="!mainForm.controls['camRefNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="currencyId" class="control-label col-md-2">Currency</label>
+                                <div class="col-md-4">
+                                    <select id="currencyId" formControlName="currencyId" name="currencyId" class="form-control" [ngClass]="!mainForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">Select Currency</option>
+										<option *ngFor="let curr of currencies"  value="{{curr.lookupId}}">{{curr.lookupName}}</option>
+									</select>
+                                </div>
+
+                            </div>
+                            <!--<hr />-->
+                            <!--bool-->
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="allowSharing" id="allowSharing" type="checkbox">
+                                    </div><label class="checkbox">Allow Sharing</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isLocationBased" id="isLocationBased" type="checkbox">
+                                    </div><label class="checkbox">Is Location Based</label>
+                                </div>
+                            </div>
+                            <!--bool-->
+                        </div>
+                    </div>
+                </form>
+            </p-tabPanel>
+
+            <!--sub forms-->
+
+            <p-tabPanel header="{{ selectedCollateralTypeName }} Details" [disabled]="disableSubFormTab" [headerStyle]="{'width': '200px'}">
+
+                <form novalidate [formGroup]="securityForm" *ngIf="showSecurityForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="securityType" class="control-label col-md-2">Security Type</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityType" formControlName="securityType" id="securityType" class="form-control" [ngClass]="!securityForm.controls['securityType'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="rating" class="control-label col-md-2">Rating</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="rating" formControlName="rating" id="rating" class="form-control" [ngClass]="!securityForm.controls['rating'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealReferenceNumber" class="control-label col-md-2">Deal Ref Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="dealReferenceNumber" formControlName="dealReferenceNumber" id="dealReferenceNumber" class="form-control" [ngClass]="!securityForm.controls['dealReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="maturityDate" class="control-label col-md-2">Maturity Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="maturityDate" formControlName="maturityDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!securityForm.controls['maturityDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealAmount" class="control-label col-md-2">Deal Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="dealAmount" formControlName="dealAmount" formatM id="dealAmount" class="numeric form-control" [ngClass]="!securityForm.controls['dealAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="effectiveDate" class="control-label col-md-2">Effective Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="effectiveDate" formControlName="effectiveDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!securityForm.controls['effectiveDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityValue" formControlName="securityValue" formatM id="securityValue" class="numeric form-control" [ngClass]="!securityForm.controls['securityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="issuerName" class="control-label col-md-2">Issuer Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="issuerName" formControlName="issuerName" id="issuerName" class="form-control" [ngClass]="!securityForm.controls['issuerName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lienUsableAmount" class="control-label col-md-2">Lien Usable Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="lienUsableAmount" formControlName="lienUsableAmount" formatM id="lienUsableAmount" class="numeric form-control" [ngClass]="!securityForm.controls['lienUsableAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="unitValue" class="control-label col-md-2">Unit Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="unitValue" formControlName="unitValue" formatM id="unitValue" class="numeric form-control" [ngClass]="!securityForm.controls['unitValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="issuerReferenceNumber" class="control-label col-md-2">Issuer Ref Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="issuerReferenceNumber" formControlName="issuerReferenceNumber" id="issuerReferenceNumber" class="form-control" [ngClass]="!securityForm.controls['issuerReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="percentageInterest" class="control-label col-md-2">Percentage Interest</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="percentageInterest" formControlName="percentageInterest" id="percentageInterest" class="form-control" [ngClass]="!securityForm.controls['percentageInterest'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="numberOfUnits" class="control-label col-md-2">Number Of Units</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="numberOfUnits" formControlName="numberOfUnits" id="numberOfUnits" class="form-control" [ngClass]="!securityForm.controls['numberOfUnits'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="interestPaymentFrequency" class="control-label col-md-2">Interest Payment Frequency</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="interestPaymentFrequency" formControlName="interestPaymentFrequency" id="interestPaymentFrequency" class="form-control" [ngClass]="!securityForm.controls['interestPaymentFrequency'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!securityForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>​
+                <form novalidate [formGroup]="propertyForm" *ngIf="showPropertyForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="propertyName" class="control-label col-md-2">Property Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="propertyName" formControlName="propertyName" id="propertyName" class="form-control" [ngClass]="!propertyForm.controls['propertyName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="cityId" class="control-label col-md-2">City</label>
+                                <div class="col-md-4">
+                                    <select name="cityId" formControlName="cityId" id="cityId" class="form-control" [ngClass]="!propertyForm.controls['cityId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select City --</option>
+										<option *ngFor="let x of cities" [value]="x.cityId">{{ x.cityName }}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="countryId" class="control-label col-md-2">Country</label>
+                                <div class="col-md-4">
+                                    <select name="countryId" formControlName="countryId" id="countryId" class="form-control" [ngClass]="!propertyForm.controls['countryId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Country --</option>
+										<option *ngFor="let x of countries" [value]="x.countryId">{{ x.countryName }}</option>
+									</select>
+                                </div>
+                                <label for="constructionDate" class="control-label col-md-2">Construction Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="constructionDate" formControlName="constructionDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!propertyForm.controls['constructionDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '261px', 'position': 'absolute', 'overflow': 'visible' }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="propertyAddress" class="control-label col-md-2">Property Address</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="propertyAddress" formControlName="propertyAddress" id="propertyAddress" class="form-control" [ngClass]="!propertyForm.controls['propertyAddress'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="dateOfAcquisition" class="control-label col-md-2">Date Of Acquisition</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="dateOfAcquisition" formControlName="dateOfAcquisition" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!propertyForm.controls['dateOfAcquisition'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '261px', 'position': 'absolute', 'overflow': 'visible' }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastValuationDate" class="control-label col-md-2">Last Valuation Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="lastValuationDate" formControlName="lastValuationDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!propertyForm.controls['lastValuationDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                                <label for="valuerId" class="control-label col-md-2">Valuer</label>
+                                <div class="col-md-4">
+                                    <select name="valuerId" formControlName="valuerId" id="valuerId" class="form-control" [ngClass]="!propertyForm.controls['valuerId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Valuer --</option>
+										<option *ngFor="let x of valuers" [value]="x.collateralValuerId">{{ x.name }}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="valuerReferenceNumber" class="control-label col-md-2">Valuer Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="valuerReferenceNumber" formControlName="valuerReferenceNumber" id="valuerReferenceNumber" class="form-control" [ngClass]="!propertyForm.controls['valuerReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="propertyValueBaseTypeId" class="control-label col-md-2">Value Base Type</label>
+                                <div class="col-md-4">
+                                    <select name="propertyValueBaseTypeId" formControlName="propertyValueBaseTypeId" id="propertyValueBaseTypeId" class="form-control" [ngClass]="!propertyForm.controls['propertyValueBaseTypeId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Property Value Base --</option>
+										<option *ngFor="let x of valueBaseTypes" [value]="x.collateralValueBaseTypeId">{{ x.valueBaseTypeName }}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="openMarketValue" class="control-label col-md-2">Open Market Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="openMarketValue" formControlName="openMarketValue" id="openMarketValue" class="form-control" [ngClass]="!propertyForm.controls['openMarketValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="collateralValue" class="control-label col-md-2">Collateral Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="collateralValue" formControlName="collateralValue" id="collateralValue" class="form-control" [ngClass]="!propertyForm.controls['collateralValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="forcedSaleValue" class="control-label col-md-2">Forced Sale Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="forcedSaleValue" formControlName="forcedSaleValue" id="forcedSaleValue" class="form-control" [ngClass]="!propertyForm.controls['forcedSaleValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="stampToCover" class="control-label col-md-2">Stamp To Cover</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="stampToCover" formControlName="stampToCover" id="stampToCover" class="form-control" [ngClass]="!propertyForm.controls['stampToCover'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="valuationSource" class="control-label col-md-2">Valuation Source</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="valuationSource" formControlName="valuationSource" id="valuationSource" class="form-control" [ngClass]="!propertyForm.controls['valuationSource'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="originalValue" class="control-label col-md-2">Original Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="originalValue" formControlName="originalValue" id="originalValue" class="form-control" [ngClass]="!propertyForm.controls['originalValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="availableValue" class="control-label col-md-2">Available Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="availableValue" formControlName="availableValue" id="availableValue" class="form-control" [ngClass]="!propertyForm.controls['availableValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityValue" formControlName="securityValue" id="securityValue" class="form-control" [ngClass]="!propertyForm.controls['securityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="perfectionStatusId" class="control-label col-md-2">Perfection Status</label>
+                                <div class="col-md-4">
+                                    <select name="perfectionStatusId" formControlName="perfectionStatusId" id="perfectionStatusId" class="form-control" [ngClass]="!propertyForm.controls['perfectionStatusId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Perfection Status --</option>
+										<option *ngFor="let x of CollateralPerfectionList" [value]="x.perfectionStatusId">{{ x.perfectionStatusName }}</option>
+									</select>
+                                </div>
+                                <label for="perfectionStatusReason" class="control-label col-md-2">Reason for Non Perfection</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="perfectionStatusReason" formControlName="perfectionStatusReason" id="perfectionStatusReason" class="form-control" [ngClass]="!propertyForm.controls['perfectionStatusReason'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="equipmentForm" *ngIf="showEquipmentForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="machineName" class="control-label col-md-2">Machine Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="machineName" formControlName="machineName" id="machineName" class="form-control" [ngClass]="!equipmentForm.controls['machineName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="description" class="control-label col-md-2">Description</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="description" formControlName="description" id="description" class="form-control" [ngClass]="!equipmentForm.controls['description'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="machineNumber" class="control-label col-md-2">Machine Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="machineNumber" formControlName="machineNumber" id="machineNumber" class="form-control" [ngClass]="!equipmentForm.controls['machineNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="manufacturerName" class="control-label col-md-2">Manufacturer Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="manufacturerName" formControlName="manufacturerName" id="manufacturerName" class="form-control" [ngClass]="!equipmentForm.controls['manufacturerName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="yearOfManufacture" class="control-label col-md-2">Year Of Manufacture</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="yearOfManufacture" formControlName="yearOfManufacture" id="yearOfManufacture" class="form-control" [ngClass]="!equipmentForm.controls['yearOfManufacture'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="yearOfPurchase" class="control-label col-md-2">Year Of Purchase</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="yearOfPurchase" formControlName="yearOfPurchase" id="yearOfPurchase" class="form-control" [ngClass]="!equipmentForm.controls['yearOfPurchase'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="valueBaseTypeId" class="control-label col-md-2">Value Base Type</label> -->
+                                <div class="col-md-4">
+                                    <select name="valueBaseTypeId" formControlName="valueBaseTypeId" id="valueBaseTypeId" class="form-control" [ngClass]="!equipmentForm.controls['valueBaseTypeId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Value Base --</option>
+										<option *ngFor="let x of valueBaseTypes" [value]="x.collateralValueBaseTypeId">{{ x.valueBaseTypeName }}</option>
+									</select>
+                                </div>
+                                <label for="machineCondition" class="control-label col-md-2">Machine Condition</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="machineCondition" formControlName="machineCondition" id="machineCondition" class="form-control" [ngClass]="!equipmentForm.controls['machineCondition'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="machineryLocation" class="control-label col-md-2">Machinery Location</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="machineryLocation" formControlName="machineryLocation" id="machineryLocation" class="form-control" [ngClass]="!equipmentForm.controls['machineryLocation'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="replacementValue" class="control-label col-md-2">Replacement Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="replacementValue" id="replacementValue" formControlName="replacementValue" formatM class="numeric form-control" [ngClass]="!equipmentForm.controls['replacementValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="equipmentSize" class="control-label col-md-2">Equipment Size</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="equipmentSize" formControlName="equipmentSize" id="equipmentSize" class="form-control" [ngClass]="!equipmentForm.controls['equipmentSize'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="intendedUse" class="control-label col-md-2">Intended Use</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="intendedUse" formControlName="intendedUse" id="intendedUse" class="form-control" [ngClass]="!equipmentForm.controls['intendedUse'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="guaranteeForm" *ngIf="showGuaranteeForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="institutionName" class="control-label col-md-2">Institution Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="institutionName" formControlName="institutionName" id="institutionName" class="form-control" [ngClass]="!guaranteeForm.controls['institutionName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="guarantorAddress" class="control-label col-md-2">Guarantor Address</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="guarantorAddress" formControlName="guarantorAddress" id="guarantorAddress" class="form-control" [ngClass]="!guaranteeForm.controls['guarantorAddress'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="guarantorReferenceNumber" class="control-label col-md-2">Guarantor Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="guarantorReferenceNumber" formControlName="guarantorReferenceNumber" id="guarantorReferenceNumber" class="form-control" [ngClass]="!guaranteeForm.controls['guarantorReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="guaranteeValue" class="control-label col-md-2">Guarantee Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="guaranteeValue" formControlName="guaranteeValue" id="guaranteeValue" class="form-control" [ngClass]="!guaranteeForm.controls['guaranteeValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="startDate" class="control-label col-md-2">Start Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!guaranteeForm.controls['startDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="endDate" class="control-label col-md-2">End Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="endDate" formControlName="endDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!guaranteeForm.controls['endDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isOwnedByCustomer" id="isOwnedByCustomer" type="checkbox">
+                                    </div><label class="checkbox">Is Owned By Customer</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!guaranteeForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="policyForm" *ngIf="showPolicyForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="insurancePolicyNumber" class="control-label col-md-2">Insurance Policy Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="insurancePolicyNumber" formControlName="insurancePolicyNumber" id="insurancePolicyNumber" class="form-control" [ngClass]="!policyForm.controls['insurancePolicyNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="premiumAmount" class="control-label col-md-2">Premium Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="premiumAmount" formControlName="premiumAmount" id="premiumAmount" class="form-control" [ngClass]="!policyForm.controls['premiumAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="policyAmount" class="control-label col-md-2">Policy Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="policyAmount" formControlName="policyAmount" id="policyAmount" class="form-control" [ngClass]="!policyForm.controls['policyAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="insuranceCompanyName" class="control-label col-md-2">Insurance Company Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="insuranceCompanyName" formControlName="insuranceCompanyName" id="insuranceCompanyName" class="form-control" [ngClass]="!policyForm.controls['insuranceCompanyName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="insurerAddress" class="control-label col-md-2">Insurer Address</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="insurerAddress" formControlName="insurerAddress" id="insurerAddress" class="form-control" [ngClass]="!policyForm.controls['insurerAddress'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="policyStartDate" class="control-label col-md-2">Policy Start Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="policyStartDate" formControlName="policyStartDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!policyForm.controls['policyStartDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="assignDate" class="control-label col-md-2">Assign Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="assignDate" formControlName="assignDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!policyForm.controls['assignDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                                <label for="renewalFrequencyTypeId" class="control-label col-md-2">Renewal Frequency</label>
+                                <div class="col-md-4">
+                                    <select name="renewalFrequencyTypeId" formControlName="renewalFrequencyTypeId" id="renewalFrequencyTypeId" class="form-control" [ngClass]="!policyForm.controls['renewalFrequencyTypeId'].valid ? 'required-input' : 'valid-input'">
+										<option value="">-- Select Renewal Frequency Type --</option>
+										<option *ngFor="let x of frequencyTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+									</select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="insurerDetails" class="control-label col-md-2">Insurer Details</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="insurerDetails" formControlName="insurerDetails" id="insurerDetails" class="form-control" [ngClass]="!policyForm.controls['insurerDetails'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="policyRenewalDate" class="control-label col-md-2">Policy Renewal Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="policyRenewalDate" formControlName="policyRenewalDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!policyForm.controls['policyRenewalDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isOwnedByCustomer" id="isOwnedByCustomer" type="checkbox">
+                                    </div><label class="checkbox">Is Owned By Customer</label>
+                                </div>
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!policyForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="vehicleForm" *ngIf="showVehicleForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="vehicleType" class="control-label col-md-2">Vehicle Type</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="vehicleType" formControlName="vehicleType" id="vehicleType" class="form-control" [ngClass]="!vehicleForm.controls['vehicleType'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="vehicleStatus" class="control-label col-md-2">Vehicle Status</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="vehicleStatus" formControlName="vehicleStatus" id="vehicleStatus" class="form-control" [ngClass]="!vehicleForm.controls['vehicleStatus'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleMake" class="control-label col-md-2">Vehicle Make</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="vehicleMake" formControlName="vehicleMake" id="vehicleMake" class="form-control" [ngClass]="!vehicleForm.controls['vehicleMake'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="modelName" class="control-label col-md-2">Model Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="modelName" formControlName="modelName" id="modelName" class="form-control" [ngClass]="!vehicleForm.controls['modelName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="manufacturedDate" class="control-label col-md-2">Manufactured Date</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="manufacturedDate" formControlName="manufacturedDate" id="manufacturedDate" class="form-control" [ngClass]="!vehicleForm.controls['manufacturedDate'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="registrationNumber" class="control-label col-md-2">Registration Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="registrationNumber" formControlName="registrationNumber" id="registrationNumber" class="form-control" [ngClass]="!vehicleForm.controls['registrationNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="serialNumber" class="control-label col-md-2">Serial Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="serialNumber" formControlName="serialNumber" id="serialNumber" class="form-control" [ngClass]="!vehicleForm.controls['serialNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="chasisNumber" class="control-label col-md-2">Chasis Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="chasisNumber" formControlName="chasisNumber" id="chasisNumber" class="form-control" [ngClass]="!vehicleForm.controls['chasisNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="engineNumber" class="control-label col-md-2">Engine Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="engineNumber" formControlName="engineNumber" id="engineNumber" class="form-control" [ngClass]="!vehicleForm.controls['engineNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="nameOfOwner" class="control-label col-md-2">Name Of Owner</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="nameOfOwner" formControlName="nameOfOwner" id="nameOfOwner" class="form-control" [ngClass]="!vehicleForm.controls['nameOfOwner'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="registrationCompany" class="control-label col-md-2">Registration Company</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="registrationCompany" formControlName="registrationCompany" id="registrationCompany" class="form-control" [ngClass]="!vehicleForm.controls['registrationCompany'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="resaleValue" class="control-label col-md-2">Resale Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="resaleValue" formControlName="resaleValue" formatM id="resaleValue" class="numeric form-control" [ngClass]="!vehicleForm.controls['resaleValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="valuationDate" class="control-label col-md-2">Valuation Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="valuationDate" formControlName="valuationDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!vehicleForm.controls['valuationDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                                <label for="lastValuationAmount" class="control-label col-md-2">Last Valuation Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="lastValuationAmount" formControlName="lastValuationAmount" formatM id="lastValuationAmount" class="numeric form-control" [ngClass]="!vehicleForm.controls['lastValuationAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="invoiceValue" class="control-label col-md-2">Invoice Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="invoiceValue" formControlName="invoiceValue" formatM id="invoiceValue" class="numeric form-control" [ngClass]="!vehicleForm.controls['invoiceValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!vehicleForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="preciousMetalForm" *ngIf="showPreciousMetalForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="preciousMetalName" class="control-label col-md-2">Precious Metal Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="preciousMetalName" formControlName="preciousMetalName" id="preciousMetalName" class="form-control" [ngClass]="!preciousMetalForm.controls['preciousMetalName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="weightInGrammes" class="control-label col-md-2">Weight In Grammes</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="weightInGrammes" formControlName="weightInGrammes" id="weightInGrammes" class="form-control" [ngClass]="!preciousMetalForm.controls['weightInGrammes'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="valuationAmount" class="control-label col-md-2">Valuation Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="valuationAmount" formControlName="valuationAmount" id="valuationAmount" class="form-control" [ngClass]="!preciousMetalForm.controls['valuationAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="unitRate" class="control-label col-md-2">Unit Rate</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="unitRate" formControlName="unitRate" id="unitRate" class="form-control" [ngClass]="!preciousMetalForm.controls['unitRate'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="preciousMetalForm" class="control-label col-md-2">Precious Metal Form</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="preciousMetalForm" formControlName="preciousMetalForm" id="preciousMetalForm" class="form-control" [ngClass]="!preciousMetalForm.controls['preciousMetalForm'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isOwnedByCustomer" id="isOwnedByCustomer" type="checkbox">
+                                    </div><label class="checkbox">Is Owned By Customer</label>
+                                </div>
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!preciousMetalForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="depositForm" *ngIf="showDepositForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="dealReferenceNumber" class="control-label col-md-2">Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="dealReferenceNumber" formControlName="dealReferenceNumber" id="dealReferenceNumber" class="form-control" [ngClass]="!depositForm.controls['dealReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="accountNumber" class="control-label col-md-2">Account Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="accountNumber" formControlName="accountNumber" id="accountNumber" class="form-control" [ngClass]="!depositForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="maturityDate" class="control-label col-md-2">Maturity Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="maturityDate" formControlName="maturityDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!depositForm.controls['maturityDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                                <label for="availableBalance" class="control-label col-md-2">Available Balance</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="availableBalance" formControlName="availableBalance" formatM id="availableBalance" class="form-control" [ngClass]="!depositForm.controls['availableBalance'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="maturityAmount" class="control-label col-md-2">Maturity Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="maturityAmount" formControlName="maturityAmount" formatM id="maturityAmount" class="form-control" [ngClass]="!depositForm.controls['maturityAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="existingLienAmount" class="control-label col-md-2">Maturity Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="existingLienAmount" formControlName="existingLienAmount" formatM id="existingLienAmount" class="form-control" [ngClass]="!depositForm.controls['existingLienAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityValue" formControlName="securityValue" formatM id="securityValue" class="form-control" [ngClass]="!depositForm.controls['securityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="lienAmount" class="control-label col-md-2">Lien Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="lienAmount" formControlName="lienAmount" formatM id="lienAmount" class="form-control" [ngClass]="!depositForm.controls['lienAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!depositForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="casaForm" *ngIf="showCasaForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="accountNumber" class="control-label col-md-2">Account Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="accountNumber" formControlName="accountNumber" id="accountNumber" class="form-control" [ngClass]="!casaForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityValue" formControlName="securityValue" id="securityValue" class="form-control" [ngClass]="!casaForm.controls['securityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="remark" class="control-label col-md-2">Remark</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="remark" formControlName="remark" id="remark" class="form-control" [ngClass]="!casaForm.controls['remark'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="availableBalance" class="control-label col-md-2">Available Balance</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="availableBalance" formControlName="availableBalance" id="availableBalance" class="form-control" [ngClass]="!casaForm.controls['availableBalance'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="existingLienAmount" class="control-label col-md-2">Maturity Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="existingLienAmount" formControlName="existingLienAmount" formatM id="existingLienAmount" class="form-control" [ngClass]="!depositForm.controls['existingLienAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="checkbox-container">
+                                        <input formControlName="isOwnedByCustomer" id="isOwnedByCustomer" type="checkbox">
+                                    </div><label class="checkbox">Owned By Customer</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form novalidate [formGroup]="stockForm" *ngIf="showStockForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="companyName" class="control-label col-md-2">Company Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="companyName" formControlName="companyName" id="companyName" class="form-control" [ngClass]="!stockForm.controls['companyName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="shareQuantity" class="control-label col-md-2">Share Quantity</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="shareQuantity" formControlName="shareQuantity" id="shareQuantity" class="form-control" [ngClass]="!stockForm.controls['shareQuantity'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="marketPrice" class="control-label col-md-2">Market Price</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="marketPrice" formControlName="marketPrice" id="marketPrice" class="form-control" [ngClass]="!stockForm.controls['marketPrice'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="amount" class="control-label col-md-2">Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="amount" formControlName="amount" id="amount" class="form-control" [ngClass]="!stockForm.controls['amount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sharesSecurityValue" class="control-label col-md-2">Shares Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="sharesSecurityValue" formControlName="sharesSecurityValue" id="sharesSecurityValue" class="form-control" [ngClass]="!stockForm.controls['sharesSecurityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="shareValueAmountToUse" class="control-label col-md-2">Share Value Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="shareValueAmountToUse" formControlName="shareValueAmountToUse" id="shareValueAmountToUse" class="form-control" [ngClass]="!stockForm.controls['shareValueAmountToUse'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>​
+                <form novalidate [formGroup]="miscellaneousForm" *ngIf="showMiscellaneousForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="securityName" class="control-label col-md-2">Name of Security</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityName" formControlName="securityName" id="securityName" class="form-control" [ngClass]="!miscellaneousForm.controls['securityName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="securityValue" formControlName="securityValue" formatM id="securityValue" class="form-control" [ngClass]="!miscellaneousForm.controls['securityValue'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <fieldset>
+                                <legend>
+                                    <a style="text-decoration: none;" href="#" (click)="createNoteField($event)"><i class="glyphicon glyphicon-plus"></i> Add New</a>
+                                </legend>
+
+                                <!--dynamic controls-->
+                                <div formArrayName="notes">
+
+                                    <!--<div *ngFor="let x of miscellaneousForm.controls.notes.controls; let i=index">
+                                    <div [formGroupName]="i">
+                                        <label class="control-label col-md-2">{{ x.value.labelName }}</label>
+                                        <div class="col-md-4">
+                                            <input type="text" formControlName="controlName" class="form-control">
+                                        </div>
+                                    </div>-->
+
+                                    <div class="form-group" *ngFor="let i of inputRows">
+                                        <div *ngFor="let x of miscellaneousForm.controls.notes.controls | slice:(i*2):(i+1)*2; let n=index">
+                                            <div [formGroupName]="n">
+                                                <label class="control-label col-md-2">{{ x.value.labelName }}</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" formControlName="labelValue" class="form-control" id="controlName" name="controlName">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--</div>-->
+                                </div>
+                                <!--dynamic controls end-->
+
+                            </fieldset>
+
+                        </div>
+                    </div>
+                </form>
+
+            </p-tabPanel>
+
+            <p-tabPanel header="Insurance Information" [disabled]="!enableInsuranceFormTab">
+                <form novalidate [formGroup]="insuranceForm" *ngIf="showInsuranceForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="insuranceCompany" class="control-label col-md-2">Insurance Company</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="insuranceCompany" formControlName="insuranceCompany" id="insuranceCompany" class="form-control" [ngClass]="!insuranceForm.controls['insuranceCompany'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="startDate" class="control-label col-md-2">Policy Start Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!insuranceForm.controls['startDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="referenceNumber" class="control-label col-md-2">Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="referenceNumber" formControlName="referenceNumber" id="referenceNumber" class="form-control" [ngClass]="!insuranceForm.controls['referenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="expiryDate" class="control-label col-md-2">Policy Expiry Date</label>
+                                <div class="col-md-4">
+                                    <p-calendar id="expiryDate" formControlName="expiryDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="!insuranceForm.controls['expiryDate'].valid ? {'width': '100%','border-left':'3px solid #ff0000'} : {'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'overflow': 'visible'  }"></p-calendar>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="sumInsured" class="control-label col-md-2">Coverage Amount</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="sumInsured" formControlName="sumInsured" formatM id="sumInsured" class="numeric form-control" [ngClass]="!insuranceForm.controls['sumInsured'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </p-tabPanel>
+
+            <p-tabPanel header="Document Uploads" [disabled]="selectedId==null">
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="documentTitle" class="control-label col-md-2">Document Title / Code</label>
+                        <div class="col-md-8">
+                            <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="description" placeholder="Document title...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="document" class="control-label col-md-2">Select Document</label>
+                        <div class="col-md-8">
+                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="document" class="control-label col-md-2"></label>
+                        <div class="col-md-4">
+                            <button (click)="uploadFile()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null || file==undefined"><span class="glyphicon glyphicon-upload"></span>  Upload</button>
+                        </div>
+                    </div>
+                </div>
+
+                <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                    <p-column field="documentTitle" header="Document Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                            <a *ngIf="d.fileExtension=='jpg' || d.fileExtension=='jpeg'" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+
+            </p-tabPanel>
+
+        </p-tabView>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--{{ subForm.value | json }}-->
+                    <button type="button" (click)="submitForm(mainForm)" [disabled]="(mainForm.invalid || subForm.invalid || (insuranceForm.invalid && showInsuranceForm))" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="closeForm()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--<pre>{{ payload | json }}</pre>-->
+
+</p-dialog>
+<!--end of form modal-->
+
+
+<!--new-label modal form-->
+<p-dialog [responsive]=true [(visible)]="displayNewFieldLabelForm" id="new-label-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Control Label
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="newFieldLabelForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="labelName" class="control-label col-md-12">Label Name</label>
+                        <div class="col-md-12">
+                            <input type="text" [ngClass]="!newFieldLabelForm.controls['labelName'].valid ? 'required-input' : 'valid-input'" class="form-control" formControlName="labelName" name="labelName">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="addNoteField()" [disabled]="newFieldLabelForm.invalid" class="btn btn-success pull-right">Create</button>
+                        <button type="button" (click)="displayNewFieldLabelForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>
+<!--END new-label modal form-->
+
+
+<!--modal for obligor details starts-->
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title: <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right"><a class="close" (click)="displayDocument=false">&times;</a></div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+
+    </div>
+</p-dialog>
+<!--modal ends-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

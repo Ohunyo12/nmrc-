@@ -1,0 +1,58 @@
+<div class="ui-g" *ngIf="!showDataForm">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Contingent Loans
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+
+            <p-dataTable [value]="contingentData" selectionMode="single" [(selection)]="selectedContingentData" (onRowSelect)="onRowSelect($event)"
+                [rows]="20" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]">
+
+                <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column>
+                <!-- for row selection -->
+                <p-column [style]="{'width':'100px'}" field="customerName" header="Obligor Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'100px'}" field="productName" header="Product"></p-column>
+
+                <p-column [style]="{'width':'100px'}" field="loanReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'100px'}" field="loanApplicationNumber" header="Application Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'40px'}" field="principalName" header="Principal " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                <p-column field="contingentAmount" header="Facility Amount" [style]="{'width':'60px','text-align':'right'}"></p-column>
+
+                <p-column field="amountRequested" header="Amount Requested" [style]="{'width':'60px','text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.amountRequested | number : '1.2' }}
+                      </ng-template>
+                </p-column>
+
+                <p-column field="percentageUsed" header="Used (%)" [style]="{'width':'60px','text-align':'right'}"></p-column>
+
+                <p-column field="operationName" header="Operation Name" [style]="{'width':'60px','text-align':'right'}"></p-column>
+
+                <p-column field="amountRemaining" header="Amount Remaining" [style]="{'width':'60px','text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      {{ d.amountRemaining | number : '1.2' }}
+                    </ng-template>
+                  </p-column>         
+            </p-dataTable>
+        </div>
+
+
+    </div>
+</div>
+
+<contingent-usage *ngIf="showDataForm" (closeWindow) ="toggleDataForm($event)"  [selectedContingentData]="selectedContingentData">  </contingent-usage>

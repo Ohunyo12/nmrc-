@@ -1,0 +1,125 @@
+<div class="panel panel-default">
+    <div class="panel-heading" >
+        <h2 class="panel-title">Approval Group Modification</h2>
+    </div>
+    <div class="panel-body">
+  
+  <div  class="row">
+    <p-dataTable [value]="approvalGroupList" [paginator]="true" [rows]="5">
+        <p-column field="groupName" header="Group Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+        <p-column field="operationName" header="Operation Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+        <p-column [style]="{'width':'110px'}">
+            <ng-template pTemplate="header">
+                <div style="text-align:center">
+                    <!-- <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                </div>
+            </ng-template>
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center">
+                    <a  (click)= "getSelectedWorkflowGroup(d)"  href="javascript:void(0)">View</a>
+                </div>
+            </ng-template>
+        </p-column>
+  
+    </p-dataTable>
+  </div>
+  </div>
+  
+
+  
+  </div>
+  
+  
+  <p-dialog [responsive]=true [(visible)]="displayModel" modal="modal" showEffect="fade" width="600">
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Workflow Group
+          </h2>
+         
+        </div>
+
+                <div class="panel-body">
+                    <div *ngIf="WorkflowGroupView != null" class="row" style="padding:0 15px 0 15px;">
+                      
+                        <table *ngIf="WorkflowGroupView" class="table table-casa-information">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong><h5>{{operationLevel}}</h5></strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Group Name:</strong>
+                                    </td>
+                                    <td colspan="2" style="text-align:left">{{WorkflowGroupView.groupName}}</td>
+                                    <td>
+                                      <strong>Operation Name:</strong>
+                                  </td>
+                                  <td>{{ WorkflowGroupView.operationName }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                        <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId < 0? 'required-input' : 'valid-input'">
+                            <option value="0">--- Select Approval ---</option>
+                            <option value="2"> Approve </option>
+                            <option value="3"> Decline </option>
+                        </select>
+                    </div>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        </div>
+            <div class="col-md-6">
+                    <div class="btn-group pull-right">
+                            <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger" style="margin-right:5px">Close</button>
+                            <button type="button" (click)="forwardGroupApproval()" [disabled]="comment == null || comment == '' || approvalStatusId < 1" class="btn btn-success">
+                            Submit</button>
+            </div>
+            </div>
+        </div>
+            </div>
+                <div >
+         </div>
+   </div>
+
+          
+          
+          <!-- <div class="well" *ngIf="WorkflowGroupView">
+                <hr />
+            <div class="row">
+                    <div class="col-md-9">
+                    <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId < 0? 'required-input' : 'valid-input'">
+                        <option value="">--- Select Approval ---</option>
+                        <option value="1"> Approve </option>
+                        <option value="3"> Decline </option>
+                    </select>
+                </div>
+            </div>
+          </div>
+          <div *ngIf="WorkflowGroupView" class="panel-body">
+                <div class="row">
+                        <div class="col-md-6">
+                            </div>
+                <div class="col-md-6">
+                        <div class="btn-group pull-right">
+                                <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger" style="margin-right:5px">Close</button>
+                                <button type="button" (click)="forwardCollateralApproval()" [disabled]="comment == null || comment == '' || approvalStatusId < 1" class="btn btn-success">
+                                        Submit</button>
+                            </div>
+                </div>
+            </div>
+            </div> -->
+  </p-dialog>

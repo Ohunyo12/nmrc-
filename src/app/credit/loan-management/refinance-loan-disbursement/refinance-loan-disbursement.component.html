@@ -1,0 +1,112 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+              <div class="col-md-12">
+                  <h2 class="panel-title pull-left">
+                      Refinancing Tranch Loan
+                  </h2>
+              </div>
+          </div>
+      </div>
+      
+
+      <div style="display: flex; justify-content: flex-start; margin-top: 10px; margin-bottom: 10px; margin-left: 20px;">
+        <button class="btn btn-success" 
+          (click)="approveSelectedLoans()" 
+          [disabled]="selectedLoans.length === 0">
+            Approve Tranch Loan
+        </button>
+      </div>
+
+      
+
+          
+          <p-tabView [activeIndex]="activeSearchTabindex" (onChange)="onSearchTabChange($event)">
+              <div class="table-responsive">
+                  <table class="table table-bordered">
+                      <thead style="border: 2px solid #010912; background-color: #05101b; color: white; text-align: left;">
+                          <tr>
+                              <th style="width:1%">
+                                  <input 
+                                      type="checkbox" 
+                                      [checked]="selectedLoans.length === loans.length" 
+                                      (change)="toggleSelectAll($event)">
+                              </th>
+                              <th style="width:1%"></th><!-- Radio Button Column -->
+                              <th style="width:15%">Refinance Number</th>
+                              <th style="width:10%">PMB NAME</th>
+                              <th style="width:10%">Total Amount</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let loan of loans">
+                              <td>
+                                  <input 
+                                      type="checkbox" 
+                                      [checked]="selectedLoans.includes(loan.refinanceNumber)" 
+                                      (change)="toggleLoanSelection(loan)">
+                              </td>
+                              <td>
+                                  <input 
+                                      type="radio"  
+                                      name="selectedLoan" 
+                                      [value]="loan.refinanceNumber"
+                                      [checked]="selectedLoan === loan.refinanceNumber"
+                                      (click)="viewLoanDetails(loan.refinanceNumber, $event)">
+                              </td>
+                              <td>{{ loan.refinanceNumber }}</td>
+                              <td>{{ loan.pmbName }}</td>
+                              <td>{{ loan.totalAmount }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+                  <!-- Loan Details Table -->
+                  <h3 *ngIf="loanDetails.length > 0" style="margin-top: 20px; color: #05101b; font-weight: bold;">Loan Details for {{ selectedLoan }}</h3>
+                  <table *ngIf="loanDetails.length > 0" class="table table-bordered">
+                      <thead style="border: 2px solid #010912; background-color: #05101b; color: white; text-align: left;">
+                          <tr>
+                              <th>Customer Name</th>
+                              <th>NHF Number</th>
+                              <th>Facility Name</th>
+                              <th>Amount</th>
+                              <th>Tenor</th>
+                              <th>Rate</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let detail of loanDetails">
+                              <td>{{ detail.customerName }}</td>
+                              <td>{{ detail.nhfnumber }}</td>
+                              <td>{{ detail.productCode }}</td>
+                              <td>{{ detail.amount }}</td>
+                              <td>{{ detail.tenor }} days</td>
+                              <td>{{ detail.rate }}%</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+
+              <!-- Pagination Controls -->
+              <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
+                  <button (click)="previousPage()" [disabled]="currentPage === 1" 
+                      style="padding: 8px 12px; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                      Previous
+                  </button>
+
+                  <span> Page {{ currentPage }} of {{ totalPages }} </span>
+
+                  <button (click)="nextPage()" [disabled]="currentPage === totalPages" 
+                      style="padding: 8px 12px; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                      Next
+                  </button>
+              </div>
+          </p-tabView>
+      </div>
+  </div>
+</div>
+
+
+

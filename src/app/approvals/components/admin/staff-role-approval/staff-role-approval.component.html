@@ -1,0 +1,170 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Staff Role Approval
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p-dataTable [paginator]="true" [rows]="15" [value]="staffRoleApprovalData" [responsive]=true selectionMode="single">
+            <p-column field="staffRoleName" header="Staff Role " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="staffRoleCode" header="Staff Role Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="staffRoleShortCode" header="Staff Role Short Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column [style]="{'width':'120px'}">
+              <ng-template pTemplate="header">
+                Approval Status
+              </ng-template>
+              <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="+row.approvalStatusId==3">Disapproved</span>
+                <span *ngIf="+row.approvalStatusId==2">Approved</span>
+                <span *ngIf="+row.approvalStatusId==1">Processing</span>
+                <span *ngIf="+row.approvalStatusId==0">Pending</span>
+              </ng-template>
+            </p-column> -->
+            <p-column [style]="{'width':'60px'}">
+              <ng-template pTemplate="header">
+                View
+              </ng-template>
+              <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewStaffRole(staff, $event)" style="display: block" href="#">
+                  <i class="glyphicon glyphicon-eye-open"></i>
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayStaffRoleModal" id="approvalModal" modal="modal" showEffect="fade" width="900"
+[contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Staff Role Approval
+      </h2>
+    </div>
+
+    <div class="panel-body">
+
+      <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+        <p-tabPanel header="Staff Role Info">
+          <div class="form-horizontal">
+            <fieldset>
+              <legend>
+                LIST OF GROUP
+              </legend>
+              <div class="form-group">
+                <div class="col-md-12">
+                  <div *ngFor="let group of selectedStaffRoleData.userGroup; let i = index" class="col-md-3">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" [disabled]=true asList name="groupname" id="group-{{i}}" value="{{group.groupId}}">{{group.groupKey}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>
+                LIST OF ACTIVITIES
+              </legend>
+              <div class="form-group">
+                <div class="col-md-12">
+                  <div *ngFor="let group of selectedStaffRoleData.activities; let i = index" class="col-md-3">
+                    <label class="checkbox-inline">
+                      <input type="checkbox" [disabled]=true asList name="activity" id="group-{{i}}" value="{{group.activityId}}">{{group.activityName}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+            <hr/>
+            <table class="table table-customer-information">
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Staff Role Code</strong>
+                  </td>
+                  <td>{{selectedStaffRoleData.staffRoleCode}}</td>
+                  <td>
+                    <strong>Staff Role</strong>
+                  </td>
+                  <td>{{selectedStaffRoleData.staffRoleName}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Staff Role Short Code</strong>
+                  </td>
+                  <td>{{selectedStaffRoleData.staffRoleShortCode}}</td>
+                  <td>
+                    
+                  </td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Comment</strong>
+                  </td>
+                  <td>
+                    <textarea [ngClass]="!selectedStaffRoleData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="selectedStaffRoleData.comment"
+                      name="comment" cols="30" rows="3"></textarea>
+                  </td>
+                  <td>
+                    <strong>Status</strong>
+                  </td>
+                  <td>
+                    <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="selectedStaffRoleData.approvalStatusId"
+                      [ngClass]="!selectedStaffRoleData.approvalStatusId ? 'required-input' : 'valid-input'">
+                      <option value="">--- Select Approval Status ---</option>
+                      <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="View Approval Workflow">
+          <p-dataTable [value]="approvalWorkflowData" [responsive]="true">
+            <p-column field="requestStaffName" header="Intiated From"></p-column>
+            <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
+            <p-column field="responseStaffName" header="Directed To"></p-column>
+            <p-column field="responseApprovalLevel" header="Response Approval Level"></p-column>
+            <p-column field="approvalStatus" header="Approval Status"></p-column>
+            <p-column field="comment" header="Comment"></p-column>
+            <p-column field="systemArrivalDate" header="Date of Arrival">
+              <ng-template let-col let-apr="rowData" pTemplate="body">
+                {{apr[col.field] | date: 'medium'}}
+              </ng-template>
+            </p-column>
+            <p-column field="systemResponseDate" header="Date of Response">
+              <ng-template let-col let-apr="rowData" pTemplate="body">
+                {{apr[col.field] | date: 'medium' }}
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group pull-right">
+            <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+            <button [disabled]="!selectedStaffRoleData.comment || !selectedStaffRoleData.approvalStatusId" type="button" (click)="goForApproval(selectedStaffRoleData, $event)"
+              class="btn btn-success">Submit For Approval</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

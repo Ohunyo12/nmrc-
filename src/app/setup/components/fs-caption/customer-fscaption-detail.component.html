@@ -1,0 +1,269 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--<p-panel [toggleable]="true" [collapsed]="displayCustomerResults">
+            <p-header>
+                <h2 class="panel-title pull-left">Search for Customer</h2>
+            </p-header>
+            <form #searchForm="ngForm" novalidate>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="searchQuery" class="control-label col-sm-2">Search For Customer</label>
+                            <div class="col-sm-6">
+                                <input type="text" id="searchQuery" [(ngModel)]="searchQuery" class="form-control" [ngModelOptions]="{standalone: true}" [ngClass]="{'valid-input':searchQuery, 'required-input':!searchQuery}">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" (click)="searchCustomers(searchQuery)" class="btn btn-sm btn-success" [disabled]="searchForm.invalid"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </p-panel>-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Search for Customer</h2>
+                    </div>
+                </div>
+            </div>
+            <form #searchForm="ngForm" novalidate autocomplete="off">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="searchQuery" class="control-label col-sm-2">Search For Customer</label>
+                            <div class="col-sm-6">
+                                <input type="text" id="searchQuery" [(ngModel)]="searchQuery" class="form-control" [ngModelOptions]="{standalone: true}"
+                                    [ngClass]="{'valid-input':searchQuery, 'required-input':!searchQuery}">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" (click)="searchCustomers(searchQuery)" class="btn btn-sm btn-success" [disabled]="searchForm.invalid">
+                                    <span class="glyphicon glyphicon-search"></span> Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel panel-default" *ngIf="displayCustomerResults">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Set Caption Details</h2>
+                        <!--<div class="pull-right">
+                            <button (click)="showModalForm()" pButton type="button" label="View FS Captions" icon="fa-plus" [attr.disabled]="true"></button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <p-tabView [(activeIndex)]="activeIndex" (onChange)="handleChange($event)">
+                    <p-tabPanel header="Select Customer" [selected]="true">
+                        <p-dataTable [value]="customerTableData" [paginator]="true" [(selection)]="customerModel" dataKey="customerCode" [rows]="6">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column *ngFor="let col of customerTableCols" [field]="col.field" [header]="col.header" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <!--<p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                <input type="checkbox" [value]="i" (change)="selectCustomer(i, $event)">
+                            </ng-template>
+                        </p-column>-->
+                        </p-dataTable>
+                    </p-tabPanel>
+                    <p-tabPanel header="Set Amounts">
+                        <form novalidate autocomplete="off">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="captionDate" class="control-label col-md-2">Reporting Year</label>
+                                    <div class="col-md-4">
+                                        <p-calendar id="captionDate" dateFormat="dd/mm/yy" [inputStyle]="{'width': '259px'}" [style]="{'overflow': 'visible', 'z-index': '999'}"
+                                            [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                                            [ngModelOptions]="{standalone: true}" [showIcon]="true" (onSelect)="onCaptionDateSelect(selectedDate)"></p-calendar>
+                                    </div>
+                                    <label for="fsCaptionGroups" class="control-label col-md-2">Caption Group</label>
+                                    <div class="col-md-4">
+                                        <select id="fsCaptionGroups" [disabled]="!selectedDate" name="fsCaptionGroups" class="form-control" (change)="onFSCaptionGroupSelect($event.target.value)">
+                                            <option value="">--- Select FS Caption Group ---</option>
+                                            <option *ngFor="let item of customerFsCaptionGroups" [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <fieldset>
+                                    <legend>Unmapped FS Captions</legend>
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <td>FS Caption Name</td>
+                                                <td>FS Caption Group</td>
+                                                <td>Parent FS Caption</td>
+                                                <td>Account Category</td>
+                                                <!--<td>Position</td>-->
+                                                <td style="width: 15%">
+
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="displaySearchResults">
+                                            <tr *ngFor="let item of unMappedFsCaptionsTableData; let i = index">
+                                                <td>{{item.fsCaptionName}}</td>
+                                                <td>{{item.fsCaptionGroupName}}</td>
+                                                <td>{{item.parentIdFSCaptionName}}</td>
+                                                <td>{{item.accountCategoryName}}</td>
+                                                <!--<td>{{item.position}}</td>-->
+                                                <td>
+                                                    <a style="text-decoration: none;" href="#" (click)="createCustomerFsMap(i, $event)">
+                                                        <i class="glyphicon glyphicon-plus"></i> Map</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </div>
+                            <div class="col-md-6">
+                                <fieldset>
+                                    <legend>Mapped FS Captions</legend>
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <td>Customer Code</td>
+                                                <td>FS Caption Name</td>
+                                                <td>Account Category</td>
+                                                <td>Amount</td>
+                                                <td style="width: 15%">
+
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="displayMappedCaptions">
+                                            <tr *ngFor="let item of mappedFSCaptionTableData; let i = index">
+                                                <td>{{item.customerCode}}</td>
+                                                <td>{{item.fsCaptionName}}</td>
+                                                <td>{{item.accountCategoryName}}</td>
+                                                <td>{{item.amount | number}}</td>
+                                                <td>
+                                                    <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeCustomerFsMap(i, $event)">
+                                                        <i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </div>
+                            <!--<p-dataTable [value]="unMappedFsCaptionsTableData" [paginator]="true" [rows]="20">
+                                <p-column *ngFor="let col of unMappedFsCaptionsTableCols" [field]="col.field" [header]="col.header" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                        <input type="checkbox" [value]="i" (change)="selectCustomer(i, $event)">
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>-->
+                        </div>
+                    </p-tabPanel>
+                    <p-tabPanel header="View Mapped Financial Details" [disabled]="hideCaptionDetails">
+                        <p-dataTable [value]="allMappedFSCaptionTableData" [paginator]="true" [rows]="15" [editable]="true">
+                            <p-column *ngFor="let col of mappedFSCaptionTableCols" [field]="col.field" [header]="col.header" [editable]="false"></p-column>
+                            <p-column field="fsDate" header="Date">
+                                <ng-template let-col let-caption="rowData" pTemplate="body">
+                                    <span>{{caption[col.field] | date : 'dd-MMM-yyyy'}}</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="amount" header="Amount" [editable]="true"></p-column>
+                            <p-column field="textValue" header="Text Value" [editable]="true"></p-column>
+                            <!-- <p-footer>
+                                <div class="ui-helper-clearfix" style="width:100%">
+                                    <button class="btn btn-success pull-right" (click)="createMultipleCaptionMappings()">Save Caption Details</button>
+                                </div>
+                            </p-footer> -->
+                        </p-dataTable>
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<p-dialog [responsive]="true" [(visible)]="displayfsCaptionDetailModal" id="fsCaption-modal" modal="modal" showEffect="fade" width="900">
+    <div class="panel panel-default" *ngIf="customerModel" style="margin-bottom:0">
+
+    </div>
+</p-dialog>-->
+
+<p-dialog [responsive]="true" [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div class="panel panel-default" *ngIf="customerModel" style="margin-bottom:0">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">Caption Details for
+                        <strong>{{customerModel.customerName}}</strong>
+                    </h2>
+                    <button type="button" class="close pull-right" (click)="displayCreateEditModal=false">
+                        <span style="margin-bottom: 0" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form [formGroup]="setCaptionAmountsForm" (ngSubmit)="submitForm(setCaptionAmountsForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="custName" class="col-md-2 control-label">Customer Name</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" [value]="customerModel.customerName" [ngClass]="customerModel.customerName ? 'valid-input':'required-input'"
+                                [attr.disabled]="true">
+                        </div>
+                        <label for="custCode" class="col-md-2 control-label">Customer Code</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" [value]="customerModel.customerCode" [ngClass]="customerModel.customerCode ? 'valid-input':'required-input'"
+                                [attr.disabled]="true">
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="selectedUnmappedFsCaption">
+                        <label for="fsCaption" class="col-md-2 control-label">FS Caption</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" [value]="selectedUnmappedFsCaption.fsCaptionName" [ngClass]="selectedUnmappedFsCaption.fsCaptionName ? 'valid-input':'required-input'"
+                                [attr.disabled]="true">
+                        </div>
+                        <label for="fsDate" class="col-md-2 control-label">FS Date</label>
+                        <div class="col-md-4">
+                            <p-calendar id="captionDate" dateFormat="dd/mm/yy" [inputStyle]="{'width': '259px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}"
+                                [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                                [ngModelOptions]="{standalone: true}" [showIcon]="true" [ngClass]="selectedDate ? 'valid-input':'required-input'"
+                                [disabled]="true"></p-calendar>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fsAmount" class="col-md-2 control-label">Value</label>
+                        <div class="col-md-4">
+                            <input type="text" id="showAmount" style="display: block;" class="form-control" formControlName="amount" formatM [ngClass]="setCaptionAmountsForm.controls['amount'].valid ? 'valid-input':'required-input'">
+                            <input type="text" id="showValue" style="display: none;" class="form-control" formControlName="textValue" [ngClass]="setCaptionAmountsForm.controls['textValue'].valid ? 'valid-input':'required-input'">
+                        </div>
+                        <label for="valueType" class="control-label col-md-2">Value Type</label>
+                        <div class="col-md-4">
+                            <select name="valueType" id="valueType" [(ngModel)]="selectedValue" class="form-control" formControlName="valueType" (change)="onValueTypeSelect($event.target.value)">
+                                <!-- <option value="">--- Select Value Type --</option> -->
+                                <option [value]="1">Amount</option>
+                                <option [value]="2">Text Value</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="setCaptionAmountsForm.invalid" class="btn btn-success pull-right">Save FS Caption Detail</button>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

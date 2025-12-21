@@ -1,0 +1,143 @@
+<div class="ui-g">
+	<div class="ui-g-12 no-padding">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+			<div class="row">
+				<div class="col-md-12">
+				<h2 class="panel-title pull-left">Green Loan Identification Setup</h2>
+					<div class="pull-right">
+						<button type="button" (click)="showESGChecklistDefinitionForm()" pButton icon="fa-plus" label="Add New Green Loan Identification Checklist Definition"></button>
+					</div>
+				</div>
+			</div>
+			</div>
+	
+			<div class="panel-body">
+				<p-dataTable [value]="ESGchecklistDefData" [rows]="10" [paginator]="true" [responsive]="true">
+					<p-column field="checklistItemName" header="Checklist Item" [style]="{'width':'400px'}" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+					<p-column field="sectorName" header="Sector" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+					<p-column field="yesGrade" header="Yes" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+					<p-column field="noGrade" header="No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+					<!-- <p-column field="isCompulsory" header="Compulsory" sortable="true" [style]="{'width':'60px'}" [filter]="true" filterMatchMode="contains">
+					<ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+						{{ model.isCompulsory ? 'Yes' : 'No' }}
+					</ng-template>
+					</p-column> -->
+					<p-column [style]="{'width':'50px'}">
+					<ng-template pTemplate="header"> </ng-template>
+					<ng-template pTemplate="body" let-col let-i="rowData">
+						<a (click)="deleteESGChecklistDefinition(i)" href="javascript:void(0)">
+						Delete
+						</a>
+					</ng-template>
+					</p-column>
+				</p-dataTable>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayESGChecklistForm" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1300" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Green Loan Identification Definition
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="ESGChecklistDefForm" (ngSubmit)="submitESGChecklistDefForm(ESGChecklistDefForm)" autocomplete="off">
+		<div class="panel-body">
+			<div class="form-horizontal">
+			<div class="form-group">
+				<label for="sectorId" class="control-label col-md-2">Sector</label>
+				<div class="col-md-4">
+					<select name="sectorId" (change)="onSelectedSectorChange($event.target.value)" id="sectorId" class="form-control"
+						formControlName="sectorId" [ngClass]="ESGChecklistDefForm.controls['sectorId'].valid ? 'valid-input':'required-input'">
+						<option value="">--- Select Sector ---</option>
+						<option *ngFor="let sector of sectors" [value]="sector.lookupId">{{sector.lookupName}}</option>
+					</select>
+				</div>
+			</div>
+			<!-- <div class="form-group">
+				<label for="itemDescription" class="control-label col-md-2">Item Description</label>
+				<div class="col-md-4">
+				<textarea row=3 name="itemDescription" formControlName="itemDescription" id="itemDescription" class="form-control" [ngClass]="ESGChecklistDefForm.controls['itemDescription'].valid
+				? 'valid-input' : 'required-input'"></textarea>
+				</div>
+				<label for="isCompulsory" class="control-label col-md-2">IsCompulsory</label>
+				<div class="col-md-4">
+				<input type="checkbox" name="isCompulsory" formControlName="isCompulsory" id="isCompulsory">
+				</div>
+			</div> -->
+
+				<div class="form-group" *ngIf="showChecklistItemData">
+					<div class="col-md-6">
+					<fieldset style="overflow: auto">
+						<legend>Unmapped Checklist Items</legend>
+						<p-dataTable [value]="unmappedChecklistItems" [editable]="true" [(selection)]="selectedChecklistItem" dataKey="checkListItemName"
+						[rows]="5" [paginator]="true" [responsive]="true">
+							<p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+							<p-column field="checkListItemName" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+							<p-column header="Define the Grade For 'Yes'">
+								<div class="form-group row">
+									<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+										<select name="yesChecklistScoresId" id="yesChecklistScoresId" class="form-control"
+											[(ngModel)]="d.yesChecklistScoresId" [ngModelOptions]="{standalone: true}" [ngClass]="d.yesChecklistScoresId > 0 ? 'valid-input':'required-input'">
+											<option value="">--- Select checkListScore For Yes---</option>
+											<option *ngFor="let checkListScore of yesCheckListScoresData" [value]="checkListScore.checklistScoresId">{{checkListScore.grade}}</option>
+										</select>
+									</ng-template>
+								</div>
+							</p-column>
+							<p-column header="Define the Grade For 'No'">
+								<div class="form-group row">
+								  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+									<select name="noChecklistScoresId" id="noChecklistScoresId" class="form-control"
+									  [(ngModel)]="d.noChecklistScoresId" [ngModelOptions]="{standalone: true}" [ngClass]="d.noChecklistScoresId > 0 ? 'valid-input':'required-input'">
+									  <option value="">--- Select checkListScore For Yes---</option>
+									  <option *ngFor="let checkListScore of noCheckListScoresData" [value]="checkListScore.checklistScoresId">{{checkListScore.grade}}</option>
+									</select>
+								  </ng-template>
+								</div>
+							  </p-column>
+						</p-dataTable>
+					</fieldset>
+					</div>
+					<div class="col-md-1">
+						<br/>
+						<br/>
+						<br/>
+						<button type="submit" [disabled]="ESGChecklistDefForm.invalid || !(selectedChecklistIsValid())" style="margin-left: 5px" class="btn btn-success pull-right">Save > </button>
+					  </div>
+					<div class="col-md-5">
+					<fieldset style="overflow: auto">
+						<legend>Mapped Checklist Items</legend>
+						<p-dataTable [value]="mappedChecklistItems" [rows]="5" [paginator]="true" [responsive]="true">
+							<p-column field="checklistItemName" header="Checklist Item"></p-column>
+							<p-column field="yesGrade" header="Defined Grades For 'Yes'"></p-column>
+							<p-column field="noGrade" header="Defined Grades For 'No'"></p-column>
+							<p-column [style]="{'width':'100px'}">
+								<ng-template pTemplate="header"> </ng-template>
+								<ng-template pTemplate="body" let-col let-i="rowData">
+									<a (click)="deleteESGChecklistDefinition(i)" href="javascript:void(0)">
+									Delete
+									</a>
+								</ng-template>
+								</p-column>
+						</p-dataTable>
+					</fieldset>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-12">
+					<button type="button" (click)="displayESGChecklistForm=false" class="btn btn-danger pull-right">Close</button>
+				</div>
+			</div>
+		</div>
+    </form>
+  </div>
+</p-dialog>

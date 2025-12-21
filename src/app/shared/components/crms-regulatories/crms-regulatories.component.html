@@ -1,0 +1,140 @@
+<p-tabView>
+    <p-tabPanel header="CBN CRMS Facility Code" *ngIf="!hideTab">
+        <div class="ui-g ui-fluid">
+            <div class="form-group" style="margin-right:30px">
+                <label for="searchItem" class="control-label col=md-3">
+                    CBN CRMS Code
+                </label>
+
+                <div class="col=md-9">
+                    <input type="text" name="crmsCode" [(ngModel)]="crmsCode" id="crmsCode" class="form-control" [ngClass]="crmsCode == null || crmsCode == '' ? 'required-input' : 'valid-input'" >
+                    <!-- <input type="text" name="securityType" maxlength="20" [(ngModel)]="crmsCode" id="crmsCode" class="form-control" [ngClass]="crmsCode == null || crmsCode == '' ? 'required-input' : 'valid-input'" > -->
+
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-right:30px">
+                <label for="searchItem" class="control-label col=md-3">
+                    .
+                </label>
+                <div class="col=md-9">
+                    <button pButton type="button" (click)="AddCRMSCode()" label="Add Code" [disabled]="crmsCode == null || crmsCode == ''"></button>
+                </div>
+            </div>
+            <div class="form-group" style="margin-right:30px">
+                <label for="searchItem" class="control-label col=md-3">
+                    .
+                </label>
+                <div class="col=md-9">
+                    <button pButton type="button" (click)="ResetCrmsCode()" label="Reset Code"></button>
+                </div>
+            </div>
+        </div>
+    </p-tabPanel>
+    <p-tabPanel header="CBN Facilities Report Export">
+        <div class="panel-body">
+            <div class="ui-g ui-fluid">
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+
+                        Start Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3 ">
+                        End Date
+                    </label>
+
+                    <div class="col=md-9">
+                        <p-calendar [(ngModel)]="endDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+                        .
+                    </label>
+                    <div class="col=md-9">
+                            <button pButton type="button" (click)="GetFacilities()" label="Get Facilities"></button>
+                        </div>
+                </div>
+                <!-- <div class="form-group" style="margin-right:30px"  *ngIf="crmsFacilityDetail || isLms">
+                    <label for="searchItem" class="control-label col=md-3">
+                        Template Type
+                    </label>
+
+                    <div class="col=md-9"  *ngIf="crmsFacilityDetail || isLms">
+                            <select ngModel [(ngModel)]="templateTypeId" class="form-control" >
+                                    <option value="">-- Select Template Type --</option>
+                                    <option *ngIf="!isLms" value="1">Template 100</option>
+                                    <option *ngIf="!isLms" value="2">Template 200</option>
+                                    <option *ngIf="!isLms" value="3">Template 300</option>
+                                    <option *ngIf="!isLms" value="6">Template 600</option>
+                                    <option *ngIf="isLms" value="7">Template 400 A</option>
+                                    <option *ngIf="isLms" value="8">Template 400 B</option>
+                                    <option *ngIf="isLms" value="9">Template 400 C</option>
+
+                            </select>  
+                            
+                            <select  ngModel [(ngModel)]="templateTypeId" class="form-control" >
+                                    <option value="">-- Select Template Type --</option>
+                                    <option *ngFor="let x of count" [value]="x.code">{{ x.crmsLegalStatusName }} - {{x.count}}</option>
+                                </select>                      
+                    </div>
+                </div> -->
+                
+                <!-- <div class="form-group" style="margin-right:30px">
+                    <label for="searchItem" class="control-label col=md-3">
+                        .
+                    </label>
+                    <div class="col=md-9">
+                        <button *ngIf="crmsFacilityDetail || isLms" pButton type="button" (click)="ExportToExcel()"[disabled]="templateTypeId > 0"  label="Export To Excel"></button>
+                        </div>
+                </div> -->
+            </div>
+            <!-- <p-dataTable #dt *ngIf="!isLms" [value]="crmsFacilityDetail" [paginator]="true" [rows]="10"></p-dataTable> -->
+            <p-dataTable #dt [value]="crmsFacilityDetail" [paginator]="true" [rows]="10">
+                <p-header>
+                    <div class="ui-helper-clearfix">
+                        <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                    </div>
+                </p-header>
+                <p-column field="crmsCode" header="CBN CRMS Code" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                <p-column field="beneficiary" header="Beneficiary" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                <p-column field="accountNumber" header="Account Number" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                <p-column field="facilityType" header="Facility Type" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                <p-column field="grantedAmount" header="Granted Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.grantedAmount | number : '1.2' }}
+                        </ng-template>                                      
+                </p-column>                                
+                <p-column field="interestRate" header="Interest Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.interestRate | number : '1.2' }}
+                        </ng-template>
+                </p-column>
+                <p-column field="tenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+                <p-column field="effectiveDate" header="Effective Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.effectiveDate | date }}
+                        </ng-template>
+                    </p-column>
+                    <p-column *ngIf="isLms" field="operationName" header="Operation" sortable="true" [filter]="true" filterMatchMode="contains"> </p-column>
+
+            </p-dataTable>
+
+            <!-- <div class="ui-g ui-fluid">
+            <button pButton type="button" (click)="GetFacilities()"  label="Export To Excel"></button>
+            </div> -->
+        </div>
+    </p-tabPanel>
+</p-tabView>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

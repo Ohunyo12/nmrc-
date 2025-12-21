@@ -1,0 +1,30 @@
+export class ProductFee {
+    constructor(
+        public productFeeId: number,
+        public feeName: string,
+        public accountCategoryId: number,
+        public accountCategoryName: string,
+        public feeTypeId: number,
+        public feeTypeName: string,
+        public feeIntervalId: number,
+        public feeIntervalName: string,
+        public productTypeId: number,
+        public productTypeName: string,
+        public feeTargetId: number,
+        public feeTargetName: string,
+        public glAccountId: number,
+        public glAccountCode: string,
+        public includeCutOffDay: boolean,
+        public cutOffDay: number,
+        public companyId: number,
+        public feeDate: string,
+        public createdBy: number,
+        public lastUpdatedBy: number,
+        public dateTimeCreated: Date,
+        public dateTimeUpdated: string,
+        public deleted: boolean,
+        public deletedBy: number,
+        public dateTimeDeleted: string,
+    ) {}
+}
+    

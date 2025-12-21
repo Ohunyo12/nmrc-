@@ -1,0 +1,160 @@
+<div class="ui-g">
+        <div class="ui-g-12 no-padding">
+            <div class="card no-padding"  >
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                  Loan Approved Markets
+                                </h2>
+                                <div class="pull-right">
+                                    <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="panel-body">
+                        <p-dataTable [paginator]="true" [rows]="15" [value]="approveMarket" [responsive]=true selectionMode="single">
+                            <p-column [style]="{'width':'110px'}" field="marketName" header="Market Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="accountNumber" header="Account Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="emailAddress" header="Email Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="cityName" header="City Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="address" header="Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+    
+                            <p-column [style]="{'width':'60px'}">
+    
+                                <ng-template pTemplate="header">
+                                </ng-template>
+                                <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editMarket(staff)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>                
+            </div>
+        </div>
+    </div>
+    <p-dialog [responsive]=true [(visible)]="displayMarket" modal="modal" showEffect="fade" width="900">
+            <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                   {{TitleName}}
+                                </h2>
+                                
+                            </div>
+                        </div>
+                    </div>
+        <div class="panel-body">
+            
+           <form novalidate [formGroup]="approvedMarketForm" autocomplete="off">
+    
+               <div class="panel-body">
+                   <div class="form-horizontal">                                                       
+                           <div class="form-group">
+                               <label for="" class="control-label col-md-2">Market Name</label>
+                               <div class="col-md-4 ">
+                                   <input type="text" class="form-control " formControlName="marketName" minlength="3" maxlength="300"
+                                   [ngClass]="!approvedMarketForm.controls['marketName'].valid ? 'required-input' : 'valid-input'"
+                                   name="principlaSpecialNumber" >
+                               </div>
+                               <label for="" class="control-label col-md-2">
+                                    Account Number
+                               </label>
+                               <div class="col-md-4 ">
+                                   <input type="text" class="form-control " formControlName="accountNumber" minlength="6" maxlength="12"
+                                   [ngClass]="!approvedMarketForm.controls['accountNumber'].valid ? 'required-input' : 'valid-input'"
+                                   name="accountNumber">
+                               </div>
+                           </div>
+    
+                           <div class="form-group">
+                               <label for="" class="control-label col-md-2">
+                                    Email Address
+                               </label>
+                               <div class="col-md-4 ">
+                                   <input type="text" class="form-control " minlength="5" maxlength="50"
+                                   [ngClass]="!approvedMarketForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'"            
+                                   formControlName="emailAddress" name="emailAddress">
+                               </div>
+                               <label for="" class="control-label col-md-2">
+                                    Phone Number
+                               </label>
+                               <div class="col-md-4 ">
+                                   <input type="text" class="form-control " minlength="5" maxlength="25"
+                                   [ngClass]="!approvedMarketForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"                                               
+                                   formControlName="phoneNumber" name="phoneNumber" > 
+                               </div>
+                           </div>
+    
+                           <div class="form-group">
+                               <label for="" class="control-label col-md-2">
+                                    State
+                               </label>
+                               
+                               <div class="col-md-4 ">
+                                    <select (change)="getStateCities($event.target.value)" 
+                                    name="stateId" id="stateId" class="form-control" formControlName="stateId"> 
+                                   
+                                            <option value="">-- Select State --</option>
+                                            <option *ngFor="let x of states" [value]="x.stateId">
+                                                {{x.stateName}}
+                                            </option>
+                                    </select>
+                               </div>
+                               <label for="" class="control-label col-md-2">
+                                   City
+                               </label>
+                               <div class="col-md-4 ">
+                                    <select name="cityId" id="cityId" 
+                                    [ngClass]="!approvedMarketForm.controls['cityId'].valid ? 'required-input' : 'valid-input'" 
+                                    formControlName="cityId" class="form-control">  
+                                            <option value="">-- Select City --</option>
+                                            <option *ngFor="let x of cities" [value]="x.cityId">
+                                                {{x.cityName}}
+                                            </option>
+                                    </select>
+                               </div>
+                           </div>
+                           <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                     Address
+                                </label>
+                                
+                                <div class="col-md-4 ">
+                                        <textarea class="form-control " minlength="5" maxlength="500"
+                                        [ngClass]="!approvedMarketForm.controls['address'].valid ? 'required-input' : 'valid-input'" 
+                                        formControlName="address"></textarea> 
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    
+                                </label>
+                                <div class="col-md-4 ">
+                                   
+                                </div>
+                            </div>
+                   </div>
+               </div>
+           </form>
+       </div>
+           <div class="panel-footer">
+               <div class="row">
+                   <div class="col-md-12">
+                        <button type="submit" (click)="saveMarket(approvedMarketForm)"  [disabled]="approvedMarketForm.invalid" class="btn btn-success pull-right">Save</button>                    
+                        <button type="button" (click)="displayMarket=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                   </div>
+               </div>
+           </div>
+      
+            </div>
+    
+    
+    </p-dialog>
+    
+    

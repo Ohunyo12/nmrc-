@@ -1,0 +1,1447 @@
+<!-- {{ facilityDetailsForm.value | json }} -->
+<!-- {{ facilityDetailsForm.valid }} -->
+
+<!-- selectedCustomerId: {{ selectedCustomerId }}
+testObject: {{ testObject | json }} -->
+
+<!-- {{ mainForm | json }} -->
+
+<div style="margin-bottom:0;" class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title"> {{programmType}} </div>
+        <h2 class="panel-title">
+            <b>Application Number</b>
+            <!-- <b>Application Number</b> {{ApplicationRef}} -->
+            <!-- <span><b>Product Limit </b> {{productLimit}} %</span>
+            <credit-limits [selectedCustomer]="selectedCustomerLimit" > </credit-limits>-->
+            <div class="col-md-8">
+                <span class="colorbox-count">Sector Limit {{sectorLimit | number : '1.2'}}%</span>
+                <span class="colorbox-count">Exposure {{exposure | number : '1.2'}}%</span>
+                <!-- <span class="colorbox-count">Sector Limit {{lsectorLimit | number : '1.2'}}</span>
+                <span class="colorbox-count">Exposure {{osectorLimit | number : '1.2'}}</span> -->
+
+                <!-- <span class="colorbox-count">Bank Limit {{bankLimit | number : '1.2'}}</span>
+                <span class="colorbox-count">Total Bank Exposure {{bankExposure | number : '1.2'}}</span> -->
+            </div>
+        </h2>
+        <!-- <app-sector-limit class="pull-right" [sectorId]="selectedProductClassId" ></app-sector-limit> -->
+
+    </div>
+
+
+    <div style="padding: 2px 15px 2px 15px">
+        <div>
+            <fieldset id="entry">
+                <div class="panel-body" style="overflow: auto;">
+
+                    <form [formGroup]="facilityDetailsForm" autocomplete="off">
+
+                        <div class="form-horizontal">
+                            <div class="form-group">
+
+                                <label style="padding-top: 13px" for=""
+                                    class="control-label col-md-2">{{customerNameOrGroup}}
+                                </label>
+
+                                <div class="col-md-4">
+                                    <!-- [ngClass]="!facilityTradderDetailsForm.controls['customerId'].valid ? 'required-input' : 'valid-input'" -->
+                                    <select (change)="OnGroupCustomerChange($event.target.value)" name="customerId"
+                                        class="form-control" formControlName="customerId"
+                                        [ngClass]="!facilityDetailsForm.controls['customerId'].valid ? 'required-input' : 'valid-input'"
+                                        id="customerId">
+                                        <!-- <option value=""></option> -->
+                                        <option *ngFor="let pc of groupMembers" value="{{pc.customerId}}">
+                                            {{pc.customerName}}
+
+                                        </option>
+                                    </select>
+                                    <!-- <span>{{customerTypeName}}</span> -->
+                                </div>
+
+                                <label style="padding-top: 13px" for="" class="control-label col-md-2">Sector </label>
+
+                                <div class="col-md-4">
+                                    <select (change)="onSectorClassChange($event.target.value)"
+                                        [ngClass]="!facilityDetailsForm.controls['sectorId'].valid ? 'required-input' : 'valid-input'"
+                                        name="sectorId" class="form-control" formControlName="sectorId" id="sectorId">
+                                        <option value=""></option>
+                                        <option *ngFor="let pc of sector" value="{{pc.lookupId}}">
+                                            {{pc.lookupName}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Product
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="proposedProductId" class="form-control"
+                                        (change)="onProductChange($event.target.value)"
+                                        [ngClass]="!facilityDetailsForm.controls['proposedProductId'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="proposedProductId" id="proposedProductId">
+                                        <option value=""></option>
+                                        <option *ngFor="let pc of filteredProducts" value="{{pc.productId}}">
+                                            {{pc.productName}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <label style="padding-top: 13px" for="" class="control-label col-md-2">Subsector
+                                </label>
+
+                                <div class="col-md-4">
+                                    <select
+                                        [ngClass]="!facilityDetailsForm.controls['subSectorId'].valid ? 'required-input' : 'valid-input'"
+                                        name="subSectorId" class="form-control" formControlName="subSectorId"
+                                        id="subSectorId">
+                                        <option value="">---Select Subsector---</option>
+                                        <option *ngFor="let pc of filteredSubsector" value="{{pc.subSectorId}}">
+                                            {{pc.sectorName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="facilityApplicationSpecialProcessFlow.length > 1">
+                                <label for="" class="control-label col-md-2">
+                                    {{facilityApplicationSpecialProcessFlow[0].label}}
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="flowchangeId" class="form-control"
+                                        [ngClass]="!facilityDetailsForm.controls['flowchangeId'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="flowchangeId" id="flowchangeId"
+                                        (change)="onFlowChange($event.target.value)">
+                                        <option value=""></option>
+                                        <option *ngFor="let c of facilityApplicationSpecialProcessFlow"
+                                            value="{{c.flowchangeId}}">
+                                            {{c.placeHolder}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <label for="" class="control-label col-md-2"
+                                    *ngIf="!isCreditcard && cashCollaterizedProcessFlow != 'undefined'">
+                                    {{cashCollaterizedProcessFlow?.label}}
+                                </label>
+                                <div class="col-md-4"
+                                    *ngIf="!isCreditcard && cashCollaterizedProcessFlow != 'undefined'">
+                                    <label for="isflowchange" class="control-label col-md-2"></label>
+                                    <div class="col-md-8">
+                                        <div class="checkbox-container">
+                                            <input (change)="getCashedBackedCollateralFlowId($event.target.checked)"
+                                                [(ngModel)]="isCashedBacked" [ngModelOptions]="{standalone: true}"
+                                                id="isflowchange" type="checkbox">
+                                        </div>
+                                        <!-- <label class="checkbox">Reconfirm Invoice Number</label> -->
+                                    </div>
+                                </div>
+
+                                <!-- <label for="isAgricRac" class="control-label col-md-2">Is Agric Related Rac</label>
+                                    <div class="col-md-4">
+                                        <div class="checkbox-container">
+                                            <input (change)="getRacType($event.target.checked)"
+                                                [(ngModel)]="isAgricRelatedRac" [ngModelOptions]="{standalone: true}"
+                                                id="isAgricRac" type="checkbox">
+                                        </div>
+                                    </div> -->
+
+                            </div>
+                            <div class="form-group" *ngIf="facilityApplicationSpecialProcessFlow.length == 1">
+                                <label for="" class="control-label col-md-2">
+                                    {{facilityApplicationSpecialProcessFlow[0].label}}
+                                </label>
+                                <div class="col-md-4">
+                                    <label for="isflowchange" class="control-label col-md-2"></label>
+                                    <div class="col-md-8">
+                                        <div class="checkbox-container">
+                                            <input (change)="getFlowId($event.target.checked)" [(ngModel)]="isTod"
+                                                [ngModelOptions]="{standalone: true}" id="isflowchange" type="checkbox">
+                                        </div>
+                                        <!-- <label class="checkbox">Reconfirm Invoice Number</label> -->
+                                    </div>
+                                </div>
+
+                                <label for="" class="control-label col-md-2"
+                                    *ngIf="!isCreditcard && cashCollaterizedProcessFlow != 'undefined'">
+                                    {{cashCollaterizedProcessFlow?.label}}
+                                </label>
+                                <div class="col-md-4"
+                                    *ngIf="!isCreditcard && cashCollaterizedProcessFlow != 'undefined'">
+                                    <label for="isflowchange" class="control-label col-md-2"></label>
+                                    <div class="col-md-8">
+                                        <div class="checkbox-container">
+                                            <input (change)="getCashedBackedCollateralFlowId($event.target.checked)"
+                                                [(ngModel)]="isCashedBacked" [ngModelOptions]="{standalone: true}"
+                                                id="isflowchange" type="checkbox">
+                                        </div>
+                                        <!-- <label class="checkbox">Reconfirm Invoice Number</label> -->
+                                    </div>
+                                </div>
+
+                                
+
+                                
+
+                            </div>
+                            <!-- <div class="form-group"
+                                *ngIf="facilityApplicationSpecialProcessFlow.length <= 0 && !isCreditcard && cashCollaterizedProcessFlow != 'undefined'">
+                                <label for="" class="control-label col-md-2">
+                                    {{cashCollaterizedProcessFlow?.label}}
+                                </label>
+                                <div class="col-md-4">
+                                    <label for="isflowchange" class="control-label col-md-2"></label>
+                                    <div class="col-md-8">
+                                        <div class="checkbox-container">
+                                            <input (change)="getCashedBackedCollateralFlowId($event.target.checked)"
+                                                [(ngModel)]="isCashedBacked" [ngModelOptions]="{standalone: true}"
+                                                id="isflowchange" type="checkbox">
+                                        </div>
+                                    </div>
+                                </div>
+
+                              <label for="isIBLRequest" class="control-label col-md-2">Is IBL Request</label>
+                                    <div class="col-md-4">
+                                        <div class="checkbox-container">
+                                            <input (change)="getIBL($event.target.checked)"
+                                                [(ngModel)]="isIBLRequest" [ngModelOptions]="{standalone: true}"
+                                                id="isIBLRequest" type="checkbox">
+                                        </div>
+                                    </div> -->
+
+                                <!-- <label for="isAgricRac" class="control-label col-md-2">Is Agric Related Rac</label>
+                                    <div class="col-md-4">
+                                        <div class="checkbox-container">
+                                            <input (change)="getRacType($event.target.checked)"
+                                                [(ngModel)]="isAgricRelatedRac" [ngModelOptions]="{standalone: true}"
+                                                id="isAgricRac" type="checkbox">
+                                        </div>
+                                    </div> -->
+
+                            <!-- </div> -->
+                            <div class="form-group">
+
+                                <label for="" class="control-label col-md-2 pull-left">Proposed Tenor</label>
+                                <div>
+                                    <div class="col-md-2">
+                                        <input name="proposedTenor" (blur)="validateTenor($event.target.value)"
+                                            formControlName="proposedTenor" [(ngModel)]="proposedTenor"
+                                            [ngClass]="!facilityDetailsForm.controls['proposedTenor'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                        <!-- <p-spinner formControlName="proposedTenor" name="proposedTenor" [ngClass]="!facilityDetailsForm.controls['proposedTenor'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control" thousandSeparator="," decimalSeparator="." [step]="1" size="10"
+                                            [min]="minimumTenor" [max]=maximumTenor></p-spinner> -->
+                                    </div>
+
+
+
+                                    <div class="col-md-2">
+                                        <select class="form-control" formControlName="tenorModeId"
+                                            (change)="onTenorModeChange($event.target.value)"
+                                            [ngClass]="!facilityDetailsForm.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
+                                            name="" id="">
+                                            <option *ngFor="let item of tenorType" value="{{item.tenorModeId}}">
+                                                {{item.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div *ngIf="(isContingent != true)">
+                                    <label for="" class="control-label col-md-2">Interest Rate</label>
+                                    <div class="col-md-4">
+                                        <!-- <input class="form-control" *ngIf="!isProductProgram" type="text" formControlName="proposedInterestRate" [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'"> -->
+                                        <input class="form-control" [readonly]="false" type="text"
+                                            formControlName="proposedInterestRate"
+                                            [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'">
+                                        <!-- <input class="form-control" [readonly]="productClassProcessId == 2" type="text" formControlName="proposedInterestRate" [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'"> -->
+                                        <!-- <p-spinner formControlName="proposedInterestRate" [attr.disabled]="true" name="proposedInterestRate" [ngClass]="!facilityDetailsForm.controls['proposedInterestRate'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control" thousandSeparator="," decimalSeparator="." [step]="0.1" size="10" [min]="minimumRate" [max]=100></p-spinner> -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="requireEquityContribution">
+                                <div class="form-group">
+                                    <label for="" class="control-label col-md-2">
+                                        {{projectName}}
+                                    </label>
+                                    <div class="col-md-4" tabindex="0">
+                                        <input type="text" formatM formControlName="totalAmountRequired"
+                                            (blur)="calculateEquityRatio()"
+                                            [ngClass]="!facilityDetailsForm.controls['totalAmountRequired'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                    <!-- <label class="col-md-2">Customer Account</label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" id="equityCasaAccountId" name="equityCasaAccountId" formControlName="equityCasaAccountId"
+                                                [ngClass]="!facilityDetailsForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                    <option value=""> Select Customer Account</option>
+                                                    <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">{{item.productAccountNumber}} </option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-12" *ngIf="showParcentage">
+                                                <h4> Equity Contribution  {{parcentage}} </h4>
+                                            </div>-->
+
+                                    <label for="" class="control-label col-md-2">
+                                        Equity Contribution
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM formControlName="equityAmount"
+                                            (blur)="calculateEquityRatio()"
+                                            [ngClass]="!facilityDetailsForm.controls['equityAmount'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                        <span *ngIf="showParcentage">
+                                            <strong>Equity Contribution {{parcentage}}%</strong>
+                                        </span>
+
+                                    </div>
+                                </div>
+                                <!-- <div class="form-group" >
+
+                                            <label class="col-md-2">Customer Account</label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" id="equityCasaAccountId" name="equityCasaAccountId" formControlName="equityCasaAccountId"
+                                                [ngClass]="!facilityDetailsForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                    <option value=""> Select Customer Account</option>
+                                                    <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">{{item.productAccountNumber}} </option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-12" *ngIf="showParcentage">
+                                                <h4> Equity Contribution  {{parcentage}} </h4>
+                                            </div>
+                                        </div> -->
+                            </div>
+
+                            <product-fees [productId]="proposedProductId" [loanApplicationDetailId]="selectedDetailId"
+                                [editFee]="true" (feesCollection)="feesData($event)"> </product-fees>
+                            <!-- <product-fees [productId]="proposedProductId" [editFee]="isFeeEditable" (feesCollection)="feesData($event)"> </product-fees> -->
+
+                            <first-trader [extendedFormDefaultBody]="extendedFormDefaultBody"
+                                [resetForm]='resetFirstTraders' (firstTraders)="getFirstTraders($event)"
+                                *ngIf="displayFirstTraders"> </first-trader>
+
+                            <education-loan [extendedFormDefaultBody]="extendedFormDefaultBody" *ngIf="displayFirstEdu"
+                                (educationLoan)="getEducationLoan($event)" [disableFormControl]="disableControl">
+                            </education-loan>
+
+                            <bond-guranty [extendedFormDefaultBody]="extendedFormDefaultBody"
+                                [customerId]="selectedCustomerId" [requireCasaAccount]="requireCasaAccount"
+                                (bondDetails)="getBondGuranty($event)" *ngIf="displayBondAndGuarantees"
+                                (disableUpload)="uploadBonsAndGuaranteeDocuments($event)"></bond-guranty>
+
+                            <div *ngIf="displayInvoiceDiscounting">
+
+                                <div class="form-group">
+                                    <label class="col-md-2">Contract Date</label>
+                                    <div class="col-md-4">
+                                        <p-calendar id="contractDate" [(ngModel)]="startdate"
+                                            formControlName="contractDate" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050"
+                                            (onSelect)="validateContratDate()" [showIcon]="true"
+                                            [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                            [style]="{'width': '100%', 'z-index': '999'}"
+                                            [ngClass]="!facilityDetailsForm.controls['contractDate'].valid ? 'required-input' : 'valid-input'">
+                                        </p-calendar>
+                                    </div>
+                                    <label class="col-md-2"> Contract Expiry Date</label>
+                                    <div class="col-md-4">
+                                        <p-calendar id="contractExpiryDate" [(ngModel)]="enddate"
+                                            formControlName="contractExpiryDate" [monthNavigator]="true"
+                                            [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"
+                                            (onSelect)="validateContratDate()"
+                                            [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                            [style]="{'width': '100%', 'z-index': '999'}"
+                                            [ngClass]="!facilityDetailsForm.controls['contractExpiryDate'].valid ? 'required-input' : 'valid-input'">
+                                        </p-calendar>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2" for="principalId">Principal</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" name="" formControlName="principalId"
+                                            [(ngModel)]="principalId"
+                                            [ngClass]="!facilityDetailsForm.controls['principalId'].valid ? 'required-input' : 'valid-input'">
+                                            <option value="">Select principal</option>
+                                            <option *ngFor="let i of principal" value="{{i.principalId}}">
+                                                {{i.name}}</option>
+                                        </select>
+                                    </div>
+
+                                    <label for="" class="control-label col-md-2">
+                                        Invoice Currency
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select id="invoiceCurrencyId" formControlName="invoiceCurrencyId"
+                                            [ngClass]="!facilityDetailsForm.controls['invoiceCurrencyId'].valid ? 'required-input' : 'valid-input'"
+                                            (change)="getExchangeRateInvoice($event.target.value)" class="form-control">
+                                            <option value=""> Select Currency</option>
+                                            <option *ngFor="let curr of allowedCurrencies" value="{{curr.currencyId}}">
+                                                {{curr.currencyCodeName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <div class="col-md-2">
+                                        <button pButton type="button" (click)="showInvoiceDetails()"
+                                            label="{{addFacilityLabel}} Invoice" style="margin-right:5px"
+                                            class="ui-button-primary">
+                                        </button>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <button pButton type="button" (click)="showMultipleInvoiceDetails()"
+                                            label="{{addBulkInvoice}} Invoice" style="margin-right:5px"
+                                            class="ui-button-primary">
+                                        </button>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="" class="form-control col-md-2"> {{invoiceLimit}}% of Invoice
+                                            ({{productAmount
+                                            | number : '1.2'}})</label>
+
+                                    </div>
+
+                                    <label for="" class="control-label col-md-2">
+                                        Invoice Total
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM name="invoiceAmount" formControlName="invoiceAmount"
+                                            [ngClass]="!facilityDetailsForm.controls['invoiceAmount'].valid ? 'required-input' : 'valid-input'"
+                                            [attr.disabled]="true" class="form-control">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="" class="control-label col-md-2">
+                                        Invoice Exchange Rate
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM formControlName="fcyRate" [attr.disabled]="true"
+                                            [ngClass]="!facilityDetailsForm.controls['fcyRate'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+
+
+
+                                    <label for="" class="control-label col-md-2">
+                                        Naira Equivalent
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" formatM formControlName="lcyInvoiceValue"
+                                            [ngClass]="!facilityDetailsForm.controls['lcyInvoiceValue'].valid ? 'required-input' : 'valid-input'"
+                                            [attr.disabled]="true" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p-dialog [responsive]=true [(visible)]="displayInvoiceDetails2" id="add-modal"
+                                modal="modal" showEffect="fade" width="700">
+                                <div class="pull-right">
+                                    <button (click)="closeModal()" pButton type="button" label="Close"></button>
+
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-12">
+                                            <input type="file" (change)="onFileChange2($event)"
+                                                placeholder="Upload file" [accept]="'.xslx, .xls, .xltx'" #fileInput
+                                                name="fileInput" style="padding-top:2px;" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-sm btn-primary pull-left"
+                                                (click)="requestPasswordBulk2()" [disabled]="file==undefined ">
+                                                <span class="glyphicon glyphicon-upload"></span> Upload Bulk Invoice
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <!-- <button class="btn btn-sm btn-primary pull-right" (click)="DownloadDocument()">
+                                                                            <span class="glyphicon glyphicon-download"></span> Download Sample </button> -->
+                                            <a href="./../../../../assets/files/BulkInvoiceSampleDocument.xlsx"
+                                                target="_blank" class="btn btn-sm btn-primary pull-right">
+                                                <span class="glyphicon glyphicon-download"></span> Download Sample</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-dialog>
+
+
+                            <div *ngIf="displaySyndicatedLoan">
+                                <div class="form-group">
+                                    <label for="field1" class="control-label col-md-2">
+                                        Syndication Ref No
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" id="field1" formControlName="field1"
+                                            [ngClass]="!facilityDetailsForm.controls['field1'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                    <label for="field2" class="control-label col-md-2">
+                                        Syndication Name
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" id="field2" formControlName="field2"
+                                            [ngClass]="!facilityDetailsForm.controls['field2'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="" class="control-label col-md-2">
+                                    </label>
+                                    <div class=" col-md-4">
+                                        <button pButton type="button" (click)="showAddSyndicationDetails()"
+                                            label="Add Syndication Details" style="margin-right:5px"
+                                            class="ui-button-primary">
+                                        </button>
+                                    </div>
+                                    <label for="field3" class="control-label col-md-2">
+                                        Syndication Amount
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" id="field3" [attr.disabled]=true formatM
+                                            formControlName="field3"
+                                            [ngClass]="!facilityDetailsForm.controls['field3'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="" class="control-label col-md-2">Facility Amount</label>
+                                <div class="col-md-4">
+
+                                    <input type="text" id="proposedAmount"
+                                        (blur)="validateDiscountAmount($event.target.value)" formatM
+                                        name="proposedAmount" [(ngModel)]="proposedAmount"
+                                        [ngClass]="!facilityDetailsForm.controls['proposedAmount'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="proposedAmount" class="form-control">
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    Currency
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="currencyId" formControlName="currencyId" name="currencyId"
+                                        [ngClass]="!facilityDetailsForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control" (change)="onCurrencyChanged($event.target.value)">
+                                        <option value=""> Select Currency</option>
+                                        <option *ngFor="let curr of currencies" value="{{curr.lookupId}}">
+                                            {{curr.lookupName}}</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <!-- <div class="form-group" *ngIf="!IsBaseCurrency">
+
+
+                                <label for="" class="control-label col-md-2">
+                                    Exchange Rate
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" name="exchangeRate" [ngClass]="!facilityDetailsForm.controls['exchangeRate'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="exchangeRate" [attr.disabled]="true" class="form-control">
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    Exchange Amount
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" formatM name="exchangeAmount" formatM [ngClass]="!facilityDetailsForm.controls['exchangeAmount'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="exchangeAmount" [attr.disabled]="true" class="form-control">
+                                </div>
+                            </div> -->
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Exchange Rate
+                                </label>
+                                <div class="col-md-4">
+                                    <label class="form-control"> {{exchangeRate}} </label>
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    Exchange Amount
+                                </label>
+                                <div class="col-md-4">
+                                    <label class="form-control"> {{exchangeValue | number : '1.2'}} </label>
+                                </div>
+                            </div>
+
+                            <div *ngIf="(isContingent != true)" class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Product Price Index And Spread
+                                </label>
+                                <div class="col-md-2">
+                                    <select [attr.disabled]="productClassProcessId == 2 ? true : null"
+                                        class="form-control" id="productPriceIndexId" name="productPriceIndexId"
+                                        formControlName="productPriceIndexId"
+                                        (change)="onProductPriceIndexChanged($event.target.value)"
+                                        [ngClass]="!facilityDetailsForm.controls['productPriceIndexId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Product Price Index</option>
+                                        <option *ngFor="let item of productPriceIndexes"
+                                            value="{{item.productPriceIndexId}}">{{item.priceIndexName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" min="0" [readonly]="productClassProcessId == 2"
+                                        name="productPriceIndexSpread" formControlName="productPriceIndexSpread"
+                                        class="form-control" (change)="onProductSpreadSelect($event.target.value)" />
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    Product Price Index Rate
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" name="productPriceIndexRate"
+                                        [ngClass]="!facilityDetailsForm.controls['productPriceIndexRate'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="productPriceIndexRate" [attr.disabled]="true"
+                                        class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    CRMS Funding Source
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="crmsFundingSourceId" name="crmsFundingSourceId"
+                                        formControlName="crmsFundingSourceId"
+                                        [ngClass]="!facilityDetailsForm.controls['crmsFundingSourceId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select CRMS Funding Source</option>
+                                        <option *ngFor="let item of crsmFundingSource" value="{{item.lookupId}}">
+                                            {{item.lookupName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <label for="" class="control-label col-md-2">
+                                    CRMS Repayment Source
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="crmsPaymentSourceId" name="crmsPaymentSourceId"
+                                        formControlName="crmsPaymentSourceId">
+                                        <option value=""> Select CRMS Repayment Source</option>
+                                        <option *ngFor="let item of crsmRepaymentSource" value="{{item.lookupId}}">
+                                            {{item.lookupName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Facility Purpose
+                                </label>
+                                <div class="col-md-4">
+                                    <textarea type="text" id="loanPurpose" rows=3 formControlName="loanPurpose"
+                                        [ngClass]="!facilityDetailsForm.controls['loanPurpose'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control"></textarea>
+                                </div>
+                                <div *ngIf="(isContingent != true)">
+                                    <label for="scheduleId" class="control-label col-md-2">
+                                        Principal Repayment Frequency
+                                    </label>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="repaymentScheduleId" name="repaymentScheduleId"
+                                            formControlName="repaymentScheduleId"
+                                            [ngClass]="!facilityDetailsForm.controls['repaymentScheduleId'].valid ? 'required-input' : 'valid-input'">
+                                            <option value=null>-Select Principal Repayment-</option>
+                                            <option *ngFor="let item of repaymentPatterns"
+                                                value="{{item.repaymentScheduleId}}">{{item.repaymentScheduleDetail}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <textarea placeholder="If Others, Specify..." type="text" id="repaymentTerm"
+                                            rows=3 formControlName="repaymentTerm"
+                                            [ngClass]="!facilityDetailsForm.controls['repaymentTerm'].valid ? 'required-input' : 'valid-input'"
+                                            class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="(isContingent != true)">
+                                <label for="isMoratorium" class="control-label col-md-2">
+                                    Is Moratorium
+                                </label>
+                                <div class="col-md-1">
+                                    <input type="checkbox" name="isMoratorium" formControlName="isMoratorium"
+                                        (click)="isMoratorium($event)" id="isMoratorium"
+                                        [ngClass]="!facilityDetailsForm.controls['isMoratorium'].valid ? 'required-input' : 'valid-input'"
+                                        style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                                </div>
+                                <label for="moratorium" class="control-label col-md-1">
+                                    Moratorium
+                                </label>
+                                <div class="col-md-2">
+                                    <textarea type="text" id="moratorium" rows=3
+                                        [ngClass]="!facilityDetailsForm.controls['moratorium'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="moratorium" class="form-control"></textarea>
+                                </div>
+                                <label for="scheduleId" class="control-label col-md-2">
+                                    Interest Repayment Frequency
+                                </label>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="interestRepaymentId" name="interestRepaymentId"
+                                        formControlName="interestRepaymentId"
+                                        [ngClass]="!facilityDetailsForm.controls['interestRepaymentId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=null>-Select Interest Repayment-</option>
+                                        <option *ngFor="let item of repaymentPatterns"
+                                            value="{{item.repaymentScheduleId}}">
+                                            {{item.repaymentScheduleDetail}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <textarea placeholder="If Others, Specify..." type="text" id="interestRepayment"
+                                        rows=3 formControlName="interestRepayment"
+                                        [ngClass]="!facilityDetailsForm.controls['interestRepayment'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control"></textarea>
+                                </div>
+                            </div>
+
+                            <div *ngIf="displayInvoiceDiscounting" class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Collection Account
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="casaAccountId" name="casaAccountId"
+                                        formControlName="casaAccountId"
+                                        [ngClass]="!facilityDetailsForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Collection Account</option>
+                                        <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">
+                                            {{item.productAccountNumber}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Operating CASA Account
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="operatingCasaAccountId"
+                                        name="operatingCasaAccountId" formControlName="operatingCasaAccountId"
+                                        [ngClass]="!facilityDetailsForm.controls['operatingCasaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Operating Account</option>
+                                        <option *ngFor="let item of customerAccount" value="{{item.casaAccountId}}">
+                                            {{item.productAccountNumber}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <label for="isTakeOverApplication" class="control-label col-md-2">
+                                    Take Over Loan?
+                                </label>
+                                <div class="col-md-2">
+                                    <input type="checkbox" name="isTakeOverApplication"
+                                        formControlName="isTakeOverApplication" (click)="showValue($event)"
+                                        id="isTakeOverApplication"
+                                        [ngClass]="!facilityDetailsForm.controls['isTakeOverApplication'].valid ? 'required-input' : 'valid-input'"
+                                        style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                                </div>
+                                <label for="isLineFacility" class="control-label col-md-1">
+                                    Is Line Facility?
+                                </label>
+
+                                <div class="col-md-1" *ngIf="isProductProgram == false">
+                                    <input [attr.disabled]="isSetupFacilityLine() ? true : null" type="checkbox"
+                                        name="isLineFacility" formControlName="isLineFacility"
+                                        (click)="showValue($event)" id="isLineFacility"
+                                        [ngClass]="!facilityDetailsForm.controls['isLineFacility'].valid ? 'required-input' : 'valid-input'"
+                                        style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                                </div>
+
+                                <div class="col-md-2" style="text-align:center" *ngIf=racFails>
+                                    <a (click)="GetRacResult()" href="javascript:void(0)">View Failed Rac</a>
+                                </div>
+                            </div>
+
+                            <div *ngIf="displayImportFinance" class="form-group">
+                                <label for="field1" class="control-label col-md-2">
+                                    List of Commodities
+                                </label>
+                                <div class="col-md-4">
+                                    <textarea type="text" id="field1" rows=3 formControlName="field1"
+                                        [ngClass]="!facilityDetailsForm.controls['field1'].valid ? 'required-input' : 'valid-input'"
+                                        class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                </label>
+                                <div class=" col-md-4" *ngIf="invoiceTable.length > 0">
+                                    <a (click)="showInvoiceData()" style="color:#ff0000" href="javascript:void(0)">View
+                                        Invoice
+                                        details
+                                    </a>
+                                    <i class="glyphicon glyphicon-eject" style="color:#ff0000"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Approved Trade Cycle (Days)
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="approvedTradeCycleId" name="approvedTradeCycleId"
+                                        formControlName="approvedTradeCycleId"
+                                        [ngClass]="!facilityDetailsForm.controls['approvedTradeCycleId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Cycle </option>
+                                        <option *ngFor="let item of approvedCycles"
+                                            value="{{item.approvedTradeCycleId}}">
+                                            {{item.approvedTradeCycleDays}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Review Type
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="loanDetailReviewTypeId"
+                                        (change)="onReviewTypeChange($event.target.value)" name="loanDetailReviewTypeId"
+                                        formControlName="loanDetailReviewTypeId"
+                                        [ngClass]="!facilityDetailsForm.controls['loanDetailReviewTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Review Type</option>
+                                        <option *ngFor="let item of loanReviewTypes"
+                                            value="{{item.loanDetailReviewTypeId}}">
+                                            {{item.loanDetailReviewTypeName}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <label for="approvedLineLimit" class="control-label col-md-2">Line limit</label>
+                                <div class="col-md-4">
+                                    <input [attr.disabled]="isSelectedFacilityLine() ? null : true" type="text"
+                                        id="approvedLineLimit" name="approvedLineLimit"
+                                        formControlName="approvedLineLimit" class="form-control" formatM
+                                        [ngClass]="!facilityDetailsForm.controls['approvedLineLimit'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group" *ngIf="requestOldReference">
+                                <label for="oldApplicationRefForRenewal" class="control-label col-md-2">Old Application
+                                    Reference Number</label>
+                                <div class="col-md-4">
+                                    <input type="text" (change)="onReviewTypeChangeRef($event.target.value)"
+                                        id="oldApplicationRefForRenewal" name="oldApplicationRefForRenewal"
+                                        formControlName="oldApplicationRefForRenewal" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">
+                                    Property Type
+                                </label>
+                                <div class="col-md-4">
+                                    <select class="form-control" id="propertyTypeId"
+                                        name="propertyTypeId" formControlName="propertyTypeId"
+                                        [ngClass]="!facilityDetailsForm.controls['propertyTypeId'].valid ? 'required-input' : 'valid-input'">
+                                        <option value=""> Select Property Type</option>
+                                        <option *ngFor="let item of propertyTypes"
+                                            value="{{item.propertyTypeId}}">
+                                            {{item.propertyTypeName}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <label for="propertyTitle" class="control-label col-md-2">Property Title</label>
+                                <div class="col-md-4">
+                                    <input type="text"
+                                        id="propertyTitle" name="propertyTitle"
+                                        formControlName="propertyTitle" class="form-control" formatM
+                                        [ngClass]="!facilityDetailsForm.controls['propertyTitle'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">Property Price</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="propertyPrice" formatM name="propertyPrice"
+                                        [ngClass]="!facilityDetailsForm.controls['propertyPrice'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="propertyPrice" class="form-control">
+                                </div>
+                                <label for="" class="control-label col-md-2">Down Payment</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="downPayment" name="downPayment" formatM
+                                        [ngClass]="!facilityDetailsForm.controls['downPayment'].valid ? 'required-input' : 'valid-input'"
+                                        formControlName="downPayment" class="form-control" [attr.disabled]="true">
+                                </div>    
+                            </div>
+                        </div>
+                    </form>
+
+
+
+                    <!-- <risk-acceptance-criteria [operationId]="2" [productId]="proposedProductId" [targetId]="newLoanApplicationId" [reload]="proposedProductId" [getFormOutput]="submitEvent" (formOutput)="setRacValues($event)"></risk-acceptance-criteria> -->
+
+                    <!-- <risk-acceptance-criteria [isDrawdown]="false" [racOperationId]="racOperationId" [customerId]="selectedCustomerId" [currencyId]="currencyId" [loanApplicationId]="loanApplicationId" [operationId]="2" [productId]="proposedProductId" [reload]="proposedProductId" [getFormOutput]="submitEvent" (formOutput)="setRacValues($event)"> -->
+
+                    <risk-acceptance-criteria *ngIf="isAdhoc == false && isAgricRac == false "
+                        [racCategoryTypeId]="racCategoryTypeId" [isDrawdown]="false" [racSearchBaseId]="racSearchBaseId"
+                        [racOperationId]="racOperationId" [customerId]="selectedCustomerId"
+                        [racCurrencyId]="racCurrencyId" [loanApplicationId]="loanApplicationId"
+                        [operationId]="racOperationId" [racCustomerId]="racCustomerId"
+                        [racProductClassId]="racProductClassId" [searchBasePlaceholder]="searchBasePlaceholder"
+                        [productId]="proposedProductId" [isOperationbased]="isOperationbased"
+                        [reload]="proposedProductId" [getFormOutput]="submitEvent" (formOutput)="setRacValues($event)">
+                    </risk-acceptance-criteria>
+
+                    <risk-acceptance-criteria *ngIf="isAdhoc == false && isAgricRac == true"
+                        [racCategoryTypeId]="racCategoryTypeId" [isDrawdown]="false" [racSearchBaseId]="racSearchBaseId"
+                        [racOperationId]="racOperationId" [customerId]="selectedCustomerId"
+                        [racCurrencyId]="racCurrencyId" [isAgricRac]="isAgricRac"
+                        [loanApplicationId]="loanApplicationId" [operationId]="racOperationId"
+                        [racCustomerId]="racCustomerId" [racProductClassId]="racProductClassId"
+                        [searchBasePlaceholder]="searchBasePlaceholder" [productId]="proposedProductId"
+                        [isOperationbased]="isOperationbased" [reload]="proposedProductId" [getFormOutput]="submitEvent"
+                        (formOutput)="setRacValues($event)">
+                    </risk-acceptance-criteria>
+
+                    <!-- <risk-acceptance-criteria *ngIf="isRenewal == true && isIBLRequest == true"
+                        [racCategoryTypeId]="racCategoryTypeId" [isDrawdown]="false" [racSearchBaseId]="racSearchBaseId"
+                        [racOperationId]="racOperationId" [customerId]="selectedCustomerId"
+                        [racCurrencyId]="racCurrencyId" [isAgricRac]="isAgricRac"
+                        [loanApplicationId]="loanApplicationId" [operationId]="racOperationId"
+                        [racCustomerId]="racCustomerId" [racProductClassId]="racProductClassId"
+                        [searchBasePlaceholder]="searchBasePlaceholder" [productId]="proposedProductId"
+                        [isOperationbased]="isOperationbased" [reload]="proposedProductId" [getFormOutput]="submitEvent"
+                        (formOutput)="setRacValues($event)">
+                    </risk-acceptance-criteria> -->
+
+
+                    <risk-acceptance-criteria-detail [customerId]="selectedCustomerId"
+                        *ngIf="editMode == true && isAdhoc == false && isIBLRequest == false && isRenewal == false" [loanApplicationId]="selectedDetailId"
+                        [operationId]="2" [productId]="proposedProductId" [reload]="proposedProductId"
+                        [racCategoryTypeId]="racCategoryTypeId" [isDrawdown]="false" [racSearchBaseId]="racSearchBaseId"
+                        [racOperationId]="racOperationId" [customerId]="selectedCustomerId"
+                        [racCurrencyId]="racCurrencyId" [loanApplicationId]="loanApplicationId"
+                        [operationId]="racOperationId" [racCustomerId]="racCustomerId"
+                        [racProductClassId]="racProductClassId" [searchBasePlaceholder]="searchBasePlaceholder"
+                        [productId]="proposedProductId" [isOperationbased]="isOperationbased"
+                        [reload]="proposedProductId" [getFormOutputReadOnly]="submitEventReadOnly"
+                        (formOutputReadOnly)="setRacValuesreadOnly($event)">
+
+                    </risk-acceptance-criteria-detail>
+
+
+                    <div class="col-md-12">
+                        <!-- {{ facilityDetailsForm.value | json }} -->
+                        <!-- INV facilityDetailsForm: {{ facilityDetailsForm.invalid }}
+                                NOT activeBondForm: {{ !activeBondForm }} -->
+                        <button type="button" pButton
+                            [disabled]="facilityDetailsForm.invalid || !activeBondForm || !exchangeValue"
+                            (click)="addFacilityDetails()" label="{{addFacilityLabel}}" style="margin-right:5px"
+                            class="pull-right">
+                        </button>
+
+
+
+                    </div>
+
+                </div>
+            </fieldset>
+        </div>
+
+
+        <div style="max-height: 200px;" *ngIf="loanApplicationDetails && loanApplicationDetails.length > 0">
+            <table class="table table-striped" style="margin-right:5px">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Customer Name</th>
+                        <th>Facility</th>
+                        <th>Requested Facility Amount</th>
+                        <th>Rate(%)</th>
+                        <th>Tenor(Days)</th>
+                        <th>Currency</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let p of loanApplicationDetails;let indx=index">
+                        <td>
+                            {{indx + 1}}
+                        </td>
+                        <td>
+                            {{p.customerName}}
+                        </td>
+                        <td>{{p.proposedProductName}}</td>
+                        <td>{{p.proposedAmount | number : '1.2'}}</td>
+                        <td>{{p.proposedInterestRate}}</td>
+                        <td> {{p.proposedTenor}} </td>
+                        <td> {{p.currencyName}} </td>
+
+                        <td style="padding: 0;width:50px">
+                            <!-- <a (click)="editApplicatiionDetailsItem($event.target)" style="color:#ff0000" href="#"><i class="fa edit" aria-hidden="true"></i>Edit</a> -->
+                            <a (click)="removeApplicatiionDetailsItem($event,indx)" style="color:#ff0000"
+                                href="javascript:void(0)">Remove</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+
+                <!-- <button type="button" [disabled]="loanApplicationDetails.length == 0" (click)="ClickDone()" class="btn btn-success pull-right"> Done</button> -->
+
+                <button type="button" (click)="closeFacilityDetails()" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Close</button>
+
+            </div>
+            <!--  {{proposedProductId}}
+             {{principalId}}
+          {{facilityDetailsForm.value | json}} -->
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayInvoiceDetails" id="add-modal" modal="modal" showEffect="fade"
+    width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Invoice Details
+            </h2>
+        </div>
+        <div class="panel-body" [formGroup]="invoiceInfo">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="contractNumber" class="control-label col-md-2">Contract Number</label>
+                    <div class="col-md-8">
+                        <!-- (blur)="CheckDocumentNoDuplication()"  (onSelect)="checkDocumentValidity()"-->
+                        <input type="text" formControlName="contractNumber" class="form-control"
+                            (blur)="CheckDocumentNoDuplication()" name="contractNumber"
+                            [ngClass]="!invoiceInfo.controls['contractNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="purchaseOrderNumber" class="control-label col-md-2">Purchase Order Number</label>
+                    <div class="col-md-8">
+                        <input type="text" formControlName="purchaseOrderNumber" class="form-control"
+                            (blur)="CheckDocumentNoDuplication()" name="purchaseOrderNumber"
+                            [ngClass]="!invoiceInfo.controls['purchaseOrderNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="certificateNumber" class="control-label col-md-2">Entry Sheet Number</label>
+                    <div class="col-md-8">
+                        <input type="text" formControlName="certificateNumber" class="form-control"
+                            name="certificateNumber"
+                            [ngClass]="!invoiceInfo.controls['certificateNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceNumber" class="control-label col-md-2">Invoice Number</label>
+                    <div class="col-md-8">
+                        <input type="text" formControlName="invoiceNumber" class="form-control"
+                            (blur)="CheckDocumentNoDuplication()" name="invoiceNumber"
+                            [ngClass]="!invoiceInfo.controls['invoiceNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceDocDate" class="control-label col-md-2">Invoice Date</label>
+                    <div class="col-md-8">
+                        <p-calendar [monthNavigator]="true" formControlName="invoiceDocDate" [yearNavigator]="true"
+                            yearRange="2000:2050" [style]="{'width': '100%', 'z-index': '999'}" [showIcon]="true"
+                            (onSelect)=" checkDocumentValidity()"
+                            [ngClass]="!invoiceInfo.controls['invoiceDocDate'].valid ? 'required-input' : 'valid-input'">
+                        </p-calendar>
+                        <span *ngIf="!invoiceStatus" style="color:#ff0000">Invoice Date is more than
+                            {{dayInterval}}</span>
+                        <span *ngIf="invoicefuturedate" style="color:#ff0000">Invoice Date can not be in the
+                            future</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reValidated" class="control-label col-md-2"></label>
+                    <div class="col-md-8">
+                        <div class="checkbox-container">
+                            <input formControlName="reValidated" id="reValidated" type="checkbox">
+                        </div><label class="checkbox">Reconfirm Invoice Number</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceAmount" class="control-label col-md-2">Invoice Amount</label>
+                    <div class="col-md-8">
+                        <input type="text" formatM formControlName="invoiceAmount" class="form-control"
+                            name="invoiceAmount"
+                            [ngClass]="!invoiceInfo.controls['invoiceAmount'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="entrySheetNumber" class="control-label col-md-2">Entry Sheet Number</label>
+                    <div class="col-md-8">
+                        <input type="text" formatM formControlName="entrySheetNumber" class="form-control" name="entrySheetNumber" [ngClass]="!invoiceInfo.controls['entrySheetNumber'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                            accept=".jpg,.jpeg,.png" #fileInput name="fileInput" style="padding-top:2px;"
+                            class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)=" onAdd()" [disabled]="invoiceInfo.invalid "
+                        class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Add Invoice</button>
+                    <button type="button" (click)="closeInvoiceDetail()" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayInvoice" id="add-modal" modal="modal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Invoice Details
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayInvoice = false">&times;</a>
+            </div>
+        </div>
+        <div class="panel-body" style="overflow:auto;">
+            <div class="form-horizontal">
+
+                <div class="content-section implementation">
+                    <!-- <p-growl [value]="msg"></p-growl> -->
+                    <div>
+                        <table class="table table-striped" style="margin-right:5px; width: 100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Contract No</th>
+                                    <th>purchase Order No.</th>
+                                    <th>Invoice No</th>
+                                    <th>Invoice Amount</th>
+                                    <th>Invoice Date</th>
+                                    <th>View Upload</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                                    <td>Total</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{totalInvoiceValue | number : '1.2'}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+
+                            </tfoot>
+                            <tbody>
+                                <tr *ngFor="let p of invoiceTable;let indx=index">
+                                    <td>{{indx + 1}}</td>
+                                    <td>{{p.contractNo}}</td>
+                                    <td>{{p.purchaseOrderNumber}} </td>
+                                    <td>{{p.invoiceNo}}</td>
+                                    <td>{{p.invoiceAmount}}</td>
+                                    <td> {{p.invoiceDate | date:'longDate'}} </td>
+                                    <!-- <td style="padding: 0;width:50px">
+                                        <a (click)="viewDocument(p)" style="color:#28026e" href="javascript:void(0)" title="View">View</a>
+                                    </td> -->
+                                    <td style="padding: 0;width:50px">
+                                        <a (click)="editInvoice(p)" style="color:#28026e" href="javascript:void(0)"
+                                            title="Edit">Edit</a>
+                                        <span style="padding:3px;">|</span>
+                                        <a (click)="removeInvoiceDetails($event,indx)" style="color:#ff0000"
+                                            href="javascript:void(0)" title="Remove">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayBGUpload" id="add-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Bonds and Guarantees Document Upload
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="documentTitle" class="form-control" name="description"
+                            placeholder="Document title...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="physicalFileNumber" class="control-label col-md-2">File Number</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalFileNumber" class="form-control"
+                            name="physicalFileNumber" placeholder="Document File Number...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="physicalLocation" class="control-label col-md-2">Physical Location</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalLocation" class="form-control" name="physicalLocation"
+                            placeholder="Document Physical Location...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file"
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png" #fileInput name="fileInput"
+                            style="padding-top:2px;" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)=" uploadFileBandG()"
+                        [disabled]="documentTitle==null || file==undefined" class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span>Upload Document</button>
+                    <!-- <button type="button" (click)="displayBGUpload=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Invoice Document
+                <!-- <strong>{{ selectedDocument }}</strong> -->
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayUpload=true">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                    [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayAddSyndicationDetails" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Syndication Details
+            </h2>
+        </div>
+        <div class="panel-body">
+            <form [formGroup]="syndicationFormDetail" autocomplete="off">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="bankName" class="control-label col-md-2">Bank Name</label>
+                        <div class="col-md-8">
+                            <input type="text" formControlName="bankName" class="form-control" name="bankName"
+                                [ngClass]="!syndicationFormDetail.controls['bankName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bankCode" class="control-label col-md-2">Bank Code</label>
+                        <div class="col-md-8">
+                            <input type="text" formControlName="bankCode" class="form-control" name="bankCode"
+                                [ngClass]="!syndicationFormDetail.controls['bankCode'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="typeId" class="control-label col-md-2">Type</label>
+
+                        <div class="col-md-8">
+                            <select class="form-control" id="typeId" name="typeId" formControlName="typeId"
+                                [ngClass]="!syndicationFormDetail.controls['typeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value=""> Select Syndication Type</option>
+                                <option *ngFor="let item of syndicationTypes" value="{{item.lookupId}}">
+                                    {{item.lookupName}}
+                                </option>
+                            </select>
+                            <!-- <input type="text" formControlName="typeId" class="form-control" name="typeId" [ngClass]="!syndicationFormDetail.controls['typeId'].valid ? 'required-input' : 'valid-input'"> -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="amountContributed" class="control-label col-md-2">Syndication Amount</label>
+                        <div class="col-md-8">
+                            <input type="text" formatM formControlName="amountContributed" class="form-control"
+                                name="amountContributed"
+                                [ngClass]="!syndicationFormDetail.controls['amountContributed'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" [disabled]="syndicationFormDetail.invalid "
+                                (click)="addSyndicationDetails(syndicationFormDetail)"
+                                class="btn btn-success pull-right">
+                                <span class="glyphicon glyphicon-upload"></span> Add To List</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div style="max-height: 260px; overflow: auto">
+                                <table class="table table-striped" style="margin-right:5px; width: 100%">
+                                    <thead>
+                                        <tr>
+                                            <th>S/N</th>
+                                            <th>Bank Name</th>
+                                            <th>Bank Code</th>
+                                            <th>Amount Contributed</th>
+                                            <th></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                                            <td>Total</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>{{syndicationAmountContribution | number : '1.2'}}</td>
+                                            <td></td>
+
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        <tr *ngFor="let p of syndicationDetailList;let indx=index">
+                                            <td>{{indx + 1}}</td>
+                                            <td>{{p.bankName}}</td>
+                                            <td>{{p.bankCode}} </td>
+                                            <td>{{p.amountContributed }}</td>
+                                            <td style="padding: 0;width:50px">
+                                                <a (click)="editSyndicationDetail(p,indx)" style="color:#28026e"
+                                                    href="javascript:void(0)" title="Edit">Edit</a>
+                                                <span style="padding:3px;">|</span>
+                                                <a (click)="removeSyndicationDetail($event,indx)" style="color:#ff0000"
+                                                    href="javascript:void(0)" title="Remove">
+                                                    <i class="glyphicon glyphicon-remove"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button type="button" [disabled]="syndicationFormDetail.invalid " class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Add Syndication Detail</button> -->
+                    <button type="button" (click)="displayAddSyndicationDetails=false" style="margin-right:5px"
+                        class="btn btn-primary pull-right">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="showRacResult" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Rist Acceptance Criteria Result
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="showRacResult=false">&times;</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <div style="max-height: 260px; overflow: auto">
+                    <table class="table table-striped" style="margin-right:5px; width: 100%">
+                        <thead>
+                            <tr>
+                                <th>S/N</th>
+                                <th>Criteria</th>
+                                <!-- <th>Bank Code</th>
+                                            <th>Amount Contributed</th> -->
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                        <!-- <tfoot>
+                                        <tr style="padding: 3px;  background-color:#072d64; color: #fff; font: bold;">
+                                            <td>Total</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>{{syndicationAmountContribution | number : '1.2'}}</td>
+                                            <td></td>
+
+                                        </tr>
+                                    </tfoot> -->
+                        <tbody>
+                            <tr *ngFor="let p of racApplicationSpecialProcessFlow;let indx=index">
+                                <td>{{indx + 1}}</td>
+                                <td>{{p.criteria}}</td>
+                                <!-- <td>{{p.bankCode}} </td>
+                                            <td>{{p.amountContributed }}</td> -->
+                                <!-- <td style="padding: 0;width:50px">
+                                                <a (click)="editSyndicationDetail(p,indx)" style="color:#28026e" href="javascript:void(0)" title="Edit">Edit</a>
+                                                <span style="padding:3px;">|</span>
+                                                <a (click)="removeSyndicationDetail($event,indx)" style="color:#ff0000" href="javascript:void(0)" title="Remove">
+                                                    <i class="glyphicon glyphicon-remove"></i>
+                                                </a>
+                                            </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<!-- <pre>{{ loanApp | json }}</pre> -->
+
+<!-- <pre>{{ facilityDetailsForm.value | json }}</pre> -->

@@ -1,0 +1,146 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Approve Staff Relief 
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <p-dataTable [value]="pendingReliefs" [rows]="10" [paginator]="true">
+            
+                    <p-column field="staffName" header="Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="reliefStaffName" header="Relief Staff Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="reliefReason" header="Relief Reason" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            
+                    <p-column field="startDate" header="Start Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.startDate | date: 'dd-MM-yyyy' }}
+                        </ng-template>
+                    </p-column>
+            
+                    <p-column field="endDate" header="End Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.endDate | date: 'dd-MM-yyyy' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="isActive" header="Active" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            <a (click)="view(d)" href="javascript:void(0)">
+                                View Details
+                            </a>
+                        </ng-template>
+                    </p-column>
+            
+                </p-dataTable>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">{{panelHeader}}
+              </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayModalForm=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <table *ngIf="selected !== null" class="table table-casa-information">
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Staff Name:</strong>
+                        </td>
+                        <td>{{ selected.staffName }}</td>
+                        <td>
+                            <strong>Start Date:</strong>
+                        </td>
+                        <td>{{ selected.startDate | date:"dd-MM-yyyy" }}</td>
+                        
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <strong>Relief Staff Name:</strong>
+                        </td>
+                        <td>{{ selected.reliefStaffName }}</td>
+                        <td>
+                            <strong>End Date:</strong>
+                        </td>
+                        <td>{{ selected.endDate | date:"dd-MM-yyyy" }}</td>
+                        
+                       
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Relief Reason:</strong>
+                        </td>
+                        <td>{{ selected.reliefReason}}</td>                     
+                        <td>
+                            <strong>Active:</strong>
+                        </td>
+                        <td>{{ selected.isActive ? 'True' : 'False' }}</td>
+                       
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr />
+
+            <div class="well">
+                <div class="row">
+
+                    <label class="col-md-2">Comment</label>
+                    <div class="col-md-4">
+                        <!-- <textarea type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"> -->
+                        <textarea style="height:60px;" name="comment" [(ngModel)]="comment" id="comment" class="form-control" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+  
+                        </div>
+                    <label class="col-md-2">Status</label>
+                    <div class="col-md-4">
+                        <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="!approvalStatusId? 'required-input' : 'valid-input'">
+                            <option selected value="0">--- Select Approval ---</option>
+                            <option value="2"> Approve </option>
+                            <option value="3"> Decline </option>
+                        </select>                        
+
+                </div>
+            </div>
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="forward()" [disabled]="comment == null || comment == '' || !approvalStatusId" class="btn btn-success pull-right">
+                        Submit</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!-- <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message> -->
+
+
+

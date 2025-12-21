@@ -1,0 +1,251 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Collateral Release
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<customer-search (customer)="getRunningLoans($event)"></customer-search>
+<!--append modal-->
+<p-dialog [responsive]=true [(visible)]="displayModal" id="append-modal" modal="modal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">Active Loans - <small>{{ selectedCustomerName }}</small>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayModal=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                <p-tabPanel header="Active Loans">
+
+                    <p-dataTable [value]="loans" [paginator]="true" [rows]="10">
+
+                        <p-column field="productName" header="Product Name"></p-column>
+                        <p-column field="loanReferenceNumber" header="Reference Number" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column field="maturityDate" header="Maturity Date" [style]="{'width':'110px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.maturityDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="interestAccrual" header="Interest Accrual" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.interestAccrual | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="principalRepayment" header="Principal Repayment" [style]="{'text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.principalRepayment | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="totalRepayment" header="Total Repayment" [style]="{'text-align':'right'}"></p-column>
+
+                        <p-column [style]="{'width':'70px'}">
+                            <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="viewCollaterals(x)" href="javascript:void(0)" title="View Collaterals"> Collaterals</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </p-tabPanel>
+
+<p-tabPanel header="Assigned Collaterals" [disabled]="disableCollateralTab">
+    <p-dataTable [value]="collaterals" [paginator]="true" [rows]="10">
+
+        <p-column field="collateralTypeId" header="Collateral Type" [filter]="true" filterMatchMode="contains">
+            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                {{ getCollateralTypeName(d.collateralTypeId) }}
+            </ng-template>
+        </p-column>
+
+        <p-column field="collateralCode" header="Collateral Code" [filter]="true" filterMatchMode="contains"></p-column>
+        <!-- <p-column field="applicationReferenceNumber" header="Reference Number" [filter]="true" filterMatchMode="contains"></p-column> -->
+        <p-column field="hairCut" header="Hair Cut" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+
+        <p-column field="isLocationBased" header="Location" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                {{ d.isLocationBased ? 'Yes' : 'No' }}
+            </ng-template>
+        </p-column>
+
+        <p-column field="valuationCycle" header="Valuation Cycle" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+       
+<!--        
+        <p-column field="isReleased" header="isReleased" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+        <p-column field="releaseApprovalStatusId" header="releaseApprovalStatusId" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column> -->
+
+        <p-column [style]="{'width':'103px'}">
+            <ng-template pTemplate="header">
+                <div style="text-align:center">
+                    <!-- <button (click)="openSearchBox()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                </div>
+            </ng-template>
+            <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="x.isReleased == false && (x.releaseApprovalStatusId == 0 || x.releaseApprovalStatusId == 3)">
+                    <a (click)="releaseConfirm(x.loanCollateralMappingId)" href="javascript:void(0)">Release</a>
+                </span>
+                <span *ngIf="x.isReleased == false && x.releaseApprovalStatusId == 1">
+                    On Approval
+                </span>
+                <!-- <span *ngIf="x.isReleased == true && x.releaseApprovalStatusId == 2">
+                    Released
+                </span> -->
+                
+            </ng-template>
+        </p-column>
+
+    </p-dataTable>
+</p-tabPanel>
+
+<!-- 0 Pending 1 Processing 2 Approved 3 Disapproved 4 Authorised 5 Referred 6 Reroute -->
+            </p-tabView>
+<!-- {{ collaterals | json }} -->
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<!--end of append modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">Search Customer Collateral</h2>
+            <div class="pull-right">
+                <a class="close" (click)="displaySearchModal=false">&times;</a>
+            </div>
+        </div>
+
+        <div style="padding:3px" class="panel-body">
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="search($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Collateral Code</th>
+                                <th>Collateral Type</th>
+                                <th>Currency</th>
+                                <th>Customer Code</th>
+                                <th>Customer Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>{{res.collateralCode}}</td>
+                                <td>{{res.collateralTypeName}}</td>
+                                <td>{{res.currencyCode}}</td>
+                                <td>{{res.customerCode}}</td>
+                                <td>{{res.customerName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+
+<!-- test
+
+ -
+<p-dataTable [value]="collaterals">
+    - -
+    <p-column field="collateralTypeId" header="Collateral Type" [filter]="true" filterMatchMode="contains">
+        -
+        <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+            - {{ getCollateralTypeName(d.collateralTypeId) }} +
+            <p-column field="interestAccrual" header="Interest Accrual"
+                [style]="{'text-align':'right'}">
+                +
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    + {{ d.interestAccrual | number : '1.2' }}
+                </ng-template>
+            </p-column>
+            - -
+            <p-column field="collateralCode" header="Collateral Code" [filter]="true" filterMatchMode="contains"></p-column>
+            -
+            -
+            <p-column field="hairCut" header="Hair Cut" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+            -
+            - -
+            <p-column field="isLocationBased" header="Location" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                -
+                <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                    - {{ isLocationBased ? 'Yes' : 'No' }} + +
+                    <p-column field="principalRepayment" header="Principal Repayment"
+                        [style]="{'text-align':'right'}">
+                        +
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            + {{ d.principalRepayment | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    - -
+                    <p-column field="valuationCycle" header="Valuation Cycle" [filter]="true" filterMatchMode="contains"
+                        [style]="{'width':'100px'}"></p-column>
+                    - -
+                    <p-column [style]="{'width':'103px'}">
+                        -
+                        <ng-template pTemplate="header">
+                            + +
+                            <p-column field="totalRepayment" header="Total Repayment" [style]="{'text-align':'right'}"></p-column>
+                            + +
+                            <p-column [style]="{'width':'70px'}">
+                                +
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">
+                                        -
+                                        <button (click)="openSearchBox()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                        +
+                                        <a (click)="viewCollaterals(x)" href="javascript:void(0)" title="View Collaterals">
+                                        Collaterals</a>
+                                    </div>
+                                </ng-template>
+                                -
+                                <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                    -
+                                    <span *ngIf="x.isReleased == false && (x.releaseApprovalStatusId == 0 || x.releaseApprovalStatusId == 3)">
+                                        -
+                                        <a (click)="releaseConfirm(x.loanCollateralMappingId)" href="javascript:void(0)">Release</a>
+                                        - </span>
+                                    -
+                                    <span *ngIf="x.isReleased == false && x.releaseApprovalStatusId == 1">
+                                        - On Approval - </span>
+                                    - </ng-template>
+                            </p-column>
+                            - +
+</p-dataTable>
+
+-->

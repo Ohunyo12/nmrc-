@@ -1,0 +1,405 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Limits Setup</h2>
+                        <div class="pull-right">
+                            <button type="button" (click)="showLimitDefinitionForm()" pButton icon="fa-plus" label="Add New Definition"></button>
+                            <!--button type="button" (click)="showLimitDetailForm()" pButton icon="fa-plus" label="Add New Detail"></button-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <p-tabView>
+                    <p-tabPanel header="Limits Definition" [selected]="true">
+                        <p-dataTable [value]="limitsTableData" [sortMode]="multiple" [rows]="15" [paginator]="true">
+                            <p-column *ngFor="let col of limitsTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <a (click)="editLimitDefinition(i)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                    <!--p-tabPanel header="Limit Detail">
+                        <p-dataTable [value]="limitDetailsTableData" [sortMode]="multiple" [rows]="15" [paginator]="true">
+                            <p-column *ngFor="let col of limitDetailsTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <a (click)="editLimitDetail(i)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel-->
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]="true" [(visible)]="displayLimitDefinitionModal" id="limit-def-modal" modal="modal" showEffect="fade"
+    width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Limit Definition
+            </h2>
+        </div>
+        <form novalidate [formGroup]="limitDefinitionForm" (ngSubmit)="submitLimitDefinitionForm(limitDefinitionForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="limitName" class="col-md-4 control-label">Limit Name</label>
+                        <div class="col-md-8">
+                            <input type="text" name="limitName" id="limitName" class="form-control" formControlName="limitName" [ngClass]="limitDefinitionForm.controls['limitName'].valid ? 'valid-input':'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="limitValueTypeId" class="col-md-4 control-label">Limit Value Type</label>
+                        <div class="col-md-8">
+                            <select name="limitValueTypeId" id="limitValueTypeId" class="form-control" formControlName="limitValueTypeId" [ngClass]="limitDefinitionForm.controls['limitValueTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Limit Value Type ---</option>
+                                <option *ngFor="let item of limitValueTypeData"  [value]="item.limitValueTypeId">{{item.limitValueTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="limitMetricId" class="col-md-4 control-label">Limit Metric</label>
+                        <div class="col-md-8">
+                            <select name="limitMetricId" id="limitMetricId" class="form-control" formControlName="limitMetricId" [ngClass]="limitDefinitionForm.controls['limitMetricId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Limit Metric ---</option>
+                                <option *ngFor="let item of limitMetricData"  [value]="item.limitMetricId">{{item.limitMetricName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="limitDefinitionForm.invalid" class="btn btn-success pull-right">Save Limit Definition</button>
+                        <button type="button" (click)="displayLimitDefinitionModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]="true" [(visible)]="displayLimitDetailModal" id="limit-detail-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Limit Detail
+            </h2>
+        </div>
+        <form novalidate [formGroup]="limitDetailForm" (ngSubmit)="submitLimitDetailForm(limitDetailForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="limitId" class="col-md-2 control-label">Limit Name</label>
+                        <div class="col-md-4">
+                            <select name="limitId" id="limitId" class="form-control" formControlName="limitId" [ngClass]="limitDetailForm.controls['limitId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Limit Metric ---</option>
+                                <option *ngFor="let item of limitsTableData"  [value]="item.limitId">{{item.limitName}}</option>
+                            </select>
+                        </div>
+                        <label for="limitTypeId" class="col-md-2 control-label">Limit Type</label>
+                        <div class="col-md-4">
+                            <select name="limitTypeId" id="limitTypeId" class="form-control" formControlName="limitTypeId" [ngClass]="limitDetailForm.controls['limitTypeId'].valid ? 'valid-input':'required-input'"
+                                (change)="onLimitTypeSelect($event.target.value)">
+                                <option value="">--- Select Limit Type ---</option>
+                                <option *ngFor="let item of limitTypeData"  [value]="item.limitTypeId">{{item.limitTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="limitFrequency" class="col-md-2 control-label">Limit Frequency</label>
+                        <div class="col-md-4">
+                            <select name="limitFrequency" id="limitFrequency" class="form-control" formControlName="limitFrequencyTypeId" [ngClass]="limitDetailForm.controls['limitFrequencyTypeId'].valid ? 'valid-input':'required-input'"
+                                [attr.disabled]="true">
+                                <option value="">--- Select Limit Frequency Type ---</option>
+                                <option *ngFor="let item of limitFrequencyTypeData"  [value]="item.frequencyTypeId">{{item.mode}}</option>
+                            </select>
+                        </div>
+                        <label for="totalRiskAppetite" class="col-md-2 control-label" *ngIf="showSectorTable">Total Risk Appetite</label>
+                        <div class="col-md-4" *ngIf="showSectorTable">
+                            <input type="text" name="totalRiskAppetite" id="totalRiskAppetite" class="form-control" [(ngModel)]="totalRiskAppetite" [ngModelOptions]="{standalone: true}">
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="showCustomerTable">
+                        <p-dataTable [value]="customerFilteredData" [(selection)]="customerModel" dataKey="customerCode">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column *ngFor="let col of customerTableCols" [field]="col.field" [header]="col.header"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Maximum Value</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="text" name="maxValue" id="maxValue" class="form-control" formControlName="maximumValue" formatM>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Allow Override</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="checkbox" name="aOverride" id="aOverride" formControlName="allowOverride">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                    <div class="form-group" *ngIf="showBranchTable">
+                        <p-dataTable [value]="branchTableData" [(selection)]="branchModel" dataKey="branchCode" [style]="{'overflow':'scroll', 'height':'320px'}">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column *ngFor="let col of branchTableCols" [field]="col.field" [header]="col.header" [filter]="true"></p-column>
+                            <p-column field="branchLimit" header="Maximum Value" [style]="{'width':'100px'}">
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <input type="text" name="maxValue" id="maxValue" class="form-control" [(ngModel)]="i[col.field]" [ngModelOptions]="{standalone: true}"
+                                        formatM>
+                                </ng-template>
+                            </p-column>
+                            <p-column field="allowOverride" header="Allow Override" [style]="{'width':'100px'}">
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <input type="checkbox" name="aOverride" id="aOverride" [(ngModel)]="i[col.field]" [ngModelOptions]="{standalone: true}">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                    <div class="form-group" *ngIf="showStaffTable">
+                        <p-dataTable [value]="staffFilteredData" selectionMode="single" [(selection)]="staffModel" dataKey="staffId" [editable]="true">
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column *ngFor="let col of staffTableCols" [field]="col.field" [header]="col.header"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Maximum Amount</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="text" name="maxValue" id="maxValue" class="form-control" formControlName="maximumValue" formatM>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Allow Override</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="checkbox" name="aOverride" id="aOverride" formControlName="allowOverride">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                    <div class="form-group" *ngIf="showSectorTable">
+                        <p-dataTable [value]="sectorTableData" [(selection)]="sectorModel" dataKey="sectorId" [editable]="true" [style]="{'overflow':'scroll', 'height':'320px'}">
+                            <p-header>Sectors</p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                            <p-column *ngFor="let col of sectorTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                            <p-column field="sectorLimit" header="Maximum Amount" [style]="{'width':'100px'}">
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <input type="text" name="maxValue" id="maxValue" class="form-control" [(ngModel)]="i[col.field]" [ngModelOptions]="{standalone: true}"
+                                        (change)="onRowSelect($event)">
+                                </ng-template>
+                            </p-column>
+                            <p-column field="allowOverride" [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Allow Override</ng-template>
+                                <ng-template let-col let-i="rowData" pTemplate="body">
+                                    <input type="checkbox" name="aOverride" id="aOverride" [(ngModel)]="i[col.field]" [ngModelOptions]="{standalone: true}">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                    <div class="form-group" *ngIf="showPenForm">
+                        <label for="maximumValue" class="control-label col-md-2">PEN Limit</label>
+                        <div class="col-md-4">
+                            <input type="text" name="maximumValue" id="maximumValue" class="form-control" formControlName="maximumValue" formatM [ngClass]="limitDetailForm.controls['maximumValue'].valid ? 'valid-input':'required-input'">
+                        </div>
+                        <label for="allOverride" class="control-label col-md-2">Allow Override</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="allOverride" id="allOverride" formControlName="allowOverride">
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="showGroupTable">
+                        <p-dataTable [value]="groupFilteredData" [(selection)]="groupModel" dataKey="customerGroupId">
+                            <p-header>Customer Groups</p-header>
+                            <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                            <p-column *ngFor="let col of custGrpTableCols" [field]="col.field" [header]="col.header"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Maximum Amount</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="text" name="maxValue" id="maxValue" class="form-control" formControlName="maximumValue" formatM>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">Allow Override</ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                    <input type="checkbox" name="aOverride" id="aOverride" formControlName="allowOverride">
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="limitDetailForm.invalid" *ngIf="!showSectorTable" class="btn btn-success pull-right">Save Limit Detail</button>
+                        <button type="button" (click)="submitMutlipleLimitDetails(limitDetailForm)" *ngIf="showSectorTable" class="btn btn-success pull-right">Save Multiple Details</button>
+                        <button type="button" (click)="displayLimitDetailModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCustomerSearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Customer
+                </h2>
+                <a href="" (click)="displayCustomerSearchModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+
+                </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchCustomerDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="custSearchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Account Number</th>
+                                <th>Customer Sector</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedCustomerData(res)" style="cursor: pointer" *ngFor="let res of custSearchResults; let i = index">
+                                <td>
+                                    {{res.branchName}}
+                                </td>
+                                <td>
+                                    {{res.customerCode}}
+                                </td>
+                                <td>
+                                    {{res.accountHolder}}
+                                </td>
+                                <td>
+                                    {{res.productAccountNumber}}
+                                </td>
+                                <td>
+                                    {{res.customerSectorName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayStaffSearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right"><a class="close" style="margin: -10px 8px;" (click)="displayStaffSearchModal=false">&times;</a></div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchStaffDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="staffSearchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedStaffData(res)" style="cursor: pointer" *ngFor="let res of staffSearchResults; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayGroupSearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Customer Groups
+                </h2>
+                <div class="pull-right"><a class="close" style="margin: -10px 8px;" (click)="displayGroupSearchModal=false">&times;</a></div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchForCustomerGroup($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="custGrpSearchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer Group</th>
+                                <th>Group Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedGroupData(res)" style="cursor: pointer" *ngFor="let res of custGrpSearchResults; let i = index">
+                                <td>
+                                    {{res.customerGroupName}}
+                                </td>
+                                <td>
+                                    {{res.customerGroupCode}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

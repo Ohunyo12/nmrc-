@@ -1,0 +1,329 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Exceptional Loan Approval
+        </h2>
+      </div>
+    </div>
+  </div>
+  <p-tabView>
+    <p-tabPanel header="Exceptional Loans">
+      <div class="panel-body">
+        <p-dataTable [value]="exceptionalLoans" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+          <p-column field="dateTimeCreated" header="Date Created" sortable="true" [filter]="true"
+            filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.dateTimeCreated | date: 'dd MMM yyyy' }}
+            </ng-template>
+          </p-column>
+          <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column>
+          <p-column field="applicationReferenceNumber" header="Reference Number" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column>
+          <p-column field="proposedAmount" header="Proposed Amount" [filter]="false" filterMatchMode="contains"
+            [style]="{'width':'10%','text-align':'right'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.proposedAmount | number : '1.2' }}
+            </ng-template>
+          </p-column>
+          <p-column field="approvedAmount" header="Approved Amount" [filter]="false" filterMatchMode="contains"
+            [style]="{'width':'10%','text-align':'right'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.approvedAmount | number : '1.2' }}
+            </ng-template>
+          </p-column>
+          <!-- <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column> -->
+          <!-- <p-column field="loanPurpose" header="Loan Purpose" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column> -->
+          <p-column field="proposedTenor" header="Proposed Tenor" sortable="true" [filter]="true"
+            filterMatchMode="contains">
+          </p-column>
+          <p-column field="currentApprovalLevel" header="Approval Level" sortable="true" [filter]="true"
+            filterMatchMode="contains">
+          </p-column>
+          <p-column field="breachedLimitName" header="Breached Limit" sortable="true" [filter]="true"
+            filterMatchMode="contains">
+          </p-column>
+          <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column>
+
+          <p-column [style]="{'width':'55px'}" header="Memo">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <div style="text-align:center">
+                <a (click)="loadedTemplate(d)" href="javascript:void(0)">Memo</a>
+              </div>
+            </ng-template>
+          </p-column>
+          <p-column [style]="{'width':'80px'}" header="Approve"> 
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <div style="text-align:center">
+                <a *ngIf="d.isTemplateUploaded == true && d.approvalStatus != 'REJECTED'" (click)="sendForApproval(d)" href="javascript:void(0)">Approve</a>
+              </div>
+            </ng-template>
+          </p-column>
+
+        </p-dataTable>
+      </div>
+
+    </p-tabPanel>
+  </p-tabView>
+</div>
+
+<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showExceptionalDetails" width="1200"
+  [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+
+  <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+    <p-tabPanel [selected]="activeTabindex == 0" header="">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h6>
+            <strong>Approval Comments</strong>
+          </h6>
+        </div>
+
+        <div class="panel-body">
+          <p-dataTable [value]="approvalWorkflowData" [paginator]="true" [rows]="5" [responsive]="true" [resizableColumns]="true">
+            <p-column field="requestStaffName" header="Intiated By"></p-column>
+            <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
+            <!-- <p-column field="responseStaffName" header="Directed To"></p-column> -->
+            <p-column field="responseApprovalLevel" header="Response Approval Level"></p-column>
+            <p-column field="approvalStatus" header="Approval Status"></p-column>
+            <p-column field="comment" header="Comment" [style]="{'width':'20%'}"></p-column>
+            <p-column field="systemArrivalDate" header="Date of Arrival">
+              <ng-template let-col let-apr="rowData" pTemplate="body">
+                {{apr[col.field] | date: 'medium'}}
+              </ng-template>
+            </p-column>
+            <p-column field="systemResponseDate" header="Date of Response">
+              <ng-template let-col let-apr="rowData" pTemplate="body">
+                {{apr[col.field] | date: 'medium' }}
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+
+        <div class="panel-footer">
+          <div class="row">
+            <!-- <div class="col-md-3 col-md-offset-9">
+              <div class="btn-group pull-right"> -->
+            <button type="button" (click)="forward()" class="btn btn-success pull-right"
+              style="margin-right:15px">Submit For Approval
+              <i class="glyphicon glyphicon-chevron-right"></i></button>
+            <button type="button" class="btn btn-primary pull-right" (click)="showReferBackModal()"
+              style="margin-right:5px">
+              <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button>
+            <button (click)="decline()" type="button" class="btn btn-danger pull-right" style="margin-right:5px">Decline
+              <i class="glyphicon glyphicon-remove"></i></button>
+            <button (click)="close()" type="button" class="btn btn-warning pull-right" style="margin-right:5px">
+              <i class="glyphicon glyphicon-chevron-left"></i> Close</button>
+
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showCsForward" width="800"
+  [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <form novalidate [formGroup]="csForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        {{csForwardTitle}}
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+          <div class="col-md-12">
+            <textarea [ngClass]="csForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'"
+              class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+          </div>
+
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="goForApproval()" [disabled]="csForwardForm.invalid"
+              class="btn btn-success pull-right">Submit</button>
+            <button type="button" (click)="showCsForward = false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayReferBackModal" id="reccol-modal" modal="modal" showEffect="fade"
+  [contentStyle]="{'overflow':'auto','max-height':'700px','max-width':'1300px'}">
+  <app-refer-back [referBackTargetId]="targetId" [referBackOperationId]="operationId" (notify)="modalControl($event)"
+    (notifyAfterReferBack)="referBackResultControl($event)">
+  </app-refer-back>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayMemoModal" modal="modal" id="searchModal" showEffect="fade"
+  width="1000">
+  <p-tabView>
+    <p-tabPanel header="Approval Memorandum">
+      <div class="card no-padding">
+        <div class="panel panel-default">
+
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="pull-right">
+                  <button (click)="previewDocumentation2(false)" style="padding: 3px 6px 3px 6px;">
+                    <span class="glyphicon glyphicon-print"></span> Preview</button>
+                    <button (click)="previewDocumentation2(true)" style="padding: 3px 6px 3px 6px;">
+                      <span class="glyphicon glyphicon-print"></span> Print</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-9">
+                <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+
+                  <select (change)="onDocumentSectionChange($event.target.value)" formControlName="sectionId"
+                    name="sectionId" id="sectionId" class="form-control">
+                    <option value="">-- Select Document Section --</option>
+                    <option *ngFor="let x of documentationSections" [value]="x.sectionId">
+                      {{ x.staffRoleName }} :: {{ x.title }}</option>
+                  </select>
+
+                </form>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- CAM -->
+          <div class="panel-body" style="min-height:350px;">
+            <CKEDITOR *ngIf="editMode" [content]="sectionContent" [height]="250"
+              (contentChange)="contentChange($event)"></CKEDITOR>
+            <div *ngIf="!editMode" [innerHTML]="sectionContent" style="overflow:auto;height:320px"></div>
+            <div><i>{{ sectionDescription }}</i></div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="row" style="padding-left:inherit;">
+              <div class="col-md-12">
+                <div class="form-horizontal">
+                  <div *ngIf="(loanSelectedData?.approvalStatusId != 2 && loanSelectedData?.approvalStatusId != 3)"
+                    class="form-group">
+
+                    <button [disabled]="!userIsAccountOfficer2" type="button" (click)="getDocumentTemplate(true)" class="btn btn-warning">
+                      <span class="glyphicon glyphicon-plus" style="padding-right:4px;"></span>
+                      Load Template</button>
+
+                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(1)"
+                      class="btn btn-default">
+                      <span class="glyphicon glyphicon-chevron-left" style="padding-right:4px;"></span>
+                      Previous</button>
+
+                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(2)"
+                      class="btn btn-default">
+                      <span class="glyphicon glyphicon-chevron-right" style="padding-right:4px;"></span> Next</button>
+
+                    <button [disabled]="!editMode" type="button" (click)="saveSection(true)" class="btn btn-success"
+                      style="margin-right:10px;">
+                      <span class="glyphicon glyphicon-floppy-disk" style="padding-right:4px;"></span> Save
+                      Changes</button>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-12">
+                <button (click)="reload()" type="button" class="btn btn-danger pull-right "
+                  style="margin-right:5px">Close</button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>
+
+<!--append modal-->
+<p-dialog [responsive]="true" [(visible)]="displayAppendModal" id="append-modal" modal="modal" showEffect="fade"
+  width="450">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Load Document Template</h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayAppendModal=false">&times;</a>
+      </div>
+    </div>
+
+    <form novalidate [formGroup]="appendForm" autocomplete="off">
+
+      <div class="panel-body">
+        <div class="form-horizontal">
+
+          <div class="form-group">
+            <label for="creditTemplateId" class="control-label col-md-4">Document Template</label>
+            <div class="col-md-8">
+              <select name="creditTemplateId" id="creditTemplateId" formControlName="creditTemplateId"
+                class="form-control"
+                [ngClass]="appendForm.controls['creditTemplateId'].valid ? 'valid-input' : 'required-input'">
+                <option value="">-- Select Document Template --</option>
+                <option *ngFor="let x of documentTemplates" [value]="x.templateId">{{ x.templateName }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="loadDocumentTemplate(appendForm)" [disabled]="appendForm.invalid"
+              class="btn btn-warning pull-right">Load Document</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Appraisal Documentation for REFERENCE:
+              <strong>{{ loanSelectedData?.applicationReferenceNumber }}</strong> of OBLIGOR:
+              <strong>{{ loanSelectedData?.customerName }}</strong>
+          </h2>
+          <div class="pull-right">
+              <a class="close" (click)="closeDocumentation()">&times;</a>
+          </div>
+      </div>
+
+      <div class="panel-body" style="overflow:auto;height:450px">
+          <div *ngFor="let x of documentations">
+              <p><strong>{{x.title}}</strong></p>
+              <span [innerHtml]="x.templateDocument"></span>
+          </div>
+      </div>
+
+  </div>
+</p-dialog>

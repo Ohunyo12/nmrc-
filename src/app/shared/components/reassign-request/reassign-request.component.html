@@ -1,0 +1,153 @@
+<div *ngIf="newUsage == true" class="panel panel-default">
+	<div *ngIf="showInPanel == true">
+		<div class="panel-heading">
+			<h2 class="panel-title">{{ panelLabel }}</h2>
+		</div>
+		<div class="panel-body">
+			<!-- <button *ngIf="enableRoute == true" (click)="showRouteForm()" class="btn btn-default">
+					<span class="glyphicon glyphicon-share-alt"></span>
+					Route
+				</button> -->
+
+			<button *ngIf="enableReassign == true" (click)="showRerouteForm()" class="btn btn-default">
+				<span class="glyphicon glyphicon-share-alt"></span>{{reassignButtonLabel}}
+			</button>
+
+			<!-- <button *ngIf="enableRoutePreset == true" (click)="showPresetRouteForm()" class="btn btn-default">
+					<span class="glyphicon glyphicon-cog"></span>
+					Preset Route
+				</button>
+
+				<button *ngIf="enableRouteOperation == true" (click)="showOperationRouteForm()" class="btn btn-default">
+					<span class="glyphicon glyphicon-cog"></span>
+					Re-Route Workflow
+				</button> -->
+
+		</div>
+	</div>
+	<div *ngIf="showInPanel == false">
+		<!-- second new usage design -->
+		<!-- <button *ngIf="enableRoute == true" (click)="showRouteForm()" class="btn btn-default">
+				<span class="glyphicon glyphicon-share-alt"></span>
+				Route
+			</button> -->
+	
+		<button *ngIf="enableReassign == true" (click)="showRerouteForm()" class="btn btn-default">
+			<span class="glyphicon glyphicon-share-alt"></span>{{reassignButtonLabel}}
+		</button>
+	
+		<!-- <button *ngIf="enableRoutePreset == true" (click)="showPresetRouteForm()" class="btn btn-default">
+				<span class="glyphicon glyphicon-cog"></span>
+				Preset Route
+			</button>
+	
+			<button *ngIf="enableRouteOperation == true" (click)="showOperationRouteForm()" class="btn btn-default">
+				<span class="glyphicon glyphicon-cog"></span>
+				Re-Route Workflow
+			</button> -->
+	</div>
+	
+</div>
+
+<div *ngIf="displayReassignForOldUsage() == true" style="margin-bottom:0" class="panel panel-default">
+	<div class="panel-heading">
+		<div style="margin-left:0" class="row">
+			<h2 class="panel-title pull-left">
+				Search Staff
+			</h2>
+			<div class="pull-right">
+				<a class="close" style="margin: -10px 8px;" (click)="returnToCaller()">&times;</a>
+			</div>
+		</div>
+	</div>
+	<div style="padding:3px" class="panel-body">
+		<div class="form-group">
+			<div class="col-md-12">
+				<input type="text" id="staffSearch" #staffInPut (keyup)="searchApprover($event.target.value)"
+					class="form-control" placeholder="Type in the staff name...">
+			</div>
+		</div>
+  
+		<div class="form-group">
+			<div class="col-md-12">
+				<p>
+					<!--{{mfacilityType}}-->
+				</p>
+				<table *ngIf="availableApprovers" class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th>Staff Code</th>
+							<th>First Name</th>
+							<th>Middle Name</th>
+							<th>Last Name</th>
+							<th>Staff Role</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr (click)="pickSearchedApprover(res)" style="cursor: pointer"
+							*ngFor="let res of availableApprovers; let i = index">
+							<td>{{res.staffCode}}</td>
+							<td>{{res.firstName}}</td>
+							<td>{{res.secondName}}</td>
+							<td>{{res.lastName}}</td>
+							<td>{{res.staffRoleName}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayReassignForNewUsage" id="add-modal" [modal]="true" showEffect="fade" width="600"
+	[appendTo]="'body'" [contentStyle]="{'overflow':'auto','max-height':'900px'}">
+	<div style="margin-bottom:0" class="panel panel-default">
+		<div class="panel-heading">
+			<div style="margin-left:0" class="row">
+				<h2 class="panel-title pull-left">
+					Search Staff
+				</h2>
+				<div class="pull-right">
+					<a class="close" style="margin: -10px 8px;" (click)="displayReassignForNewUsage = false">&times;</a>
+				</div>
+			</div>
+		</div>
+		<div style="padding:3px" class="panel-body">
+			<div class="form-group">
+				<div class="col-md-12">
+					<input type="text" id="staffSearch" #staffInPut (keyup)="searchApprover($event.target.value)"
+						class="form-control" placeholder="Type in the staff name...">
+				</div>
+			</div>
+	
+			<div class="form-group">
+				<div class="col-md-12">
+					<p>
+						<!--{{mfacilityType}}-->
+					</p>
+					<table *ngIf="availableApprovers" class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th>Staff Code</th>
+								<th>First Name</th>
+								<th>Middle Name</th>
+								<th>Last Name</th>
+								<th>Staff Role</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr (click)="pickSearchedApprover(res)" style="cursor: pointer"
+								*ngFor="let res of availableApprovers; let i = index">
+								<td>{{res.staffCode}}</td>
+								<td>{{res.firstName}}</td>
+								<td>{{res.secondName}}</td>
+								<td>{{res.lastName}}</td>
+								<td>{{res.staffRoleName}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</p-dialog>

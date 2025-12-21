@@ -1,0 +1,123 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Facility Job Request
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <!-- <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Request List <small> {{ operationTitle }}</small>
+                        </h2>
+                        <div class="pull-right">
+                            <button (click)="showRequestForm()" pButton type="button" label="Create New" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="pull-right" style="margin-right:16px;margin-bottom:2px;">
+                    <input type="search" [(ngModel)]="searchString" id="searchString" name="searchString" placeholder="Search job request..."
+                        aria-label="Search" size="30" minlength="4" maxlength="50">
+                    <button (click)="getFacilityJobRequests()">Search</button>
+                </div>
+            <div class="panel-body">
+                <p-dataTable  [responsive]="true" [value]="jobRequests" [paginator]="true" [rows]="10"  selection="true" selectionMode="single"
+                [rowsPerPageOptions]="[10,20,30]" >
+                     <p-column field="systemArrivalDate" [style]="{'width':'83px'}" header="Date" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            {{ row.systemArrivalDate | date }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="jobRequestCode" [style]="{'width':'73px'}" header="Code" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="refNo" [style]="{'width':'95px'}" header="Reference" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="jobSubTypeName" [style]="{'width':'100px'}" header="Job Type" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="fromSender" header="Sent By" [style]="{'width':'125px'}" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'182px'}" field="customerName" header="Customer" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'125px'}" field="operationName" header="Required for" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'40px'}" header="View">
+                        <ng-template pTemplate type="header"></ng-template>
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate type="body">
+                            <a (click)="ViewJobRequest(d)" href="javascript:void(0)">View</a>
+                        </ng-template>
+                    </p-column>
+
+                    <p-column field="requestStatusId" header="" [style]="{'width':'68px','text-align':'center'}">
+                        <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                            <span [innerHTML]="getStatus(row.requestStatusId)" ></span>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+
+                <div class="panel-body"  style="overflow:auto;height:400px">
+                    <div class="form-horizontal">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayJobViewForm" [closable]="true" id="add-modal" modal="modal" showEffect="fade" width="750">
+    <div style="margin-bottom:0" class="panel panel-default overflow-y: scroll ">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Job Request View
+            </h2>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:300px">
+            <footer>Sent By:</footer> <cite>{{row ? row['fromSender'] : ''}} </cite>
+            <!-- ({{row ? row['senderRoleCode'] : ''}}) -->
+            <div class="form-group">
+                <div class="col-md-12 ">
+                    <div class="panel-body col-md-12" style="min-height:200px;">
+                        <div  [innerHTML]="senderComment" class="paper" style="overflow:auto;height:180px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="form-group col-md-12">
+
+                    <footer>Responded by</footer><cite>{{row ? row['responseStaffName'] : ''}} </cite> 
+                    <!-- ({{row ? row['senderRoleCode'] : ''}}) -->
+                    <!-- <cite>{{to}} ({{toBranch}})</cite> -->
+
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 ">
+                        <div class="panel-body col-md-12" style="min-height:180px;">
+                            <div [innerHTML]="responseComment" class="paper" style="overflow:auto;height:180px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div *ngIf="to === null || to === 'n/a'" class="panel-body col-md-12">
+                <cite>This Request has not been responded to</cite>
+            </div> -->
+
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="closeDialog()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+<!-- <pre>{{jobRequests | json }}</pre> -->

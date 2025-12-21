@@ -1,0 +1,133 @@
+<div class="ui-g">
+    <!--*ngIf="!isGlobal" -->
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Override Request
+                            </h2>
+                            <div class="pull-right">
+                                <button pButton (click)="addOverride()" type="button" label="New Override" icon="fa fa-add"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:3px" class="panel-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+
+                                <th>Customer Code</th>
+                                <th>Customer Name</th>
+                                <th>Overide</th>
+                                <th>Reference Number</th>
+                                <th>Status</th>
+                                <th>Used</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let res of overrideRequest; let i = index">
+                                <!-- <td>(click)="selectedSearchCustomer(res)" style="cursor: pointer"</td> -->
+
+                                <td>{{res.customerCode}}</td>
+                                <td>{{res.customerName}}</td>
+                                <td>{{res.itemName}}</td>
+                                <td>{{res.sourceReferenceNumber}}</td>
+                                <td>{{res.approvalStatus}}</td>
+                                <td>{{res.isUsed ? 'Yes' : 'No' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayOverrideForm" id="add-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Override Request
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <form [formGroup]="overrideForm" autocomplete="off">
+
+                    <div >
+                        <div  >
+                            <div class="form-group">
+                                <label for="" class="col-md-2">Customer Search</label>
+                                <div class="col-md-10">
+                                    <simple-customer-search (selectedCustomer)="selectedSearchCustomer($event)"></simple-customer-search>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2" for="customerCode"> Customer Code</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" formControlName="customerCode" [attr.disabled]="true" name="" id="customerCode">
+                                </div>
+
+                                <label class="col-md-2" for="customerName">Customer Name</label>
+                                <div class="col-md-4">
+                                    <input type="text" [attr.disabled]="true" class="form-control" formControlName="customerName" name="" id="customerCode">
+                                </div>
+                            </div>
+                             
+                            <div class="form-group">
+                                <label class="col-md-2" for="reason">Reason</label>
+                                <div class="col-md-10">
+                                    <textarea class="form-control" formControlName="reason" name="" id="" rows="4"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <legend>
+                                    <fieldset>
+                                            Allowed Override
+                                    </fieldset>
+                                    <div class="col-md-offset-2" >
+                                            <table class="table table-striped" style=" border: 1px; margin-right:5px">
+                                                    <tbody>
+        
+                                                        <tr *ngFor="let item of overrideItem; let i = index">
+                                                            <td style="width: 5px">
+                                                                <!-- <input type="checkbox"> -->
+                                                                <p-checkbox name="override" (onChange)="onSelect($event, item, i)"></p-checkbox>
+                                                            </td>
+                                                            <td>{{item.itemName}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                    </div>
+                                   
+                                </legend>
+                                    
+                                  
+                                </div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+           
+        </div>
+        <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- [disabled]="loanApplForm.invalid || disableBtn == true" *ngIf="allowForLoanApplication" -->
+                        <button type="button" (click)="displayOverrideForm = false" class="btn btn-danger pull-right">Close</button>
+                        <button type="button" class="btn btn-primary pull-right" style="margin-right:5px" (click)="onSubmit()">Submit</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+</p-dialog>

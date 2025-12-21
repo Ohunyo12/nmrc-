@@ -1,0 +1,519 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Customer Information Awaiting Approval
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <p-dataTable [paginator]="true" [rows]="15" [value]="customerApprovalData" [responsive]=true selectionMode="single">
+            <p-column field="customerCode" header="Customer Code " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'220px'}"></p-column>
+            <p-column field="customerBranch" header="Customer Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="modificationType" header="Modification Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="createdBy" header="Modified By" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="dateUpdated" header="Date Modified" sortable="true" [filter]="true" filterMatchMode="contains">
+              <ng-template let-col let-apr="rowData" pTemplate="body">
+                {{apr[col.field] | date: 'medium' }}
+              </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'60px'}">
+
+              <ng-template pTemplate="header">
+                View
+              </ng-template>
+              <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewCustomerDetails(staff, $event)" style="display: block" href="#">
+                  <i class="glyphicon glyphicon-eye-open"></i>
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCustomerModal" id="approvalModal" modal="modal" showEffect="fade" width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Customer Information Approval
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayCustomerModal=false">&times;</a>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+        <p-tabPanel header="Customer Information">
+          <app-customer-information-detail></app-customer-information-detail>
+        </p-tabPanel>
+        <p-tabPanel header="Modified Information">
+          <div class="form-horizontal">
+            <table class="table table-customer-information">
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Customer Code</strong>
+                  </td>
+                  <td>{{selectedCustomerData.customerCode}}</td>
+                  <td>
+                    <strong>Customer Branch</strong>
+                  </td>
+                  <td>{{selectedCustomerData.customerBranch}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Customer Name</strong>
+                  </td>
+                  <td>{{selectedCustomerData.customerName}}</td>
+                  <td>
+                    <strong>Modified Info</strong>
+                  </td>
+                  <td>{{selectedCustomerData.modificationType}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Modified By</strong>
+                  </td>
+                  <td>{{selectedCustomerData.createdBy}}</td>
+                  <td>
+                    <strong>Date Modified</strong>
+                  </td>
+                  <td>{{selectedCustomerData.dateUpdated | date: 'medium'}}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Comment</strong>
+                  </td>
+                  <td>
+                    <textarea [ngClass]="!selectedCustomerData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="selectedCustomerData.comment"
+                      name="comment" cols="30" rows="3"></textarea>
+                  </td>
+                  <td>
+                    <strong>Status</strong>
+                  </td>
+                  <td>
+                    <select name="approvalStatus" id="approvalStatus" class="form-control" [(ngModel)]="selectedCustomerData.approvalStatusId"
+                      [ngClass]="!selectedCustomerData.approvalStatusId ? 'required-input' : 'valid-input'">
+                      <option value="">--- Select Approval Status ---</option>
+                      <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="overflow-y: auto; overflow-x: hidden;max-height: 270px">
+              <div *ngIf="customerSelection">
+                <fieldset>
+                  <legend>General Information Awaiting Approval</legend>
+                </fieldset>
+                <table class="table table-customer-information">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Customer Code:</strong>
+                      </td>
+                      <td>{{ customerSelection.customerCode }}</td>
+                      <td>
+                        <strong>Customer Type:</strong>
+                      </td>
+                      <td>{{ getCustomerType(customerSelection.customerTypeId) }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>Title:</strong>
+                      </td>
+                      <td>{{ customerSelection.title }}</td>
+                      <td>
+                        <strong>Gender:</strong>
+                      </td>
+                      <td>{{ customerSelection.gender }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>First Name:</strong>
+                      </td>
+                      <td>{{ customerSelection.firstName }}</td>
+                      <td>
+                        <strong>Date of Birth:</strong>
+                      </td>
+                      <td> {{customerSelection.dateOfBirth | date : 'dd/MM/yyyy' }}</td>
+                    </tr>
+                    <tr *ngIf="isCorperateCustomer">
+                      <td>
+                        <strong>Corporate Name:</strong>
+                      </td>
+                      <td>{{ customerSelection.firstName }}</td>
+                      <td>
+                        <strong>Date of Established:</strong>
+                      </td>
+                      <td> {{customerSelection.dateOfBirth | date : 'dd/MM/yyyy' }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>Middle Name:</strong>
+                      </td>
+                      <td>{{ customerSelection.middleName }}</td>
+                      <td>
+                        <strong>Customer BVN:</strong>
+                      </td>
+                      <td>{{ customerSelection.customerBVN }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>Last Name:</strong>
+                      </td>
+                      <td>{{ customerSelection.lastName }}</td>
+                      <td>
+                        <strong>Place of Birth:</strong>
+                      </td>
+                      <td>{{ customerSelection.placeOfBirth }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Email Address:</strong>
+                      </td>
+                      <td>{{ customerSelection.emailAddress }}</td>
+                      <td>
+                        <strong> TIN:</strong>
+                      </td>
+                      <td>{{ customerSelection.taxNumber }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>Marital Status:</strong>
+                      </td>
+                      <td>{{ getMaritalStatus(customerSelection.maritalStatus) }}</td>
+                      <td>
+                        <strong> Occupation:</strong>
+                      </td>
+                      <td>{{ customerSelection.occupation }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong>Spouse:</strong>
+                      </td>
+                      <td>{{ customerSelection.spouse }}</td>
+                      <td>
+                        <strong> Maiden Name:</strong>
+                      </td>
+                      <td>{{ customerSelection.maidenName }}</td>
+                    </tr>
+                    <tr *ngIf="!isCorperateCustomer">
+                      <td>
+                        <strong> Nationality:</strong>
+                      </td>
+                      <td>{{ customerSelection.nationality }}</td>
+                      <td>
+                        <strong> Account Creation Complete:</strong>
+                      </td>
+                      <td>{{ customerSelection.accountCreationComplete ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong> Relationship Manager:</strong>
+                      </td>
+                      <td>{{ customerSelection.relationshipOfficerName }}</td>
+                      <td>
+                        <strong> Sector:</strong>
+                      </td>
+                      <td>{{ customerSelection.sectorName }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Sub-Sector:</strong>
+                      </td>
+                      <td>{{ customerSelection.subSectorName }}</td>
+                      <td>
+                        <strong>Politically Exposed:</strong>
+                      </td>
+                      <td>{{ customerSelection.isPoliticallyExposed ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>CRMS Legal Status:</strong>
+                      </td>
+                      <td>{{ customerSelection.crmsLegalStatusName }}</td>
+                      <td>
+                        <strong>CRMS Company Size:</strong>
+                      </td>
+                      <td>{{ customerSelection.crmsCompanySizeName }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>CRMS Relationship Type:</strong>
+                      </td>
+                      <td>{{ customerSelection.crmsRelationshipTypeName }}</td>
+                      <td>
+                        <strong> </strong>
+                      </td>
+                      <td> </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div *ngIf="customerCompanyInfomation">
+                <fieldset>
+                  <legend>Corporate Information Awaiting Approval</legend>
+                </fieldset>
+                <table class="table table-customer-information">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong> Registration Number:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.registrationNumber }}</td>
+                      <td>
+                        <strong>Company Website:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.companyWebsite }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong> Company Email:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.companyEmail }}</td>
+                      <td>
+                        <strong>Registered Office:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.registeredOffice }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong> Annual Turn Over:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.annualTurnOver ? [customerCompanyInfomation.annualTurnOver | number:
+                        '.2-2'] : 0.00 }}
+                      </td>
+                      <td>
+                        <strong> Paid Up Capital:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.paidUpCapital ? [customerCompanyInfomation.paidUpCapital | number:
+                        '.2-2'] : 0.00}}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong> Authorized Capital:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.authorizedCapital ? [customerCompanyInfomation.authorizedCapital
+                        | number: '.2-2'] : 0.00 }}</td>
+                      <td>
+                        <strong> Business Sector:</strong>
+                      </td>
+                      <td>{{ getSectorBySectoeId(customerCompanyInfomation?.corporateBusinessCategory) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong> Shareholder Fund:</strong>
+                      </td>
+                      <td>{{ customerCompanyInfomation?.shareholderFund ? [customerCompanyInfomation.shareholderFund | number:
+                        '.2-2'] : 0.00 }}
+                      </td>
+                      <td>
+                        <strong> </strong>
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div *ngIf="customerAddresses">
+                <fieldset>
+                  <legend>Address Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerAddresses" [responsive]="true">
+                      <p-header>Customer Address Information</p-header>
+                      <p-column field="address" header="Conatact Address"></p-column>
+                      <p-column field="stateName" header="State Name"></p-column>
+                      <p-column field="localGovernment" header="Local Government"></p-column>
+                      <p-column field="homeTown" header=" Town/City"></p-column>
+                      <p-column field="nearestLandmark" header="nearestLandmark"></p-column>
+                      <p-column field="active" header="Active"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerPhoneContact">
+                <fieldset>
+                  <legend>Phone Contact Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerPhoneContact" [responsive]="true">
+                      <p-header>Customer Phone Contact</p-header>
+                      <p-column field="phone" header="Home Phone No"></p-column>
+                      <p-column field="phoneNumber" header="Mobile Phone No"></p-column>
+                      <p-column field="active" header="Active"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerCompanyDirectors">
+                <fieldset>
+                  <legend>Director Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerCompanyDirectors" [responsive]="true">
+                      <p-header>Directors</p-header>
+                      <p-column field="firstname" header="Firstname"></p-column>
+                      <p-column field="surname" header="Surname"></p-column>
+                      <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                      <p-column field="email" header="Email"></p-column>
+                      <p-column field="isPoliticallyExposed" header="Politically Exposed">
+                      </p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerCompanyAccountSignatory">
+                <fieldset>
+                  <legend>Account Signatory Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerCompanyAccountSignatory" [responsive]="true">
+                      <p-header>Account Signatory(s)</p-header>
+                      <p-column field="firstname" header="Firstname"></p-column>
+                      <p-column field="surname" header="Surname"></p-column>
+                      <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                      <p-column field="email" header="Email"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerSupplier">
+                <fieldset>
+                  <legend>Top Supplier Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerSupplier" [responsive]="true">
+                      <p-header>Customer Top Supplier(s)</p-header>
+                      <p-column field="customerTypeName" header="Supplier Type"></p-column>
+                      <p-column field="clientOrSupplierName" header="Supplier Name"></p-column>
+                      <p-column field="client_SupplierAddress" header="Address"></p-column>
+                      <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                      <p-column field="client_SupplierEmail" header="Email"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerClient">
+                <fieldset>
+                  <legend>Top Client Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerClient" [responsive]="true">
+                      <p-header>Customer Top Client(s)</p-header>
+                      <p-column field="customerTypeName" header="Client Type"></p-column>
+                      <p-column field="clientOrSupplierName" header="Client Name"></p-column>
+                      <p-column field="client_SupplierAddress" header="Address"></p-column>
+                      <p-column field="client_SupplierPhoneNumber" header="Phone Number"></p-column>
+                      <p-column field="client_SupplierEmail" header="Email"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerCompanyShareholderIndividual">
+                <fieldset>
+                  <legend>Individual Shareholder Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerCompanyShareholderIndividual" [responsive]="true">
+                      <p-header>INDIVIDUAL - Significant Shareholder (5% and above)</p-header>
+                      <p-column field="firstname" header="Firstname"></p-column>
+                      <p-column field="surname" header="Surname"></p-column>
+                      <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                      <p-column field="email" header="Email"></p-column>
+                      <p-column field="numberOfShares" header="% Holding"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerCompanyShareholderCorporate">
+                <fieldset>
+                  <legend>Corporate Shareholder Information Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerCompanyShareholderCorporate" [responsive]="true">
+                      <p-header> CORPORATE - Significant Shareholder (5% and above)</p-header>
+                      <p-column field="firstname" header="Corporate Name"></p-column>
+                      <p-column field="rcNumber" header="RC Number"></p-column>
+                      <p-column field="numberOfShares" header="% Holding"></p-column>
+                      <p-column field="email" header="Email"></p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="customerEmploymentHistory">
+                <fieldset>
+                  <legend>Employment History Awaiting Approval</legend>
+                </fieldset>
+                <div class="form-group">
+                  <div class="col-md-12">
+                    <p-dataTable [value]="customerEmploymentHistory" [responsive]="true">
+                      <p-header>Customer Employment History</p-header>
+                      <p-column field="employerName" header="Employer Name"></p-column>
+                      <p-column field="employerAddress" header="Employer Address"></p-column>
+                      <p-column field="officePhone" header="Office Phone"></p-column>
+                      <p-column field="employDate" header="Employment Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                          {{ d.employDate | date: 'dd-MM-yyyy' }}
+                        </ng-template>
+                      </p-column>
+                    </p-dataTable>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="View Approval Workflow">
+          <p-dataTable [value]="approvalWorkflowData">
+            <p-column field="staffName" header="Approving Staff" filterMatchMode="contains"></p-column>
+            <p-column field="operationName" header="Operation" filterMatchMode="contains"></p-column>
+            <p-column field="approvalLevelName" header="Approval Level" filterMatchMode="contains"></p-column>
+            <p-column field="approvalStatusName" header="Approval Status" filterMatchMode="contains">
+              <ng-template let-col let-ln="rowData" pTemplate="body">
+                {{ln[col.field]==0 ? 'Initialise' : 'Approved'}}
+              </ng-template>
+            </p-column>
+            <p-column field="comment" header="Comment" filterMatchMode="contains"></p-column>
+          </p-dataTable>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group pull-right">
+            <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+            <button [disabled]="!selectedCustomerData.comment || !selectedCustomerData.approvalStatusId" type="button" (click)="goForApproval(selectedCustomerData, $event)"
+              class="btn btn-success">Submit For Approval</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</p-dialog>

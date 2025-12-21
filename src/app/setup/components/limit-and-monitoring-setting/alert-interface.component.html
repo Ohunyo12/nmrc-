@@ -1,0 +1,131 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding"  >
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                             List of Email Alert Notifications
+                            </h2>
+                            <!-- <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="alertList" [responsive]=true selectionMode="single">
+                        <p-column [style]="{'width':'150px'}" field="messageTitle" header="Alert Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="notificationPeriod1" header="Notification Period 1 (Days Before)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="escalationLevel1" header="Escalation Level 1" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="notificationPeriod2" header="Notification Period 2  (Days Before)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="escalationLevel2" header="Escalation Level 2" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="notificationPeriod3" header="Notification Period 3  (Days Before)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'150px'}" field="escalationLevel3" header="Escalation Level 3" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'60px'}">
+
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editAlertMessage(staff)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+        </div>
+    </div>
+  </div>
+
+  <p-dialog [responsive]=true [(visible)]="displayemailMessage" modal="modal" showEffect="fade" width="900">
+    <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                           Edit Alert Monitoring Message
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+   <form novalidate [formGroup]="alertListForm" autocomplete="off">
+       <div class="panel-body">
+           <div class="form-horizontal">
+                   <div class="form-group">
+                       <label for="" class="control-label col-md-3">Message Title</label>
+                       <div class="col-md-8 ">
+                           <input type="text" class="form-control " [attr.disabled]="true" formControlName="messageTitle"
+                           [ngClass]="!alertListForm.controls['messageTitle'].valid ? 'required-input' : 'valid-input'"
+                           name="messageTitle" >
+                       </div>
+                   </div>
+                   <div class="form-group">
+                        <label for="" class="control-label col-md-3">Notification Period 1 (days)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control numeric" maxlength="3" formatM formControlName="notificationPeriod1" 
+                            [ngClass]="!alertListForm.controls['notificationPeriod1'].valid ? 'required-input' : 'valid-input'"
+                            name="notificationPeriod1" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-3">  Escalation Email(s)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control " formControlName="escalationLevel1" 
+                            [ngClass]="!alertListForm.controls['escalationLevel1'].valid ? 'required-input' : 'valid-input'"
+                            name="escalationLevel1" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-3">Notification Period 2 (days)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control numeric" maxlength="3" formatM formControlName="notificationPeriod2" 
+                            [ngClass]="!alertListForm.controls['notificationPeriod2'].valid ? 'required-input' : 'valid-input'"
+                            name="notificationPeriod2" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-3">  Escalation Email(s)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control " formControlName="escalationLevel2" 
+                            [ngClass]="!alertListForm.controls['escalationLevel2'].valid ? 'required-input' : 'valid-input'"
+                            name="escalationLevel2" >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-3">Notification Period 3 (days)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control numeric" maxlength="3" formatM formControlName="notificationPeriod3" 
+                            [ngClass]="!alertListForm.controls['notificationPeriod3'].valid ? 'required-input' : 'valid-input'"
+                            name="notificationPeriod13" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-3">  Escalation Email(s)</label>
+                        <div class="col-md-8 ">
+                            <input type="text" class="form-control " formControlName="escalationLevel3" 
+                            [ngClass]="!alertListForm.controls['escalationLevel3'].valid ? 'required-input' : 'valid-input'"
+                            name="escalationLevel3" >
+                        </div>
+                    </div>
+           </div>
+       </div>
+   </form>
+
+   <div class="panel-footer">
+       <div class="row">
+           <div class="col-md-12">
+                <button type="submit" (click)="saveEmailMessage(alertListForm)"  [disabled]="alertListForm.invalid" class="btn btn-success pull-right">Save</button>
+                <button type="button" (click)="displayemailMessage=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+           </div>
+       </div>
+   </div>
+
+  </div>
+</p-dialog>
+

@@ -1,0 +1,101 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">Call Limits Setup</h2>
+            <div class="pull-right">
+              <button type="button" (click)="showCallLimitForm()" pButton icon="fa-plus" label="Add New Call Limit"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <p-dataTable [value]="callLimitsTableData" [rows]="15" [paginator]="true">
+          <p-column field="jobTitleName" header="Staff Role" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="minimumAmount" header="Minimum Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.minimumAmount | number : '1.2-2'}}
+            </ng-template>
+          </p-column>
+          <p-column field="maximumAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              {{ d.maximumAmount | number : '1.2-2'}}
+            </ng-template>
+          </p-column>
+          <p-column field="frequencyName" header="Frequency" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          <p-column field="callLimitTypeName" header="Limit Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+          <p-column [style]="{'width':'100px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template pTemplate="body" let-col let-i="rowIndex">
+              <a (click)="editCallLimit(i)" href="javascript:void(0)">Edit</a>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [responsive]="true" [(visible)]="displayCallLimitModal" id="limit-def-modal" modal="modal" showEffect="fade" width="850">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="callLimitForm" (ngSubmit)="submitCallLimitForm(callLimitForm)" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="maximumAmount" class="col-md-2 control-label">Maximum Amount</label>
+            <div class="col-md-4">
+              <input type="text" name="maximumAmount" id="maximumAmount" class="form-control numeric" formatM maxlength="20" formControlName="maximumAmount" [ngClass]="callLimitForm.controls['maximumAmount'].valid ? 'valid-input':'required-input'">
+            </div>
+            <label for="callLimitTypeId" class="col-md-2 control-label">Call Limit Type</label>
+            <div class="col-md-4">
+              <select name="callLimitTypeId" id="callLimitTypeId" class="form-control" formControlName="callLimitTypeId" [ngClass]="callLimitForm.controls['callLimitTypeId'].valid ? 'valid-input':'required-input'">
+                <option value="">--- Select Call Limit Type ---</option>
+                <option *ngFor="let item of callLimitTypes" [value]="item.callLimitTypeId">{{item.name}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="minimumAmount" class="col-md-2 control-label">Minimum Amount</label>
+            <div class="col-md-4">
+              <input type="text" name="minimumAmount" id="minimumAmount" class="form-control numeric" formatM maxlength="20" formControlName="minimumAmount" [ngClass]="callLimitForm.controls['minimumAmount'].valid ? 'valid-input':'required-input'">
+            </div>
+            <label for="jobTitleId" class="col-md-2 control-label">Staff Role</label>
+            <div class="col-md-4">
+              <select name="jobTitleId" id="jobTitleId" class="form-control" formControlName="jobTitleId" [ngClass]="callLimitForm.controls['jobTitleId'].valid ? 'valid-input':'required-input'">
+                <option value="">--- Select Staff Role ---</option>
+                <option *ngFor="let st of staffRoles" value="{{st.staffRoleId}}">{{st.staffRoleName}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="frequencyId" class="col-md-2 control-label">Call Frequency</label>
+            <div class="col-md-4">
+              <select name="frequencyId" id="frequencyId" class="form-control" formControlName="frequencyId" [ngClass]="callLimitForm.controls['frequencyId'].valid ? 'valid-input':'required-input'">
+                <option value="">--- Select Call Frequency ---</option>
+                <option *ngFor="let feq of frequencies" value="{{feq.lookupId}}">
+                  {{feq.lookupName}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="callLimitForm.invalid" class="btn btn-success pull-right">Save Call Limit</button>
+            <button type="button" (click)="displayCallLimitModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-dialog>

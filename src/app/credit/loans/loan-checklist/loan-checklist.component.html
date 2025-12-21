@@ -1,0 +1,1171 @@
+<p-growl [(value)]="msgs"></p-growl>
+<div class="btn-group dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span> Checklist
+  </button>
+  <ul class="dropdown-menu">
+    <li *ngFor="let type of checklistTypeList">
+      <a href="javascript:void(0)" (click)="ShowLoanEligibilityChecklist(type.targetTypeId)">{{ type.targetTypeName }}</a>
+      <div role="separator" class="divider"></div>
+    </li>
+
+  </ul>
+</div>
+<div class="ui-g" *ngIf="false">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Loan Application Awaiting Checklist
+              </h2>
+            </div>
+          </div>
+
+        </div>
+        <div class="panel-body">
+          <p-dataTable [paginator]="true" [rows]="15" [value]="loanApplicationList" [responsive]=true selectionMode="single">
+            <p-column field="applicationRefNo" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="customerName" header="Obligor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="proposedProductName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains">
+
+            </p-column>
+            <p-column field="proposedAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.proposedAmount | number : '1.2' }}
+              </ng-template>
+            </p-column>
+            <p-column field="proposedInterestRate" header="Rate" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.proposedInterestRate | number : '1.2' }}
+              </ng-template>
+            </p-column>
+            <p-column field="proposedTenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                {{ d.applicationTenor | number : '1.2' }}
+              </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'60px'}">
+
+              <ng-template pTemplate="header">
+                View
+              </ng-template>
+              <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="viewLoanCheckList(i, $event)" style="display: block" href="#">
+                  <i class="glyphicon glyphicon-eye-open"></i>
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistDetailValidation" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="820" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View Loan Application CheckList
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayChecklistDetailValidation=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-12" style="max-height: 400px; overflow: auto">
+              <p-dataTable [value]="ChecklistDetailsValidationList" [responsive]=true [style]="{'overflow':'auto', 'max-height':'400px'}">
+                <p-column field="checkListDefinitionItemName" header="CheckList Item" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="checkListStatusName" header="Checklist Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="deferedDate" header="Deferred Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.deferedDate ? [d.deferedDate | date: 'dd-MM-yyyy'] : 'N/A' }}
+                  </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"> </ng-template>
+                  <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                    <a (click)="viewChecklistUpload(d)" href="javascript:void(0)">View</a>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button " (click)="displayChecklistDetailValidation=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistvalidateDecline" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View {{checkListTypeHeader}}
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayChecklistvalidateDecline=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-12" style="max-height: 400px; overflow: auto">
+              <div *ngIf="showMultipleFacility" class="form-group">
+                <label for="esgTypeId" class="control-label col-md-2">Select Facility</label>
+                <div class="col-md-6">
+                  <select [ngClass]="'valid-input'" (change)="onSelectedApplicationDetailChanged($event.target.value)" class="form-control">
+                    <option value="">-- Select Facility --</option>
+                    <option *ngFor="let type of loanApplicationDetailLists" value="{{type.loanApplicationDetailId}}">{{type.proposedAmount
+                      +' - ' + type.proposedProductName}}</option>
+                  </select>
+                </div>
+              </div>
+              <p-dataTable [value]="ChecklistDetailsValidationList" [responsive]=true [style]="{'overflow':'auto', 'max-height':'400px'}">
+                <p-column field="checkListDefinitionItemName" header="CheckList Item"></p-column>
+                <p-column field="checkListStatusName" header="Checklist Status" [style]="{'width':'100px'}"></p-column>
+                <p-column *ngIf="isAvailmentChecklist || isCAMchecklist" field="checkListValidationStatus1" header="Checklist Status(CAP)"
+                  [style]="{'width':'100px'}" filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-d="rowData">
+                    <span *ngIf="d.checkListValidationStatus1==true">Validated</span>
+                    <span *ngIf="d.checkListValidationStatus1==false">Declined</span>
+                    <span *ngIf="d.checkListValidationStatus1==null">Not Checked</span>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="isAvailmentChecklist && !canDoChecklist" field="checkListValidationStatus2" header="Checklist Status(Availment)"
+                  [style]="{'width':'100px'}" filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-m="rowData">
+                    <span *ngIf="m.checkListValidationStatus2==true">Validated</span>
+                    <span *ngIf="m.checkListValidationStatus2==false">Declined</span>
+                    <span *ngIf="m.checkListValidationStatus2==null">Not Checked</span>
+                  </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"> Checklist Document</ng-template>
+                  <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                    <a (click)="viewChecklistUpload(d)" href="javascript:void(0)">View</a>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="isAvailmentChecklist && canDoChecklist" field="checkListValidationStatus2" [style]="{'width':'70px', 'text-align': 'center'}">
+                  <ng-template pTemplate="header"> Validated </ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <label class="radio-inline">
+                      <input type="radio" name="{{i}}" id="{{i}}" [value]="true" [(ngModel)]="k.checkListValidationStatus2" [ngModelOptions]="{standalone: true}">Yes</label>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="isAvailmentChecklist && canDoChecklist" field="checkListValidationStatus2" [style]="{'width':'80px', 'text-align': 'center'}">
+                  <ng-template pTemplate="header"> </ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <label class="radio-inline">
+                      <input type="radio" name="{{i}}" id="{{i}}" [value]="false" [(ngModel)]="k.checkListValidationStatus2" [ngModelOptions]="{standalone: true}">No</label>
+                  </ng-template>
+                </p-column>
+
+
+                <p-column *ngIf="isCAMchecklist && canDoChecklist" field="checkListValidationStatus1" [style]="{'width':'70px', 'text-align': 'center'}">
+                  <ng-template pTemplate="header"> Validated </ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <label class="radio-inline">
+                      <input type="radio" name="{{i}}" id="{{i}}" [value]="true" [(ngModel)]="k.checkListValidationStatus1" [ngModelOptions]="{standalone: true}">Yes</label>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="isCAMchecklist && canDoChecklist" field="checkListValidationStatus1" [style]="{'width':'80px', 'text-align': 'center'}">
+                  <ng-template pTemplate="header"> </ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <label class="radio-inline">
+                      <input type="radio" name="{{i}}" id="{{i}}" [value]="false" [(ngModel)]="k.checkListValidationStatus1" [ngModelOptions]="{standalone: true}">No</label>
+                  </ng-template>
+                </p-column>
+                <!-- <p-column *ngIf="isAvailmentChecklist && canDoChecklist" field="checkListValidationStatus1" [style]="{'width':'120px'}">
+                  <ng-template pTemplate="header"> {{validationHeader}}</ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <select name="checkListValidationStatus2" id="checkListValidationStatus2" class="form-control" (change)="checklistValidated(i, $event.target.value)"
+                      [(ngModel)]="k.checkListValidationStatus2" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                      <option value=" ">--- Select Option ---</option>
+                      <option value="true">--- Yes ---</option>
+                      <option value="false">--- No ---</option>
+                    </select>
+                  </ng-template>
+                </p-column> -->
+                <!-- <p-column *ngIf="isCAMchecklist && canDoChecklist" field="checkListValidationStatus1" [style]="{'width':'120px'}">
+                  <ng-template pTemplate="header"> {{validationHeader}}</ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <select name="checkListValidationStatus1" id="checkListValidationStatus1" class="form-control" (change)="checklistValidated(i, $event.target.value)"
+                      [(ngModel)]="d.checkListValidationStatus1" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                      <option value=" ">--- Select Option ---</option>
+                      <option value="true">--- Yes ---</option>
+                      <option value="false">--- No ---</option>
+                    </select>
+                  </ng-template>
+                </p-column> -->
+              </p-dataTable>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button" *ngIf="canDoChecklist" (click)="checklistValidated()" style="margin-right:5px " class="btn btn-success pull-right ">Save</button>
+          <button type="button" *ngIf="canDoChecklist" (click)="displayChecklistvalidateDecline=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+          <button type="button" *ngIf="!canDoChecklist" (click)="displayChecklistvalidateDecline=false " style="margin-right:5px "
+            class="btn btn-primary pull-right ">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistEntry" id="create-edit-modal" modal="modal" showEffect="fade" width="600" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        CheckList Details
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayChecklistEntry=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Checklist Item</label>
+            <div class="col-md-8">
+              <textarea rows="3" name="checklistItem" id="checklistItem" class="form-control" [(ngModel)]="checklistItem" [ngClass]="'valid-input'"
+                [attr.disabled]="true"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Checklist Status
+            </label>
+            <div class="col-md-8">
+              <select name="checkListStatusId" id="checkListStatusId" class="form-control" (change)="onChecklistStatusChanged($event.target.value)"
+                [(ngModel)]="checkListStatusId" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                <option value=" ">--- Select Checklist Status ---</option>
+                <option *ngFor="let item of checklistStatusResponse " [value]="item.checklistStatusId ">{{item.checklistStatusName}}</option>
+              </select>
+            </div>
+          </div>
+          <div *ngIf="checklistDeffered" class="form-group">
+            <label style="padding-top: 13px" for="" class="control-label col-md-4">Deferred Date</label>
+            <div class="col-md-8">
+              <p-calendar id="deferedDate " dateFormat="dd/mm/yy " [inputStyle]="{ 'width': '350px'}" [monthNavigator]="true " [yearNavigator]="true "
+                yearRange="1955:2030 " [(ngModel)]="deferedDate" [ngModelOptions]="{standalone: true}" [showIcon]="true " [ngClass]=" 'valid-input' "></p-calendar>
+            </div>
+          </div>
+          <div *ngIf="checklistNotProvided">
+            <div class="form-group">
+              <label style="padding-top: 13px" for="" class="control-label col-md-4">Upload Document</label>
+              <div class="col-md-8">
+                <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                  #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="submit" [disabled]="saveButtonEnabled" class="btn btn-success pull-right" (click)="submitLoanChecklist()">Save</button>
+          <button type="button " (click)="displayChecklistEntry=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Document Title:
+        <strong>{{ selectedDocumentName }}</strong>
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayUpload=false">&times;</a>
+      </div>
+    </div>
+
+    <div class="panel-body" style="overflow:auto;height:500px">
+      <div style="margin: auto; width: 50%">
+        <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+          class="img-thumbnail">
+      </div>
+    </div>
+
+  </div>
+</p-dialog>
+
+
+
+<!--p-dialog [responsive]=true [(visible)]="displayCheckListDetails" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="900">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+            {{checkListTypeHeader}}
+          </h2>
+          <div class="pull-right">
+            <a class="close" (click)="displayCheckListDetails=false">&times;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:0" class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Unchecked Items</legend>
+                <div class="col-md-12" style="max-height: 400px; overflow: auto">
+                  <p-dataTable [value]="ChecklistDefinitionList" [(selection)]="selectedChecklist" [rows]="5" [paginator]="true" [responsive]="true">
+                    <p-column field="checkListItemName" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'70px'}">
+                      <ng-template pTemplate="header"> </ng-template>
+                      <ng-template pTemplate="body" let-col let-i="rowData">
+                        <a (click)="uncheckedChecklistItem(i, $event)" href="javascript:void(0)">Check
+                          <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                      </ng-template>
+                    </p-column>
+                  </p-dataTable>
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-md-6">
+              <fieldset>
+                <legend>Checked Checklist Items</legend>
+                <div class="col-md-12" style="max-height: 400px; overflow: auto">
+                  <p-dataTable [value]="ChecklistDetailsValidationList" [rows]="5" [paginator]="true" [responsive]="true">
+                    <p-column field="checkListDefinitionItemName" header="Checklist Item" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'70px'}" field="checkListStatusName" header="Check list Status"></p-column>
+                    <p-column [style]="{'width':'70px'}">
+                      <ng-template pTemplate="header"> </ng-template>
+                      <ng-template pTemplate="body" let-col let-i="rowIndex">
+                        <a (click)="onRemoveClicked(i)" style="color:#ff0000" href="javascript:void(0)">Remove</a>
+                      </ng-template>
+                    </p-column>
+                  </p-dataTable>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button " (click)="displayCheckListDetails=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog-->
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayCheckListDetails" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View {{checkListTypeHeader}}
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayCheckListDetails=false">&times;</a>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <fieldset>
+              <legend>Checklist Items</legend>
+            </fieldset>
+            <p-dataTable [value]="ChecklistDefinitionList" [style]="{'overflow':'auto', 'max-height':'400px'}">
+              <p-column field="checkListItemName" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+              <p-column field="isActive" header="Upload" [style]="{'width':'220px'}">
+                <ng-template pTemplate="body" let-col let-model="rowData">
+                  <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                    #fileInput name="fileInput" style="padding-top:2px;" class="form-control" [(ngModel)]="model.upload" [ngModelOptions]="{standalone: true}">
+                </ng-template>
+              </p-column>
+
+              <!-- <p-column field="checkListValidationStatus1" [style]="{'width':'120px'}">
+                <ng-template pTemplate="header"> Checklist Status</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <select name="checklistStatusId" id="checklistStatusId" class="form-control" (change)="createUpdateChecklistDetails(k, $event.target.value)"
+                    [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                    <option value=" ">--- Select Checklist Status ---</option>
+                    <option *ngFor="let item of k.responseTypes " [value]="item.checklistStatusId ">{{item.checklistStatusName}}</option>
+                  </select>
+                </ng-template>
+              </p-column> -->
+
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Status </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[0].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}" (click)="createUpdateChecklistDetails(k, k.responseTypes[0].checklistStatusId)">{{k.responseTypes[0].checklistStatusName}}</label>
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Status </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" id="checklistStatusId" [value]="k.responseTypes[1].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}" (click)="createUpdateChecklistDetails(k, k.responseTypes[1].checklistStatusId)">{{k.responseTypes[1].checklistStatusName}}</label>
+                </ng-template>
+              </p-column>
+
+
+
+              <p-column field="checklistStatusId" header="Checked" [style]="{'width':'80px', 'text-align': 'center' }" filterMatchMode="contains">
+                <ng-template pTemplate="body" let-col let-d="rowData">
+                  <span *ngIf="d.checklistStatusId==5" style="color:  #198f19c4; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                  <span *ngIf="d.checklistStatusId==6" style="color: #ff0000; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button " (click)="displayCheckListDetails=false " style="margin-right:5px " class="btn btn-primary pull-right ">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayConditionPrecedentValidation" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="900" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View {{checkListTypeHeader}}
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayConditionPrecedentValidation=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-12" style="max-height: 400px; overflow: auto">
+              <p-dataTable [value]="form3800BChecklistDetailsList" [responsive]=true [style]="{'overflow':'auto', 'max-height':'400px'}">
+                <p-column field="condition" header="CheckList Item"></p-column>
+                <p-column field="status" header="Checklist Status(RM)" [style]="{'width':'100px'}"></p-column>
+
+                <p-column field="isExternal" header="Condition Type" [style]="{'width':'100px'}" filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-m="rowData">
+                    <span *ngIf="m.isExternal==false">Internal</span>
+                    <span *ngIf="m.isExternal==true">External</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="approvalStatus" header="Approval Status" [style]="{'width':'100px'}"></p-column>
+                <p-column *ngIf="!canDoChecklist" field="validationStatus" header="Checklist Status(Availment)" [style]="{'width':'100px'}"
+                  filterMatchMode="contains">
+                  <ng-template pTemplate="body" let-col let-m="rowData">
+                    <span *ngIf="m.validationStatus==true">Validated</span>
+                    <span *ngIf="m.validationStatus==false">Declined</span>
+                    <span *ngIf="m.validationStatus==null">Not Checked</span>
+                  </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"> Checklist Document</ng-template>
+                  <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                    <a (click)="viewConditionPrecedentChecklistUpload(d)" href="javascript:void(0)">View</a>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="canDoChecklist" field="validationStatus" [style]="{'width':'120px'}">
+                  <ng-template pTemplate="header"> Availment Validation</ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <select name="validationStatus" id="validationStatus" class="form-control" (change)="validateConditionPrecedent(d, $event.target.value)"
+                      [(ngModel)]="d.validationStatus" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input' ">
+                      <option value=" ">--- Select Option ---</option>
+                      <option value="true">--- Yes ---</option>
+                      <option value="false">--- No ---</option>
+                    </select>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="button " (click)="displayConditionPrecedentValidation=false " style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayESGCheckListDetails" id="create-esg-modal" modal="modal" showEffect="fade"
+  width="1000" [style]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Perform Environmental and Social Risk Assessment(ESGS)
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="closeModal()">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <form [formGroup]="ESGChecklistDetailsForm" novalidate autocomplete="off">
+        <p-tabView *ngIf="!replicate" [activeIndex]="activeIndex" (onChange)="handleChange($event)">
+          <!-- <p-tabPanel header="Transaction Details">
+            <div class="form-horizontal">
+              <br/>
+              <br/>
+              <div *ngIf="false" class="form-group">
+                <label for="" class="control-label col-md-2">Customer Name</label>
+                <div class="col-md-4">
+                  <input type="text" [attr.disabled]="true" [ngClass]="!ESGChecklistDetailsForm.controls['customerName'].valid ? 'required-input' : 'valid-input'"
+                    formControlName="customerName" class="form-control" name="customerName">
+                </div>
+                <label for="" class="control-label col-md-2">Customer Code</label>
+                <div class="col-md-4">
+                  <input type="text" [attr.disabled]="true" [ngClass]="!ESGChecklistDetailsForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'"
+                    formControlName="customerCode" class="form-control" name="customerCode">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="esgTypeId" class="control-label col-md-2">Proposed Transaction</label>
+                <div class="col-md-4">
+                  <select [ngClass]="!ESGChecklistDetailsForm.controls['esgTypeId'].valid ? 'required-input' : 'valid-input'" formControlName="esgTypeId"
+                    name="esgTypeId" id="esgTypeId" class="form-control">
+                    <option value="">-- Select Transaction --</option>
+                    <option *ngFor="let type of ESGTypeList" value="{{type.esgTypeId}}">{{type.esgTypeName}}</option>
+                  </select>
+                </div>
+                <label for="esgClassId" class="control-label col-md-2">Transaction Type</label>
+                <div class="col-md-4">
+                  <select [ngClass]="!ESGChecklistDetailsForm.controls['esgClassId'].valid ? 'required-input' : 'valid-input'" formControlName="esgClassId"
+                    name="esgClassId" id="esgClassId" class="form-control">
+                    <option value="">-- Select Transaction Type --</option>
+                    <option *ngFor="let class of ESGClassList" value="{{class.esgClassId}}">{{class.esgClassName}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">Transaction Description</label>
+                <div class="col-md-10">
+                  <textarea type="text" rows="8" [ngClass]="!ESGChecklistDetailsForm.controls['description'].valid ? 'required-input' : 'valid-input'"
+                    formControlName="description" class="form-control" name="description"></textarea>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel> -->
+          <!-- <p-tabPanel header="Due Diligence Requirements">
+            <p-dataTable [value]="ESGDueDilligenceList" [sortMode]="multiple" sortField="categoryName" rowGroupMode="subheader" groupField="categoryName"
+              [style]="{'overflow':'auto', 'max-height':'400px'}">
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+                <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span>
+              </ng-template>
+              <p-column field="checkListItemName" header="Checklist Item"></p-column>
+              <p-column field="comment" [style]="{'width':'200px'}">
+                <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <textarea type="text" name="comment" id="comment" [(ngModel)]="k.comment" [ngModelOptions]="{standalone: true}" [ngClass]="!k.comment ? 'required-input' : 'valid-input'"
+                    class="form-control"></textarea>
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'70px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Low </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[0].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}">{{k.responseTypes[0].checklistStatusName}}</label>
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Medium </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" id="checklistStatusId" [value]="k.responseTypes[1].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}">{{k.responseTypes[1].checklistStatusName}}</label>
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'70px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> High </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[2].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}">{{k.responseTypes[2].checklistStatusName}}</label>
+                </ng-template>
+              </p-column>
+              <p-column field="checklistStatusId" header="Checked" [style]="{'width':'80px', 'text-align':'center' }" filterMatchMode="contains">
+                <ng-template pTemplate="body" let-col let-d="rowData">
+                  <span *ngIf="d.checklistStatusId==9" style="color: red; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                  <span *ngIf="d.checklistStatusId==8" style="color: yellow; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                  <span *ngIf="d.checklistStatusId==7" style="color: green; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </p-tabPanel> -->
+          <p-tabPanel header="ESR CATEGORISATION METRICS">
+              <!-- <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="subCategoryName" rowGroupMode="subheader"
+              groupField="subCategoryName" [style]="{'overflow':'auto', 'max-height':'400px'}">
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+                <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span>
+              </ng-template> -->
+            <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="categoryName" rowGroupMode="subheader"
+              groupField="categoryName">
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+                <!-- <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span> -->
+              </ng-template>
+              <p-column field="checkListItemName" header="Checklist Item"></p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Yes </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" [value]="k.yesResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.yesResponseTypes.checklistStatusName}}</label>
+                    <!-- <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[0].checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.responseTypes[0].checklistStatusName}}</label> -->
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> No </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" [value]="k.noResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.noResponseTypes.checklistStatusName}}</label>
+                    <!-- <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[1].checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.responseTypes[1].checklistStatusName}}</label> -->
+                </ng-template>
+              </p-column>
+              <p-column field="comment" [style]="{'width':'200px'}">
+                  <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                  <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                    <textarea type="text" name="comment" id="comment" [(ngModel)]="k.comment" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input'"
+                      class="form-control"></textarea>
+                  </ng-template>
+              </p-column>
+              <!-- <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> N/A </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <label class="radio-inline">
+                    <input type="radio" name="{{i}}" id="{{i}}" id="checklistStatusId" [value]="k.responseTypes[2].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+                      [ngModelOptions]="{standalone: true}">{{k.responseTypes[2].checklistStatusName}}</label>
+                </ng-template>
+              </p-column> -->
+              <!-- <p-column field="checklistStatusId" header="Grade" [style]="{'width':'80px' }" filterMatchMode="contains">
+                <ng-template pTemplate="body" let-col let-d="rowData">
+					<b>{{getScoreGrade(d.checklistStatusId)}}</b> -->
+                  <!-- <span *ngIf="d.checklistStatusId==5" style="color:  #198f19c4; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+                  <span *ngIf="d.checklistStatusId==6" style="color: #ff0000; font-size: 15px" class="glyphicon glyphicon-ok"></span> -->
+                <!-- </ng-template>
+              </p-column> -->
+            </p-dataTable>
+          </p-tabPanel>
+          <p-tabPanel header="Risk Level Summary" [disabled]="!(checklistStatusIdIsValid())">
+            <div class="form-horizontal">
+              <br/>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">Overall Risk level</label>
+                <div class="col-md-10">
+                  <label style="margin-right:20px" class="radio-inline">
+                    <input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=1
+                      class="radio-checkbox">CATEGORY A</label>
+                  <label style="margin-right:20px" class="radio-inline">
+                    <input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=5
+                      class="radio-checkbox">CATEGORY B</label>
+                  <label style="margin-right:20px" class="radio-inline">
+                    <input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=6
+                      class="radio-checkbox">CATEGORY C</label>
+                </div>
+              </div>
+              <br/>
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">Summary</label>
+                <div class="col-md-10" *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value>0">
+                  <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==1" style="color:  #ff0000; font-size: 30px" class="bold">{{ESGChecklistDetailsForm.get('overSummary').value}}</span>
+                  <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==5" style="color: #ffc400; font-size: 30px">{{ESGChecklistDetailsForm.get('overSummary').value}}</span>
+                  <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==6" style="color: #198f19c4; font-size: 30px">{{ESGChecklistDetailsForm.get('overSummary').value}}</span>
+                </div>
+              </div>
+            </div>
+          </p-tabPanel>
+        </p-tabView>
+      </form>
+      <div *ngIf="replicate" class="row ">
+        <div class="col-md-12" style="max-height: 700px; overflow: auto">
+          <div class="form-group">
+            <label for="esgTypeId" class="control-label col-md-2">Select Facility</label>
+            <div class="col-md-6">
+              <select [ngClass]="'valid-input'" (change)="onSelectedFacilityChanged($event.target.value)" class="form-control">
+                <option value="">-- Select Facility --</option>
+                <option *ngFor="let type of checklistFacilityLists" value="{{type.loanApplicationDetailId}}">{{[type.proposedAmount
+                  | number: '.2-2'] +' - ' + type.proposedProductName}}</option>
+              </select>
+            </div>
+          </div>
+          <hr/>
+          <div class="form-group">
+            <p-dataTable [value]="ESGChecklistDetailsList" [sortMode]="multiple" sortField="subCategoryName" rowGroupMode="subheader"
+              groupField="subCategoryName" [responsive]=true>
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+                <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span>
+              </ng-template>
+              <p-column field="esgCheckListItemName" header="Checklist Item"></p-column>
+              <p-column field="comment" [style]="{'width':'120px'}">
+                <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  {{k.comment ? k.comment : 'N/A'}}
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" header="Checklist Status(CAP)" [style]="{'width':'100px'}" filterMatchMode="contains">
+                <ng-template pTemplate="body" let-col let-d="rowData">
+					<span *ngIf="d.checkStatusId==1">Yes</span>
+					<span *ngIf="d.checkStatusId==5">Yes</span>
+					<span *ngIf="d.checkStatusId==6">No</span>
+					<span *ngIf="d.checkStatusId==7">Low</span>
+					<span *ngIf="d.checkStatusId==8">Medium</span>
+					<span *ngIf="d.checkStatusId==9">High</span>
+					<span *ngIf="d.checkStatusId==10">N/A</span>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </div>
+          <br/>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Overall Risk level</label>
+            <div class="col-md-10">
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=1 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category A</label>
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=5 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category B</label>
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=6 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category C</label>
+            </div>
+          </div>
+          <br/>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Summary</label>
+            <div class="col-md-10" *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value>0">
+              <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==1" style="color:  #ff0000; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+              <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==5" style="color: #ffc400; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+              <span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==6" style="color: #198f19c4; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+            </div>
+          </div>
+          <!-- <div class="form-group">
+            <label for="" class="control-label col-md-2">Overall Risk level</label>
+            <div class="col-md-10">
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" name="replicateESGOverAllRiskStatusId" id="replicateESGOverAllRiskStatusId" [value]="7" class="radio-checkbox"
+                  [(ngModel)]="replicateESGOverAllRiskStatusId">Low</label>
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" name="replicateESGOverAllRiskStatusId" id="replicateESGOverAllRiskStatusId" [value]="8" class="radio-checkbox"
+                  [(ngModel)]="replicateESGOverAllRiskStatusId">Medium</label>
+              <label style="margin-right:20px" class="radio-inline">
+                <input type="radio" name="replicateESGOverAllRiskStatusId" id="replicateESGOverAllRiskStatusId" [value]="9" class="radio-checkbox"
+                  [(ngModel)]="replicateESGOverAllRiskStatusId">High</label>
+            </div>
+          </div>
+          <br/>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Summary</label>
+            <div class="col-md-10">
+              <textarea type="text" rows="10" [ngClass]="!replicateEGSOverSummary ? 'required-input' : 'valid-input'" class="form-control"
+                name="replicateEGSOverSummary" [(ngModel)]="replicateEGSOverSummary"></textarea>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer">
+		<div class="row ">
+			<div class="col-md-12 ">
+			<button type="button" *ngIf="replicate" [disabled]="!replicateEGSOverSummary || !replicateESGOverAllRiskStatusId" (click)="submitESGChecklistDetailReplication()"
+				style="margin-left:5px " class="btn btn-success pull-right ">Replicate</button>
+				<button type="button" *ngIf="initESDForm == true && activeIndex != 1 && !replicate" (click)="getESGSummary(ESGChecklistDetailsForm)" style="margin-right:5px" class="btn btn-primary pull-right">Show Summary</button>
+				<button type="button" *ngIf="activeIndex != 1 && !replicate" [disabled]="!(checklistStatusIdIsValid())" (click)="nextButton()" style="margin-left:5px" class="btn btn-primary pull-left">Next</button>
+			<button type="button" *ngIf="activeIndex > 0 && !replicate" (click)="prevButton()" style="margin-left:5px" class="btn btn-primary pull-left">Previous</button>
+
+			<button type="button" [disabled]="ESGChecklistDetailsForm.invalid" (click)="submitESGChecklistDetail(ESGChecklistDetailsForm)"
+				*ngIf="activeIndex == 1 && !replicate" style="margin-right:5px" class="btn btn-success pull-right">Save ESGRating</button>
+			<!-- <button type="button" *ngIf="activeIndex == 1" [disabled]="ESGChecklistDetailsForm.invalid" style="margin-right:5px "
+			(click)="submitESGChecklistSummary()" class="btn btn-success pull-right ">Save ESG Summary</button> -->
+			<button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+			<label style="margin-right:20px" class="radio-inline pull-right">
+				<input type="checkbox" [(ngModel)]="replicate" (change)="replicateChecklist($event.target.checked)">Replicate
+			</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayGreenRatingDetails" id="create-esg-modal" modal="modal" showEffect="fade"
+  width="1200" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Perform Green Loan Identifier Assessment
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="closeModal()">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <form [formGroup]="ESGChecklistDetailsForm" novalidate autocomplete="off">
+        <p-tabView [activeIndex]="activeIndex" (onChange)="handleChange($event)">
+        <p-tabPanel header="GREEN LOAN IDENTIFIER CATEGORISATION METRICS">
+          <div *ngIf="canDoChecklist">
+            <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="sectorName" rowGroupMode="subheader"
+              groupField="sectorName" [style]="{'overflow':'auto', 'max-height':'700px'}">
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['sectorName']}}
+                <!-- <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span> -->
+              </ng-template>
+              <p-column field="checkListItemName" header="Checklist Item"></p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> Yes </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                <label class="radio-inline">
+                  <input type="radio" name="{{i}}" id="{{i}}" [value]="k.yesResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.yesResponseTypes.checklistStatusName}}</label>
+                  <!-- <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[0].checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.responseTypes[0].checklistStatusName}}</label> -->
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+                <ng-template pTemplate="header"> No </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                <label class="radio-inline">
+                  <input type="radio" name="{{i}}" id="{{i}}" [value]="k.noResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.noResponseTypes.checklistStatusName}}</label>
+                  <!-- <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[1].checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.responseTypes[1].checklistStatusName}}</label> -->
+                </ng-template>
+              </p-column>
+              <p-column field="comment" [style]="{'width':'200px'}">
+                <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  <textarea type="text" name="comment" id="comment" [(ngModel)]="k.comment" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input'"
+                  class="form-control"></textarea>
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'text-align': 'center'}">
+                <ng-template pTemplate="header"> Green Category </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                <!-- <span *ngIf="k.checklistStatusId == k.responseTypes[0].checklistStatusId" style="color:  #198f19c4; font-size: 15px"><b>{{k.responseTypes[0].grade}}</b></span> -->
+                <span *ngIf="k.checklistStatusId == k.yesResponseTypes.checklistStatusId" style="color:  #198f19c4; font-size: 15px"><b>{{k.yesResponseTypes.grade}}</b></span>
+                <span *ngIf="k.checklistStatusId == k.noResponseTypes.checklistStatusId" style="color: #ff0000; font-size: 15px"><b>{{k.noResponseTypes.grade}}</b></span>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </div>
+          <div *ngIf="!canDoChecklist">
+            <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="sectorName" rowGroupMode="subheader"
+              groupField="sectorName" [style]="{'overflow':'auto', 'max-height':'700px'}">
+              <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['sectorName']}}
+                <!-- <br/>
+                <span style="color: 'gray'">{{rowData['subCategoryName']}} </span> -->
+              </ng-template>
+              <p-column field="checkListItemName" [style]="{'width':'300px'}" header="Checklist Item"></p-column>
+              <p-column field="checklistStatusName" [style]="{'width':'100px'}">
+                <ng-template pTemplate="header"> Checklist Status</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  {{k.checklistStatusName ? k.checklistStatusName : 'N/A'}}
+                </ng-template>
+              </p-column>
+              <p-column field="comment" [style]="{'width':'200px'}">
+                <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                  {{k.comment ? k.comment : 'N/A'}}
+                </ng-template>
+              </p-column>
+              <p-column field="checkStatusId" [style]="{'text-align': 'center'}">
+                <ng-template pTemplate="header"> Green Category </ng-template>
+                <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                <span *ngIf="k.checklistStatusId == k.yesResponseTypes.checklistStatusId" style="color:  #198f19c4; font-size: 15px"><b>{{k.yesResponseTypes.grade}}</b></span>
+                <span *ngIf="k.checklistStatusId == k.noResponseTypes.checklistStatusId" style="color: #ff0000; font-size: 15px"><b>{{k.noResponseTypes.grade}}</b></span>
+                </ng-template>
+              </p-column>
+            </p-dataTable>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="Risk Level Summary" [disabled]="!(checklistStatusIdIsValid())">
+          <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Summary</label>
+            <div class="col-md-10">
+              <span id="summary" style="font-size: 30px" class="bold">{{ESGChecklistDetailsForm.get('overSummary').value}}</span>
+            </div>
+          </div>
+          </div>
+        </p-tabPanel>
+        </p-tabView>
+      </form>
+    </div>
+    <div class="panel-footer">
+		<div class="row ">
+			<div class="col-md-12 ">
+				<button type="button" *ngIf="initESDForm == true && activeIndex != 1" (click)="getGreenRatingSummary(ESGChecklistDetailsForm)" style="margin-right:5px" class="btn btn-primary pull-right">Show Summary</button>
+				<button type="button" *ngIf="activeIndex != 1" [disabled]="!(checklistStatusIdIsValid())" (click)="nextButton()" style="margin-left:5px" class="btn btn-primary pull-left">Next</button>
+				<button type="button" *ngIf="activeIndex > 0" (click)="prevButton()" style="margin-left:5px" class="btn btn-primary pull-left">Previous</button>
+				<button type="button" [disabled]="ESGChecklistDetailsForm.invalid" (click)="submitGreenRatingDetail(ESGChecklistDetailsForm)"
+				*ngIf="activeIndex == 1" style="margin-right:5px" class="btn btn-success pull-right">Save Green Rating</button>
+				<button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+        	</div>
+      	</div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayESGChecklistvalidation" id="create-edit-modal" modal="modal" showEffect="fade"
+  width="900" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        View {{checkListTypeHeader}}
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayESGChecklistvalidation=false">&times;</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <p-tabView [activeIndex]="activeIndexView" (onChange)="handleChangeView($event)">
+            <p-tabPanel header="View ESG Checklist">
+              <div class="form-group">
+                <div class="col-md-12" style="max-height: 400px; overflow: auto">
+					<div class="form-group">
+						<label for="esgTypeId" class="control-label col-md-2">Select Facility</label>
+						<div class="col-md-6">
+						<select [ngClass]="'valid-input'" (change)="onSelectedFacilityChanged($event.target.value)" class="form-control">
+							<option value="">-- Select Facility --</option>
+							<option *ngFor="let type of loanApplicationDetailLists" value="{{type.loanApplicationDetailId}}">{{type.proposedAmount
+							+' - ' + type.proposedProductName}}</option>
+						</select>
+						</div>
+					</div>
+          <div *ngIf="canDoChecklist">
+						<form [formGroup]="ESGChecklistDetailsForm" novalidate autocomplete="off">
+								<!-- <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="subCategoryName" rowGroupMode="subheader"
+								groupField="subCategoryName" [style]="{'overflow':'auto', 'max-height':'400px'}">
+								<ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+									<br/>
+									<span style="color: 'gray'">{{rowData['subCategoryName']}} </span>
+								</ng-template> -->
+								<p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="categoryName" rowGroupMode="subheader"
+								groupField="categoryName" [style]="{'overflow':'auto', 'max-height':'700px'}">
+								<ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+									<!-- <br/>
+									<span style="color: 'gray'">{{rowData['subCategoryName']}} </span> -->
+								</ng-template>
+								<p-column field="checkListItemName" header="Checklist Item"></p-column>
+								
+				
+								<p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+								<ng-template pTemplate="header"> Yes </ng-template>
+								<ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+									<label class="radio-inline">
+									<!-- <input type="radio" name="{{i}}" id="{{i}}" [value]="k.responseTypes[0].checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.responseTypes[0].checklistStatusName}}</label> -->
+									<input type="radio" name="{{i}}" id="{{i}}" [value]="k.yesResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.yesResponseTypes.checklistStatusName}}</label>
+								</ng-template>
+								</p-column>
+								<p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+								<ng-template pTemplate="header"> No </ng-template>
+								<ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+									<label class="radio-inline">
+									<input type="radio" name="{{i}}" id="{{i}}" [value]="k.noResponseTypes.checklistStatusId" [(ngModel)]="k.checklistStatusId" [ngModelOptions]="{standalone: true}">{{k.noResponseTypes.checklistStatusName}}</label>
+								</ng-template>
+                </p-column>
+                <p-column field="comment" [style]="{'width':'200px'}">
+                    <ng-template pTemplate="header"> Remark/Comment</ng-template>
+                    <ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+                      <textarea type="text" name="comment" id="comment" [(ngModel)]="k.comment" [ngModelOptions]="{standalone: true}" [ngClass]=" 'valid-input'"
+                      class="form-control"></textarea>
+                    </ng-template>
+                </p-column>
+								<!-- <p-column field="checkStatusId" [style]="{'width':'80px', 'text-align': 'center'}">
+								<ng-template pTemplate="header"> N/A </ng-template>
+								<ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+									<label class="radio-inline">
+									<input type="radio" name="{{i}}" id="{{i}}" id="checklistStatusId" [value]="k.responseTypes[2].checklistStatusId" [(ngModel)]="k.checklistStatusId"
+										[ngModelOptions]="{standalone: true}">{{k.responseTypes[2].checklistStatusName}}</label>
+								</ng-template>
+								</p-column> -->
+								<!-- <p-column field="checklistStatusId" header="Grade" [style]="{'width':'80px' }" filterMatchMode="contains">
+								<ng-template pTemplate="body" let-col let-d="rowData">
+									<b>{{getScoreGrade(d.checklistStatusId)}}</b> -->
+									<!-- <span *ngIf="d.checklistStatusId==5" style="color:  #198f19c4; font-size: 15px" class="glyphicon glyphicon-ok"></span>
+									<span *ngIf="d.checklistStatusId==6" style="color: #ff0000; font-size: 15px" class="glyphicon glyphicon-ok"></span> -->
+								<!-- </ng-template>
+								</p-column> -->
+							</p-dataTable>
+									
+							<div class="form-horizontal">
+								<br/>
+								<div class="form-group">
+								<label for="" class="control-label col-md-2">Overall Risk level</label>
+								<div class="col-md-10">
+									<label style="margin-right:20px" class="radio-inline">
+									<input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=1
+										class="radio-checkbox">CATEGORY A</label>
+									<label style="margin-right:20px" class="radio-inline">
+									<input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=5
+										class="radio-checkbox">CATEGORY B</label>
+									<label style="margin-right:20px" class="radio-inline">
+									<input type="radio" [attr.disabled]="true" name="overAllRiskStatusId" formControlName="overAllRiskStatusId" id="overAllRiskStatusId" [value]=6
+										class="radio-checkbox">CATEGORY C</label>
+								</div>
+								</div>
+								<br/>
+								<div class="form-group">
+								<label for="" class="control-label col-md-2">Summary</label>
+								<div class="col-md-10" *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value>0">
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==1" style="color:  #ff0000; font-size: 30px" class="bold"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==5" style="color: #ffc400; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==6" style="color: #198f19c4; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+								</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div *ngIf="!canDoChecklist">
+						<!-- <p-dataTable [value]="newESGcheckListForAccess" [sortMode]="multiple" sortField="subCategoryName" rowGroupMode="subheader"
+						groupField="subCategoryName" [style]="{'overflow':'auto', 'max-height':'400px'}">
+						<ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+							<br/>
+							<span style="color: 'gray'">{{rowData['subCategoryName']}} </span>
+						</ng-template> -->
+						<p-dataTable [value]="ESGChecklistDetailsList" [sortMode]="multiple" sortField="categoryName" rowGroupMode="subheader"
+						groupField="categoryName" [style]="{'overflow':'auto', 'max-height':'700px'}">
+							<ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['categoryName']}}
+								<!-- <br/>
+								<span style="color: 'gray'">{{rowData['subCategoryName']}} </span> -->
+							</ng-template>
+							<p-column field="esgCheckListItemName" header="Checklist Item"></p-column>
+							
+							<p-column field="checkStatusId" header="Checklist Status(CAP)" [style]="{'width':'100px'}" filterMatchMode="contains">
+							<ng-template pTemplate="body" let-col let-d="rowData">
+								<span *ngIf="d.checkStatusId==1">Yes</span>
+								<span *ngIf="d.checkStatusId==5">Yes</span>
+								<span *ngIf="d.checkStatusId==6">No</span>
+								<span *ngIf="d.checkStatusId==7">Low</span>
+								<span *ngIf="d.checkStatusId==8">Medium</span>
+								<span *ngIf="d.checkStatusId==9">High</span>
+								<span *ngIf="d.checkStatusId==10">N/A</span>
+							</ng-template>
+              				</p-column>
+							<p-column field="comment" [style]="{'width':'120px'}">
+								<ng-template pTemplate="header"> Remark/Comment</ng-template>
+								<ng-template let-k="rowData" let-i="rowIndex" pTemplate="body">
+									{{k.comment ? k.comment : 'N/A'}}
+								</ng-template>
+							</p-column>
+						</p-dataTable>
+						<div>
+							<br/>
+							<!-- <div class="form-group">
+							<label for="" class="control-label col-md-2">Overall Risk level</label>
+							<div class="col-md-10">
+								<label style="margin-right:20px" class="radio-inline">
+								<input type="radio" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]="7" class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Low</label>
+								<label style="margin-right:20px" class="radio-inline">
+								<input type="radio" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]="8" class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Medium</label>
+								<label style="margin-right:20px" class="radio-inline">
+								<input type="radio" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]="9" class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">High</label>
+							</div> -->
+							<div class="form-group">
+								<label for="" class="control-label col-md-2">Overall Risk level</label>
+								<div class="col-md-10">
+									<label style="margin-right:20px" class="radio-inline">
+										<input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=1 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category A</label>
+									<label style="margin-right:20px" class="radio-inline">
+										<input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=5 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category B</label>
+									<label style="margin-right:20px" class="radio-inline">
+										<input type="radio" [attr.disabled]="true" name="ESGOverAllRiskStatusId" id="ESGOverAllRiskStatusId" [value]=6 class="radio-checkbox" [(ngModel)]="ESGOverAllRiskStatusId">Category C</label>
+								</div>
+							</div>
+							<br/>
+							<div class="form-group">
+								<label for="" class="control-label col-md-2">Summary</label>
+								<div class="col-md-10" *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value>0">
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==1" style="color:  #ff0000; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==5" style="color: #ffc400; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+									<span *ngIf="ESGChecklistDetailsForm.get('overAllRiskStatusId').value==6" style="color: #198f19c4; font-size: 30px"><b>{{ESGChecklistDetailsForm.get('overSummary').value}}</b></span>
+								</div>
+							<!-- <div class="col-md-10">
+								<textarea type="text" rows="10" [ngClass]="!EGSOverSummary ? 'required-input' : 'valid-input'" class="form-control" name="EGSOverSummary"
+								[(ngModel)]="EGSOverSummary"></textarea>
+							</div> -->
+							</div>
+						</div>
+					</div>
+                </div>
+              </div>
+            </p-tabPanel>
+            <!-- <p-tabPanel *ngIf="canDoChecklist" header="Validate ESG Checklist">
+            
+            </p-tabPanel> -->
+          </p-tabView>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <!-- <button type="button" (click)="nextButton()" *ngIf="activeIndexView == 0 && canDoChecklist==true" style="margin-right:5px "
+            class="btn btn-primary pull-right ">Next</button>
+          <button type="button" *ngIf="activeIndexView > 0 && canDoChecklist==true" (click)="prevButton()" style="margin-left:5px "
+            class="btn btn-primary pull-left ">Previous</button> -->
+			<button type="button" *ngIf="initESDForm == true" (click)="getESGSummary(ESGChecklistDetailsForm)" style="margin-right:5px" class="btn btn-primary pull-right">Get Summary</button>
+			<button type="button" *ngIf="canDoChecklist" [disabled]="ESGChecklistDetailsForm.invalid" style="margin-right:5px"
+            (click)="submitESGChecklistDetail(ESGChecklistDetailsForm)" class="btn btn-success pull-right">Save ESGRating</button>
+          <button type="button" (click)="displayESGChecklistvalidation=false " style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+                  <!-- <span *ngIf="d.checklistStatusId==1" style="color: #ff0000; font-size: 15px" class="glyphicon glyphicon-remove"></span> -->

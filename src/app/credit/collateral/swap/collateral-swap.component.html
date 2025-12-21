@@ -1,0 +1,398 @@
+<div class="card no-padding">
+    <div class="panel panel-default">
+        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+            <p-tabPanel [selected]="activeTabindex == 0" header="Collateral Swap Requests">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Collateral Swap Requests
+                                </h2>
+                                <div class="pull-right" *ngIf="isOnApplicationsListTab()">
+                                    <button (click)="startNewSwapRequest()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <p-dataTable [value]="collateralSwapRequests" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+                            <p-column field="systemArrivalDateTime" header="Arrival Time" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.systemArrivalDateTime | date: 'medium' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="applicationReferenceNumber" header="Loan Reference" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="customerName" header="Customer Name" sortable="true"
+								[filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="productName" header="Facility" sortable="true" [filter]="true"
+								filterMatchMode="contains"></p-column>
+                            <p-column field="swapRef" header="Swap Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="oldCollateralCode" header="Old Collateral Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="newCollateralCode" header="New Collateral Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">                                           
+                                        <a (click)="viewSwapInfo(d)" href="javascript:void(0)">See Swap Info</a>
+                                    </div>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel [selected]="activeTabindex == 1" header="Applications">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Select Loan Application
+                                </h2>
+                                
+                                <div class="pull-right">
+                                    <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <p-dataTable [value]="applications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+                            <p-column field="applicationReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="proposedProductName" header="Facility" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column  header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <!-- {{ d.firstName }} {{ d.middleName }} {{ d.lastName }} -->
+                                    {{ d.customerName == null ? d.customerGroupName : d.customerName }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="proposedAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.proposedAmount | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'150px'}">
+                                <ng-template pTemplate="header">
+                                    <div style="text-align:center">                                            
+                                    </div>
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">                                           
+                                        <a (click)="viewProposedCollaterals(d)" href="javascript:void(0)">See Proposed Collaterals</a>
+                                    </div>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'150px'}">
+                                <ng-template pTemplate="header">
+                                    <div style="text-align:center">                                            
+                                    </div>
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div style="text-align:center">                                           
+                                        <a (click)="viewLoanDetail(d)" href="javascript:void(0)">See Loan Details</a>
+                                    </div>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel [selected]="activeTabindex == 2" header="Collaterals" *ngIf="selectedApplicationId>0">
+                <app-collaterals-proposed
+                    [loanApplicationId]="selectedApplicationId"
+                    [currencyId]=1
+                    [reload]="selectedApplicationId"
+                    [isForSwap]="true"
+                    (emitCollateral)="getEmittedCollateral($event)">
+                </app-collaterals-proposed>
+            </p-tabPanel>
+            <p-tabPanel [selected]="activeTabindex == 3" header="Collateral Swap Details" *ngIf="collateralSwapForm.valid">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h6>
+                            <strong>Collateral Swap Information</strong>
+                        </h6>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="(selectedApplicationId>0)">
+                            <app-loan-application-details-view [isRecommendedInfo]="true"
+                                [loanApplicationId]="selectedApplicationId">
+                            </app-loan-application-details-view>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div *ngIf="oldSwapCollateral != null && oldSwapCollateral != undefined" class="row" style="padding:0 15px 0 15px;">
+                            <h6>
+                                <strong>Old Collateral Details</strong>
+                            </h6>
+                            <p-dataTable [responsive]="true" [value]="approvedCollateralDetails">
+                                <p-column field="customerName" header="Collateral Owner"></p-column>
+                                <p-column field="collateralCode" header="Collateral Code"></p-column>
+                                <p-column field="collateralValue" header="Collateral Value (LCY)">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="availableCollateralValue" header="Available Collateral Value (LCY)">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="coverage" header="Facility Coverage">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="baseCurrencyCode" header="Currency"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="viewCollateralDetail(d)" href="javascript:void(0)">
+                                            View Details
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </div>
+                        <div *ngIf="newSwapCollateral != null && newSwapCollateral != undefined" class="row" style="padding:0 15px 0 15px;">
+                            <h6>
+                                <strong>New Collateral Details</strong>
+                            </h6>
+                            <p-dataTable [responsive]="true" [value]="proposedCollateralDetails">
+                                <p-column field="customerName" header="Collateral Owner"></p-column>
+                                <p-column field="collateralCode" header="Collateral Code"></p-column>
+                                <p-column field="collateralValueLcy" header="Collateral Value (LCY)">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="availableCollateralValue" header="Available Collateral Value (LCY)">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="coverage" header="Facility Coverage">
+                                    <ng-template let-col let-loan="rowData" pTemplate="body">
+                                        {{loan[col.field] | number : '1.2' }}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="baseCurrencyCode" header="Currency"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="viewCollateralHistory(d)" href="javascript:void(0)">
+                                            View History
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="viewCollateralDetail(d)" href="javascript:void(0)">
+                                            View Details
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </div>
+                        <!-- <table class="table table-casa-information">
+                            <tr *ngIf="oldSwapCollateral != null && oldSwapCollateral != undefined">
+                                <td><h4><strong>Old Collateral Details</strong></h4></td>
+                                <td><strong>Collateral Code</strong></td><td>{{ oldSwapCollateral?.collateralCode }}</td>
+                                <td><strong>Collateral Value (LCY)</strong></td><td>{{ oldSwapCollateral?.baseCurrencyCode }} {{ oldSwapCollateral?.collateralValue }}</td>
+                                <td><strong>Available Collateral Value (LCY)</strong></td><td>{{ oldSwapCollateral?.baseCurrencyCode }} {{ oldSwapCollateral?.availableCollateralValue }}</td>
+                                <td><a (click)="viewCollateralDetail(oldSwapCollateral)" href="javascript:void(0)">Click To View Details</a></td>
+                            </tr>
+                            <tr *ngIf="newSwapCollateral != null && newSwapCollateral != undefined">
+                                <td><h4><strong>New Collateral Details</strong></h4></td>
+                                <td><strong>Collateral Code</strong></td><td>{{ newSwapCollateral?.collateralCode }}</td>
+                                <td><strong>Collateral Value (LCY)</strong></td><td>{{ newSwapCollateral?.baseCurrencyCode }} {{ newSwapCollateral?.collateralValueLcy }}</td>
+                                <td><strong>Available Collateral Value (LCY)</strong></td><td>{{ newSwapCollateral?.baseCurrencyCode }} {{ newSwapCollateral?.availableCollateralValue }}</td>
+                                <td><a (click)="viewCollateralDetail(newSwapCollateral)" href="javascript:void(0)">Click To View Details</a></td>
+                            </tr>
+                        </table> -->
+                    </div>
+                    <div class="panel-footer">
+						<div class="row">
+							<div class="col-md-12">
+								<button type="button" (click)="saveCollateralSwapRequest()" [disabled]="collateralSwapForm.invalid" class="btn btn-success pull-right">Save</button>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Supporting Documents" *ngIf="selectedId>0">
+				<!-- <p-tabPanel header="Supporting Documents" *ngIf="isUserLegal || isDocumentUploaded"> -->
+                <document-upload *ngIf="selectedId>0" [reload]="targetId" [autoZIndex]="false"
+                    [operationId]="operationId" [customerId]="customerId"
+                    [targetId]="targetId"
+                    [targetReferenceNumber]="collateralSwapCode">
+                </document-upload>
+            </p-tabPanel>
+            <p-tabPanel *ngIf="(selectedId>0)" header="Approval Memo">
+				<app-approval-memo
+					[showControls]="true"
+					[allowTemplateToLoad]="true"
+					[referenceNumber]="collateralSwapCode"
+					[label]="'Collateral Swap'"
+					[customerId]="customerId"
+					[OPERATION_ID]="operationId"
+					[targetId]="selectedId">
+				</app-approval-memo>
+			</p-tabPanel>
+            <p-tabPanel header="Comments" *ngIf="selectedId>0">
+                <div class="panel panel-default">
+                    <app-approval-comments *ngIf="selectedId>0" [operationId]="operationId"
+                        [targetId]="selectedId" [requireAll]=false [tableLabel]="'Collateral Swap Comments'">
+                    </app-approval-comments>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+                                
+        <div class="panel-footer" *ngIf="!isOnApplicationsListTab()">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button [disabled]="disableSubmitForApproval" -->
+                    <button [disabled]="(collateralSwapForm.invalid) || !(selectedId > 0)"
+                            type="button" (click)="forward()" class="btn btn-success pull-right" style="margin-right:15px">Submit For Approval</button>
+                    <button (click)="resetActiveTabIndex()" type="button"
+                        class="btn btn-danger pull-right" style="margin-right:5px">Back to Requests</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCollateralHistory" modal="modal" showEffect="fade" width="1000"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+	
+	<div class="panel panel-default">
+		<div style="margin-bottom:0" class="panel panel-default">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-md-12">
+						<h2 class="panel-title pull-left">
+							Proposed Facilities
+						</h2>
+					</div>
+				</div>
+			</div>
+			<app-collateral-facilities *ngIf="displayCollateralHistory"
+				[collateralId]="collateralToShow?.collateralId"
+				[reload]="collateralToShow?.collateralId">
+			</app-collateral-facilities>
+		</div>
+		<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-12">
+					<button type="button" (click)="displayCollateralHistory=false" style="margin-right:5px"
+					class="btn btn-danger pull-right">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</p-dialog>
+
+
+    <p-dialog [responsive]=true [(visible)]="displaySearchForm" id="reccol-modal" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Search Application
+                </h2>
+            </div>
+    
+            <form novalidate [formGroup]="searchForm" (submit)="submitSearch(searchForm)" autocomplete="off">
+    
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="searchString" class="control-label col-md-12">Request Number / Customer Name</label>
+                            <div class="col-md-12">
+                                <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitSearch(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                            <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </form>
+    
+        </div>
+    </p-dialog>
+    
+    <p-dialog [responsive]=true id="reccol-modal" modal="modal" showEffect="fade" [dismissableMask]=true [(visible)]="showCollateralDetail"
+        width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+        <div class="panel panel-default">
+            <collateral-information-view *ngIf="showCollateralDetail"
+                [reload]="collateralToShow?.collateralId"
+                [collateralCustomerId]="collateralToShow?.collateralId"
+                [showCollateralInformation]="showCollateralDetail"
+                (closeWindow)="showCollateralDetail=false">
+            </collateral-information-view>
+        </div>
+    </p-dialog>
+
+    <p-dialog [responsive]=true id="reccol-modal" modal="modal" showEffect="fade" [dismissableMask]=true [(visible)]="showCsForward" width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+        <form novalidate [formGroup]="csForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{csForwardTitle}}
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+                        <div class="col-md-12">
+                            <textarea [ngClass]="csForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'" 
+                            class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+                        </div>
+                        <!-- <label for="forward" class="control-label col-md-12">Status</label>
+                        <div class="col-md-12">
+                                <select name="forward" (change)="resetButton($event.target.value)" id="forward" class="form-control" formControlName="forward" [ngClass]="csForwardForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+                                    <option value="">--- Select Approval Status ---</option>
+                                    <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                                </select>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="goForApproval()" [disabled]="csForwardForm.invalid" class="btn btn-success pull-right">Submit</button>
+                            <button type="button" (click)="showCsForward = false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog [responsive]=true id="reccol-modal" modal="modal" showEffect="fade" [dismissableMask]=true [(visible)]="showLoanDetails" width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div *ngIf="(selectedApplicationId>0)">
+                    <app-loan-application-details-view [isRecommendedInfo]="true"
+                        [loanApplicationId]="selectedApplicationId">
+                    </app-loan-application-details-view>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="showLoanDetails=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+
+    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

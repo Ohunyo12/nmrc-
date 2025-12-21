@@ -1,0 +1,209 @@
+<!-- <div class="panel-body">
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="suggestedConditions" [rows]="12" dataKey="suggestionid" (onRowSelect)="onSelectedSuggestion($event.data)"
+            (onRowUnselect)="removeSelectedSuggestion($event.data)" (onHeaderCheckboxToggle)="onSelectedAllSuggestions($event.data)"
+            [(selection)]="selectedSuggestions">
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="isAnalyst"></p-column>
+
+            <p-column field="description" header="Conditions" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="isSubsequent" header="Subsequent" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isSubsequent == true" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column field="isExternal" header="Internal" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editCondition(d,true)" href="javascript:void(0)">Modify & Add</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+</div> -->
+
+<div class="panel-body">
+    <div class="col-md-6">
+        <select (change)="onDynamicsFacilityChange($event.target.value)" [(ngModel)]="selectedDetailId" class="form-control" [ngClass]="selectedDetailId == null ? 'required-input' : 'valid-input'">
+            <option value="null">-- Select Facility--</option>
+            <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+        </select>
+    </div>
+</div>
+
+<div class="panel-body">
+
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="defaultDynamics" [rows]="12" dataKey="dynamicsId" (onRowSelect)="onSelectedDynamics($event.data)"
+            (onRowUnselect)="removeSelectedDynamics($event.data)" (onHeaderCheckboxToggle)="onSelectedAllDynamics($event.data)"
+            [(selection)]="selectedDynamics">
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <p-column [style]="{'width':'38px'}"></p-column>
+            <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="isAnalyst || isBusiness"></p-column> -->
+            <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="!displayedOnly"></p-column>
+            <!-- <p-column field="dynamicsId" header="dynamicsId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column>
+                                    <p-column field="product" header="Product" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column> -->
+            <p-column field="dynamics" header="Transaction Dynamics" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="isExternal" header="Internal" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+            
+            <p-column [style]="{'width':'110px'}" *ngIf="!displayedOnly">
+                    <!-- <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst || isBusiness"> -->
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editDynamics(d,true)" href="javascript:void(0)">Modify & Add</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+
+<div class="panel-body">
+    <div class="col-md-6" *ngIf="!displayedOnly">
+            <!-- div class="col-md-6" *ngIf="isAnalyst || isBusiness"> -->
+        <button type="button" (click)="saveSelectDynamicsChanges()" [disabled]="unsavedDynamics == false || selectedDetailId == null"
+            class="btn btn-success">
+            Save Selected Changes</button>
+        <span *ngIf="unsavedDynamics == true" style="margin:6px; font-size:17px; font-weight: 400; color: red; vertical-align: middle;">
+            Unsaved changes***</span>
+    </div>
+</div>
+
+
+<!-- additional -->
+<div class="panel-heading">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="panel-title pull-left">Loan Transaction Dynamics</h2>
+        </div>
+    </div>
+</div>
+
+<div class="panel-body">
+    <div class="form-horizontal">
+        <p-dataTable [responsive]="true" [value]="dynamics">
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+
+            <!-- <p-column field="dynamicsId" header="dynamicsId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column>
+                                    <p-column field="loanDynamicsId" header="L dynamicsId" sortable="true" [filter]="false" [style]="{'width':'200px'}"></p-column> -->
+            <p-column field="dynamics" [style]="{'width':'700px'}" header="Transaction Dynamics" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="position" header="Ordering"></p-column>
+            <p-column field="isExternal" header="Internal" [style]="{'width':'60px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isExternal == false" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'110px'}" *ngIf="!displayedOnly">
+                    <!-- <p-column [style]="{'width':'110px'}" *ngIf="isAnalyst || isBusiness"> -->
+                <ng-template pTemplate="header" let-d="rowData">
+                    <div class="pull-right">
+                        <button  [disabled]="selectedDetailId == null" (click)="showDynamicsForm(d)" pButton type="button" label="Add New" icon="fa-plus"></button>
+                    </div>
+                </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editDynamics(d)" href="javascript:void(0)">Edit</a>
+                        <span style="padding:3px;"> | </span>
+                        <a (click)="removeDynamics(d.loanDynamicsId)" href="javascript:void(0)">Remove</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+</div>
+
+<!-- <suggested-conditions *ngIf="applicationId && (isAnalyst == true || isBusiness == true)" [reload]="reload" [callerId]="1" [isAnalyst]="isAnalyst" [applicationId]="applicationId"
+[isTransaction]="isTransaction" [proposedItems]="proposedItems" (addSuggestedCondition)="addSuggestedCondition($event)"></suggested-conditions> -->
+
+<!--dynamics form modal-->
+<p-dialog [responsive]=true [(visible)]="displayDynamicsForm" id="dynamics-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{ formState }} Transaction Dynamics</h2>
+        </div>
+
+        <form novalidate [formGroup]="dynamicsForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="position" class="control-label col-md-12">Facility</label>
+                        <div class="col-md-12">
+                            <select  [attr.disabled]="true" name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                class="form-control" [ngClass]="!dynamicsForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="dynamics">Dynamics</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea style="height:120px;" name="dynamics" formControlName="dynamics" id="dynamics" class="form-control" [ngClass]="!dynamicsForm.controls['dynamics'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="checkbox-container">
+                                <input formControlName="isExternal" id="isExternal" type="checkbox">
+                            </div>
+                            <label class="checkbox">External Dynamics</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-md-12">
+                                <label for="position">Ordering</label>
+                            </div>
+                            <div class="col-md-12">
+                                   <input name="position" formControlName="position" id="position" class="form-control" [ngClass]="!dynamicsForm.controls['position'].valid ? 'required-input' : 'valid-input'"/>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveDynamics(dynamicsForm)" [disabled]="dynamicsForm.invalid" class="btn btn-success pull-right">
+                            Save</button>
+                        <button type="button" (click)="displayDynamicsForm=false" style="margin-right:5px" class="btn btn-danger pull-right"> Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->

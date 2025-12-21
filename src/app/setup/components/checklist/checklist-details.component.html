@@ -1,0 +1,115 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Checklist Detail</h2>
+                        <div class="pull-right">
+                            <button type="button" (click)="showChecklistDetailForm()" pButton icon="fa-plus" label="Add New"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <form #searchForm novalidate autocomplete="off">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="control-label col-md-2">Target Type</label>
+                            <div class="col-md-4">
+                                <select name="targetType" id="targetType" class="form-control" ([ngModel])="selectedTargetType" (change)="onTargetTypeSelect($event.target.value)" [ngClass]="!selectedTargetType ? 'required-input' : 'valid-input'">
+                                    <option value="">--- Select Target Type ---</option>
+                                    <option *ngFor="let item of targetTypeData" [value]="item.targetTypeId">{{item.targetTypeName}}</option>
+                                </select>
+                            </div>
+                            <label for="" class="control-label col-md-2">Product</label>
+                            <div class="col-md-4">
+                                <select name="product" id="product" class="form-control" ([ngModel])="selectedProduct" (change)="onProductSelect($event.target.value)" [ngClass]="!selectedProduct ? 'required-input' : 'valid-input'" [disabled]="disableProductBtn">
+                                    <option value="">--- Select Product --</option>
+                                    <option *ngFor="let item of productData" [value]="item.productId">{{item.productName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <p-dataTable [value]="checklistDetailData" [rows]="10" [paginator]="true" [responsive]="true">
+                    <p-column *ngFor="let col of checklistDetailTableCols" [field]="col.field" [header]="col.header"></p-column>
+                    <p-column field="deferedDate" header="Defered Date">
+                        <ng-template pTemplate="body" let-col let-defDate="rowData">
+                            <span>{{defDate[col.field] | date : 'dd/MM/yyyy'}}</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'50px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                            <a (click)="editChecklistDetail(col, $event)" href="javascript:void(0)">Edit</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistForm" id="create-edit-modal" modal="modal" showEffect="fade" width="820">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{panelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistDetailForm" (ngSubmit)="onFormSubmit(checklistDetailForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="checkDefItem" class="control-label col-md-2">Checklist Definition Item</label>
+                        <div class="col-md-4">
+                            <select name="checkDefItem" id="checkDefItem" class="form-control" formControlName="checkListDefinitionId" [ngClass]="checklistDetailForm.controls['checkListDefinitionId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Definition ---</option>
+                                <option *ngFor="let item of checklistDefData" [value]="item.checkListDefinitionId">{{item.checkListItemName}}</option>
+                            </select>
+                        </div>
+                        <label for="targetType" class="control-label col-md-2">Target Type</label>
+                        <div class="col-md-4">
+                            <select name="targetType" id="targetType" class="form-control" formControlName="targetTypeId" [ngClass]="checklistDetailForm.controls['targetTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Target Type ---</option>
+                                <option *ngFor="let item of targetTypeData" [value]="item.targetTypeId">{{item.targetTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="checklistStatus" class="control-label col-md-2">Checklist Status</label>
+                        <div class="col-md-4">
+                            <select name="checklistStatus" id="checklistStatus" class="form-control" formControlName="checkListStatusId" [ngClass]="checklistDetailForm.controls['checkListStatusId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Item ---</option>
+                                <option *ngFor="let item of checklistStatusData" [value]="item.checklistStatusId">{{item.checklistStatusName}}</option>
+                            </select>
+                        </div>
+                        <label for="deferedDate" class="control-label col-md-2">Defered Date</label>
+                        <div class="col-md-4">
+                            <!--<p-calendar id="deferedDate" dateFormat="dd/mm/yyyy" formControlName="deferedDate"></p-calendar>-->
+                            <p-calendar id="deferedDate" dateFormat="dd/mm/yy" [inputStyle]="{'width': '239px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}" [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [(ngModel)]="selectedDate"
+                                [ngModelOptions]="{standalone: true}" [showIcon]="true" [ngClass]="selectedDate ? 'valid-input':'required-input'"></p-calendar>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="remark" class="control-label col-md-2">Remark</label>
+                        <div class="col-md-4">
+                            <input type="text" name="remark" id="remark" class="form-control" formControlName="remark">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistDetailForm.invalid" class="btn btn-success pull-right">Save Checklist Definition</button>
+                        <button type="button" (click)="displayChecklistForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

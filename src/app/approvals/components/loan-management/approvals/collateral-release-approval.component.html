@@ -1,0 +1,165 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Collateral Release Approvals 
+                            </h2>
+                            <div class="pull-right">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="pendingApprovals" [paginator]="true" [rows]="15">
+
+                        <p-column field="collateralTypeId" header="Collateral Type" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ getCollateralTypeName(d.collateralTypeId) }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="collateralCode" header="Collateral Code" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="applicationReferenceNumber" header="Reference Number" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="hairCut" header="Hair Cut" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+
+                        <p-column field="isLocationBased" header="Location" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}">
+                            <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                {{ isLocationBased ? 'Yes' : 'No' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="valuationCycle" header="Valuation Cycle" [filter]="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+
+                        <p-column [style]="{'width':'65px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-x="rowData" let-i="rowIndex" pTemplate="body">
+                                <span *ngIf="x.isReleased == false && x.releaseApprovalStatusId == 1">
+                                    <a (click)="view(x)" href="javascript:void(0)">View</a>
+                                </span>
+                                <span *ngIf="x.isReleased == true && x.releaseApprovalStatusId == 2">
+                                    Released
+                                </span>
+                                <span *ngIf="x.releaseApprovalStatusId == 3">
+                                    Rejected
+                                </span>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayApprovalModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">Collateral Release</h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayApprovalModal=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <table *ngIf="selected !== null" class="table table-casa-information">
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Customer Name:</strong>
+                        </td>
+                        <td colspan="5" style="text-align:left">{{ selected.firstName }} {{ selected.middleName }} {{ selected.lastName }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Collateral Code:</strong>
+                        </td>
+                        <td>{{ selected.collateralCode }}</td>
+                        <td>
+                            <strong>Customer Code:</strong>
+                        </td>
+                        <td>{{ selected.customerCode }}</td>
+                        <td>
+                            <strong>Time Created:</strong>
+                        </td>
+                        <td>{{ selected.dateTimeCreated | date:"dd-MM-yyyy" }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- <strong>Loan Reference:</strong> -->
+                        </td>
+                        <td>{{ selected.applicationReferenceNumber }}</td>
+                        <td>
+                            <strong>Allow Sharing:</strong>
+                        </td>
+                        <td>{{ selected.allowSharing ? 'Yes' : 'No' }}</td>
+                        <td>
+                            <strong>Is Released:</strong>
+                        </td>
+                        <td>{{ selected.isReleased ? 'Yes' : 'No' }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Hair Cut:</strong>
+                        </td>
+                        <td>{{ selected.hairCut }}</td>
+                        <td>
+                            <strong>Valuation Cycle:</strong>
+                        </td>
+                        <td>{{ selected.valuationCycle }}</td>
+                        <td>
+                            <strong>Is Location Based:</strong>
+                        </td>
+                        <td>{{ selected.isLocationBased ? 'Yes' : 'No' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr />
+
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-9">
+                        <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId < 0? 'required-input' : 'valid-input'">
+                            <option value="">--- Select Approval ---</option>
+                            <option value="1"> Approve </option>
+                            <option value="3"> Decline </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="forward()" [disabled]="comment == null || comment == '' || approvalStatusId < 2" class="btn btn-success pull-right">
+                        Submit</button>
+                    <button type="button" (click)="displayApprovalModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

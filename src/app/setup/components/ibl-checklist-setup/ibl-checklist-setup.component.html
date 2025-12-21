@@ -1,0 +1,181 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+  
+        <div class="card no-padding">
+  
+            <div class="panel panel-default">
+  
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Project Criteria 
+                               
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="addNewContractorCriteria()" pButton type="button" label="Add IBL Checklist" icon="fa-plus"></button>
+                                <button (click)="addNewContractorCriteriaOption()" pButton type="button" label="Add IBL Checklist Options" icon="fa-plus"></button>
+                               
+                         </div>
+                        </div>
+                    </div>
+                </div>
+  
+                <div class="panel-body">
+                    <!-- tabs here -->
+                    <p-tabView>
+                        <!-- Contractor criteria -->
+                        <p-tabPanel header="IBL Checklist">
+                            <p-dataTable [value]="IBLChecklists" [paginator]="true" [rows]="10" [responsive]="true">
+                                <p-column field="checklist" header="Checklist" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editContractorCriteria(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+  
+                            </p-dataTable>
+                        </p-tabPanel>
+                        <p-tabPanel header="IBL Checklist Option">
+                          <p-dataTable [value]="contractorCriteriaOptions" [paginator]="true" [rows]="10" [responsive]="true">
+                              <p-column field="checklist" header="Checklist" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <p-column field="optionName" header="Option Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <!-- <p-column field="optionValue" header="Value" sortable="true" [filter]="true" filterMatchMode="contains">
+                              </p-column> -->
+                              <p-column [style]="{'width':'100px'}">
+                                  <ng-template pTemplate="header">
+                                      Edit
+                                  </ng-template>
+                                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      <a (click)="editContractorCriteriaOption(d)" href="javascript:void(0)">
+                                          Edit
+                                      </a>
+                                  </ng-template>
+                              </p-column>
+  
+                          </p-dataTable>
+                      </p-tabPanel>
+  
+     
+                </p-tabView>
+                    <!-- end tabs here -->
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+  
+            </div>
+            <!--end of panel2-->
+  
+        </div>
+        <!--end of card2-->
+  
+  
+    </div>
+  </div>
+  
+  <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+  
+  <!--modal forms starts here-->
+  <p-dialog [responsive]=true [(visible)]="contractorDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+  
+        <form novalidate [formGroup]="IBLChecklistForm" autocomplete="off">
+  
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="checklist" class="control-label col-md-2">Checklist Item</label>
+                        <div class="col-md-4">
+                            <textarea  name="checklist" formControlName="checklist" id="checklist" class="form-control" [ngClass]="!IBLChecklistForm.controls['checklist'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+  
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitContractorCriteriaForm(IBLChecklistForm)" [disabled]="IBLChecklistForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="contractorDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+  
+        </form>
+  
+    </div>
+  </p-dialog>
+  
+  
+  <!--modal forms starts here-->
+  <p-dialog [responsive]=true [(visible)]="contractorOptionDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+      <div style="margin-bottom:0" class="panel panel-default">
+          <div class="panel-heading">
+              <h2 class="panel-title">
+                  {{ entityName}}
+              </h2>
+          </div>
+    
+          <form novalidate [formGroup]="IBLChecklistOptionForm" autocomplete="off">
+    
+              <div class="panel-body">
+                  <div class="form-horizontal">
+                      <div class="form-group">
+                          <label for="iblChecklistId" class="control-label col-md-2">Criteria</label>
+                          <div class="col-md-4">
+                              <select class="form-control" id="iblChecklistId" name="iblChecklistId"
+                              formControlName="iblChecklistId"
+                              [ngClass]="!IBLChecklistOptionForm.controls['iblChecklistId'].valid ? 'required-input' : 'valid-input'">
+                              <option value=""> Select Category</option>
+                              <option *ngFor="let item of IBLChecklists" value="{{item.iblChecklistId}}">
+                                  {{item.checklist}}
+                              </option>
+                          </select>
+                          </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="optionName" class="control-label col-md-2">Option Name</label>
+                        <div class="col-md-4">
+                            <textarea type="text" name="optionName" id="optionName" class="form-control" formControlName="optionName" [ngClass]="IBLChecklistOptionForm.controls['optionName'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+                      <!-- <div class="form-group">
+                          <label for="optionValue" class="control-label col-md-2">Value</label>
+                          <div class="col-md-4">
+                              <input type="text" name="optionValue" id="optionValue" class="form-control" formControlName="optionValue" [ngClass]="contractorCriteriaOptionForm.controls['optionValue'].valid ? 'valid-input' : 'required-input'">
+                          </div>
+    
+                      </div> -->
+                     
+                  </div>
+              </div>
+    
+              <div class="panel-footer">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <button type="button" (click)="submitContractorCriteriaOptionForm(IBLChecklistOptionForm)" [disabled]="IBLChecklistOptionForm.invalid" class="btn btn-success pull-right">Save</button>
+                          <button type="button" (click)="contractorOptionDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                      </div>
+                  </div>
+              </div>
+    
+          </form>
+    
+      </div>
+    </p-dialog>

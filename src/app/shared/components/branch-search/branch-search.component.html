@@ -1,0 +1,59 @@
+<input (focus)="openSearchBox()"  name="branch" id="branch"  [(ngModel)]="branchId" type="text" class="form-control" placeholder="Search for Loan" name="loanReferenceNo" [ngClass]="'valid-input'">
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <div style="margin-left:0" class="row">
+        <h2 class="panel-title pull-left">
+          Search For Branch
+        </h2>
+        <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+          <i class="glyphicon glyphicon-remove-sign">
+          </i>
+        </a>
+
+      </div>
+    </div>
+    <div style="padding:3px" class="panel-body">
+      <div class="form-group">
+        <div class="col-md-12">
+          <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-12">
+          <p>
+            <!--{{mfacilityType}}-->
+          </p>
+          <table *ngIf="searchResults" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Branch Code</th>
+                <th>Branch Name</th>
+                <th>Address</th>
+                <th>stateName</th> 
+              </tr>
+            </thead>
+            <tbody>
+              <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                <td>
+                  {{res.branchCode}}
+                </td>
+                <td>
+                  {{res.branchName}}
+                </td>
+                <td>
+                  {{res.addressLine1}}
+                </td>
+                <td>
+                      {{res.stateName}}
+                    </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

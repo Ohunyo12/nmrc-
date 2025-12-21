@@ -1,0 +1,573 @@
+<div *ngIf="displaySearch" class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Prepayment Reversal
+                            </h2>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="callLimitTypeId" class="col-md-2 control-label"></label>
+                            <div class="col-md-4">
+                            </div>
+                            <label for="" class="control-label col-md-2"></label>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input (focus)="openSearchBox()" type="text" class="form-control" placeholder="Search for Loan Customer" name="loanReferenceNo"
+                                        [ngClass]="'valid-input'">
+                                    <div class="input-group-btn">
+                                        <button (click)="openSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end of panel-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="displayData" class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Prepayment Reversal
+                            </h2>
+                            <button type="button" (click)="loanDetails()" style="margin-right:5px" class="btn btn-primary pull-right">Loan Details</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <form novalidate [formGroup]="loanPrepaymentForm">
+                            <div class="form-group">
+                                <label for="loanReferenceNumber" class="control-label col-md-2">Loan Reference Number</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="loanReferenceNumber" formControlName="loanReferenceNumber" id="loanReferenceNumber"
+                                        class="form-control" [ngClass]="!loanPrepaymentForm.controls['loanReferenceNumber'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="" class="control-label col-md-2">Principal Amount</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="approvedAmount" formControlName="approvedAmount" id="approvedAmount" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label for="outstandingPrincipal" class="control-label col-md-2">Outstanding Principal</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="outstandingPrincipal" formControlName="outstandingPrincipal" id="outstandingPrincipal"
+                                        class="form-control" [ngClass]="!loanPrepaymentForm.controls['outstandingPrincipal'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                <label for="interestRate" class="control-label col-md-2">Interest Rate</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="interestRate" formControlName="interestRate" id="interestRate" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['interestRate'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teno" class="control-label col-md-2">Tenor</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="teno" formControlName="teno" id="teno" class="form-control" [ngClass]="!loanPrepaymentForm.controls['teno'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                                <label for="accrualedAmount" class="control-label col-md-2">Accrued Interest</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="accrualedAmount" formControlName="accrualedAmount" id="accrualedAmount" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['accrualedAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="currency" class="control-label col-md-2">Currency</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="currency" formControlName="currency" id="currency" class="form-control" [ngClass]="!loanPrepaymentForm.controls['currency'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                                <label for="pastDueTotal" class="control-label col-md-2">Past Due Interest</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="pastDueTotal" formControlName="pastDueTotal" id="pastDueTotal" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['pastDueTotal'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+                                                        
+                            <div class="form-group">
+                                <div class="col-md-6">
+                                    <!-- <input type="text" [attr.disabled]=true name="currency" formControlName="currency" id="currency" class="form-control" [ngClass]="!loanPrepaymentForm.controls['currency'].valid ? 'required-input' : 'valid-input'"> -->
+                                </div>
+
+                                <label for="pastDuePrincipal" class="control-label col-md-2">Past Due Principal</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="pastDuePrincipal" formControlName="pastDuePrincipal" id="pastDuePrincipal" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['pastDuePrincipal'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="totalAmount" class="control-label col-md-2">Total Outstanding</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" [attr.disabled]=true name="totalAmount" formControlName="totalAmount" id="totalAmount" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['totalAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                                <label  for="previousEffectiveDate" class="control-label col-md-2">Effective Date </label>
+                                <div  class="col-md-4">
+                                    <p-calendar id="previousEffectiveDate"  (click)="validateEffectiveDate()" formControlName="previousEffectiveDate" dateFormat="dd/mm/yy" [ngClass]="'valid-input'"
+                                        [inputStyle]="{'width': '270px' }" [monthNavigator]="true" [yearNavigator]="true" readOnlyInputText="true"
+                                        yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                                </div>
+
+
+                            </div>
+
+                            <div class="form-group">
+                                <!-- <label for="equityContribution" class="control-label col-md-2">Prepayment Amount</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" formatM name="equityContribution" formControlName="equityContribution" id="equityContribution" class="form-control"
+                                    (blur)="calculateBalance($event.target.value)" [ngClass]="!loanPrepaymentForm.controls['equityContribution'].valid ? 'required-input' : 'valid-input'">
+                                </div> -->
+
+                        
+                                <!-- 
+                                <label *ngIf="displayEffectiveDate" for="effectiveDate" class="control-label col-md-2">New Effective Date </label>
+                                <div *ngIf="displayEffectiveDate" class="col-md-4">
+                                    <p-calendar id="effectiveDate" formControlName="effectiveDate" dateFormat="dd/mm/yy" [ngClass]="!loanPrepaymentForm.controls['effectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                        (onSelect)="calculateTenor()" [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                        [yearNavigator]="true" yearRange="2000:2990" [showIcon]="true"></p-calendar>
+                                </div> -->
+
+
+                                <!-- <label for="prepaymentMethod" class="control-label col-md-2">Prepayment Method</label>
+                                <div class="col-md-4 ">
+                                    <select (change)="selectOption($event.target.value)" name="prepaymentMethod"  class="form-control" >
+                                        <option value="">-- Select Prepayment Method --</option>
+                                        <option *ngFor="let x of prepaymentMothods" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div> -->
+
+
+                                
+                            </div>
+
+                            <div *ngIf="!displayIrregularSchedule" class="form-group">
+                                <!-- <label for="maintainTenor" class="control-label col-md-2">Maintain Tenor</label>
+                                <div class="col-md-4">
+                                    <input type="checkbox" checked="checked" (change)="keepTenor($event.target.checked)" formControlName="maintainTenor" name="maintainTenor"
+                                        id="maintainTenor">
+                                </div> -->
+
+                                <label *ngIf="displayMaturityDate" for="maturityDate" class="control-label col-md-2">Maturity Date </label>
+
+                                <div *ngIf="displayMaturityDate" class="col-md-4">
+                                    <p-calendar id="maturityDate" formControlName="maturityDate" dateFormat="dd/mm/yy" [ngClass]="!loanPrepaymentForm.controls['maturityDate'].valid ? 'required-input' : 'valid-input'"
+                                        (onSelect)="calculateTenor()" [inputStyle]="{'width': '270px' }" [monthNavigator]="true"
+                                        [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                                </div>
+
+
+
+                            </div>
+
+                            <div *ngIf="displayMaturityDate" class="form-group">
+
+                                <label for="newtenor" class="control-label col-md-2">New Tenor</label>
+                                <div class="col-md-4 ">
+                                    <input type="text" name="newtenor" (change)="calculateMaturityDate()" formControlName="newtenor" id="newtenor" class="form-control"
+                                        [ngClass]="!loanPrepaymentForm.controls['newtenor'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+
+
+                            </div>
+
+
+                        </form>
+                        <div *ngIf="displayIrregularSchedule">
+                            <fieldset>
+                                <legend>New Payment Plan</legend>
+                                <div class="form-group">
+                                    <label for="" class="control-label col-md-2">
+                                        Date
+                                    </label>
+                                    <div class="col-md-4">
+                                        <p-calendar id="scateredDate" dateFormat="dd/mm/yy" [(ngModel)]="data.scateredDate" [monthNavigator]="true" [inputStyle]="{'width': '270px' }"
+                                            [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true"></p-calendar>
+                                    </div>
+                                    <label for="" class="control-label col-md-2">
+                                        Amount
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="number" [(ngModel)]="data.amount" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-10">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>S/No</th>
+                                                    <th>Date</th>
+                                                    <th style="text-align: right">Amount</th>
+                                                    <th></th>
+                                                </tr>
+
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let p of scatterdPayments;let indx=index">
+                                                    <td>
+                                                        {{indx + 1}}
+                                                    </td>
+                                                    <td>
+                                                        {{p.paymentDate | date}}
+                                                    </td>
+                                                    <td style="text-align: right;width:120px">{{p.paymentAmount | number:'1.2'}}</td>
+                                                    <td style="padding: 0;width:50px">
+                                                        <a (click)="removeItem($event,indx)" style="color:#ff0000" href="#">
+                                                            <i class="fa fa-times" aria-hidden="true"></i>X</a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="text-align: left" class="col-md-2">
+
+                                        <button [disabled]="!data.amount && !data.scateredDate" (click)="addToList()" pButton type="button" label="Add To List" icon="fa-plus"></button>
+                                        <!-- <br/>
+                                        <br/> Balance:
+                                        <span style="margin:0;text-align: right">
+                                            {{principalValanceString }}
+                                        </span> -->
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                       
+                       
+
+
+<!-- 
+
+                        <div class="form-group">
+                            <div *ngIf="!displayIrregularSchedule">
+                                <div class="col-md-2">
+                                    <label class="control-label">Balance: </label>
+                                    <span style="margin:0;text-align: right">
+                                        {{principalValanceString}}
+                                    </span>
+                                </div>
+                                <div class="col-md-2 col-md-offset-8">
+                                    <button type="button" [disabled]="! newPrincipalBalance" (click)="generateIrregularSchedule()" class="btn btn-success btn-block">Generate</button>
+                                </div>
+                            </div>
+
+                            <div *ngIf="displayIrregularSchedule" class="col-md-2 col-md-offset-10">
+                                <button type="button" [disabled]="! newPrincipalBalance" (click)="generateIrregularSchedule()" class="btn btn-success btn-block">Generate</button>
+                            </div>
+                        </div>
+                    
+                    
+                     -->
+                    
+                    
+                   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     <fieldset>
+                        <legend style="color:#ff0000">Prepayment Amount Entered As At Current Run Date</legend>
+
+                        <!-- loanPrepaymentReversalData -->
+                        <div class="form-group">
+                            <div class="col-md-8">
+                                    <p-dataTable  [value]="loanPrepaymentReversalData" [(selection)]="multipleAmountData" [responsive]=true dataKey="payDate"
+                                    selectionMode="multiple">
+                                    <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column> -->
+                                    <p-column field="" header="#"  sortable="true" [style]="{width:'5%','text-align':'left'}">
+                                        <ng-template let-i="rowIndex" pTemplate="body">
+                                            {{i+1}}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="operationDate" sortable="true" [filter]="true" filterMatchMode="contains" [editable]="true" header="Prepayment Date">
+                                        <ng-template let-col let-cov="rowData" pTemplate="body">
+                                         <span>{{cov[col.field] | date: '  dd/MM/yyyy'}}</span>
+                                        </ng-template>       >                   
+                                         </p-column>
+                            
+                                    <p-column field="prepaymentAmount" header="Prepayment Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                   
+                                   
+                                    <!-- <p-column field="payType" header="Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                                    <!-- <p-footer>
+                                        <button [disabled]=null style="width: 100%;" type="button" (click)="removeSelectedItem()" class="btn btn-warning">Delete Selected</button>
+                                    </p-footer> -->
+                                </p-dataTable>
+
+                            </div>
+
+                            <!-- <div style="text-align: left" class="col-md-2">
+                                Total Amount Checked:
+                                <span style="margin:0;text-align: right">
+                                {{principalValanceString}}
+                            </span>
+                            </div> -->
+                        </div>
+                    </fieldset>
+                    
+        
+
+
+
+
+
+
+
+
+
+                     
+                   
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm(loanPrepaymentForm)" [disabled]="loanPrepaymentForm.invalid" class="btn btn-success pull-right">Save</button>
+                            <button type="button" (click)="backToSearch()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <!--end of panel-->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search For Current Prepayment Loan
+                </h2>
+                <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                    </i>
+                </a>
+
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan Reference No</th>
+                                <th>Customer Name</th>
+                                <th>Loan Principal Amount</th>
+                                <th>Facility Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>
+                                    {{res.loanReferenceNumber}}
+                                </td>
+                                <td>
+                                    {{res.customerName}}
+                                </td>
+                                <td> 
+                                    {{res.principalAmount}}
+                                </td>
+                                <td>
+                                    {{res.productTypeName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+
+
+        </div>
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<p-dialog header="Loan Schedule" [responsive]=true resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal"
+    modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Schedule Details
+            </h2>
+        </div>
+        <div class="panel-body">
+            <fieldset>
+                <table style="margin-bottom: 20px">
+                    <tr>
+                        <td style="font-size: 12px;font-weight: bold;padding: 4px">Granted Amount</td>
+                        <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.principalAmount}}</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Interest Rate</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.interestRate}} %</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Effective Interest Rate</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.effectiveInterestRate | number: '1.2-2'}} %</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px;font-weight: bold;padding: 4px">Effective Date</td>
+                        <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.effectiveDate | date}}</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Maturity Date</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.maturityDate | date}}</td>
+                    </tr>
+                </table>
+
+            </fieldset>
+
+
+            <p-dataTable scrollable="true" scrollHeight="400px" [value]="schedules" [responsive]=true selectionMode="single">
+                <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No"></p-column>
+                <p-column field="paymentDate" header="Payment Date">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span>{{schedule[col.field] | date}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="startPrincipalAmount" header="Start Principal">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodPaymentAmount" header="Periodic Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodPrincipalAmount" header="Principal Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodInterestAmount" header="Interest Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="endPrincipalAmount" header="Balance">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+
+                <p-column field="amortisedStartPrincipalAmount" header="AM Start Principal">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="amortisedPeriodPaymentAmount" header="AM Periodic Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="amortisedPeriodPrincipalAmount" header="AM Principal Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="amortisedPeriodInterestAmount" header="AM Interest Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="amortisedEndPrincipalAmount" header="AM Balance">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <!-- <p-column field="internalRateOfReturn" header="IRR">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column> -->
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayScheduleModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- <p-dialog [responsive]=true [(visible)]="displayLoanDetailsModal" modal="modal" id="loanDetails" showEffect="fade" width="650">
+    <app-customer-information-detail [loanApplicationId]="loanApplicationId"></app-customer-information-detail>
+</p-dialog> -->
+
+<p-dialog header="Loan Details" [responsive]=true resizable="true" [(visible)]="displayLoanDetailsModal" id="loanDetails"
+    modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                View Loan Details
+            </h2>
+            <a href="" (click)="displayLoanDetailsModal=false" class="pull-right remove-btn">
+                <i class="glyphicon glyphicon-remove-sign">
+                </i>
+            </a>
+        </div>
+        <div class="panel-body">
+            <!-- <app-customer-information-detail [loanApplicationId]="loanApplicationId"></app-customer-information-detail> -->
+            <app-disbursed-loan-details [displayDetails]="displayLoanDetailsModal" [loanSystemTypeId]="loanSystemTypeId" [LoadLoanDetails]="termLoanId"></app-disbursed-loan-details>
+            <!-- <app-disbursed-loan-details [displayDetails]="displayCustomerLoanDetails" [LoadLoanDetails]="termLoanId"></app-disbursed-loan-details> -->
+        </div>
+    </div>
+</p-dialog>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

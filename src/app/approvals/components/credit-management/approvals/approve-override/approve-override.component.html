@@ -1,0 +1,131 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              Override Request Awaiting Approval
+                          </h2>
+                      </div>
+                  </div>
+              </div>
+              <div class="panel-body">
+                <p-dataTable [value]="overrideList">
+                    <p-column field="customerCode" [style]="{'width':'80px'}" header="Customer Code" ></p-column>
+                    <p-column field="customerName" [style]="{'width':'250px'}" header="Customer Name " ></p-column>
+                    <p-column field="customerbvn" [style]="{'width':'80px'}" header="Customer BVN" ></p-column>                    
+                    <p-column field="itemName" header="Override Request " ></p-column>
+                    <p-column field="staffName" header="Request By" ></p-column>
+                    <p-column   field="dateTimeCreated" header="Request Date" >
+                        <ng-template let-col let-ln="rowData" pTemplate="body">
+                            {{ln[col.field] | date}}
+                        </ng-template>
+                    </p-column>
+                    <p-column  [style]="{'width':'50px'}">
+                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">   
+                            
+                                <button type="button" (click)="approveOverride(row)">
+                                        <i class="glyphicon glyphicon-eye-open"></i>
+                                      </button>
+                            
+                          <!-- <a (click)="approveOverride(row)" href="javascript:void(0)">Approve</a>  |  <a href="javascript:void(0)">Disapprove</a>  -->
+                        </ng-template>
+                    </p-column>
+   
+                </p-dataTable>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayApprovalModal" widgetVar="ajaxDialog" [draggable]="false" appendToBody="true"
+  modal="modal" showEffect="fade" width="949">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Checklist Approval
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="hideModal()">&times;</a>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="form-horizontal" [formGroup]="formData" >
+        <table class="table table-customer-information">
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Customer Code</strong>
+                </td>
+                <td>{{ selectedRequest.customerCode }}</td>
+                <td>
+                  <strong>Customer Name</strong>
+                </td>
+                <td>{{ selectedRequest.customerName }}</td>
+              </tr>
+
+            <tr>
+                <td>
+                    <strong>Customer BVN</strong>
+                </td>
+                <td>{{ selectedRequest.customerbvn }}</td>
+                <td>
+                    <strong>Request Date</strong>
+                </td>
+                <td>{{ selectedRequest.dateTimeCreated | date : 'dd/MM/yyyy' }}</td>
+            </tr>
+
+            
+              <tr>
+                <td>
+                  <strong>Override Request</strong>
+                </td>
+                <td>{{ selectedRequest.itemName }}</td>
+                <td>
+                  <strong>Reason for Override</strong>
+                </td>
+                <td>{{ selectedRequest.reason }}</td>
+              </tr>
+              <br/>
+              <tr>
+
+                <td>
+                  <strong>Comment</strong>
+                </td>
+                <td>
+                  <textarea   class="form-control"[ngClass]="!formData.controls['statusComment'].valid ? 'required-input' : 'valid-input'"
+                  formControlName="statusComment" cols="15" rows="3"></textarea>
+                </td>
+                <td>
+                  <strong>Status</strong>
+                </td>
+                <td>
+                  <select formControlName="approvedStatusId" id="approvedStatusId" class="form-control" 
+                  [ngClass]="!formData.controls['approvedStatusId'].valid ? 'required-input' : 'valid-input'">
+                    <option value="">--- Select Approval Status ---</option>
+                    <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="btn-group pull-right">
+            <button (click)="hideModal()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+
+            <button [disabled]="formData.invalid" type="button" (click)="goForApproval()"
+              class="btn btn-success">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>

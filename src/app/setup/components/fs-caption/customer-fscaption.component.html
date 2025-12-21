@@ -1,0 +1,108 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Financial Statement Captions
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pull-left">
+                                    <form class="form-horizontal" autocomplete="off">
+                                        <select name="fsCaptionGroup" id="fsCaptionGroup" class="form-control" ([ngModel])="selectedFSCaptionGroup" (change)="onFSCaptionGroupSelect($event.target.value)">
+                                            <option value="">--- Select FS Caption Group ---</option>
+                                            <option *ngFor="let item of fsCaptionGroupData" [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pull-right">
+                                    <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p-dataTable [value]="fsCaptionData" [sortMode]="multiple">
+                    <p-column *ngFor="let col of fsCaptionTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                    <p-column field="isRatio" header="Is Derived">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            <span *ngIf="d.isRatio">Yes</span>
+                            <span *ngIf="!d.isRatio">No</span>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-col let-i="rowIndex">
+                            <a (click)="editFSCaptionGroup(i)" href="javascript:void(0)">Edit</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-col let-i="rowIndex">
+                            <a (click)="deleteFSCaptionGroup(i)" href="javascript:void(0)">Delete</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Financial Statement Caption
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createEditFormGroup" (ngSubmit)="submitFSCaptionForm(createEditFormGroup)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="grpId" class="control-label col-md-2">FS Name</label>
+                        <div class="col-md-4">
+                            <input type="text" id="grpId" name="grpId" class="form-control" formControlName="fsCaptionName" [ngClass]="createEditFormGroup.controls['fsCaptionName'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="fsCaptionGroup" class="control-label col-md-2">FS Caption Group</label>
+                        <div class="col-md-4">
+                            <!--<select name="fsCaptionGroup" id="fsCaptionGroup" class="form-control" formControlName="fsCaptionGroupId" disabled="true">
+                                <option value="">--- Select FS Caption Group ---</option>
+                                <option *ngFor="let item of fsCaptionGroupData"  [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                            </select>-->
+                            <input type="text" name="fsCaptionGroup" class="form-control" [value]="captionGroupName" [attr.disabled]="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="position" class="control-label col-md-2">Position</label>
+                        <div class="col-md-4">
+                            <input type="number" min="0" max="100" name="position" class="form-control" formControlName="position" [ngClass]="createEditFormGroup.controls['position'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="isRatio" class="control-label col-md-2">Is Derived</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isRatio" formControlName="isRatio" [ngClass]="createEditFormGroup.controls['isRatio'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="createEditFormGroup.invalid" class="btn btn-success pull-right">Save FS Caption</button>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

@@ -1,0 +1,80 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Additional Comment
+                </h2>
+                <div class="pull-right">
+                    <button (click)="showAdditionalCommentForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+
+        <p-dataTable [value]="additionalComments" [responsive]="true" [paginator]="false" [rows]="5">
+
+            <p-column field="additionalComment" header="Additional Comment" sortable="true" filterMatchMode="contains">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                     <span innerHTML="{{ d.additionalComment }}"></span>
+                </ng-template>
+            </p-column>
+            <!-- <p-column field="staffName" header="Staff Name" sortable="true" filterMatchMode="contains"></p-column> -->
+
+            <p-column [style]="{'width':'100px'}" header="View">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center" *ngIf="d.owner">
+                    <a (click)="deleteAdditionalComment(d)" href="javascript:void(0)">Remove</a>
+                    <span style="padding:3px;">|</span>
+                    <a (click)="editAdditionalComment(d)" href="javascript:void(0)">Edit</a>
+                </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+
+</div>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayAdditionalCommentForm" id="ct-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Additional Comment
+            </h2>
+        </div>
+                    
+        <form novalidate [formGroup]="additionalCommentForm" autocomplete="off">
+           <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="additionalComment" class="control-label col-md-12">Additional Comment</label>
+                        <div class="col-md-12">
+                            <!-- <textarea name="additionalComment" formControlName="additionalComment" id="additionalComment" class="form-control" [ngClass]="!additionalCommentForm.controls['additionalComment'].valid ? 'required-input' : 'valid-input'"></textarea> -->
+                            <p-editor formControlName="additionalComment" name="additionalComment" [style]="{'height':'100px'}"></p-editor>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="saveAdditionalComment(additionalCommentForm)" [disabled]="additionalCommentForm.invalid" class="btn btn-success pull-right">Save and Close</button>
+                    <button type="button" (click)="displayAdditionalCommentForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+

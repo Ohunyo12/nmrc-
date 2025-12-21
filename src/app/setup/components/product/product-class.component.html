@@ -1,0 +1,146 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Product Classification
+              </h2>
+
+              <div class="pull-right">
+                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+
+          <p-dataTable [value]="productClassData" [paginator]="true" [rows]="20" [responsive]="true">
+            <p-column field="productClassName" header="Product Class " sortable="true" [filter]="true"
+              filterMatchMode="contains"></p-column>
+            <p-column field="productClassType" header="Product Class Type " sortable="true" [filter]="true"
+              filterMatchMode="contains"></p-column>
+            <p-column field="productClassProcess" header="Product Class Process " sortable="true" [filter]="true"
+              filterMatchMode="contains"></p-column>
+            
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"> </ng-template>
+              <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="editProductClass(pGrp, $event)" href="javascript:void(0)">
+                  Edit
+                </a>
+              </ng-template>
+            </p-column>
+          </p-dataTable>
+
+        </div>
+
+      </div>
+      <!--end of panel-->
+    </div>
+  </div>
+</div>
+
+
+<!--add modal-->
+<p-dialog [responsive]="true" [(visible)]="displayAddUpdateModal" id="add-modal" modal="modal" showEffect="fade"
+  width="560">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{panelHeader}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="productClassForm" autocomplete="off">
+
+      <div class="panel-body">
+        <div class="form-horizontal">
+
+          <div class="form-group">
+            <label for="productClassName" class="control-label col-md-4">
+              Product Class
+            </label>
+            <div class="col-md-8">
+              <input type="text" name="productClassName" formControlName="productClassName" id="productClassName"
+                class="form-control"
+                [ngClass]="!productClassForm.controls['productClassName'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="productClassTypeId" class="control-label col-md-4">
+              Product Class Type
+            </label>
+            <div class="col-md-8">
+              <select name="productClassTypeId" id="productClassTypeId" formControlName="productClassTypeId"
+                class="form-control"
+                [ngClass]="!productClassForm.controls['productClassTypeId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">Select Product Class Type</option>
+                <option *ngFor="let nat of productClassTypes" value="{{nat.lookupId}}">
+                  {{nat.lookupName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="productClassTypeId" class="control-label col-md-4">
+              Product Class Process
+            </label>
+            <div class="col-md-8">
+              <select name="productClassProcessId" id="productClassProcessId" formControlName="productClassProcessId"
+                class="form-control"
+                [ngClass]="!productClassForm.controls['productClassProcessId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">Select Product Process</option>
+                <option *ngFor="let nat of productClassProcess" value="{{nat.productClassProcessId}}">
+                  {{nat.productClassProcessName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="globalSla" class="control-label col-md-4">
+              Global SLA
+            </label>
+            <div class="col-md-8">
+              <input type="text" name="globalSla" formControlName="globalSla" id="globalSla" class="form-control"
+                [ngClass]="!productClassForm.controls['globalSla'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="businessUnitId" class="control-label col-md-4">
+              Business Unit
+            </label>
+            <div class="col-md-8">
+              <select name="businessUnitId" id="businessUnitId" formControlName="businessUnitId" class="form-control"
+                [ngClass]="!productClassForm.controls['businessUnitId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">--- Select Business Unit ---</option>
+                <option *ngFor="let sbu of businessUnit" value="{{sbu.businessUnitId}}">
+                  {{sbu.businessUnitName}}
+                </option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-12">
+                <button type="button" (click)="submitForm(productClassForm)" [disabled]="productClassForm.invalid"
+                  class="btn btn-success pull-right">Save</button>
+                <button type="button" (click)="displayAddUpdateModal=false" style="margin-right:5px"
+                  class="btn btn-danger pull-right">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</p-dialog>
+<!--end of add modal-->

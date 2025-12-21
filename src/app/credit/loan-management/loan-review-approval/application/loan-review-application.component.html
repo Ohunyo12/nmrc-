@@ -1,0 +1,390 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <!--module header-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Review Application
+                        </h2>
+                        <!-- <div class="pull-right">
+                            <button (click)="loanSearch()" pButton type="button" label="Loan Search" icon="fa-search"></button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+
+
+            <p-tabView [activeIndex]="activeSearchTabindex" (onChange)="onSearchTabChange($event)">
+
+                <p-tabPanel header="Loan Search">
+
+                    <form novalidate [formGroup]="loanSearchForm"
+                        (keydown.enter)="loanSearchForm.valid ? submitLoanSearchForm(loanSearchForm) : $event.preventDefault()"
+                        autocomplete="off">
+                        <div class="panel-body">
+
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <!-- <label for="operationTypeId" class="control-label col-md-3">Loan Performance</label> -->
+                                    <!-- <label for="loanSystemTypeId" class="control-label col-md-3">Facility Type</label> -->
+                                    <label for="operationTypeId" class="control-label col-md-3">Select Status Type</label>
+                                    <label for="searchString" class="control-label col-md-6">Customer Name / Customer Id (For importing Customers) / Application
+                                        Reference Number</label>
+                                    <label class="control-label col-md-3">.</label>
+                                    <!-- <div class="col-md-3">
+                                        <select  (change)="onChangePerformanceType($event.target.value)" name="performanceTypeId" formControlName="performanceTypeId" id="operationTypeId" class="form-control" [ngClass]="loanSearchForm.controls['performanceTypeId'].valid ? 'valid-input' : 'required-input'">
+                                            <option value="">-- Select Performance --</option>
+                                            <option *ngFor="let x of performanceTypes" [value]="x.id">{{ x.name }}</option>
+                                        </select>
+                                    </div> -->
+                                    <!-- <div class="col-md-3">
+                                        <select (change)="onChangeFacilityType($event.target.value)"
+                                            name="loanSystemTypeId" formControlName="loanSystemTypeId"
+                                            id="operationTypeId" class="form-control"
+                                            [ngClass]="loanSearchForm.controls['loanSystemTypeId'].valid ? 'valid-input' : 'required-input'">
+                                            <option value="">-- Select Facility Type --</option>
+                                            <option *ngFor="let x of loanSystemTypes" [value]="x.id">{{ x.name }}
+                                            </option> 
+                                        </select>
+                                    </div> -->
+                                    <div class="col-md-3">
+                                        <select name="statusId" formControlName="statusId" id="statusId" class="form-control" [ngClass]="loanSearchForm.controls['statusId'].valid ? 'valid-input' : 'required-input'">
+                                            <option value="">-- Select Status --</option>
+                                            <option *ngFor="let x of loanStatusTypes" [value]="x.id">{{ x.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 input-group" style="padding:0 15px;">
+                                            <input type="text" name="searchString" formControlName="searchString"
+                                            id="searchString" class="form-control"
+                                            placeholder="Search by loan / application reference number"
+                                            [ngClass]="!loanSearchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+
+                                        <span (click)="submitLoanSearchForm(loanSearchForm)"
+                                            class="input-group-addon btn btn-info">
+                                            <span class="glyphicon glyphicon-search"></span> Search
+                                        </span>
+
+                                        
+                                    </div>
+                                    <!-- <div class="col-md-3">
+                                    </div> -->
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+
+
+                    <p-dataTable [value]="loans" [paginator]="true" [rows]="5" [(selection)]="loanSelection"
+                        dataKey="loanId" (onRowSelect)="onSelectedLoanChange()">
+                        <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                        <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Product Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="loanTypeName" header="Loan Type" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                            <p-column [style]="{'width':'20%'}" header="Loan System Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    <div class="btn-group"
+                                        [innerHtml]="getLoanSystemType(row.loanSystemTypeId)">
+                                    </div>
+                                </ng-template> </p-column>
+                        <p-column field="principalAmount" header="Loan Amount" sortable="true" [filter]="true"
+                            filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.principalAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column header="Performing" [style]="{'width':'7%'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <span *ngIf="d.isPerforming" style="color:#a9a9a9;"
+                                    class="glyphicon glyphicon-ok"></span>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column header="Written-Off" [style]="{'width':'7%'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <span *ngIf="d.writtenOff" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Selected Loan Details" [disabled]="loanSelection == null">
+
+                    <button (click)="newApplication()" pButton type="button" label="Loan Review Application"
+                        icon="fa-plus" style="margin-bottom: 8px;"></button>
+
+                    <div class="panel panel-default" *ngIf="loanSelection != null">
+                        <div class="panel-body">
+                            <app-disbursed-facility-detail *ngIf="loanSystemTypeId != 4" [displayDetails]="true"
+                                [loanSystemTypeId]="loanSystemTypeId" [loanReferenceNumber]="loanSelection.loanReferenceNumber" [loanApplicationDetailId]="loanApplicationDetailId" [LoadLoanDetails]="reloadLoanDetails">
+                            </app-disbursed-facility-detail>
+                            <app-loan-application-details-view *ngIf="loanSystemTypeId == 4"
+                                [loanApplicationDetailId]="reloadLoanDetails"> </app-loan-application-details-view>
+                        </div>
+                    </div>
+
+                </p-tabPanel>
+
+            </p-tabView>
+
+            <!-- <pre>{{ operationTypes | json }}</pre> -->
+
+        </div>
+    </div>
+</div>
+
+
+<!-- APPLICATION FORM -->
+<p-dialog [responsive]=true [(visible)]="showApplicationForm" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title"> New Application </h2>
+        </div>
+
+        <p-tabView>
+            <p-tabPanel header="Application Form">
+                <form novalidate [formGroup]="applicationForm" autocomplete="off">
+
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+
+                            <div class="form-group">
+                                <label class="control-label col-md-6">Activity type</label>
+                                <!-- <label class="control-label col-md-3">Proposed Amount</label> -->
+                                <label class="control-label col-md-3">.</label>
+                                <div class="col-md-6">
+                                    <select (change)="onChangeSelectedOperationType($event.target.value)"
+                                        name="operationTypeId" formControlName="operationTypeId" id="operationTypeId"
+                                        class="form-control"
+                                        [ngClass]="applicationForm.controls['operationTypeId'].valid ? 'valid-input' : 'required-input'">
+                                        <option value="0">-- Select Activity Type --</option>
+                                        <option *ngFor="let x of operationTypeIds" [value]="x.id">{{ x.name }}</option>
+                                    </select>
+                                </div>
+                                <!-- <div class="col-md-3">
+                                    <input type="text" name="customerProposedAmount"
+                                        formControlName="customerProposedAmount" formatM formatM
+                                        id="customerProposedAmount" class="numeric form-control"
+                                        [ngClass]="!applicationForm.controls['customerProposedAmount'].valid ? 'required-input' : 'valid-input'">
+                                </div> -->
+                                <div class="col-md-3">
+                                    <button style="width:100%;" (click)="validateSubAllocationTranche(applicationForm)"
+                                        [disabled]="applicationForm.invalid" class="btn btn-primary form-control">
+                                        <i class="glyphicon glyphicon-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- <div class="form-group">
+                                <label class="control-label col-md-3">New Tenor</label>
+                                <label class="control-label col-md-9">New Interest Rate</label>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                    <input type="text" name="proposedTenor"
+                                        formControlName="proposedTenor" formatM formatM
+                                        id="proposedTenor" class="numeric form-control"
+                                        [ngClass]="!applicationForm.controls['proposedTenor'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <input type="text" name="proposedInterest"
+                                        formControlName="proposedInterest" formatM formatM
+                                        id="proposedInterest" class="numeric form-control"
+                                        [ngClass]="!applicationForm.controls['proposedInterest'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+                                 
+                            </div> -->
+                           
+                            <div class="form-group">
+                                <!-- <label for="reviewDetails" class="control-label col-md-12">Review Details</label>
+                                <div class="col-md-9"> -->
+                                <label for="reviewDetails" class="control-label col-md-8">Review Details</label>
+                                <label for="duration" class="control-label col-md-4" *ngIf="showDuration">Duration (days)</label>
+                                <div class="col-md-8">
+                                    <textarea style="height:50px;" name="reviewDetails" formControlName="reviewDetails"
+                                        id="reviewDetails" class="form-control"
+                                        [ngClass]="applicationForm.controls['reviewDetails'].valid ? 'valid-input' : 'required-input'"></textarea>
+                                </div>
+                                <div class="col-md-4" *ngIf="showDuration">
+                                    <input type="text" (keypress)="numericOnly($event)" name="duration" formControlName="duration"
+                                            id="duration" class="form-control numeric" 
+                                            [ngClass]="applicationForm.controls['duration'].valid ? 'valid-input' : 'required-input'">
+
+                                    <!-- <select (change)="onChangeSelectedDuration($event.target.value)" *ngIf="showDuration"
+                                        name="duration" formControlName="duration" id="duration" class="form-control"
+                                        [ngClass]="applicationForm.controls['duration'].valid ? 'valid-input' : 'required-input'">
+                                        <option value="0">-- Select Duration --</option>
+                                        <option value="15">15 days</option>
+                                        <option value="30">30 days</option>
+                                        <option value="60">60 days</option>
+                                        <option value="90">90 days</option>
+                                    </select> -->
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <p-dataTable [value]="applicationCollection" [paginator]="true" [rows]="5"
+                            [(selection)]="loanSelection" dataKey="id" (onRowSelect)="onSelectedLoanChange()">
+                            <p-column field="operationType" header="Operation Type" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="reviewDetails" header="Review Details" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <!-- <p-column field="customerProposedAmount" header="Proposed Amount" sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column field="proposedTenor" header="Proposed Tenor " sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column field="proposedInterest" header="Proposed Interest Rate" sortable="true"
+                                [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                                <!-- <p-column field="duration" header="Duration" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                                <p-column [style]="{'width':'60px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div style="text-align:center">
+                                            <a (click)="editApplication(d)" href="javascript:void(0)">Edit</a>
+                                        </div>
+                                    </ng-template>
+                                </p-column>
+
+                                <p-column [style]="{'width':'60px'}">
+                                    <ng-template pTemplate="header"></ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div style="text-align:center">
+                                            <a (click)="removeApplicationCollection(d)" href="javascript:void(0)">Remove</a>
+                                        </div>
+                                    </ng-template>
+                                </p-column>
+                        </p-dataTable>
+
+                    </div>
+
+                </form>
+            </p-tabPanel>
+            <p-tabPanel header="Documents" *ngIf="enableTab">
+                <app-contingent-used-document [loanId]="selectedLoanId"></app-contingent-used-document>
+            </p-tabPanel>
+        </p-tabView>
+        <!-- {{ applicationCollection | json }} -->
+        <form [formGroup]="regionForm" autocomplete="off">
+            <!-- <div class="panel-body form-horizontal">
+                <div class="form-group">
+                    <label for="" class="control-label col-md-12">CAP Region</label>
+                    <div class="col-md-6">
+                        <select id="regionId" name="regionId" formControlName="regionId" class="form-control"
+                            [ngClass]="regionForm.controls['regionId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">--- Select Region ---</option>
+                            <option *ngFor="let x of regions" [ngValue]="x.lookupId">{{x.lookupName}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(regionForm)"
+                            [disabled]="(applicationCollection.length < 1 || applicationCollection.length >1)  || regionForm.invalid"
+                            class="btn btn-success pull-right">Submit Application</button>
+                        <button type="button" (click)="closeForm()" style="margin-right:5px"
+                            class="btn btn-primary pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<p-dialog [responsive]=true [(visible)]="displayExternalLoansGrid" modal="modal" width="1200"
+ [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div *ngIf="displayExternalLoansGrid" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                THIRD-PARTY FACILITIES
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayExternalLoansGrid=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;">
+            <p-dataTable [responsive]="true" [paginator]="true" [rows]="10" [value]="externalLoans">
+                <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true" [filter]="true"></p-column>
+                <p-column field="productName" header="Product Name" sortable="true" [filter]="true"></p-column>
+                <p-column field="customerCode" header="Customer Code" sortable="true" [filter]="true"></p-column>
+                <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"></p-column>
+                <p-column field="loanTypeName" header="Loan Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'20%'}" header="Loan System Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                            <div class="btn-group"
+                                [innerHtml]="getLoanSystemType(row.loanSystemTypeId)">
+                            </div>
+                        </ng-template> </p-column>
+                <p-column field="principalAmount" header="Loan Amount" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.principalAmount | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+
+                <p-column header="Performing" [style]="{'width':'7%'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <span *ngIf="d.isPerforming" style="color:#a9a9a9;"
+                            class="glyphicon glyphicon-ok"></span>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a *ngIf="d.isSavedExternalFacility == false" (click)="ImportExternalFacility(d)" href="javascript:void(0)">
+                            Import
+                        </a>
+                        <a *ngIf="d.isSavedExternalFacility == true" (click)="AddToGrid(d)" href="javascript:void(0)">
+                            Continue
+                        </a>
+                    </ng-template>
+                </p-column>
+            </p-dataTable>
+        </div>
+
+    </div>
+</p-dialog>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!-- <pre>{{ application | json }}</pre> -->
+<!-- <pre>{{ list | json }}</pre> -->
+<!-- 
+FILTERED:
+<pre>{{ operationTypes | json }}</pre>
+
+RAW:
+<pre>{{ list.operationTypes | json }}</pre>  -->
+
+<!-- <PRE>{{ loans | json }}</PRE> -->

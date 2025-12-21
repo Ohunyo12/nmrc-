@@ -1,0 +1,276 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Region
+              </h2>
+              <div class="pull-right">
+                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <p-dataTable [value]="regions" [responsive]="true" [paginator]="true" [rows]="15">
+            <p-column field="regionName" header="Region Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+             <p-column field="regionTypeName" header="Region Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> 
+            <p-column [style]="{'width':'100px'}">
+                <ng-template pTemplate="header"></ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                  <a (click)="RegionSupervisor(d)" href="javascript:void(0)">
+                    Supervisors
+                  </a>
+                </ng-template>
+              </p-column>
+            <p-column [style]="{'width':'100px'}">
+              <ng-template pTemplate="header"></ng-template>
+              <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <a (click)="editRegion(d, $event)" href="javascript:void(0)">
+                  Edit
+                </a>
+              </ng-template>
+            </p-column>
+
+          </p-dataTable>
+        </div>
+
+      </div>
+      <!--end of panel-->
+
+
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayRegionModal" id="add-modal" modal="modal" showEffect="fade" width="600">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="regionForm" autocomplete="off">
+
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="regionName" class="control-label col-md-2">Region Name</label>
+            <div class="col-md-8">
+              <input type="text" name="regionName" formControlName="regionName" id="stateName" class="form-control" [ngClass]="!regionForm.controls['regionName'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+              <label for="regionName" class="control-label col-md-2">Region Type</label>
+              <div class="col-md-8">
+                  <select name="regionTypeId" formControlName="regionTypeId" class="form-control" [ngClass]="!regionForm.controls['regionTypeId'].valid ? 'required-input' : 'valid-input'"
+                  id="regionTypeId">
+                  <option value="">--- Select Region Type ---</option>
+                  <option *ngFor="let p of staffTypeList" value="{{p.lookupId}}">
+                    {{p.lookupName}}
+                  </option>
+                </select>               
+              </div>
+            </div>
+          <!-- <div class="form-group">
+            <label for="houStaffId" class="control-label col-md-2">Region Supervisor</label>
+            <div class="col-md-8">
+                <input type="text" name="searchParamemter" (focus)="openSearchBox()" placeholder="Staff Code" [(ngModel)]="searchParamemter" class="form-control"  >
+              <select name="houStaffId" formControlName="houStaffId" class="form-control" [ngClass]="!regionForm.controls['houStaffId'].valid ? 'required-input' : 'valid-input'"
+                id="houStaffId">
+                <option value="">--- Select Region Supervisor ---</option>
+                <option *ngFor="let p of staffList" value="{{p.staffId}}">
+                  {{p.fullName}}
+                </option>
+              </select> 
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitForm(regionForm)" [disabled]="regionForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayRegionModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+        <div style="margin-left:0" class="row">
+          <h2 class="panel-title pull-left">
+            Search For Staff
+          </h2>
+          <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+            <i class="glyphicon glyphicon-remove-sign">
+            </i>
+          </a>
+
+        </div>
+      </div>
+      <div style="padding:3px" class="panel-body">
+        <div class="form-group">
+          <div class="row">
+              <div class="col-md-9">
+                  <input type="text" [(ngModel)]="staffSearchText"   class="form-control" placeholder="Type in your search parameter">
+                </div>
+                <div class="col-md-3">
+                    <button pButton type="button" (click)="StaffSearch()" label="Search"></button>
+                </div>
+          </div>
+      
+        </div>
+
+        <div class="form-group">
+          <div class="col-md-12">
+            <p>
+              <!--{{mfacilityType}}-->
+            </p>
+            <table *ngIf="searchResults" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Staff Name</th>
+                  <th>Staff Code</th>
+                  <th>Branch Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                  <td>
+                    {{res.firstName}}
+                  </td>
+                  <td>
+                    {{res.staffCode}}
+                  </td>
+                  <td>
+                    {{res.branchName}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+
+
+<!--region staff modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalRegionStaff" id="add-modal" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+                <h2 class="panel-title">
+                        Region Staff List
+                    </h2>                    
+        </div>
+        <div class="pull-right">
+            <button (click)="showAddRegionStaffModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+        </div>
+            <div class="panel-body">
+                    <p-dataTable [value]="regionStaffs" [paginator]="true" [rows]="10" [responsive]=true>
+                        <p-column field="regionStaffTypeName" header="Staff Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="houStaffName" header="Staff" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                           
+                            <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editRegionStaff(d)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="removeRegionStaff(d)" href="javascript:void(0)">                                            <i class="glyphicon glyphicon-remove"></i>
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                        </p-dataTable>
+            </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button> -->
+                    <button type="button" (click)="displayModalRegionStaff=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of region staff modal-->  
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddRegionStaffModal" id="add-modal" modal="modal" showEffect="fade" width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+        <h2 class="panel-title">
+          {{entityName}}
+        </h2>
+      </div>
+  
+      <form novalidate [formGroup]="regionStaffForm" autocomplete="off">
+  
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <input type="hidden" name="staffRegionId" formControlName="staffRegionId" class="form-control" >
+              <input type="hidden"  name="regionId" formControlName="regionId" class="form-control" visible="false">
+
+              <label for="regionName" class="control-label col-md-4">Region Staff Type</label>
+              <div class="col-md-8">
+                  <select name="regionStaffTypeId" formControlName="regionStaffTypeId" class="form-control" [ngClass]="!regionStaffForm.controls['regionStaffTypeId'].valid ? 'required-input' : 'valid-input'"
+                  id="regionStaffTypeId">
+                  <option value="">--- Select Region Staff Type ---</option>
+                  <option *ngFor="let p of staffTypeList" value="{{p.lookupId}}">
+                    {{p.lookupName}}
+                  </option>
+                </select>               
+              </div>
+            </div>
+             <div class="form-group">
+              <label for="houStaffId" class="control-label col-md-4">Region Supervisor</label>
+              <div class="col-md-8">
+                  <!-- <input type="text" name="searchParamemter" (focus)="openSearchBox()" placeholder="Staff Code" [(ngModel)]="searchParamemter" class="form-control"  > -->
+                <select name="houStaffId" formControlName="houStaffId" class="form-control" [ngClass]="!regionStaffForm.controls['houStaffId'].valid ? 'required-input' : 'valid-input'"
+                  id="houStaffId">
+                  <option value="">--- Select Region Supervisor ---</option>
+                  <option *ngFor="let p of staffList" value="{{p.staffId}}">
+                    {{p.fullName}}
+                  </option>
+                </select> 
+                <span><a (click)="openSearchBox()" href="javascript:void(0)"><i>Click Here to filter staffs</i></a></span>
+              </div>
+            </div> 
+        </div>
+        </div>
+  
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+              <button type="button" (click)="submitRegionStaffForm(regionStaffForm)" [disabled]="regionStaffForm.invalid" class="btn btn-success pull-right">Save</button>
+              <button type="button" (click)="displayAddRegionStaffModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+          </div>
+        </div>
+  
+      </form> 
+  
+    </div>
+  </p-dialog>

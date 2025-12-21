@@ -1,0 +1,93 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">Authourised Signatory</h2>
+        </div>
+        <div class="pull-right">
+            <button (click)="addNewSignatory()" pButton type="button" label="Add New Signatory"
+                icon="fa-plus"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="row">
+        <p-dataTable [value]="authourisedSignatories" [paginator]="true" [rows]="5">
+          <p-column field="signatoryName" header="Signatory Name" sortable="true" [filter]="true"
+            filterMatchMode="contains"></p-column>
+          <p-column field="signatoryInitials" header="Signatory Initials" sortable="true" [filter]="true" filterMatchMode="contains">
+          </p-column>
+          <p-column field="signatoryTitle" header="Signatory Title" sortable="true" [filter]="true" filterMatchMode="contains">
+          </p-column>
+          <p-column [style]="{'width':'150px'}">
+            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+              <div style="text-align:center">
+                <a (click)="editSignatory(d)" href="javascript:void(0)">Edit</a>
+                <span style="padding:3px;" >|</span>
+                <a (click)="removeSignatory(d)" href="javascript:void(0)">Remove</a>
+              </div>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+      </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="signatoryForm" id="reccol-modal" modal="modal" showEffect="fade"
+  width="500" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+          <h2 class="panel-title">{{formState}} Signatory</h2>
+    </div>
+    <form novalidate [formGroup]="signatoryFormGroup" (ngSubmit)="saveSignatory(signatoryFormGroup)" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-2">
+                  <label for="signatoryName" class="control-label col-md-12">Signatory Name</label>
+                </div>
+                <div class="col-md-10">
+                  <input type="text" name="signatoryName" maxlength="50" formControlName="signatoryName" id="signatoryName"
+                    class="form-control"
+                    [ngClass]="signatoryFormGroup.controls['signatoryName'].valid ? 'valid-input' : 'required-input'">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+                  <label for="signatoryInitials" class="control-label col-md-12">Signatory Initials</label>
+                </div>
+                <div class="col-md-10">
+                  <input type="text" name="signatoryInitials" maxlength="50" formControlName="signatoryInitials"
+                    id="signatoryInitials" class="form-control"
+                    [ngClass]="signatoryFormGroup.controls['signatoryInitials'].valid ? 'valid-input' : 'required-input'">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+                  <label for="signatoryTitle" class="control-label col-md-12">Signatory Title</label>
+                </div>
+                <div class="col-md-10">
+                  <input type="text" name="signatoryTitle" maxlength="50" formControlName="signatoryTitle" id="signatoryTitle"
+                    class="form-control"
+                    [ngClass]="signatoryFormGroup.controls['signatoryTitle'].valid ? 'valid-input' : 'required-input'">
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+          <div class="row">
+              <div class="col-md-12">
+                  <button type="button" (click)="saveSignatory(signatoryFormGroup)"
+                      [disabled]="signatoryFormGroup.invalid" class="btn btn-success pull-right">Save and
+                      Close</button>
+                  <button type="button" (click)="signatoryForm=false" style="margin-right:5px"
+                      class="btn btn-danger pull-right">Cancel</button>
+              </div>
+          </div>
+      </div>
+  </form>
+  </div>
+</p-dialog>

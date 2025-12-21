@@ -1,0 +1,111 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Related Employers Approval
+        </h2>
+        <!-- <div class="pull-right">
+          <button (click)="addNewRelatedEmployer()" pButton type="button" label="Add New" icon="fa-plus"></button>
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <p-dataTable [value]="relatedEmployers" [paginator]="true" [rows]="10">
+      <!-- <p-column field="dateTimeCreated" header="Date Created" sortable="true" filterMatchMode="contains">
+        <ng-template let-col let-apr="rowData" pTemplate="body">
+          {{apr[col.field] | date: 'dd MMM yyyy' }}
+        </ng-template>
+      </p-column> -->
+      <!-- <p-column field="loanAmount" header="Loan Amount" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.loanAmount | number : '1.2' }}
+        </ng-template>
+      </p-column> -->
+      <p-column field="employerName" header="Employer Name" filterMatchMode="contains">
+      </p-column>
+      <p-column field="emailAddress" header="Email Address" filterMatchMode="contains">
+      </p-column>
+      <p-column field="phoneNumber" header="Phone Number" filterMatchMode="contains">
+      </p-column>
+      <p-column field="address" header="Address" filterMatchMode="contains">
+      </p-column>
+
+      <!-- <p-column field="insurance" header="Insurance" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.insurance }} %
+        </ng-template>
+      </p-column> -->
+
+      <p-column field="cityName" header="City Name" filterMatchMode="contains">
+      </p-column>
+      <p-column field="employerSubTypeName" header="Employer Type" filterMatchMode="contains">
+      </p-column>
+
+      <p-column field="approvalStatus" header="Approval Status" filterMatchMode="contains">
+      </p-column>
+
+      <p-column [style]="{'width':'100px'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          <div style="text-align:center">
+            <a (click)="approveRelatedEmployer(d)" href="javascript:void(0)">Send for Approval</a>
+          </div>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+
+  </div>
+
+  <div class="panel-footer ">
+    <div class="row ">
+      <div class="col-md-12 ">
+        <!-- <button type="submit" [disabled]="consumerProtectionForm.invalid" (click)="submitConsumerProtection(consumerProtectionForm)"
+          class="btn btn-success pull-right">Submit Details</button>
+
+        <button type="button" (click)="showSubmitModal = false;" style="margin-right:5px"
+          class="btn btn-danger pull-right">Close</button> -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showCsForward" width="800"
+  [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <form novalidate [formGroup]="csForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Related Employer
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+          <div class="col-md-12">
+            <textarea [ngClass]="csForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'"
+              class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+          </div>
+          <!-- <label for="forward" class="control-label col-md-12">Status</label>
+								<div class="col-md-12">
+										<select name="forward" (change)="resetButton($event.target.value)" id="forward" class="form-control" formControlName="forward" [ngClass]="csForwardForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select Approval Status ---</option>
+											<option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+										</select>
+          </div> -->
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="goForApproval()" [disabled]="csForwardForm.invalid"
+              class="btn btn-success pull-right">Submit</button>
+            <button type="button" (click)="showCsForward = false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</p-dialog>

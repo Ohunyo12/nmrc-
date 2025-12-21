@@ -1,0 +1,408 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding" *ngIf="!displayPenApplForm">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Preliminary Evaluation Notes
+                            </h2>
+
+                            <div class="pull-right hide">
+                                <!-- <select name="" id="" class="form-control" [(ngModel)]="loanTypeId" >
+                                    <option value="">-- Select Loan Type --</option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                </select> -->
+                                <!-- <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">View By Loan Type
+                                        <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a (click)="viewSingleCustomerPEN($event)" href="#">Single Customer</a></li>
+                                        <li><a (click)="viewGroupCustomerPEN($event)" href="#">Customer Group</a></li>
+                                    </ul>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                        <!-- [dataKey]="loanPreliminaryEvaluationId" -->
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="penApplications" [(selection)]="selectedRecord" (onRowSelect)="viewApplicationDetails($event)" [responsive]="true">
+                        <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                        <p-column field="customerName" header="Customer"  sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="customerCode" header="Customer Code"  sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="preliminaryEvaluationCode" header="PEN Code " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="branchName" header="Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="loanTypeName" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="dateTimeCreated" header="Date Created" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-col let-pen="rowData" pTemplate="body">
+                                {{pen[col.field] | date : 'dd/MM/yyyy' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'90px'}">
+                            <ng-template pTemplate="header">
+                                View
+                            </ng-template>
+                            <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                <!-- <div class="btn-group">
+                                    <a (click)="viewPenDetails(row, $event)" style="display: block" href="#">
+                                        Edit
+                                    </a>
+                                </div>
+                                || -->
+                                <div class="btn-group">
+                                    <span [class]="row.approvalStatusId == 2 ? 'label label-success' : row.approvalStatusId == 1 ? 'label label-info' : 'label label-warning'" [innerHTML]="row.approvalStatusId == 2 ? 'Approved' : row.approvalStatusId == 1 ? 'Processing' :'Pending'"></span>
+                                </div>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui-g-12 no-padding" *ngIf="displayPenApplForm">
+        <div class="card no-padding">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Preliminary Evaluation Note: <strong>{{panelHeader}}</strong>
+                            </h2>
+                            <button *ngIf="showBackButton" type="button" class="btn btn-danger pull-right" (click)="hideModal()"><i class="glyphicon glyphicon-chevron-left"></i> Go Back</button>
+                        </div>
+                    </div>
+                </div>
+
+                <form novalidate [formGroup]="penApplForm" id="penForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            
+                   
+
+                            <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                                <p-tabPanel header="PEN Details">
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-md-2">Relationship Officer</label>
+                                        <div class="col-md-4">
+                                            <select name="relationshipOfficerId" formControlName="relationshipOfficerId" class="form-control" [ngClass]="!penApplForm.controls['relationshipOfficerId'].valid ? 'required-input' : 'valid-input'" id="relationshipOfficerId" [attr.disabled]="true">
+                                                        <option value=""></option>
+                                                        <option *ngFor="let p of officers" value="{{p.staffId}}">
+                                                            {{p.fullName}}
+                                                        </option>
+                                                    </select>
+                                        </div>
+                                        <label for="" class="control-label col-md-2">Business Manager </label>
+                                        <div class="col-md-4">
+                                            <select name="relationshipManagerId" formControlName="relationshipManagerId" [ngClass]="!penApplForm.controls['relationshipManagerId'].valid ? 'required-input' : 'valid-input'" class="form-control" id="relationshipManagerId" [attr.disabled]="true">
+                                                        <option value=""></option>
+                                                        <option *ngFor="let p of officers" value="{{p.staffId}}">
+                                                            {{p.fullName}}
+                                                        </option>
+                                                    </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Project Description</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="projectDescription" id="projectDescription" class="form-control" formControlName="projectDescription" [ngClass]="penApplForm.controls['projectDescription'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Ownership Structure</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="ownershipStructure" id="ownershipStructure" class="form-control" formControlName="ownershipStructure" [ngClass]="penApplForm.controls['ownershipStructure'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Client Description</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="clientDescription" id="clientDescription" class="form-control" formControlName="clientDescription" [ngClass]="penApplForm.controls['clientDescription'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" *ngIf="displayGrpCustomers == false">
+                                        <label for="" class="col-md-2 control-label">Registration Number</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="registrationNumber" id="registrationNumber" class="form-control" formControlName="registrationNumber" [ngClass]="penApplForm.controls['registrationNumber'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null">
+                                        </div>
+                                        <label for="" class="col-md-2 control-label">Tax Identification Number</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="taxIdentificationNumber" id="taxIdentificationNumber" class="form-control" formControlName="taxIdentificationNumber" [ngClass]="penApplForm.controls['taxIdentificationNumber'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Existing Exposure</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="existingExposure" id="existingExposure" class="form-control" style="text-align: right" formControlName="existingExposure" formatM [ngClass]="penApplForm.controls['existingExposure'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null">
+                                        </div>
+                                        <label for="" class="col-md-2 control-label">Bank’s Role/Financial request </label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="bankRole" id="bankRole" class="form-control" formControlName="bankRole" [ngClass]="penApplForm.controls['bankRole'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Project Financing Plan</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="projectFinancingPlan" id="projectFinancingPlan" class="form-control" formControlName="projectFinancingPlan" [ngClass]="penApplForm.controls['projectFinancingPlan'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    
+                                </p-tabPanel>
+                                <p-tabPanel header="PEN Details Cont'd">
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Proposed Terms & Conditions</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="6" name="proposedTermsAndConditions" id="proposedTermsAndConditions" class="form-control" formControlName="proposedTermsAndConditions" [ngClass]="penApplForm.controls['proposedTermsAndConditions'].valid ? 'valid-input' : 'required-input'"
+                                                [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Collateral Arrangement</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="3" name="collateralArrangement" id="collateralArrangement" class="form-control" formControlName="collateralArrangement" [ngClass]="penApplForm.controls['collateralArrangement'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Implementation Arrangements</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="implementationArrangements" id="implementationArrangements" class="form-control" formControlName="implementationArrangements" [ngClass]="penApplForm.controls['implementationArrangements'].valid ? 'valid-input' : 'required-input'"
+                                                [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Market Demand</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="marketDemand" id="marketDemand" class="form-control" formControlName="marketDemand" formatM [ngClass]="penApplForm.controls['marketDemand'].valid ? 'valid-input' : 'required-input'">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Environmental Impact</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="environmentalImpact" id="environmentalImpact" class="form-control" formControlName="environmentalImpact" [ngClass]="penApplForm.controls['environmentalImpact'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="PEN Details Cont'd">
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Business Profile</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="4" name="businessProfile" id="businessProfile" class="form-control" formControlName="businessProfile" [ngClass]="penApplForm.controls['businessProfile'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Risk/Concerns & Mitigants</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="4" name="risksAndConcerns" id="risksAndConcerns" class="form-control" formControlName="risksAndConcerns" [ngClass]="penApplForm.controls['risksAndConcerns'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="" class="col-md-2 control-label">Prudential & Exposure Limit Implications</label>
+                                        <div class="col-md-10">
+                                            <textarea rows="2" name="prudentialExposureLimitImplications" id="prudentialExposureLimitImplications" class="form-control" formControlName="prudentialExposureLimitImplications" [ngClass]="penApplForm.controls['prudentialExposureLimitImplications'].valid ? 'valid-input' : 'required-input'"
+                                                [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                        </div>
+                                    </div>
+                                    <fieldset>
+                                        <legend>Bank Participation Justification</legend>
+                                        <div class="form-group">
+                                            <label for="" class="col-md-2 control-label">Portfolio Strategic Alignment</label>
+                                            <div class="col-md-10">
+                                                <textarea rows="2" name="portfolioStrategicAlignment" id="portfolioStrategicAlignment" class="form-control" formControlName="portfolioStrategicAlignment" [ngClass]="penApplForm.controls['portfolioStrategicAlignment'].valid ? 'valid-input' : 'required-input'"
+                                                    [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="" class="col-md-2 control-label">Commercial Viability Assesmdent</label>
+                                            <div class="col-md-10">
+                                                <textarea rows="2" name="commercialViabilityAssessment" id="commercialViabilityAssessment" class="form-control" formControlName="commercialViabilityAssessment" [ngClass]="penApplForm.controls['commercialViabilityAssessment'].valid ? 'valid-input' : 'required-input'"
+                                                    [attr.disabled]="disableCtrl ? true : null"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </p-tabPanel>
+                                <!-- <p-tabPanel header="PEN Details Cont'd">
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="companyDirectors" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Directors</p-header>
+                                                <p-column field="firstname" header="Firstname"></p-column>
+                                                <p-column field="surname" header="Surname"></p-column>
+                                                <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                                <p-column field="companyDirectorTypeName" header="Type"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="companyShareholders" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Shareholders</p-header>
+                                                <p-column field="firstname" header="Firstname"></p-column>
+                                                <p-column field="surname" header="Surname"></p-column>
+                                                <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                                <p-column field="companyDirectorTypeName" header="Type"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="companyBvnInformation" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Signatory BVNs</p-header>
+                                                <p-column field="firstname" header="Firstname"></p-column>
+                                                <p-column field="surname" header="Surname"></p-column>
+                                                <p-column field="bankVerificationNumber" header="Bank Verification Number"></p-column>
+                                                <p-column field="isPoliticallyExposed" header="Politically Exposed"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                </p-tabPanel> -->
+                                <p-tabPanel header="PEN Details Cont'd">
+                                    <div class="form-group" *ngIf="displayGrpCustomers">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="penApplicant.customerGroupMappings" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Customers Within Group</p-header>
+                                                <p-column field="customerCode" header="Customer Code"></p-column>
+                                                <p-column field="customerName" header="Customer Name"></p-column>
+                                                <p-column field="relationshipTypeName" header="Relationship Type"></p-column>
+                                                <p-column field="productAccountNumber" header="Account Number"></p-column>
+                                                <p-column field="taxIdentificationNumber" header="Tax Number"></p-column>
+                                                <p-column field="registrationNumber" header="Registration Number"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerTopClients" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Top Clients</p-header>
+                                                <p-column field="firstName" header="Firstname"></p-column>
+                                                <p-column field="lastName" header="Surname"></p-column>
+                                                <p-column field="client_SupplierEmail" header="Email"></p-column>
+                                                <p-column field="client_SupplierTypeName" header="Type"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <p-dataTable [value]="customerTopSuppliers" [paginator]="true" [rows]="3" [responsive]="true">
+                                                <p-header>Top Suppliers</p-header>
+                                                <p-column field="firstName" header="Firstname"></p-column>
+                                                <p-column field="lastName" header="Surname"></p-column>
+                                                <p-column field="client_SupplierEmail" header="Email"></p-column>
+                                                <p-column field="client_SupplierTypeName" header="Type"></p-column>
+                                            </p-dataTable>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="Supporting Documents">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="documentTitle" class="control-label col-md-2">Document Title</label>
+                                            <div class="col-md-8">
+                                                <input type="text" [(ngModel)]="uploadFileTitle" [attr.disabled]="disableCtrl ? true : null" [ngModelOptions]="{standalone: true}" class="form-control" name="description" placeholder="Document title...">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2">Select Document</label>
+                                            <div class="col-md-8">
+                                                <input type="file" (change)="onFileChange($event)" [attr.disabled]="disableCtrl ? true : null" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2"></label>
+                                            <div class="col-md-4">
+                                                <button (click)="uploadFile()" class="btn btn-sm btn-primary" [disabled]="((uploadFileTitle==null) || (file==undefined)) && disableCtrl"><span class="glyphicon glyphicon-upload"></span>  Upload</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr/>
+
+                                    <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                        <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                        <p-column field="physicalFileNumber" header="File Number" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}"></p-column>
+                                        <p-column field="physicalLocation" header="Physical Location" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px'}">
+                                            <ng-template pTemplate="header"> </ng-template>
+                                            <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                    <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d.documentId)"
+                                                        href="javascript:void(0)">Download </a>
+                                                </ng-template>
+                                            <!-- <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                <a *ngIf="d.fileExtension=='jpg' || d.fileExtension=='jpeg'" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                                            </ng-template> -->
+                                        </p-column>
+                                    </p-dataTable>
+                                </p-tabPanel>
+                                <p-tabPanel *ngIf="penApplicant.approvalStatusId > 0" header="View Approval Workflow">
+                                    <p-dataTable [value]="approvalWorkflowData" [paginator]="true" [rows]="15" [responsive]="true">
+                                        <p-column field="requestStaffName" header="Intiated From"></p-column>
+                                        <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
+                                        <p-column field="responseStaffName" header="Directed To"></p-column>
+                                        <p-column field="responseApprovalLevel" header="Response Approval Level"></p-column>
+                                        <p-column field="approvalStatus" header="Approval Status"></p-column>
+                                        <p-column field="comment" header="Comment"></p-column>
+                                        <p-column field="systemArrivalDate" header="Date of Arrival">
+                                            <ng-template let-col let-wrk="rowData" pTemplate="body">
+                                                {{wrk[col.field] | date : 'dd/MM/yyyy' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="systemResponseDate" header="Date of Response">
+                                            <ng-template let-col let-wrk="rowData" pTemplate="body">
+                                                {{wrk[col.field] | date: 'dd/MM/yyyy' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <!-- <p-column field="systemArrivalDate" header="Date of Arrival">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="systemResponseDate" header="Date of Response">
+                                            <ng-template let-col let-apr="rowData" pTemplate="body">
+                                                {{apr[col.field] | date: 'medium' }}
+                                            </ng-template>
+                                        </p-column> -->
+                                    </p-dataTable>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div *ngIf="showBackButton" class="col-md-12">
+                                <button type="submit" *ngIf="penApplicant.approvalStatusId != 2 && activeIndex == 4 && showBackButton" [disabled]="penApplForm.invalid || disableCtrl"  (click)="submitPreliminaryEvaluation(penApplForm)" class="btn btn-success pull-right">Save</button>
+                                <button style="margin-right:5px" type="button" *ngIf="activeIndex != 4" (click)="next()" class="btn btn-primary pull-right">Next</button>
+                                <button style="margin-right:5px" type="button" *ngIf="activeIndex > 0" class="btn btn-primary pull-right" (click)="prev()">Previous</button>
+                                <label class="radio-checkbox" style="margin-right:5px" *ngIf="penApplicant.approvalStatusId < 2">
+                                                <input type="checkbox" name="sendForEvaluation" formControlName="sendForEvaluation" value="false">
+                                                <div class="chklabel">Send For Evaluation</div>                           
+                                            </label>
+                                <label *ngIf="penApplicant.approvalStatusId == 2 || penApplicant.approvalStatusId == 1"  style="margin-right:5px; font-size:smaller" class="label label-info">Preview only. PEN is either approved or currently undergoing approval.</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title: <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right"><a class="close" (click)="displayDocument=false">&times;</a></div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+    </div>
+</p-dialog> 

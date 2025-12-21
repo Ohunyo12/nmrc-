@@ -1,0 +1,137 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Lc CashBuildUpPlan
+                </h2>
+                <div class="pull-right">
+                    <button *ngIf="showButtons==true" (click)="showLcCashBuildUpPlanForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+    <div class="panel-body">
+
+        <p-dataTable [value]="lcCashBuildUpPlans" [responsive]="true" [paginator]="false" [rows]="5">
+
+            <p-column field="lcReferenceNumber" header="Lc Issuance Ref" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="amount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+				<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+					{{getCurrencyCode(d.currencyId)}} {{ d.amount | number : '1.2' }}
+				</ng-template>
+			</p-column>
+            <p-column field="cashBuildUpReferenceTypeName" header="Cash BuildUp ReferenceType" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="daysInterval" header="Days Interval" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="planDate" header="Plan Date" sortable="true" filterMatchMode="contains"></p-column>
+
+            <p-column [style]="{'width':'100px'}" header="View" *ngIf="showButtons==true">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center">
+                    <a (click)="deleteLcCashBuildUpPlan(d)" href="javascript:void(0)">Remove</a>
+                    <span style="padding:3px;">|</span>
+                    <a (click)="editLcCashBuildUpPlan(d)" href="javascript:void(0)">Edit</a>
+                </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayLcCashBuildUpPlanForm" id="ct-modal" modal="modal" showEffect="fade" width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Lc CashBuildUpPlan
+            </h2>
+        </div>
+                    
+        <form novalidate [formGroup]="lcCashBuildUpPlanForm" (ngSubmit)="saveLcCashBuildUpPlan(lcCashBuildUpPlanForm)">
+           <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="amount" class="control-label col-md-2">Amount</label>
+						<div class="col-md-4">
+							<input type="text" name="amount" formControlName="amount" formatM id="amount" class="numeric form-control" [ngClass]="lcCashBuildUpPlanForm.controls['amount'].valid ? 'valid-input' : 'required-input'">
+						</div>
+						<label for="currencyId" class="control-label col-md-2">Currency</label>
+						<div class="col-md-4">
+							<select id="currencyId" formControlName="currencyId" name="currencyId" 
+								[ngClass]="lcCashBuildUpPlanForm.controls['currencyId'].valid ? 'valid-input' : 'required-input'"
+								class="form-control">
+								<option value=""> Select Currency</option>
+								<option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyName}}</option>
+							</select>
+						</div>
+                    </div>
+
+                    <div class="form-group">
+					<label for="cashBuildUpReferenceTypeId" class="control-label col-md-2">Cash BuildUp ReferenceType</label>
+					<div class="col-md-4">
+						<select id="cashBuildUpReferenceTypeId" formControlName="cashBuildUpReferenceTypeId" name="cashBuildUpReferenceTypeId" 
+							[ngClass]="lcCashBuildUpPlanForm.controls['cashBuildUpReferenceTypeId'].valid ? 'valid-input' : 'required-input'"
+							class="form-control">
+							<option value=""> Select Cash BuildUp ReferenceType</option>
+							<option *ngFor="let curr of cashBuildUpReferenceTypes" value="{{curr.cashBuildUpReferenceTypeId}}"> {{curr.cashBuildUpReferenceTypeName}}</option>
+						</select>
+					</div>
+					<label for="collectionCasaAccountId" class="control-label col-md-2">Collection Account</label>
+						<div class="col-md-4">
+							<select id="collectionCasaAccountId" formControlName="collectionCasaAccountId" name="collectionCasaAccountId" 
+								[ngClass]="lcCashBuildUpPlanForm.controls['collectionCasaAccountId'].valid ? 'valid-input' : 'required-input'"
+								class="form-control">
+								<option value="">--- Select Collection Account ---</option>
+								<option *ngFor="let item of customerAccount" [value]="item.casaAccountId">{{item.productAccountNumber}}</option>
+							</select>
+						</div>
+					</div>
+
+                    <div class="form-group">
+                        <label for="daysInterval" class="control-label col-md-2">Days Interval</label>
+                        <div class="col-md-4">
+                            <input type="number" name="daysInterval" formControlName="daysInterval" id="daysInterval" class="form-control" [ngClass]="lcCashBuildUpPlanForm.controls['daysInterval'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="planDate" class="control-label col-md-2">Plan Date</label>
+						<div class="col-md-4">
+							<p-calendar [disabled]="true" id="planDate" formControlName="planDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+								[showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+								[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcCashBuildUpPlanForm.controls['planDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+						</div>
+                    </div>
+
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="saveLcCashBuildUpPlan(lcCashBuildUpPlanForm)" [disabled]="lcCashBuildUpPlanForm.invalid" class="btn btn-success pull-right">Save and Close</button>
+                    <button type="button" (click)="displayLcCashBuildUpPlanForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+		
+
+    </div>
+	
+</p-dialog>
+
+ <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!-- 
+                                <select name="responseTypeId" id="responseTypeId" formControlName="responseTypeId" class="form-control" [ngClass]="lcCashBuildUpPlanForm.controls['responseTypeId'].valid ? 'valid-input' : 'required-input'">
+                                    <option value="">-- Select ResponseType --</option>
+                                    <option *ngFor="let x of responseTypes" [value]="x.responseTypeId">{{ x.responseType }}</option>
+                                </select>
+ -->

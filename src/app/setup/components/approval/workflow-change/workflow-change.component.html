@@ -1,0 +1,138 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Work Flow Change
+                </h2> 
+                <div class="pull-right">
+                    <button (click)="showWorkFlowChange()" pButton type="button" label="Add New"
+                        icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <p-dataTable [value]="workFlowChange" [responsive]="true" [paginator]="true" [rows]="10">
+
+
+            <p-column field="placeHolder" header="PlaceHolder" sortable="true" [filter]="true"
+                filterMatchMode="contains"></p-column>
+                
+            <p-column field="label" header="Label" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="productType" header="Product Type" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="productClass" header="Product Class" sortable="true" filterMatchMode="contains">
+            </p-column>
+    
+            <p-column field="operation" header="Operation" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column field="destinationUrl" header="Destination Url" sortable="true" filterMatchMode="contains"></p-column>
+
+            <p-column field="skipFlo" header="Skip Flow" sortable="true" filterMatchMode="contains">
+            </p-column>
+            <p-column [style]="{'width':'100px'}" header="View">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="deleteworkFlowChange(d)" href="javascript:void(0)">Remove</a>
+                        <span style="padding:3px;">|</span>
+                        <a (click)="editworkFlowChange(d)" href="javascript:void(0)">Edit</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayworkFlowChange" id="ct-modal" modal="modal" showEffect="fade"
+    width="800" [contentStyle]="{'overflow':'auto','max-height':'800px'}">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                 Work Flow Change
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="workFlowChangeForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="mapByOperation" class="control-label col-md-2">Map By</label>
+                        <div class="col-md-4">
+                            <select (change)="onSelectChange($event.target.value)" name="mapByOperation"
+                                class="form-control" id="mapByOperation" formControlName="mapByOperation"
+                                [ngClass]="!workFlowChangeForm.controls['mapByOperation'].valid ? 'required-input' : 'valid-input'" >
+                                <option value="0">--- Select Operation ---</option>
+                                <option value="1">Product Type</option>
+                                <option value="2">Product Class</option>
+                                <option value="3">Product</option>
+                            </select>
+                        </div>
+                        <label for="FieldLabel" class="control-label col-md-2">Field Label</label>
+                        <div class="col-md-4">
+                            <textarea name="fieldLabel" formControlName="fieldLabel"
+                                id="fieldLabel" class="form-control"
+                                [ngClass]="!workFlowChangeForm.controls['fieldLabel'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                           
+                 
+                    <div class="form-group" *ngIf="dynamicObject.length>0">
+                        <label for="{{dynamicText}}" class="control-label col-md-2">{{dynamicText}}</label>
+                        <div class="col-md-4">
+                            <select name="documentOperation" class="form-control" formControlName="documentOperation" id="documentOperation"
+                                [ngClass]="!workFlowChangeForm.controls['documentOperation'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">--- Select Operation ---</option>
+                                <option  *ngFor="let x of dynamicObject" [value]="x.productTypeId">
+                                    {{x.productTypeName}}
+                                </option>
+                           
+                            </select>
+                        </div>
+
+
+                        <label for="DestinationUrl" class="control-label col-md-2">DestinationUrl</label>
+                        <div class="col-md-4">
+                            <textarea name="destinationUrl" formControlName="destinationUrl"
+                                id="destinationUrl" class="form-control"
+                                [ngClass]="!workFlowChangeForm.controls['destinationUrl'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+               
+                    <div class="form-group">
+                            <div class="col-md-2"><label for="skipWorkFlow" class="control-label col-md-2">Skip WorkFlow</label></div>
+                            <div class="col-md-10 ">
+                                <input type="checkbox" name="skipWorkFlow" id="skipWorkFlow" formControlName="skipWorkFlow"/>
+                            </div>
+                        </div>
+                   
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="saveWorkFlowChange(workFlowChangeForm)"
+                        [disabled]="workFlowChangeForm.invalid" class="btn btn-success pull-right">Save and
+                        Close</button>
+                    <button type="button" (click)="displayworkFlowChangeCancel()" style="margin-right:5px"
+                        class="btn btn-dangern pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>

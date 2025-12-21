@@ -1,0 +1,156 @@
+<div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Reassign Job <small>- </small>
+        </h2>
+    </div>
+
+    <div style="overflow-y: scroll;" class="panel-body">
+        <form [formGroup]="reassignForm" autocomplete="off">
+            <div class="form-horizontal">
+                <!-- <div class="form-group">
+                    <div class="col-md-12 ">
+                        <div class="panel-body" style="min-height:220px;">
+                            <div [innerHTML]="comment" class="paper" style="overflow:auto;height:200px"></div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label for="departmentUnitId" class="control-label col-md-2">Hub</label>
+                    <div class="col-md-10 ">
+                        <select class="selectpicker" formControlName="hubId" data-live-search="true" (change)="onHubSelectionChange($event.target.value)"
+                            [ngClass]="reassignForm.controls['hubId'].valid ? 'valid-input' : 'required-input'"
+                            name="hubId" id="hubId" class="form-control">
+                            <option value="">-- Select Hub --</option>
+                            <option *ngFor="let x of jobHubs" [value]="x.jobTypeHubId">{{ x.jobTypeHubName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="staffId" class="control-label col-md-2">Hub Target Staff</label>
+                    <div class="col-md-10 ">
+                        <select class="selectpicker" formControlName="staffId" data-live-search="true" 
+                            [ngClass]="reassignForm.controls['staffId'].valid ? 'valid-input' : 'required-input'"
+                            name="staffId" id="staffId" class="form-control">
+                            <option value="">-- Select Target Staff --</option>
+                            <option *ngFor="let x of jobHubStaff" [value]="x.hubStaffId">{{ x.hubStaffName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- <div class="form-group">
+                    <div class="col-md-12 ">
+                        <label for="" class="control-label col-md-2">Reasign To Staff</label>
+                        <div class="input-group col-md-10">
+                            <input (focus)="searchDB($event.target.value)" type="text" class="form-control" formControlName="staffName" placeholder="Search Staff" name="staffName" [ngClass]="reassignForm.controls['staffName'].valid ? 'valid-input' : 'required-input'">
+                            <div class="input-group-btn" >
+                                <button (click)="searchText()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <div class="col-md-12 ">
+                        <label for="" class="control-label col-md-2"></label>
+                        <div class="col-md-10">
+                            <table *ngIf="searchResults" class="table table-striped table-hover col-md-10">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Name</th>
+                                        <th>Branch</th>
+                                        <th>Department</th>
+                                        <th>Unit</th>
+                                        <th>Job Title</th>
+                                        <th>Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                        <td> {{res.fullname}} </td>
+                                        <td> {{res.branchName}} </td>
+                                        <td> {{res.departmentName}} </td>
+                                        <td> {{res.departmentUnitName}} </td>
+                                        <td> {{res.jobTitleName}} </td>
+                                        <td> {{res.roleName}} </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="submitReassignForm(reassignForm)" [disabled]="reassignForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Send</button>
+                <button type="button" (click)="emitCloseNoRefresh()" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" id="searchModal" showEffect="fade" width="550">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                    </i>
+                </a>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p> </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Department</th>
+                                <th>Staff Name</th>
+                                <th>Job Title</th>
+                                <th>Rank</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>
+                                    {{res.branchName}}
+                                </td>
+                                <td>
+                                    {{res.departmentName}}
+                                </td>
+                                <td>
+                                    {{res.fullname}}
+                                </td>
+                                <td>
+                                    {{res.jobTitleName}}
+                                </td>
+                                <td>
+                                    {{res.rankName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

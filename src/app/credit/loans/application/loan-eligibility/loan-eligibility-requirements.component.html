@@ -1,0 +1,416 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Eligibility Requirements
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 25%; position:fixed; right:150px; top:300px; z-index:999">
+                <!-- <loan-sticker [loanApplicationId]="applicationId" [loanApp]="loanCollateralDetails()"> 
+                    </loan-sticker> -->
+                <!--p-panel [header]="title" [toggleable]="true" [collapsed]="false" [style]="{'margin-bottom':'20px'}">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <label class="ui-g-12 ui-md-4 ui-lg-6">Loan Amount</label>
+                            <label class="ui-g-12 ui-md-8 ui-lg-6">{{loanCurrency}} {{loanApplicationAmount}}</label>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <label class="ui-g-12 ui-md-4 ui-lg-6">Requaired Collateral</label>
+                            <label class="ui-g-12 ui-md-8 ui-lg-6">{{loanCurrency}} {{requairedCollateralValue }}</label>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <label class="ui-g-12 ui-md-4 ui-lg-6">Security Value</label>
+                            <label class="ui-g-12 ui-md-8 ui-lg-6">{{colCurrencyCode}} {{totalSecurity }}</label>
+                        </div>
+                        <div class="ui-g-12 ui-md-12 ui-lg-12">
+                            <label class="ui-g-12 ui-md-4 ui-lg-6">Collateral Currency</label>
+                            <div class="ui-g-12 ui-md-8 ui-lg-6">
+                                <select class="form-control" id="currencyId" name="currencyId" (change)="getExchangeRateInvoice2($event.target.value)">
+                                    <option value=""> Select Currency</option>
+                                    <option *ngFor="let curr of currencies" value="{{curr.currencyId}}"> {{curr.currencyCode}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </p-panel-->
+            </div>
+
+            <div class="ui-g" *ngIf="requirementItems">
+                <button pButton type="button" style="margin:5px; width:150.168px" (click)="showRequestForm()" label="Initiate Request"
+                    class="cyan-btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+                <!-- <button *ngIf="requireCollateral" pButton type="button" (click)="gotoCollateralInformation()" style="margin:5px; width:150.168px"
+                    label="Collateral Information" class="ui-button-success">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button> -->
+
+                <button pButton type="button" style="margin:5px; width:150.168px" label="Customer Financial Statement"
+                    [disabled]="isCustomerTypeIndividual" (click)="viewFinancialStatement()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+                <!-- <button pButton type="button" style="margin:5px; width:150.168px" label="Fee/Rate Concession" (click)="viewConcession()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button> -->
+
+                <!-- <button pButton type="button" (click)="showSuggestionForm()" style="margin:5px; width:150.168px" label="RM Suggestions"
+                    class="ui-button-success ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button> -->
+
+                <button pButton type="button" (click)="displayUploadOtherDocument = true" style="margin:5px; width:150.168px"
+                    label="Uploads" class="deep-orange-btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+                <!-- <app-loan-checklist [operationId]="operationId" [productClassProcessId]="productClassProcessId"
+                    [productId]="productId" [loanApplicationDetailId]="loanApplicationDetailId" [loanApplicationId]="applicationId"
+                    [isCAMchecklist]="false" [isAvailmentChecklist]="false" [onPageLoad]="true" [customerCode]="selectedCustomerCode"
+                    [customerName]="selectedCustomerName" [selectedCustomerDetail]="selectedCustomerDetail" [customerId]="selectedCustomerId"></app-loan-checklist> -->
+
+                <button pButton type="button" (click)="openUWSModal()" style="margin:5px; width:150.168px" label="Checklist"
+                    [disabled]="!selectedApplicationDetail" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+                <!-- <button pButton type="button" (click)="loanCollateralDetails()" style="margin:5px; width:150.168px" pButton label="Financials" class="indigo-btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button> -->
+            </div>
+
+            <div class="">
+                <button *ngIf="isExternal" pButton type="button" style="margin:5px;" (click)="showCreditBureau()"
+                    label="Capture Credit Bureau" class="ui-button-success ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <p-dataTable [paginator]="true" (onRowSelect)="onRowSelect($event)" [(selection)]="loanApplicationDetails"
+                    [rows]="15" [value]="loanApplicationLists" [responsive]=true selectionMode="single">
+                    <p-column field="applicationReferenceNumber" header="Reference" sortable="true" [filter]="true"
+                        filterMatchMode="contains"></p-column>
+                    <p-column field="customerName" header="Obligor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="proposedProductName" [style]="{'width':'350px'}" header="Product" sortable="true"
+                        [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="proposedAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains"
+                        [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.proposedAmount | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="proposedInterestRate" header="Rate(%)" sortable="true" [filter]="true"
+                        filterMatchMode="contains" [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.proposedInterestRate | number : '1.2' }}
+                        </ng-template>
+                    </p-column>
+                    <p-column field="proposedTenor" header="Tenor (Days)" sortable="true" [filter]="true"
+                        filterMatchMode="contains" [style]="{'text-align':'right'}">
+                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                            {{ d.proposedTenor }}
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+
+            <div style="padding: 2px 15px 2px 15px" *ngIf="displayCollateral">
+                <collateral-information [loanApplicationId]="loanApplicationId" [applicationCustomerId]="selectedCustomerId"
+                    [applicationCustomerName]="customerName" [autoMapNew]="autoMapNew" (sum)="getSecurityValue($event)" [canEditExternally]="false">
+                </collateral-information>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="onSubmitForCAM()" class="btn btn-success pull-right">Next</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="returnToStart()">Back To List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job Request Form Modal -->
+<p-dialog [responsive]=true [(visible)]="displayRequestForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <job-request-template 
+        [requestComment]="requestComment" 
+        [pageHeaderTitle]="requestPageHeaderTitle" 
+        [isReassigned]="isRequestReassigned"
+        [isAcknowledged]="isRequestAcknowledged" 
+        [targetId]="loanApplicationDetailId" 
+        [jobSourceId]=jobSourceId
+        [moduleReferenceNumber]="loanApplicationReferance"
+        [operationsId]="requestOperationsId" 
+        [operationAvailable]=true 
+        [requestStatusId]="requestStatusId" 
+        (notify)="getRequestData($event)"
+        (displayOption)="CallRequestClose()">
+    </job-request-template>
+</p-dialog>
+
+<!-- Edit Loan Application Details Modal -->
+<p-dialog header="Loan Application Details" [(visible)]="allowForEdit" [responsive]="true" showEffect="fade" [modal]="true" width="500">
+    <div style="margin-bottom:0;" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Edit Loan Amount
+            </h2>
+        </div>
+        <form [formGroup]="applicationDetail" autocomplete="off">
+            <div class="panel-body">
+                <div class="row"></div>
+                <div class="form-group">
+                    <label class="control-label col-md-4" for="customerName">Obligor</label>
+                    <div class="col-md-8" style="margin:5px;">
+                        <input type="text" [attr.disabled]="true" name="customerName" formControlName="customerName" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4" for="proposedProductName">Product</label>
+                    <div class="col-md-8" style="margin:5px;">
+                        <input type="text" [attr.disabled]="true" name="proposedProductName" formControlName="proposedProductName" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4" for="proposedInterestRate">Rate</label>
+                    <div class="col-md-8" style="margin:5px;">
+                        <input type="number" [attr.disabled]="true" name="proposedRate" formControlName="proposedRate" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4" for="proposedTenor">Tenor</label>
+                    <div class="col-md-8" style="margin:5px;">
+                        <input type="number" name="proposedTenor" formControlName="proposedTenor" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4" for="proposedAmount">Loan Amount</label>
+                    <div class="col-md-8" style="margin:5px;">
+                        <input type="text" name="proposedAmount" formControlName="proposedAmount" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="ui-dialog-buttonpane ui-helper-clearfix">
+                        <button type="button" class="btn btn-danger" pButton icon="fa-close" (click)="closeUpdate()" label="Close"></button>
+                        <button type="button" class="btn btn-success" pButton icon="fa-check" (click)="saveUpdate()" label="Update"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Upload Supporting Documents Modal -->
+<p-dialog [responsive]=true [(visible)]="displayUploadOtherDocument" [rows]="5" [paginator]="true" [rowsPerPageOptions]="[10, 20, 30]" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Upload Supporting Documents
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <button (click)="showAddNewUpload()" pButton type="button" label="Add New Upload" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div>
+                <p-dataTable [value]="loanDocumentUploadList" [paginator]="true" [rows]="5">
+                    <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                    <p-column field="physicalFileNumber" header="File Number" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}"></p-column>
+                    <p-column field="physicalLocation" header="Physical Location" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                            <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d.documentId)" href="javascript:void(0)">Download</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayUploadOtherDocument=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- New Loan Document Upload Modal -->
+<p-dialog [responsive]=true [(visible)]="displayDocumentUpload" id="add-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Loan Document Upload
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="description" placeholder="Document title...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">File Number</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalFileNumber" class="form-control" name="physicalFileNumber" placeholder="Document File Number...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Physical Location</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="physicalLocation" class="form-control" name="physicalLocation" placeholder="Document Physical Location...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png" #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="uploadFile()" [disabled]="uploadFileTitle==null || file==undefined" class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Upload
+                    </button>
+                    <button type="button" (click)="displayDocumentUpload=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Document View Modal -->
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title: <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayUpload=false">×</a>
+            </div>
+        </div>
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Fee Concession Modal -->
+<p-dialog header="Fee Concession" [(visible)]="allowFeeConcessionForEdit" [responsive]="true" showEffect="fade" [modal]="true" width="500">
+    <fee-concession [loanDetailId]="loanDetailId" (closeTab)="closeFeeConcession($event)"></fee-concession>
+</p-dialog>
+
+<!-- Financial Statement Modal -->
+<p-dialog header="Financial Statement" [(visible)]="allowFinancialShow" [responsive]="true" showEffect="fade" [modal]="true" width="500">
+    <financial-statement [customerId]="applicationCustomerId"></financial-statement>
+</p-dialog>
+
+<!-- Customer Financial Statement Component -->
+<app-customer-financial-statement [customerId]="selectedCustomerId" [viewCustomerFinancialStatement]="false" [canDoFinancialStatementEntry]="true">
+</app-customer-financial-statement>
+
+<!-- Credit Bureau Modal -->
+<p-dialog [responsive]=true *ngIf="isExternal" [(visible)]="displayCreditBureauModal" id="credit-bureau-modal" modal="true" showEffect="fade" width="1000" [baseZIndex]="2000">
+    <credit-bureau-search-component [display]="displayCreditBureauModal" (reverseEvent)="displayCreditBureauModal = false" (proceedEvent)="displayCreditBureauModal = false" [startLoanTypeId]="startLoanTypeId" [isGlobal]=false [selCustomerId]="customerId" [showViewCreditBureau]="false">
+    </credit-bureau-search-component>
+</p-dialog>
+
+<!-- Uniform Underwriting Standard Modal -->
+<p-dialog [(visible)]="isUWSModalVisible" [modal]="true" header="Uniform Underwriting Standard" [style]="{ width: '40%', maxWidth: '80vw', maxHeight: '75vh', margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }" [closable]="false">
+    <div style="position: absolute; top: 10px; right: 15px; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 2px solid red; border-radius: 5px; background-color: white;" (click)="closeUWSModal()">
+        <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
+    </div>
+    <div style="padding: 15px; width: 100%; text-align: center;">
+        <h3 style="font-weight: bold;">Uniform Underwriting Standard for {{ selectedApplicationDetail?.customerName }}</h3>
+        <form (ngSubmit)="saveUWSDetails()" style="width: 100%;">
+            <div style="max-height: 60vh; overflow-y: auto; padding: 0; margin: 0; width: 100%; border: 1px solid #ddd;">
+                <table class="table table-bordered" style="width: 100%; font-size: 14px; text-align: left; border-collapse: collapse; table-layout: fixed; margin: 0; padding: 0;">
+                    <thead style="position: sticky; top: 0; background-color: #f5f5f5; z-index: 100; margin: 0; padding: 0;">
+                        <tr style="text-align: center; color: black; border-bottom: 2px solid #ddd;">
+                            <th style="padding: 10px; width: 20%;">Item</th>
+                            <th style="padding: 10px; width: 30%;">Description</th>
+                            <th style="padding: 10px; width: 20%;">Option</th>
+                            <th style="padding: 10px; width: 15%;">Defer Date</th>
+                            <th style="padding: 10px; width: 15%;">Upload File</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="uwsList && uwsList.length > 0; else noData">
+                        <tr *ngFor="let uws of uwsList" style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 8px;">{{ uws.item }}</td>
+                            <td style="padding: 8px;">{{ uws.description }}</td>
+                            <td style="padding: 8px; text-align: center;">
+                                <div style="display: flex; flex-direction: column; gap: 5px; align-items: start;">
+                                    <label><input type="radio" [(ngModel)]="uws.option" value="Yes" [name]="'option' + uws.id"> Met</label>
+                                    <label><input type="radio" [(ngModel)]="uws.option" value="No" [name]="'option' + uws.id"> Not Met</label>
+                                    <label><input type="radio" [(ngModel)]="uws.option" value="Waiver" [name]="'option' + uws.id"> Waiver</label>
+                                    <label><input type="radio" [(ngModel)]="uws.option" value="Deferred" [name]="'option' + uws.id" (change)="onOptionChange(uws)"> Defer</label>
+                                </div>
+                            </td>
+                            <td>
+                                <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
+                                    <input type="date" [(ngModel)]="uws.deferredDate" [name]="'deferredDate' + uws.id" [min]="today" class="form-control" (change)="onDeferredDateChange(uws)" style="appearance: none; background-color: #fff; border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; font-size: 14px; cursor: pointer; width: 100%;">
+                                </ng-container>
+                                <ng-template #showNA>N/A</ng-template>
+                            </td>
+                            <td style="padding: 8px; text-align: center;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                    <input type="file" id="fileInput-{{uws.id}}" (change)="onFileSelect($event, uws.id)" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx" multiple [disabled]="uws.option === 'Deferred'" style="display: none;">
+                                    <label for="fileInput-{{uws.id}}" [style.background-color]="uws.option === 'Deferred' ? '#ccc' : '#007bff'" [style.cursor]="uws.option === 'Deferred' ? 'not-allowed' : 'pointer'" style="display: inline-block; color: white; padding: 8px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; text-align: center; min-width: 130px;">
+                                        📁 Choose File
+                                    </label>
+                                    <span id="fileNameDisplay-{{uws.id}}" style="font-size: 12px; color: #555; min-height: 16px; display: block;">
+                                        No file selected
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <ng-template #noData>
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No data available</td>
+                        </tr>
+                    </ng-template>
+                </table>
+            </div>
+            <div style="position: sticky; bottom: 0; background: white; padding: 15px; display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid #ddd;">
+                <button type="button" (click)="clearForm()" style="background-color: #ffc107; color: black; padding: 12px 20px; border-radius: 5px; font-weight: bold; min-width: 120px;">
+                    Clear
+                </button>
+                <button type="submit" style="background-color: #28a745; color: white; padding: 12px 20px; border-radius: 5px; font-weight: bold; min-width: 120px;">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</p-dialog>

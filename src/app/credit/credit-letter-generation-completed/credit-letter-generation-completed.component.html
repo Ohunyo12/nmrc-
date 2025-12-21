@@ -1,0 +1,298 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Letter Generation Completed
+                </h2>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-dataTable [value]="letterGenerationCompleted" [responsive]="true" [paginator]="true" [rows]="15" let
+            i="index">
+            <p-column field="dateTimeCreated" header="Date" [filter]="false">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.dateTimeCreated | date: 'dd-MM-yyyy' }}
+                </ng-template>
+            </p-column>
+            <p-column field="customerName" header="Customer" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="requestType" header="Request Type" sortable="true" filterMatchMode="contains">
+                <ng-template let-d="rowData" pTemplate="body">
+                    <div style="text-align:center">
+                        {{ getRequestTypeName(d.requestType) }}
+                    </div>
+                </ng-template>
+            </p-column>
+            <p-column field="requestDate" header="Request Date" sortable="true" filterMatchMode="contains">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.requestDate | date: 'dd-MM-yyyy' }}
+                </ng-template>
+            </p-column>
+            <p-column [style]="{'width':'100px'}" header="View">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editLetterGenerationRequest(d)" href="javascript:void(0)">View</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayLetterGenerationRequestForm" id="ct-modal" modal="modal"
+    showEffect="fade" width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Letter Generation Completed
+            </h2>
+        </div>
+
+        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+            <p-tabPanel header="General">
+                <form novalidate [formGroup]="letterGenerationRequestForm" autocomplete="off">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+
+                            <div class="form-group">
+                                <label for="customerName" class="control-label col-md-12">Customer</label>
+                                <div class="col-md-8">
+                                    <input type="text" readonly=true name="customerName" formControlName="customerName"
+                                        id="customerName" class="form-control"
+                                        [ngClass]="!letterGenerationRequestForm.controls['customerName'].valid ? 'required-input' : 'valid-input'">
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="requestDate" class="control-label col-md-12">Request Date</label>
+                                <div class="col-md-12">
+                                    <p-calendar id="requestDate" disabled=true formControlName="requestDate"
+                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                        [showIcon]="true"
+                                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'z-index': '999'}"
+                                        [ngClass]="letterGenerationRequestForm.controls['requestDate'].valid ? 'valid-input' : 'required-input'">
+                                    </p-calendar>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="requestType" class="control-label col-md-12">Request Type</label>
+                                <div class="col-md-12">
+                                    <select id="requestType" disabled=true formControlName="requestType"
+                                        name="requestType"
+                                        [ngClass]="letterGenerationRequestForm.controls['requestType'].valid ? 'valid-input' : 'required-input'"
+                                        class="form-control">
+                                        <option value=""> Select Request Type</option>
+                                        <option *ngFor="let req of requestTypes" value="{{req.id}}"> {{req.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="asAtDate" class="control-label col-md-12">As At Date</label>
+                                <div class="col-md-12">
+                                    <p-calendar id="asAtDate" disabled=true formControlName="asAtDate"
+                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1900:2030"
+                                        [showIcon]="true"
+                                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                        [style]="{'width': '100%', 'z-index': '999'}"
+                                        [ngClass]="letterGenerationRequestForm.controls['asAtDate'].valid ? 'valid-input' : 'required-input'">
+                                    </p-calendar>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="comment" class="control-label col-md-12">Comment</label>
+                                <div class="col-md-12">
+                                    <textarea readonly=true name="comment" formControlName="comment" id="comment"
+                                        class="form-control"
+                                        [ngClass]="!letterGenerationRequestForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </p-tabPanel>
+            <p-tabPanel header="Debt Status">
+                <form novalidate [formGroup]="letterGenerationRequestForm" autocomplete="off">
+                    <div class="panel-body">
+                        <!-- <div class="form"> -->
+                        <div class="form-group">
+                            <label for="loanBalance" class="control-label col-md-2">Loan Balance</label>
+                            <div class="col-md-4">
+                                <input readonly=true name="loanBalance" formControlName="loanBalance" id="loanBalance"
+                                    class="form-control" />
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                    </div>
+                </form>
+                <p-dataTable [responsive]="true" [value]="letterGenerationCamsolList">
+                    <p-column field="customerCode" header="Customer Code">
+                    </p-column>
+                    <p-column field="customerName" header="Customer Name">
+                    </p-column>
+                    <p-column field="balance" header="Balance">
+                    </p-column>
+                    <p-column field="accountNumber" header="Account Number">
+                    </p-column>
+                    <p-column field="camsolTypeName" header="Source">
+                    </p-column>
+
+                    <!-- <p-column [style]="{'width':'150px'}" header="View">
+                                                                <ng-template pTemplate="header"> </ng-template>
+                                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                                    <div style="text-align:center">
+                                                                        <a (click)="getValuationPrerequisites(d.collateralValuationId)"
+                                                                            href="javascript:void(0)">Add / View Prerequisite(s)</a>
+                                                                    </div>
+                                                                </ng-template>
+                                                            </p-column> -->
+                </p-dataTable>
+            </p-tabPanel>
+            <p-tabPanel header="Signatories">
+                <p-dataTable [responsive]="true" [value]="letterGenerationsignatories">
+                    <p-column field="signatoryTitle" header="Signatory's Tile ">
+                    </p-column>
+                    <p-column field="signatoryName" header="Signatory's Name">
+                    </p-column>
+                    <p-column field="signatoryInitials" header="Signatory's Initials">
+                    </p-column>
+                </p-dataTable>
+            </p-tabPanel>
+            <p-tabPanel header="Customer Exposures" *ngIf="customerId > 0">
+                <expfacility [reload]="customerId" [customer]="customerIds" [loanTypeId]=1>
+                </expfacility>
+            </p-tabPanel>
+            <p-tabPanel header="Print Document">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                    </div>
+                    <div class="panel-body" id="camsolLoanDocument" [innerHtml]="camsolLoanDocHtml">
+                    </div>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="displayLetterGenerationRequestForm=false" type="button" class="btn btn-danger"
+                            style="margin-right:5px">Cancel</button>
+                        <!-- <button type="button" (click)="printCamsolLoanDocument()" style="margin-right:5px"
+                            [disabled]="!(isCCO || isBRANCHMANAGER)" class="btn btn-success pull-right">Print
+                            Document</button> -->
+                        <button type="button" (click)="printCamsolLoanDocument()" style="margin-right:5px"
+                             class="btn btn-success pull-right">Print
+                            Document</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showLcForward" width="600"
+    [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <form novalidate [formGroup]="lcForwardForm" autocomplete="off">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Letter Generation Completed
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+                    <div class="col-md-12">
+                        <textarea [ngClass]="lcForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'"
+                            class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+                    </div>
+                    <label for="forward" class="control-label col-md-12">Status</label>
+                    <div class="col-md-12">
+                        <select name="forward" (change)="resetButton($event.target.value)" id="forward"
+                            class="form-control" formControlName="forward"
+                            [ngClass]="lcForwardForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">--- Select Approval Status ---</option>
+                            <option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">
+                                {{item.approvalStatusName}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="goForApproval()" [disabled]="lcForwardForm.invalid"
+                            class="btn btn-success pull-right">Submit</button>
+                        <button type="button" (click)="closeDialog()" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+<!-- 
+<p-dialog [responsive]=true [(visible)]="displayCommentForm" id="reccol-modal" modal="modal" showEffect="fade"
+  width="600">
+  <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+          <h2 class="panel-title">Refer back</h2>
+      </div>
+      <form novalidate [formGroup]="commentForm">
+          <div class="panel-body">
+              <div class="form-horizontal">
+                  <div class="form-group">
+                      <label class="control-label col-md-6">Approval Level</label>
+                      <div class="col-md-12">
+                          <select name="approvalLevelId" formControlName="approvalLevelId" id="approvalLevelId"
+                              class="form-control"
+                              [ngClass]="commentForm.controls['approvalLevelId'].valid ? 'valid-input' : 'required-input'">
+                              <option value="">-- Select Approval Level --</option>
+                              <option *ngFor="let x of trailApprovalLevels" [value]="x.fromApprovalLevelId">
+                                  {{ x.fromApprovalLevelName }}</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <div class="col-md-12">
+                          <label>Comment</label>
+                      </div>
+                      <div class="col-md-12">
+                          <textarea name="comment" formControlName="comment" id="comment" class="form-control"
+                              [ngClass]="!commentForm.controls['comment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="button" (click)="returnBack(commentForm)" [disabled]="commentForm.invalid"
+                          class="btn btn-success pull-right">Submit</button>
+                      <button type="button" (click)="displayCommentForm=false" style="margin-right:5px"
+                          class="btn btn-danger pull-right">Cancel</button>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+</p-dialog> -->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>

@@ -1,0 +1,155 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <!--module header-->
+        <div class="panel panel-default">
+
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            LMS Operation Routing
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- panel content -->
+            <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+
+                <p-tabPanel header="Loan Operations">
+                    <!-- loan review applications -->
+                    <div class="card no-padding">
+                        <div class="panel panel-default">
+
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2 class="panel-title pull-left">
+                                            LMS Operations
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <p-dataTable [paginator]="true" [value]="approvedLoanReviewData" [rows]="10" (onRowSelect)="pushSelectedLoans($event)" (onRowUnselect)="popSelectedLoans($event)">
+                                    <!-- <p-column *ngIf="routableMode" [style]="{'width':'38px'}" [selection]=false selectionMode="multiple" (onRowSelect)="pushSelectedLoans($event)" [(selection)]="multipLoanData"></p-column> -->
+                                    <p-column *ngIf="routableMode" [style]="{'width':'38px'}"  selectionMode="multiple" (onRowSelect)="pushSelectedLoans($event)" 
+                                   
+                                    ></p-column>
+                                    <p-column *ngIf="!routableMode" [style]="{'width':'38px'}">
+                                        <ng-template let-loan="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="onSelectedLoanReviewChange(loan)" style="display: block" href="javascript:void(0)">
+                                                <i class="glyphicon glyphicon-eye-open"></i>
+                                                <!-- <i class="glyphicon glyphicon-eye-open"></i> -->
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column [style]="{'width':'80px'}" field="timeLapse" header="Time In"></p-column>
+                                    <!-- <p-column [style]="{'width':'150px'}" field="loanTypeName" header="Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                                    <p-column [style]="{'width':'150px'}" field="loanReferenceNumber" header="Loan Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="lmsApplicationReferenceNumber" header="Application Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="customerName" header="Obligor Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <!-- <p-column [style]="{'width':'150px'}" field="operationName" header="Operation Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                                    <p-column [style]="{'width':'100px','text-align':'right'}" field="principalAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'100px'}" field="interestRate" header="Interest" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column [style]="{'width':'70px'}" field="tenor" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column  [style]="{'text-align':'right','width':'120px'}" field="responsiblePerson" header="Routed To" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template pTemplate="body" let-item="rowData">
+                                            {{item.responsiblePerson != null ? item.responsiblePerson : 'None'}}
+                                        </ng-template> </p-column>
+                                    <p-column   [style]="{'width':'60px'}" field="responsiblePerson" header="Status">
+                                        <ng-template pTemplate="body" let-item="rowData">
+                                            <span *ngIf="item.responsiblePerson != null" class="glyphicon glyphicon-share-alt label label-info">Routed</span>
+                                            <span *ngIf="item.responsiblePerson == null " class="label label-warning">Pending</span>
+                                        </ng-template>
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div *ngIf="workflowTargets.length > 0" class="col-md-12">
+                                        <!-- <app-workflow-routing
+                                            [currentSelection]="workflowTarget"
+                                            [multiCurrentSelection]="workflowTargets"
+                                            [enableRoutePreset]="false"
+                                            [enableReroute]="true"
+                                            [operationId]="116"
+                                            [panelLabel]="'Facility Operations Routing'"
+                                            [referenceNumber]="applicationSelection?.applicationReferenceNumber"
+                                            (rerouted)="resetGrid($event)"
+                                        ></app-workflow-routing> -->
+                                        <app-workflow-routing
+                                            [currentSelection]="workflowTarget"
+                                            [multiCurrentSelection]="workflowTargets"
+                                            [enableRoutePreset]="false"
+                                            [enableReroute]="true"
+                                            [panelLabel]="'Facility Operations Routing'"
+                                            [referenceNumber]="applicationSelection?.applicationReferenceNumber"
+                                            (rerouted)="resetGrid($event)"
+                                        ></app-workflow-routing>
+                                    </div>
+                                </div>
+                                <div *ngIf="workflowTargets.length <= 0 || !routableMode " class="row ">
+                                        <div class="col-md-12 ">
+                                            <div class="form-group text-center">
+                                                <div class="col-md-12">
+                                                    <button type="button" (click)="setRouteMode()"
+                                                        style="margin-right:5px " class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">{{routeButtonText}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- endof loan review applications -->
+                </p-tabPanel>
+
+                <p-tabPanel header="Facility Operation Information" [disabled]="disableApplicationInformationTab">
+                    <!-- <app-workflow-routing
+                        [moduleId]="operationType"
+                        [currentSelection]="workflowTarget"
+                        [enableRoutePreset]="false"
+                        [enableReroute]="true"
+                        [enableRoute]="false"
+                        [operationId]="116"
+                        [panelLabel]="'Operation Routing'"
+                        [referenceNumber]="applicationSelection?.applicationReferenceNumber"
+                        (rerouted)="resetGrid($event)"
+                    ></app-workflow-routing> -->
+
+                    <div *ngIf="operationType == 1">
+                        <!-- <app-customer-information-detail [loanApplicationId]="applicationSelection?.loanApplicationId"></app-customer-information-detail>
+                        <app-loan-application-details-view [isRecommendedInfo]="true" [loanApplicationId]="applicationSelection?.loanApplicationId" [loanInformation]="applicationSelection?.loanInformation"> </app-loan-application-details-view> -->
+                        <app-loan-review-operation [isRouteMode]="true" ></app-loan-review-operation>
+                    </div>
+
+                    <div *ngIf="operationType == 2">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">Loan Details</h2>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-6">
+                                    <select (change)="onFacilityChange($event.target.value)" class="form-control"  [ngClass]="reloadLoanDetails == null ? 'required-input' : 'valid-input'">
+                                        <option value="null">-- Select Facility --</option>
+                                        <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <!-- <app-disbursed-facility-detail [displayDetails]="loanSystemTypeId != 0 && loanSystemTypeId != 4" [loanSystemTypeId]="loanSystemTypeId" [LoadLoanDetails]="reloadLoanDetails" [customerId]="customerId"></app-disbursed-facility-detail>
+                                <app-loan-application-details-view *ngIf="loanSystemTypeId == 4" [loanApplicationDetailId]="reloadLoanDetails"> </app-loan-application-details-view> -->
+                            </div>
+
+                        </div>
+                    </div>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+    </div>
+</div>
+

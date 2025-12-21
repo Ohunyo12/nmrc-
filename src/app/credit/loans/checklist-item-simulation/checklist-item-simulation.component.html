@@ -1,0 +1,59 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Checklist Item Simulation</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-2">
+                            <label>Product Type</label>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" id="search" (input)="searchDB($event.target.value)" class="form-control"
+                                placeholder="Filter products...">
+                        </div>
+                        <!-- <div class="form-group"> -->
+                            <div class="col-md-4">
+                                <!-- <p-dropdown *ngIf="productData2" [options]="productData2" 
+                                   [(model)]="productId" (onchange)="onProductTypeChanged($event.value)">
+                            </p-dropdown> -->
+                                <select name="productId" id="productId" class="form-control" [(ngModel)]="productId"
+                                    (change)="onProductTypeChanged($event.target.value)">
+                                    <option value="">--- Select Product ---</option>
+                                    <option *ngFor="let item of productData2" [value]="item.productId">{{item.productName}}</option>
+                                </select>
+                            </div>
+                        <!-- </div> -->
+                        <br /><br /><br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <p-dataTable [value]="checklistSimulationDetails" sortField="checkListTypeName"
+                                rowGroupMode="subheader" groupField="checkListTypeName">
+                                <ng-template pTemplate="rowgroupheader" let-rowData>{{rowData['checkListTypeName']}}
+                                    <br />
+                                    <span style="color: 'gray'">{{rowData['itemDescription']}} </span>
+                                </ng-template>
+                                <p-column [style]="{'width':'50px', 'text-align': 'center'}">
+                                    <ng-template pTemplate="header"> S/No</ng-template>
+                                    <ng-template let-i="rowIndex" pTemplate="body">
+                                        {{ i + 1}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="checkListItemName" header="Checklist Item"></p-column>
+                            </p-dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

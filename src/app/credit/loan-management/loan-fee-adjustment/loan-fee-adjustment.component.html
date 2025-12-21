@@ -1,0 +1,197 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Loan Fee Charge
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div *ngIf="displaySearch" class="form-group">
+              <label for="" class="col-md-2 control-label"></label>
+              <label for="" class="control-label col-md-2"></label>
+              <div class="col-md-4">
+                <div class="input-group">
+                  <input (focus)="openSearchBox()" type="text" class="form-control" placeholder="Search for Loan Customer" name="loanReferenceNo"
+                    [ngClass]="'valid-input'">
+                  <div class="input-group-btn">
+                    <button (click)="openSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                      <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!displaySearch" class="form-group">
+              <div class="col-md-12">
+                <p-dataTable [value]="loanChargeFeeList" [paginator]="true" [rows]="5" [(selection)]="feeChargeSelection" dataKey="loanFeeId"
+                  (onRowSelect)="onSelectedFeeChargeChange()">
+                  <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+                  <p-column header="Loan Reference Number">
+                    <ng-template pTemplate="body">
+                      {{ referenceNo }}
+                    </ng-template>
+                  </p-column>
+                  <p-column field="chargeFeeName" header="Charge Fee Name"></p-column>
+                  <p-column field="feeAmount" header="Fee Amouunt">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      {{ d.feeAmount | number : '1.2' }}
+                    </ng-template>
+                  </p-column>
+                  <p-column field="feeEarnedAmount" header="Earned Amount">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      {{ d.feeEarnedAmount | number : '1.2' }}
+                    </ng-template>
+                  </p-column>
+                  <p-column field="feeUnearnedAmount" header="Unearned Amount">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      {{ d.feeUnearnedAmount | number : '1.2' }}
+                    </ng-template>
+                  </p-column>
+                  <p-column field="feeRateValue" header="Fee Rate Value">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                      {{ d.feeRateValue | number : '1.2' }}
+                    </ng-template>
+                  </p-column>
+                </p-dataTable>
+              </div>
+              <div class="col-md-12">
+                <div class="pull-right">
+                    <button (click)="return()" style="padding: 3px 6px 3px 6px;">
+                        <span class="glyphicon glyphicon-file"></span>Return</button>
+                </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <!--end of panel-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOAN SEARCH FORM -->
+<p-dialog [responsive]=true [(visible)]="displayLoanSearch" id="add-modal" modal="modal" showEffect="fade" width="800">
+
+  <div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title"> Loan Search</h2>
+      <div class="pull-right">
+        <a class="close" (click)="closeLoanSearch()">&times;</a>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <form novalidate [formGroup]="loanSearchForm" autocomplete="off">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="operationTypeId" class="control-label col-md-12">Product Type</label>
+            <div class="col-md-6">
+              <select name="productTypeId" formControlName="productTypeId" id="operationTypeId" class="form-control" [ngClass]="loanSearchForm.controls['productTypeId'].valid ? 'valid-input' : 'required-input'">
+                <option value="">-- Select Product Type --</option>
+                <option *ngFor="let x of productTypes" [value]="x.id">{{ x.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 input-group">
+              <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" placeholder="Enter Customer Name, CASA Account number or Loan Reference Number"
+                [ngClass]="!loanSearchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+
+              <span (click)="submitLoanSearchForm(loanSearchForm)" class="input-group-addon btn btn-info">
+                <span class="glyphicon glyphicon-search"></span> Search
+              </span>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <p-dataTable [value]="searchResult" [paginator]="true" [rows]="5" [(selection)]="loanSelection" dataKey="loanId" (onRowSelect)="onSelectedLoanChange()">
+        <p-column [style]="{'width':'38px'}" selectionMode="single"></p-column>
+
+        <p-column field="loanReferenceNumber" header="Loan Reference Number"></p-column>
+        <p-column field="productName" header="Product Name"></p-column>
+        <p-column field="customerName" header="Customer Name"></p-column>
+
+        <p-column field="principalAmount" header="Principal Amount">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.principalAmount | number : '1.2' }}
+          </ng-template>
+        </p-column>
+      </p-dataTable>
+    </div>
+
+  </div>
+
+</p-dialog>
+<!--end of form modal-->
+
+<p-dialog [responsive]=true [(visible)]="displayFeeChargeForm" id="add-modal" modal="modal" showEffect="fade" width="700">
+
+  <div style="margin-bottom:0" class="panel panel-default">
+
+    <div class="panel-heading">
+      <h2 class="panel-title"> Charge Fee Modification </h2>
+      <div class="pull-right">
+        <a class="close" (click)="displayFeeChargeForm=false">&times;</a>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <form novalidate [formGroup]="feeChargeForm" autocomplete="off">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Charge/Fee Type</label>
+            <div class="col-md-4">
+              <input type="text" name="chargeFeeName" formControlName="chargeFeeName" id="chargeFeeName" [attr.disabled]="true" class="form-control"
+                [ngClass]="'valid-input'">
+            </div>
+            <label for="" class="control-label col-md-2">Facility Amount</label>
+            <div class="col-md-4">
+              <input type="text" name="principalAmount" formatM formControlName="principalAmount" id="principalAmount" [attr.disabled]="true"
+                class="form-control" [ngClass]="'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">Fee Rate Value</label>
+            <div class="col-md-4">
+              <input type="text" name="feeRateValue" formControlName="feeRateValue" id="feeRateValue" [attr.disabled]="true" class="form-control"
+                [ngClass]="'valid-input'">
+            </div>
+            <label for="" class="control-label col-md-2">Fee Amount</label>
+            <div class="col-md-4">
+              <input type="text" name="feeAmount" formatM formControlName="feeAmount" id="feeAmount" [attr.disabled]="true" class="form-control"
+                [ngClass]="'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">New Rate Value</label>
+            <div class="col-md-4">
+              <input type="text" name="newFeeRateValue" formControlName="newFeeRateValue" id="newFeeRateValue" [attr.disabled]="true" class="form-control"
+                [ngClass]="'valid-input'">
+            </div>
+            <label for="" class="control-label col-md-2">Refund Amount</label>
+            <div class="col-md-4">
+              <input type="text" name="newFeeAmount" (input)="calculateRateValue($event.target.value)" formatM formControlName="newFeeAmount"
+                id="newFeeAmount" class="form-control" [ngClass]="!feeChargeForm.controls['newFeeAmount'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="submitLoanFeeCharge(feeChargeForm)" [disabled]="feeChargeForm.invalid" class="btn btn-success pull-right">Save</button>
+          <button type="button" (click)="displayFeeChargeForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</p-dialog>

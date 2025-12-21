@@ -1,0 +1,122 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Document Definition
+                </h2>
+                <div class="pull-right">
+                    <button (click)="showDocumentDefinitionForm()" pButton type="button" label="New Document Definition"
+                        icon="fa-plus">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-tabView>
+            <p-tabPanel header="Document Definition">
+                <div class="panel-body">
+                    <p-dataTable [value]="documentDefinitions" [responsive]="true" [paginator]="true" [rows]="5">
+
+                        <p-column field="documentTitle" [filter]="true" header="Document Title" sortable="true"
+                            filterMatchMode="contains">                            
+                        </p-column>
+
+                        <p-column field="inUse" header="In Use" [filter]="true" sortable="true"
+                            filterMatchMode="contains">
+                        </p-column>
+
+                        <!-- <p-column [style]="{'width':'100px'}" header="View">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="addAdditionalDetail(d)" href="javascript:void(0)">Additional Detail</a>
+
+                                </div>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}" header="View">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div *ngIf="d.approvalStatusId!=2" style="text-align:center">
+                                    <a (click)="deleteAtcLodgment(d)" href="javascript:void(0)">Remove</a>
+                                    <span style="padding:3px;">|</span>
+                                    <a (click)="editAtcLodgment(d)" href="javascript:void(0)">Edit</a>
+                                    <a (click)="saveAtcLodgmentForApproval(d)" href="javascript:void(0)">Go For Approval</a>
+                                </div>
+                            </ng-template>
+                        </p-column> -->
+
+                    </p-dataTable>
+                </div>
+
+            </p-tabPanel>
+        </p-tabView>
+
+    </div>
+
+    <p-dialog [responsive]=true [(visible)]="displayDocumentDefinitionForm" modal="modal" showEffect="fade"
+                          width="1000" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Add Document Definition
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <form novalidate [formGroup]="documentDefinitionForm" (ngSubmit)="saveDocumentDefinition(documentDefinitionForm)" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="documentTitle" class="control-label col-md-12">Document Title</label>
+                                    <div class="col-md-12">
+                                        <textarea name="documentTitle" maxlength="100" formControlName="documentTitle" id="documentTitle"
+                                            class="form-control"
+                                            [ngClass]="documentDefinitionForm.controls['documentTitle'].valid ? 'valid-input' : 'required-input'"></textarea>    
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inUse" class="control-label col-md-12">In Use</label>
+                                    <div class="col-md-12">
+                                            <input type="checkbox" name="inUse" id="inUse" formControlName="inUse">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="button" (click)="saveDocumentDefinition(documentDefinitionForm)"
+                                        [disabled]="documentDefinitionForm.invalid" class="btn btn-success pull-right">Save and
+                                        Close</button>
+                                    <button type="button" (click)="displayDocumentDefinitionForm=false" style="margin-right:5px"
+                                        class="btn btn-danger pull-right">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>            
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12"></div>
+                    </div>
+            </div>
+                
+        </div>
+    </p-dialog>
+
+</div> 
+

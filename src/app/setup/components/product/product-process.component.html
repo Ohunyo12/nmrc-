@@ -1,0 +1,107 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Product Class Process
+                            </h2>
+
+                            <!-- <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="productProcessData" [paginator]="true" [rows]="20" [responsive]="true">
+                        <p-column field="productClassProcessName" header="Product Class Process" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="maximumAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                            <ng-template let-pGrp="rowData" let-col pTemplate="body">
+                                {{pGrp[col.field] | number : '1.2-2' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="useAmountLimit" header="Use Amount Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-pGrp="rowData" let-col pTemplate="body">
+                                {{pGrp[col.field] ? 'yes' : 'no' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editProductProcess(pGrp, $event)" href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+        </div>
+    </div>
+</div>
+
+
+<!--add modal-->
+<p-dialog [responsive]="true" [(visible)]="displayAddUpdateModal" id="add-modal" modal="modal" showEffect="fade" width="560">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{panelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="productProcessForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="productClassProcessName" class="control-label col-md-4">
+                            Product Process
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" name="productClassProcessName" formControlName="productClassProcessName" id="productClassProcessName"
+                                class="form-control" [ngClass]="!productProcessForm.controls['productClassProcessName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maximumAmount" class="control-label col-md-4">
+                            Maximum Amount
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" name="maximumAmount" style="text-align:right" formControlName="maximumAmount" formatM id="maximumAmount"
+                                class="form-control" [ngClass]="!productProcessForm.controls['maximumAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="useAmountLimit" class="control-label col-md-4">Use Amount Limit</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" formControlName="useAmountLimit">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(productProcessForm)" [disabled]="productProcessForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddUpdateModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->

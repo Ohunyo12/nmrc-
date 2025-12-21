@@ -1,0 +1,163 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                <!-- Loan Workflow SLA for {{operationName}} Report -->
+                Collateral Adequacy
+              </h2>
+
+              <!-- <div class="pull-right">
+                                <button pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+
+          <div class="ui-g ui-fluid">
+            <div class="form-group">
+              <label for="searchItem" class="control-label col-md-1">
+                Start Date
+              </label>
+
+              <div class="col-md-2">
+                <p-calendar [(ngModel)]="startDate" [showIcon]="true"></p-calendar> <span
+                  style="margin-left:35px"></span>
+
+              </div>
+
+              <label for="searchItem" class="control-label col-md-1 ">
+                End Date
+              </label>
+
+              <div class="col-md-2">
+                <p-calendar [(ngModel)]="endDate" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+
+              </div>
+              <label for="searchItem" class="control-label col-md-1">
+                Branch
+              </label>
+
+              <div class="col-md-2">
+                <input (focus)="openSearchBox()" name="branch" id="branch" [(ngModel)]="branchId" type="text"
+                  class="form-control" placeholder="pick a branch" name="loanReferenceNo" [ngClass]="'valid-input'">
+                <div class="pull-right" style="margin-left:6px">
+                  <a class="close" (click)="clearInput()"></a>
+                </div>
+              </div>
+              <div class="col-md-offset-5 col-md-6">
+                <button pButton type="button" (click)="popoverSeeMore()" label="Preview Report"
+                  style="width:30%"></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="1200" modal="modal" showEffect="fade">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+            COLLATERAL ADEQUACY
+
+          </h2>
+          <button type="button" (click)="displayReport=false" style="margin-right:5px"
+            class="btn btn-danger pull-right">Cancel</button>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+        <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px"
+          style="overflow:auto"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="displayReport=false" style="margin-right:5px"
+          class="btn btn-danger pull-right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade"
+  width="650">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <div style="margin-left:0" class="row">
+        <h2 class="panel-title pull-left">
+          Search For Branch
+        </h2>
+        <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+          <i class="glyphicon glyphicon-remove-sign">
+          </i>
+        </a>
+
+      </div>
+    </div>
+    <div style="padding:3px" class="panel-body">
+      <div class="form-group">
+        <div class="col-md-12">
+          <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control"
+            placeholder="Type in your search parameter">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-12">
+          <p>
+            <!--{{mfacilityType}}-->
+          </p>
+          <div class="table-responsive"><table *ngIf="searchResults" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Branch Code</th>
+                <th>Branch Name</th>
+                <th>Address</th>
+                <th>stateName</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr (click)="pickSearchedData(res)" style="cursor: pointer"
+                *ngFor="let res of searchResults; let i = index">
+                <td>
+                  {{res.branchCode}}
+                </td>
+                <td>
+                  {{res.branchName}}
+                </td>
+                <td>
+                  {{res.addressLine1}}
+                </td>
+                <td>
+                  {{res.stateName}}
+                </td>
+              </tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

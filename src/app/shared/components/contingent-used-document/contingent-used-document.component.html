@@ -1,0 +1,38 @@
+<div *ngIf="apsDocuments==null">
+    <p-dataTable [value]="apsDocuments">
+        <p-column field="documentTitle" header="Document Title" sortable="true" ></p-column>
+        <p-column field="fileName" [style]="{'width':'70px'}" header="File Name" [style]="{'width':'60px'}"></p-column>
+        <p-column field="fileExtension" [style]="{'width':'50px'}" header="Type" [style]="{'width':'60px'}"></p-column>
+        <p-column [style]="{'width':'100px'}">
+            <ng-template pTemplate="header"> </ng-template>
+            <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension) > -1"
+                    (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension) > -1"
+                    (click)="DownloadDocument(d.documentId)" href="javascript:void(0)">Download</a>
+            </ng-template>
+        </p-column>
+
+    </p-dataTable>
+
+    
+</div>
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title: <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right"><a class="close" (click)="displayDocument=false">&times;</a></div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+
+    </div>
+</p-dialog>

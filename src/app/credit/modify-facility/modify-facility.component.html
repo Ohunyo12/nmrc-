@@ -1,0 +1,230 @@
+
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Application Modification
+                        </h2>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+            <p-tabPanel header="Loan Applications">
+
+                <div class="card no-padding">
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title pull-left">
+                                        Loan Applications
+                                    </h2>
+            
+                                    <div class="pull-right">
+                                        <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <p-tabView>
+                                <p-tabPanel header="Loan Applications" *ngIf="displaySearchTable" >
+                                    <p-dataTable [value]="applications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]" [responsive]="true">
+    
+                                    <p-column field="applicationDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column  header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.firstName }} {{ d.middleName }} {{ d.lastName }}
+                                        </ng-template>
+                                    </p-column>
+    
+                                    <p-column field="applicationReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    
+                                    <p-column field="applicationAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                            {{ d.applicationAmount | number : '1.2' }}
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column *ngIf="isAmongActivities('Modify Facility')">
+                                        <ng-template pTemplate="header"></ng-template>
+                                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                            <a (click)="view(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+                                        </ng-template>
+                                    </p-column>  
+                                </p-dataTable>
+                                </p-tabPanel>
+                                <p-tabPanel header="Loan Application Details"  *ngIf="displayApplicationDetail"> 
+                                    <div *ngIf="displayApplicationDetail" style="margin-bottom:0" class="panel panel-default">
+
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                Loan Application Information
+                                            </h2>
+                                            <div class="pull-right"><a class="close"
+                                                 (click)="displayApplicationDetail=false; displaySearchTable=true;">&times;</a>
+                                            </div>
+                                        </div>
+                                
+                                        <div class="panel-body">
+                                            <p-tabView>
+                                                <p-tabPanel header="Loan Information">
+                                                    <div class="panel-body">
+														<app-loan-application-details-view [isRecommendedInfo]="true" 
+                                                        [loanApplicationId]="loanApplicationId" 
+                                                        [isForModification]="true" 
+                                                        (emitLoanApplicationDetaiId)="getEmittedLoanApplicationDetailId($event)"
+                                                        (modify)="openForModification($event)"
+                                                        [reloadLoan]="reloadLoan"
+														[visible]="false"> </app-loan-application-details-view>                   
+                                                        </div>    
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Conditions">
+                                                    <app-credit-condition [reload]="loanApplicationId" [callerId]="1" [isAnalyst]="false" [isBusiness]="false"
+                                                        [displayedOnly]="false" [applicationId]="loanApplicationId" [proposedItems]="proposedItems">
+                                                    </app-credit-condition>
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Transaction Dynamics">
+                                                    <app-transaction-dynamics [reload]="loanApplicationId" [callerId]="1" [isAnalyst]="false" [isBusiness]="false"
+                                                        [displayedOnly]="false" [applicationId]="loanApplicationId" [proposedItems]="proposedItems">
+                                                    </app-transaction-dynamics>
+                                                </p-tabPanel>
+                                            </p-tabView>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                            </p-tabView> 
+                        </div>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-9 ">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </p-tabPanel>        
+        </p-tabView>
+
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search Application
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="searchForm" autocomplete="off" (ngSubmit)="submitForm(searchForm)">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">Loan Application Reference Number / Customer Name/ Staff Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayFacilityDetailForm" id="add-modal" modal="modal" showEffect="fade" 
+[contentStyle]="{'overflow':'auto','max-height':'700px'}" width="1200">
+	<app-modify-facility-details 
+		[ApplicationRef]="loanApplicationReferance" 
+		[customerGroupId]="customerGroupId" 
+		[customerId]="customerId"
+		[customerTypeId1]="customerTypeId"
+		[customerName]="customerNameTitle" 
+		[loanTypeId]="loanTypeId" 
+		[newLoanApplicationId]="loanApplicationId" 
+		[productClassProcessId]="productClassProcessId"
+		[productClassId]="productClassId" 
+        [loanApplicationDetailId]="applicationDetailId"
+        (openModification)="reloadFacilities($event)">
+	</app-modify-facility-details>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayApproverSearchForm" modal="modal" id="searchModal" showEffect="fade"
+    width="650" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search Staff
+                </h2>
+                <div class="pull-right">
+                    <a class="close" style="margin: -10px 8px;" (click)="displayApproverSearchForm=false">&times;</a>
+                </div>
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" #approvalInPut
+                        class="form-control" placeholder="Type in the staff name...">
+
+                    <!-- <input type="text" id="search" #approvalInPut class="form-control"
+                        placeholder="Type in the staff name..."> -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="availableApprovers" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Staff Code</th>
+                                <th>First Name</th>
+                                <th>Middle Name</th>
+                                <th>Last Name</th>
+                                <th>Staff Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedApprover(res)" style="cursor: pointer"
+                                *ngFor="let res of availableApprovers; let i = index">
+                                <td>{{res.staffCode}}</td>
+                                <td>{{res.firstName}}</td>
+                                <td>{{res.secondName}}</td>
+                                <td>{{res.lastName}}</td>
+                                <td>{{res.staffRoleName}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

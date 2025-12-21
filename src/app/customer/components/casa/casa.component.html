@@ -1,0 +1,190 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Account Search
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+        <form novalidate [formGroup]="casaSearchForm" (keyup.enter)="submitForm(casaSearchForm)" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="accountNumberOrName" class="control-label col-md-2">Account Number / Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="accountNumberOrName" formControlName="accountNumberOrName" id="accountNumberOrName" class="form-control" [ngClass]="!casaSearchForm.controls['accountNumberOrName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>                    
+
+                </div>
+            </div>
+        </form>
+
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm(casaSearchForm)" [disabled]="casaSearchForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-search"></span> Search</button>
+                            <button type="button" (click)="clearSearchForm()"  style="margin-right:5px" class="btn btn-default pull-right">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+        <!--end of card-->
+
+        <div *ngIf="displayCasaList" class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Search Result
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="casas" [paginator]="true" [rows]="20">
+
+                        <p-column field="productAccountNumber" header="Product Account Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productAccountName" header="Product Account Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        
+                        <p-column field="isCurrentAccount" header="Current Account" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-account="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ account.isCurrentAccount ? 'Yes' : 'No' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'100px'}"> 
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-account="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewCasaDetails(i)" href="javascript:void(0)">View Details</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel2-->
+
+        </div>
+        <!--end of card2-->
+    </div>
+</div>
+
+<!--modal starts-->
+<p-dialog [responsive]=true [(visible)]="displayCasaDetails" modal="modal" showEffect="fade" width="900">
+    <div *ngIf="displayCasaDetails" style="margin-bottom:0" class="panel panel-default">
+	
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Account Details: <strong>{{ model.productAccountName }}</strong>
+                <!--{{ model | json }}-->
+                <!--{minIntegerDigits}.{minFractionDigits}-{maxFractionDigits}-->
+            </h2>
+            <div class="pull-right"><a class="close" (click)="displayCasaDetails=false">&times;</a></div>
+        </div>
+		
+		<div class="panel-body">
+
+			<p-tabView>
+				
+				<p-tabPanel header="Account Information">
+                    <table class="table table-casa-information">
+                        <tbody>
+                            <tr>
+                            <td><strong>Product Account Number:</strong></td> <td>{{ model.productAccountNumber }}</td>
+                            <td><strong>Product Account Name:</strong></td> <td colspan="3" style="text-align:left">{{ model.productAccountName }}</td>
+                            </tr><tr>
+                            <td><strong>Customer Sensitivity Level:</strong></td> <td>{{ getCustomerSensitivityLevel(0) }}</td>
+                            <td><strong>Ledger Balance:</strong></td> <td>{{ model.ledgerBalance | number:'1.2' }}</td>
+                            <td><strong>Available Balance:</strong></td> <td>{{ model.availableBalance | number:'1.2' }}</td>
+                            </tr><tr>
+                            <td><strong>Product Code:</strong></td> <td>{{ model.productCode }}</td>
+                            <td><strong>Tenor:</strong></td> <td>{{ model.tenor }}</td>
+                            <td><strong>Has Lien:</strong></td> <td>{{ model.hasLien ? "Yes" : "No" }}</td>
+                            </tr><tr>
+                            <td><strong>Product Name:</strong></td> <td>{{ model.productName }}</td>
+                            <td><strong>Interest Rate:</strong></td> <td>{{ model.interestRate | percent:'1.2-2' }}</td>
+                            <td><strong>Lien Amount:</strong></td> <td>{{ model.lienAmount | number:'1.2' }}</td>
+                            </tr><tr>
+                            <td><strong>Branch Code:</strong></td> <td>{{ model.branchCode }}</td>
+                            <td><strong>Effective Date:</strong></td> <td>{{ model.effectiveDate | date:"dd-MM-yyyy" }}</td>
+                            <td><strong>Has Overdraft:</strong></td> <td>{{ model.hasOverdraft ? "Yes" : "No" }}</td>
+                            </tr><tr>
+                            <td><strong>Branch Name:</strong></td> <td>{{ model.branchName }}</td>
+                            <td><strong>Terminal Date:</strong></td> <td>{{ model.terminalDate | date:"dd-MM-yyyy" }}</td>
+                            <td><strong>Overdraft Amount:</strong></td> <td>{{ model.overdraftAmount | number:'1.2' }}</td>
+                            </tr><tr>
+                            <td><strong>Is Current Account:</strong></td> <td>{{ model.isCurrentAccount ? "Yes" : "No" }}</td>
+                            <td><strong>Action By:</strong></td> <td>{{ model.actionBy }}</td>
+                            <td><strong>Overdraft Interest Rate:</strong></td> <td>{{ model.overdraftInterestRate | percent:'1.2-2' }}</td>
+                            </tr><tr>
+                            <td><strong>Account Status:</strong></td> <td>{{ getAccountStatus(model.accountStatusId) }}</td>
+                            <td><strong>Action Date:</strong></td> <td>{{ model.actionDate | date:"dd-MM-yyyy" }}</td>
+                            <td><strong>Overdraft Expiry Date:</strong></td> <td>{{ model.overdraftExpiryDate | date:"dd-MM-yyyy" }}</td>
+                            </tr><tr>
+                            <td><strong>MIS Code:</strong></td> <td>{{ model.misCode }}</td>
+                            <td><strong>Operation:</strong></td> <td>{{ getOperation(model.operationId) }}</td>
+                            <td><strong>Post No Status:</strong></td> <td>{{ getPostNoStatus(model.postNoStatusId) }}</td>
+                            </tr><tr>
+                            <td><strong>Old Product Account Number:</strong></td> <td>{{ model.oldProductAccountNumber1 }}</td>
+                            <td><strong></strong></td> <td></td>
+                            <td><strong></strong></td> <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+				</p-tabPanel>
+
+			</p-tabView>
+		</div>
+		
+		<div class="panel-footer">
+			<div class="row">
+				<div class="col-md-12">
+				</div>
+			</div>
+		</div>
+			
+    </div>
+</p-dialog>
+
+<!--modal ends-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--
+{{ dateObj | date }}               // output is 'Jun 15, 2015'
+{{ dateObj | date:'medium' }}      // output is 'Jun 15, 2015, 9:43:11 PM'
+{{ dateObj | date:'shortTime' }}   // output is '9:43 PM'
+{{ dateObj | date:'mmss' }}        // output is '43:11'
+-->

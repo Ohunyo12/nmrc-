@@ -1,0 +1,152 @@
+<div class="panel panel-default">
+
+		<div class="panel-heading">
+			<div class="row">
+				<div class="col-md-12">
+					<h2 class="panel-title pull-left">
+						Lc Shipping
+					</h2>
+					<div class="pull-right">
+						<button *ngIf="showButtons==true" (click)="showLcShippingForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel-body">
+	
+			<p-dataTable [value]="lcShippings" [responsive]="true" [paginator]="false" [rows]="5">
+	
+				<p-column field="lcIssuanceId" header="Lc Issuance Id" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="partyName" header="Party Name" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="partyAddress" header="Party Address" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="portOfDischarge" header="Port Of Discharge" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="portOfShipment" header="Port Of Shipment" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="latestShipmentDate" header="Latest Shipment Date" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="isPartShipmentAllowed" header="Is Part Shipment Allowed" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="isTransShipmentAllowed" header="Is Trans Shipment Allowed" sortable="true" filterMatchMode="contains"></p-column>
+				<p-column field="lcShipping" header="Additional Comment" sortable="true" filterMatchMode="contains"></p-column>
+	
+				<p-column [style]="{'width':'100px'}" header="View">
+					<ng-template pTemplate="header"> </ng-template>
+					<ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+					<div style="text-align:center">
+						<!-- <div style="text-align:center" *ngIf="d.owner"> -->
+						<a (click)="deleteLcShipping(d)" href="javascript:void(0)">Remove</a>
+						<span style="padding:3px;">|</span>
+						<a (click)="editLcShipping(d)" href="javascript:void(0)">Edit</a>
+					</div>
+					</ng-template>
+				</p-column>
+	
+			</p-dataTable>
+	
+		</div>
+	
+	</div>
+	
+	<p-dialog [responsive]=true [(visible)]="displayLcShippingForm" [modal]=true 
+	width="600" [contentStyle]="{'overflow':'auto','max-height':'600px'}">
+	
+		<div style="margin-bottom:0" class="panel panel-default">
+			
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					{{ formState }} Lc Shipping
+				</h2>
+			</div>
+						
+			<form novalidate [formGroup]="lcShippingForm" (ngSubmit)="saveLcShipping(lcShippingForm)" autocomplete="off">
+			   <div class="panel-body">
+					<div class="form-horizontal">
+	
+						<div class="form-group">
+							<label for="lcIssuanceId" class="control-label col-md-12">Lc Issuance Id</label>
+							<div class="col-md-12">
+								<input type="text" [disabled]=true name="lcIssuanceId" formControlName="lcIssuanceId" id="lcIssuanceId" class="form-control" [ngClass]="lcShippingForm.controls['lcIssuanceId'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="partyName" class="control-label col-md-12">Party Name</label>
+							<div class="col-md-12">
+								<input type="text" name="partyName" formControlName="partyName" id="partyName" class="form-control" [ngClass]="lcShippingForm.controls['partyName'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="partyAddress" class="control-label col-md-12">Party Address</label>
+							<div class="col-md-12">
+								<textarea name="partyAddress" formControlName="partyAddress" id="partyAddress" class="form-control" [ngClass]="lcShippingForm.controls['partyAddress'].valid ? 'valid-input' : 'required-input'"></textarea>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="portOfDischarge" class="control-label col-md-12">Port Of Discharge</label>
+							<div class="col-md-12">
+								<input type="text" name="portOfDischarge" formControlName="portOfDischarge" id="portOfDischarge" class="form-control" [ngClass]="lcShippingForm.controls['portOfDischarge'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="portOfShipment" class="control-label col-md-12">Port Of Shipment</label>
+							<div class="col-md-12">
+								<input type="text" name="portOfShipment" formControlName="portOfShipment" id="portOfShipment" class="form-control" [ngClass]="lcShippingForm.controls['portOfShipment'].valid ? 'valid-input' : 'required-input'">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<label for="latestShipmentDate" class="control-label col-md-12">Latest Shipment Date</label>
+							<div class="col-md-12">
+								<p-calendar id="latestShipmentDate" formControlName="latestShipmentDate" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050"
+									[showIcon]="true" 
+									[style]="{'width': '100%', 'z-index': '999'}" [ngClass]="lcShippingForm.controls['latestShipmentDate'].valid ? 'valid-input' : 'required-input'"></p-calendar>
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<div class="col-md-6">
+								<div class="checkbox-container">
+									<input formControlName="isPartShipmentAllowed" id="isPartShipmentAllowed" type="checkbox">
+								</div><label class="checkbox">Is Part Shipment Allowed</label>
+							</div>
+							<div class="col-md-6">
+							</div>
+						</div>
+	
+						<div class="form-group">
+							<div class="col-md-6">
+								<div class="checkbox-container">
+									<input formControlName="isTransShipmentAllowed" id="isTransShipmentAllowed" type="checkbox">
+								</div><label class="checkbox">Is Trans Shipment Allowed</label>
+							</div>
+							<div class="col-md-6">
+							</div>
+						</div>
+	
+					</div>
+				</div>
+			</form>
+	
+			<div class="panel-footer">
+				<div class="row">
+					<div class="col-md-12">
+						<button type="button" (click)="saveLcShipping(lcShippingForm)" [disabled]="lcShippingForm.invalid" class="btn btn-success pull-right">Save and Close</button>
+						<button type="button" (click)="displayLcShippingForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+					</div>
+				</div>
+			</div>
+	
+		</div>
+		
+	</p-dialog>
+	
+	 <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+	
+	<!-- 
+									<select name="responseTypeId" id="responseTypeId" formControlName="responseTypeId" class="form-control" [ngClass]="lcShippingForm.controls['responseTypeId'].valid ? 'valid-input' : 'required-input'">
+										<option value="">-- Select ResponseType --</option>
+										<option *ngFor="let x of responseTypes" [value]="x.responseTypeId">{{ x.responseType }}</option>
+									</select>
+	 -->
+	

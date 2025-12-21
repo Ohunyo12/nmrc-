@@ -1,0 +1,112 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Deferral Extension Approval
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <p-dataTable [value]="deferralDocuments" [rows]="10" [paginator]="true">
+      <p-column field="dateCreated" header="Date Created" sortable="true" [filter]="true" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.dateCreated | date: 'dd MMM yyyy'}}
+        </ng-template>
+      </p-column>
+      <p-column field="applicationReferenceNumber" header="Reference Number" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+      <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+      <p-column field="condition" header="Condition" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+      <!-- <p-column field="deferredDate" header="Deferred Date" sortable="true" [filter]="true" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.nextCallDate | date: 'dd-MM-yyyy'}}
+        </ng-template>
+      </p-column> -->
+      <p-column field="comment" header="Comment" sortable="true" [filter]="true"
+        filterMatchMode="contains">
+      </p-column>
+      <p-column field="fromApprovalLevelName" header="From Approval Level" sortable="true" [filter]="true"
+        filterMatchMode="contains">
+      </p-column>
+      <p-column field="toApprovalLevelName" header="To Approval Level" sortable="true" [filter]="true"
+        filterMatchMode="contains">
+      </p-column>
+      <p-column field="approvalStatus" header="Approval Status" sortable="true" filterMatchMode="contains"
+        [filter]="true">
+      </p-column>
+      <p-column [style]="{'width':'100px'}">
+        <ng-template pTemplate="header"> </ng-template>
+        <ng-template pTemplate="body" let-col let-d="rowData" let-i="rowIndex">
+          <a (click)="approveDeferral(d)" href="javascript:void(0)">Approve</a>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+  </div>
+</div>
+
+
+<p-dialog [responsive]="true" [(visible)]="displayDeferralModal" id="limit-def-modal" modal="modal" showEffect="fade"
+  width="900" scrollable="true" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+  'max-height': '80vh','min-height':'300px','z-index': 1500}">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+            Approve Deferral Extension
+          </h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <p-tabPanel *ngIf="(deferralId>0)" header="Approval Memo">
+        <app-approval-memo
+            [showControls]="true"
+            [allowTemplateToLoad]="true"
+            [referenceNumber]="applicationReferenceNumber"
+            [label]="'Deferral Extension'"
+            [customerId]="customerId"
+            [OPERATION_ID]="operationId"
+            [targetId]="deferralId">
+        </app-approval-memo>
+      </p-tabPanel>
+      <p-tabPanel header="Decision">
+        <div class="row">
+          <div class="col-md-6">
+            <textarea rows="4" name="comment" id="comment" class="form-control" [(ngModel)]="comment"
+              [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+          </div>
+          <div class="col-md-6">
+            <select class="form-control" [(ngModel)]="approvalStatusId" name="approvalStatus"
+              [ngClass]="approvalStatusId != 2 && approvalStatusId != 3 ? 'required-input' : 'valid-input'">
+              <option value="0">--- Select Approval ---</option>
+              <option value="2">Approve</option>
+              <option value="3">Decline</option>
+            </select>
+          </div>
+        </div>
+      </p-tabPanel>
+      
+    </div>
+
+    <div class="panel-footer">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" (click)="submitForApproval()" class="btn btn-success pull-right"
+            [disabled]="comment == null || comment == '' || approvalStatusId != 2 && approvalStatusId != 3">
+            Approve</button>
+          <button type="button" (click)="displayDeferralModal = false;" style="margin-right:5px"
+            class="btn btn-danger pull-right">Close</button>
+            <!-- <button type="button" class="btn btn-danger" (click)="showCommentForm()" style="margin-right:5px">
+                <i class="glyphicon glyphicon-chevron-left"></i> Refer Back</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

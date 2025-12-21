@@ -1,0 +1,150 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="panel-title pull-left">
+              NMRC LOAN BOOKING
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loan Booking Table -->
+<!-- Loan Bookings Table -->
+<div class="card no-padding">
+  <p-dataTable 
+    [value]="loanBookings" 
+    [paginator]="true" 
+    [rows]="10" 
+    selectionMode="single"
+    [(selection)]="selectedLoanBooking"
+    (onRowSelect)="onSelectedLoanChange($event)"
+  >
+    <p-column selectionMode="single" [style]="{'width':'38px'}"></p-column>
+
+    <p-column field="tranchNumber" header="Tranch Number" sortable="true" [filter]="true" [style]="{'width':'70px'}"></p-column>
+    <p-column field="pmbName" header="PMB Name" sortable="true" [filter]="true" [style]="{'width':'70px'}"></p-column>
+
+
+    <p-column field="rate" header="Rate (%)" sortable="true" [style]="{'width':'90px'}" [filter]="true">
+      <ng-template pTemplate="body" let-item="rowData">
+        {{ item.rate }}%
+      </ng-template>
+    </p-column>
+
+    <p-column field="tenor" header="Tenor (Days)" sortable="true" [filter]="true" [style]="{'width':'70px'}">
+      <ng-template pTemplate="body" let-item="rowData">
+        {{ item.tenor }} days
+      </ng-template>
+    </p-column>
+
+    <p-column field="totalAmount" header="Total Amount" sortable="true" [filter]="true" [style]="{'width':'120px'}"></p-column>
+
+    <p-column field="totalApprovalAmount" header="Total Approved Amount" sortable="true" [filter]="true" [style]="{'width':'120px'}"></p-column>  
+
+    <!-- Book Loan Button -->
+    <p-column header="" [style]="{'width':'100px'}">
+      <ng-template pTemplate="body" let-item="rowData">
+        <button class="btn btn-success  w-100 px-2" (click)="Bookloan(item)" [disabled]="isModalOpen">Book Loan</button>
+      </ng-template>
+    </p-column>
+
+    <!-- View Schedule Button -->
+    <p-column header="" [style]="{'width':'100px'}">
+      <ng-template pTemplate="body" let-item="rowData">
+        <button class="btn btn-primary  w-100 px-2" style="min-width: 100px;" (click)="openUWSModal(loanBookings)">View Schedule</button>
+      </ng-template>
+    </p-column>
+  </p-dataTable>
+</div>
+</div>
+  
+</div>
+</div>
+<!-- Loan Schedule Modal -->
+ 
+<!-- Modal Dialog -->
+<p-dialog [(visible)]="displayScheduleModalForm" [modal]="true" [closable]="false" [resizable]="true" width="900" header="Schedule Details">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">Loan Schedule</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Panel Body -->
+    <div class="panel-body" *ngIf="scheduleView.length > 0" 
+      style="max-height: 400px; overflow-y: auto; padding: 15px;">
+      
+      <fieldset>
+        <table style="margin-bottom: 20px;">
+          <tr>
+            <td style="font-size: 12px; font-weight: bold; padding: 4px; white-space: nowrap;">Granted Amount:</td>
+            <td style="text-align: right; padding: 4px; padding-left: 5px;">{{scheduleView[0]?.endprincipalamount}}</td>
+            <td style="font-size: 12px; font-weight: bold; padding-left: 20px; padding: 4px;">Interest Rate:</td>
+            <td style="text-align: right;padding: 4px">{{scheduleView[0]?.interestrate}} %</td>
+            <td style="font-size: 12px; font-weight: bold; padding-left: 20px; padding: 4px;">Effective Interest Rate:</td>
+            <td style="text-align: right;padding: 4px">{{scheduleView[0]?.effectiveinterestrate | number: '1.2-2'}} %</td>
+          </tr>
+          <tr>
+            <td style="font-size: 12px; font-weight: bold; padding: 4px;">Effective Date:</td>
+            <td style="text-align: right; padding-left: 10px; padding: 4px;">{{scheduleView[0]?.datetimecreated | date}}</td>
+            <td style="font-size: 12px; font-weight: bold; padding-left: 20px; padding: 4px;">Maturity Date:</td>
+            <td style="text-align: right; padding: 4px;">{{scheduleView[0]?.paymentdate | date}}</td>
+          </tr>
+        </table>
+      </fieldset>
+
+      <table class="table table-bordered" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Payment Date</th>
+            <th>Start Principal</th>
+            <th>Periodic Amount</th>
+            <th>Principal Amount</th>
+            <th>Interest Amount</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let schedule of scheduleView; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ schedule.paymentdate | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ schedule.startprincipalamount | number: '1.2-2' }}</td>
+            <td>{{ schedule.periodpaymentamount | number: '1.2-2' }}</td>
+            <td>{{ schedule.periodprincipalamount | number: '1.2-2' }}</td>
+            <td>{{ schedule.periodinterestamount | number: '1.2-2' }}</td>
+            <td>{{ schedule.endprincipalamount | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="scheduleView.length === 0" style="padding: 15px;">
+      <p>Schedule Loading......</p>
+    </div>
+
+    <div class="panel-footer">
+      <div class="row">
+          <div class="col-md-12">
+              <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+          </div>
+      </div>
+  </div>
+  </div>
+</p-dialog>
+
+
+
+
+
+<!-- Loan Schedule Modal -->
+
+
+
+

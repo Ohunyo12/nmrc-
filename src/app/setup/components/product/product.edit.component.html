@@ -1,0 +1,836 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Edit Product
+                            </h2>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="productTypeId" class="col-md-2 control-label">Product Type</label>
+                                    <div class="col-md-4">
+                                        <select name="productTypeId" [(ngModel)]="productTypeId" (change)="onProdTypeChanged($event.target.value)" id="productTypeId" class="form-control" [ngClass]="productTypeId ? 'valid-input' : 'required-input'" required>
+                                            <option value="">Select Product Type</option>
+                                            <option *ngFor="let ptype of productTypes" value="{{ptype.id}}">{{ptype.display}}</option>
+                                        </select>
+                                    </div>
+
+                                    <label for="" class="col-md-2 control-label">Product Category</label>
+                                    <div class="col-md-4">
+                                        <select [(ngModel)]="categoryId" name="categoryId" id="categoryId" (change)="onCategoryChanged(categoryId)" class="form-control" [ngClass]="categoryId ? 'valid-input' : 'required-input'" required>                                        
+                                            <option value="">Select Category</option>
+                                            <option *ngFor="let cat of productCategories" [ngValue]="cat.productCategoryId">{{cat.productCategoryName}}</option>
+                                            <!--<option value="602">Liability</option>-->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="" class="col-md-2 control-label">Product</label>
+                                    <div class="col-md-4">
+                                        <select (change)="onProductChanged()" [ngClass]="!productLoaded ? 'no-data' : ''" [(ngModel)]="selectedProduct" name="productId" id="productId" class="form-control" [disabled]="prodCatNotSelected" required>
+                                            <option value="">Select Product</option>
+                                            <option *ngFor="let product of products" [ngValue]="product">{{product.productName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row" *ngIf="editProductDetails">
+                        <div class="col-md-12">
+
+                            <p-tabView (onChange)="handleChange($event)" [activeIndex]="activeIndex">
+                                <p-tabPanel header="Product Details">
+                                    <div class="row">
+                                        <!-- <div class="form-horizontal">
+                                            <div style="margin-left:2px" class="form-group">
+                                                <label for="productName" class="control-label col-sm-2">Product Name</label>
+                                                <div class="col-sm-5">
+                                                    <input type="text" name="productName" [(ngModel)]="productName" class="form-control">
+                                                </div>
+
+                                            </div>
+                                        </div> -->
+                                        <form class="form-horizontal" id="form1" [formGroup]="productFormGroup" role="form" novalidate autocomplete="off">
+                                            <div id="details-container">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="productName" class="control-label col-sm-4">Product Name</label>
+                                                        <div class="col-sm-8">
+                                                            <input type="text" formControlName="productName" class="form-control" [ngClass]="productFormGroup.controls['productName'].valid ? 'valid-input': 'required-input'" name="productName" placeholder="Provide Product Name" required>
+                                                        </div>
+                                                    </div> 
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="productCategory" class="control-label col-sm-4">Product Category</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="accountTypes" class="form-control" formControlName="productCategoryId" (change)="onProdCategorySelect($event.target.value)" [ngClass]="productFormGroup.controls['productCategoryId'].valid ? 'valid-input' : 'required-input'" required>
+                                                                <option value="">--- Select Product Category ---</option>
+                                                                <option *ngFor="let item of productCategories" [value]="item.productCategoryId">{{item.productCategoryName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-sm-4" for="productDes">Product Description</label>
+                                                        <div class="col-sm-8">
+                                                            <textarea class="form-control" formControlName="productDescription" id="productDes" [ngClass]="productFormGroup.controls['productDescription'].valid ? 'valid-input' : 'required-input'" placeholder="Describe product" required></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="prodClass" class="control-label col-sm-4">Product Class</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="prodClass" (change)="getSelectedProductClass($event.target.value)" class="form-control" [ngClass]="productFormGroup.controls['productClassId'].valid ? 'valid-input' : 'required-input'" formControlName="productClassId" required>
+                                                            <option value="">--- Select Product Class ---</option>
+                                                            <option *ngFor="let item of productClassData" [value]="item.lookupId">{{item.lookupName}}</option>
+                                                        </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="dayCount" class="control-label col-sm-4">Accrual Basis</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="dayCount" id="dayCount" class="form-control" formControlName="dayCountId" required [ngClass]="productFormGroup.controls['dayCountId'].valid ? 'valid-input' : 'required-input'" (change)="onDayCountSelect($event.target.value)">
+                                                                <option value="">--- Select Day Count ---</option>
+                                                                <option *ngFor="let item of dayCountData" [value]="item.lookupId">{{item.lookupName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="dealClass" class="control-label col-sm-4">Classification</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="dealClass" class="form-control" formControlName="dealClassificationId" [ngClass]="productFormGroup.controls['dealClassificationId'].valid ? 'valid-input': 'required-input'" required>
+                                                                <option value="">--- Select Deal Classification ---</option>
+                                                                <option *ngFor="let item of dealClassficationData"  [value]="item.lookupId">{{item.lookupName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 ">
+                                                    <div class="form-group">
+                                                        <label for="prodPriceIndex" class="control-label col-sm-4">Product Price Index</label>
+                                                        <div class="col-sm-6">
+                                                            <select name="prodPriceIndex" id="prodPriceIndex" class="form-control" formControlName="productPriceIndexId" [ngClass]="productFormGroup.controls['productPriceIndexId'].valid ? 'valid-input': 'required-input'" (change)="onPriceIndexSelect($event.target.value)">
+                                                                <option value="">--- Select Product Price Index ---</option>
+                                                                <option *ngFor="let item of productPriceIndexData" [value]="item.productPriceIndexId">{{item.priceIndexName}}</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <input type="text" [(ngModel)]="priceIndexRateValue" [ngModelOptions]="{standalone: true}" class="form-control" [disabled]="true">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 ">
+                                                    <div class="form-group">
+                                                        <label for="prodSpreadIndex" class="control-label col-sm-4">Product Spread Index</label>
+                                                        <div class="col-sm-4">
+                                                            <input type="number" name="prodSpreadIndex" formControlName="productPriceIndexSpread" class="form-control" [ngClass]="productFormGroup.controls['productPriceIndexSpread'].valid ? 'valid-input': 'required-input'" (change)="onProductSpreadSelect($event.target.value)"
+                                                            />
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="input-group">
+                                                                <span class="input-group-addon">Total</span>
+                                                                <input type="text" [(ngModel)]="productSpreadTotal" [ngModelOptions]="{standalone: true}" class="form-control" [disabled]="true" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="dealTypes" class="control-label col-sm-4">Accrual Type</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="radio-inline"><input type="radio" value="1" formControlName="dealTypeId">Backend</label>
+                                                            <label class="radio-inline"><input type="radio" value="2" formControlName="dealTypeId">Upfront</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 " *ngIf="isSelectedType('Current Account')">
+                                                    <div class="form-group">
+                                                        <label for="allowOverdraft" class="control-label col-sm-4">Allow Overdraft</label>
+                                                        <div class="col-sm-8">
+                                                            <label class="radio-inline"><input type="radio" value="true" id="allowOverdraft" formControlName="allowOverdrawn">Yes</label>
+                                                            <label class="radio-inline"><input type="radio" value="false" id="allowOverdraft" formControlName="allowOverdrawn"> No</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 " *ngIf="requireLoanSchedule()">
+                                                    <div class="form-group">
+                                                        <label for="scheduleTypeId" class="control-label col-sm-4">Loan Schedule</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="scheduleTypeId" id="scheduleTypeId" class="form-control" formControlName="scheduleTypeId">
+                                                                <option value="">--- Select Loan Schedule ---</option>
+                                                                <option *ngFor="let item of loanScheduleTypeData" [value]="item.lookupId">{{item.lookupName + ' - ' + item.lookupTypeName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="col-sm-6 ">
+                                                    <div class="form-group">
+                                                        <label for="productBehaviourId" class="control-label col-sm-4">Product Behaviour Type</label>
+                                                        <div class="col-sm-8">
+                                                            <select name="productBehaviourId" id="productBehaviourId" class="form-control" formControlName="productBehaviourId">
+                                                                <option value="">--- Select Product Behaviour Type ---</option>
+                                                                <option *ngFor="let item of productBehaviorData" [value]="item.lookupId">{{item.lookupName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
+                                                <div class="col-sm-12 col-lg-12" *ngIf="isSelectedGroup('00002')">
+                                                    <div class="form-group">
+                                                        <label for="minBalance" class="control-label col-sm-2">Minumum Balance</label>
+                                                        <div class="col-sm-4">
+                                                            <input type="number" min="0" id="minBalance" formControlName="minimumBalance" class="form-control" style="width:80px">
+                                                        </div>
+                                                        <label for="opBalance" class="control-label col-sm-2">Opening Balance</label>
+                                                        <div class="col-sm-4">
+                                                            <input type="number" min="0" id="opBalance" formControlName="openingBalance" class="form-control" style="width:80px">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-12 col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="customerLimit" class="control-label col-sm-2">Customer Limit</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="customerLimit" formControlName="customerLimit" class="form-control">
+                                                                <!-- <span class="input-group-addon">Months</span> -->
+                                                            </div>
+                                                        </div>
+                                                        <label for="collateralLcyLimit" class="control-label col-sm-2">Collateral LCY Limit</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="collateralLcyLimit" formControlName="collateralLcyLimit" class="form-control">
+                                                                <!-- <span class="input-group-addon">Months</span> -->
+                                                            </div>
+                                                        </div>
+                                                        <label for="collateralFcyLimit" class="control-label col-sm-2">Collateral FCY Limit</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="collateralFcyLimit" class="form-control" formControlName="collateralFcyLimit" class="form-control">
+                                                                <!-- <span class="input-group-addon">%</span> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="productLimit" class="control-label col-sm-2">Product Limit</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="productLimit" formControlName="productLimit" class="form-control">
+                                                                <!-- <span class="input-group-addon">Months</span> -->
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="isInvoiceBased"><strong>Is Invoice Based</strong></label>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="allowFundUsage"><strong>Allow Fund Usage</strong></label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="cols-sm-12 col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="" class="control-label col-sm-2" *ngIf="requireRateTenor()">Tenor Bracket (Months)</label>
+                                                        <div class="col-sm-4" *ngIf="requireRateTenor()">
+                                                            <div class="row">
+                                                                <label class="control-label col-sm-3" for="minimumTenor">Mininum:</label>
+                                                                <div class="col-sm-3">
+                                                                    <input type="number" min="0" max="100" formControlName="minimumTenor" id="minimumTenor" class="form-control">
+                                                                </div>
+                                                                <label class="control-label col-sm-3" for="maximumTenor">Maximum:</label>
+                                                                <div class="col-sm-3">
+                                                                    <input type="number" min="0" max="100" formControlName="maximumTenor" id="maximumTenor" class="form-control">
+                                                                </div>
+                                                                <br>
+                                                                <div class="col-sm-6">
+                                                                    <input type="checkbox" formControlName="allowTenor"> Allow Override
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <label for="" class="col-sm-2 control-label" *ngIf="requireRateTenor()">Rate Bracket (%)</label>
+                                                        <div class="col-sm-4" *ngIf="requireRateTenor()">
+                                                            <div class="row">
+                                                                <label class="control-label col-sm-3" for="minimumRate">Minimum:</label>
+                                                                <div class="col-sm-3">
+                                                                    <input type="number" min="0" max="100" formControlName="minimumRate" id="minimumRate" class="form-control">
+                                                                </div>
+                                                                <label class="control-label col-sm-3" for="maximumRate">Maximum:</label>
+                                                                <div class="col-sm-3">
+                                                                    <input type="number" min="0" max="100" formControlName="maximumRate" id="maximumRate" class="form-control">
+                                                                </div>
+                                                                <br>
+                                                                <div class="col-sm-6">
+                                                                    <input type="checkbox" formControlName="allowRate"> Allow Override
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr/>
+                                                <div class="col-sm-12 col-lg-12">
+                                                    <div class="form-group">
+                                                        <label for="dGracePeriod" class="control-label col-sm-2">Grace Period (Default)</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="dGracePeriod" formControlName="defaultGracePeriod" class="form-control">
+                                                                <span class="input-group-addon">Days</span>
+                                                            </div>
+                                                        </div>
+                                                        <label for="cleanUpPeriod" class="control-label col-sm-2">Clean-Up Period</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="cleanUpPeriod" formControlName="cleanupPeriod" class="form-control">
+                                                                <span class="input-group-addon">Days</span>
+                                                            </div>
+                                                        </div>
+                                                        <label for="eqContrib" class="control-label col-sm-2">Equity Contribution</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="eqContrib" class="form-control" formControlName="equityContribution" class="form-control">
+                                                                <span class="input-group-addon">%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="expPeriod" class="control-label col-sm-2">Expiry Period</label>
+                                                        <div class="col-sm-2">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0" max="100" id="expPeriod" formControlName="expiryPeriod" class="form-control">
+                                                                <span class="input-group-addon">Months</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="allowCustomerAccountForceDebit"><strong>Allow Customer Account Force Debit</strong></label>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="allowMoratorium"><strong>Allow Moratorium</strong></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="riskRatingId" class="control-label col-md-2">Product Rating</label>
+                                                        <div class="col-md-4">
+                                                                <select name="riskRatingId" formControlName="riskRatingId" id="riskRatingId" class="form-control" [ngClass]="!productFormGroup.controls['riskRatingId'].valid ? 'required-input' : 'valid-input'">
+                                                                        <option value="">-- Select Product Rating --</option>
+                                                                        <option *ngFor="let x of riskRatings" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                                                    </select>
+                                                                </div>
+
+                                                         <div class="col-md-4">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="excludeFromLitigation"><strong>Exclude From Litigation/Debt Recovery Agencies</strong></label>
+                                                        </div>
+                                                        <div class="col-md-2" *ngIf="displayIsPaydayProduct == true">
+                                                            <label class="checkbox-inline control-label"><input type="checkbox" value="false" formControlName="isPaydayProduct"><strong>Is Payday Product</strong></label>
+                                                             </div>
+                                                    </div>
+                                                </div>
+                                                <!-- ==================================================== -->
+                                                <div class="col-sm-12 col-lg-12">
+                                                        <fieldset>
+                                                            <legend>PRODUCT BEHAVIOUR</legend>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label for="customerLimit" class="control-label col-sm-2">Customer Limit</label>
+                                                                    <div class="col-sm-2">
+                                                                        <div class="input-group">
+                                                                            <input type="number" min="0" max="100" id="customerLimit" formControlName="customerLimit" class="form-control">
+                                                                            <!-- <span class="input-group-addon">Months</span> -->
+                                                                        </div>
+                                                                    </div>
+                                                                    <label for="collateralLcyLimit" class="control-label col-sm-2">Collateral LCY Limit</label>
+                                                                    <div class="col-sm-2">
+                                                                        <div class="input-group">
+                                                                            <input type="number" min="0" max="100" id="collateralLcyLimit" formControlName="collateralLcyLimit" class="form-control">
+                                                                            <!-- <span class="input-group-addon">Months</span> -->
+                                                                        </div>
+                                                                    </div>
+                                                                    <label for="collateralFcyLimit" class="control-label col-sm-2">Collateral FCY Limit</label>
+                                                                    <div class="col-sm-2">
+                                                                        <div class="input-group">
+                                                                            <input type="number" min="0" max="100" id="collateralFcyLimit" class="form-control" formControlName="collateralFcyLimit"
+                                                                                class="form-control">
+                                                                            <!-- <span class="input-group-addon">%</span> -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="productLimit" class="control-label col-sm-2">Product Limit</label>
+                                                                    <div class="col-sm-2">
+                                                                        <div class="input-group">
+                                                                            <input type="number" min="0" max="100" id="productLimit" formControlName="productLimit" class="form-control">
+                                                                            <!-- <span class="input-group-addon">Months</span> -->
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-2">
+                                                                        <label class="checkbox-inline control-label">
+                                                                            <input type="checkbox" value="false" formControlName="isInvoiceBased">
+                                                                            <strong>Is Invoice Based</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="col-sm-2">
+                                                                        <label class="checkbox-inline control-label">
+                                                                            <input type="checkbox" value="false" formControlName="allowFundUsage">
+                                                                            <strong>Allow Fund Usage</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="col-sm-4">
+                                                                        <label class="checkbox-inline control-label">
+                                                                            <input type="checkbox" value="false" formControlName="isTemporaryOverDraft">
+                                                                            <strong>Is Temporary Overdraft</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                        <label for="crmsRegulatoryId" class="control-label col-md-2">CRMS Regulatory Type</label>
+                                                                        <div class="col-md-4">
+                                                                                <select name="crmsRegulatoryId" formControlName="crmsRegulatoryId" id="crmsRegulatoryId" class="form-control" [ngClass]="!productFormGroup.controls['crmsRegulatoryId'].valid ? 'required-input' : 'valid-input'">
+                                                                                        <option value="">-- Select CRMS Regulatory Type --</option>
+                                                                                        <option *ngFor="let x of crmsProductTypes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <label for="invoiceLimit" class="control-label col-sm-2">Invoice Limit</label>
+                                                                                <div class="col-sm-2">
+                                                                                    <div class="input-group">
+                                                                                        <input type="number" min="0" max="100" id="invoiceLimit" formControlName="invoiceLimit" class="form-control">
+                                                                                        <!-- <span class="input-group-addon">Months</span> -->
+                                                                                    </div>
+                                                                                </div>
+                                                                    </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                                <div class="col-sm-12 col-lg-12" *ngIf="requireGl()">
+                                                    <fieldset>
+                                                        <legend>LEDGERS</legend>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rPrinGl">
+                                                            <div class="form-group">
+                                                                <label for="pBalanceLedger" class="control-label col-sm-4">Principal Balance Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="pBalanceLedger" class="form-control" formControlName="principalBalanceGl" [ngClass]="productFormGroup.controls['principalBalanceGl'].valid ? 'valid-input': 'required-input'" (change)="onPrincipalGLSelect($event.target.value)">
+                                                                        <option value="">--- Select Principal Balance Ledger ---</option>
+                                                                        <option *ngFor="let item of assetLiabilityLedgerData"  [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rInIncomeGl">
+                                                            <div class="form-group">
+                                                                <label for="inExpenseLedger" class="control-label col-sm-4">Interest Income Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="inExpenseLedger" class="form-control" formControlName="interestIncomeExpenseGl" [attr.disabled]="principalGlNotClicked ? true : null">
+                                                                        <option value="">--- Select Interest Income\Expense Ledger ---</option>
+                                                                        <option *ngFor="let item of incomeExpenseLedgerData"  [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rPrinGl2">
+                                                            <div class="form-group">
+                                                                <label for="pBalanceLedger2" class="control-label col-sm-4">Principal Balance Ledger 2</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="pBalanceLedger2" class="form-control" formControlName="principalBalanceGl2" [ngClass]="productFormGroup.controls['principalBalanceGl2'].valid ? 'valid-input': 'required-input'" (change)="onPrincipalGLSelect($event.target.value)">
+                                                                            <option value="">--- Select Principal Balance Ledger 2 ---</option>
+                                                                            <option *ngFor="let item of assetLiabilityLedgerData"  [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                        </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rInReGl">
+                                                            <div class="form-group">
+                                                                <label for="inPayableLedger" class="control-label col-sm-4">Interest Receivable Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="inPayableLedger" class="form-control" formControlName="interestReceivablePayableGl" [attr.disabled]="principalGlNotClicked ? true : null">
+                                                                        <option value="">--- Select Interest Receivable\Payable Ledger ---</option>
+                                                                        <option *ngFor="let item of assetLiabilityLedgerData"  [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rPrDisGl">
+                                                            <div class="form-group">
+                                                                <label for="preDiscountLedger" class="control-label col-sm-4">Premium\Discount Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="preDiscountLedger" id="preDiscountLedger" class="form-control" formControlName="premiumDiscountGl" [attr.disabled]="principalGlNotClicked ? true : null">
+                                                                        <option value="">--- Select Premium\Discount Ledger ---</option>
+                                                                        <option *ngFor="let item of assetLiabilityLedgerData" [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rDorGl">
+                                                            <div class="form-group">
+                                                                <label for="dBalanceLedger" class="control-label col-sm-4">Dormant Balance Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="dBalanceLedger" class="form-control" formControlName="dormantGl" [attr.disabled]="principalGlNotClicked ? true : null">
+                                                                        <option value="">--- Select Dormant Balance Ledger ---</option>
+                                                                        <option *ngFor="let item of assetLiabilityLedgerData" [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6" *ngIf="requireGlObj.rOvGl && productFormGroup.get('allowOverdrawn').value == true">
+                                                            <div class="form-group">
+                                                                <label for="overDrawnLedger" class="control-label col-sm-4">Overdrawn Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="overDrawnLedger" id="overDrawnLedger" class="form-control" formControlName="overdrawnGl" [attr.disabled]="principalGlNotClicked ? true : null">
+                                                                        <option value="">--- Select Overdrawn Ledger ---</option>
+                                                                        <option *ngFor="let item of assetLiabilityLedgerData" [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-lg-6"  *ngIf="requireGlObj.rPrinGl">
+                                                            <div class="form-group">
+                                                                <label for="penalChargeGl" class="control-label col-sm-4">Penal Charge Ledger</label>
+                                                                <div class="col-sm-8">
+                                                                    <select name="penalChargeGl" id="penalChargeGl" class="form-control" formControlName="penalChargeGl">
+                                                                        <option value="">--- Select Penal Charge Ledger ---</option>
+                                                                        <option *ngFor="let item of assetPenalChargeLedgerData" [value]="item.accountId">{{item.accountCode + ' -- ' +item.accountName}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                        <div class="col-sm-6" *ngIf="requireGlObj.rPrinGl">
+                                                                                <label for="penalChargeRate" class="control-label col-sm-4">Penal Charge Rate</label>
+                                                                                <div class="col-sm-8">
+                                                                                        <input type="number"  id="penalChargeRate" formControlName="penalChargeRate" class="form-control">
+                                    
+                                                                                </div>
+                                                                        </div>
+                                                                        <div class="col-sm-6"  *ngIf="requireGlObj.rPrinGl">
+                                                                                <label class="checkbox-inline control-label">
+                                                                                        <input type="checkbox" value="false" formControlName="usedByLos">
+                                                                                        <strong>Use By LOS</strong>
+                                                                                    </label>
+                                                                    </div>
+                                                                </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </div>
+                                                <div class="col-sm-12 col-lg-12" *ngIf="displaySelectedCurrencies">
+                                                    <fieldset>
+                                                        <legend>PRODUCT CURRENCIES</legend>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-4">
+                                                                <button type="button" class="btn btn-info" (click)="getAllProductCurrencies()">View Selected Currencies</button>
+                                                            </div>
+                                                            <div class="col-sm-8">
+                                                                <p-chips [(ngModel)]="mappedCurrencies" [ngModelOptions]="{standalone: true}" (onRemove)="removeCurrency($event.value)"></p-chips>
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="panel-footer">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <button type="button" (click)="next()" class="btn btn-primary pull-right" [disabled]="productFormGroup.invalid">Next</button>
+                                                        <button type="button" (click)="previous()" class="btn btn-primary pull-right" style="margin-right:5px">Previous</button>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </form>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="Fees">
+                                    <div class="row">
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Unmapped Fees</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Charge Name
+                                                            </td>
+                                                            <td>
+                                                                Target
+                                                            </td>
+                                                            <td>
+                                                                Frequency
+                                                            </td>
+                                                            <td>
+                                                                Account Category
+                                                            </td>
+                                                            <td style="width: 12%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let fee of feesNotMapped; let i = index">
+                                                            <td>
+                                                                {{fee.chargeName}}
+                                                            </td>
+                                                            <td>
+                                                                {{fee.targetName}}
+                                                            </td>
+                                                            <td>{{fee.frequencyTypeName}}</td>
+                                                            <td>{{fee.accountCategoryName}}</td>
+                                                            <td>
+                                                                <a style="text-decoration: none;" href="#" (click)="mapFee(i,$event)"><i class="glyphicon glyphicon-plus"></i> Add</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Mapped Fees</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Charge Name
+                                                            </td>
+                                                            <td>
+                                                                Target
+                                                            </td>
+                                                            <td>
+                                                                Frequency
+                                                            </td>
+                                                            <td>
+                                                                Value
+                                                            </td>
+                                                            <td>
+                                                                Dep Amount
+                                                            </td>
+                                                            <td style="width: 15%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let fee of feedMapped; let i = index">
+                                                            <td>
+                                                                {{fee.feeName}}
+                                                            </td>
+                                                            <td>
+                                                                {{fee.feeTargetName}}
+                                                            </td>
+                                                            <td>{{fee.feeIntervalName}}</td>
+                                                            <td>{{fee.rateValue}}</td>
+                                                            <td>{{fee.dependentAmount}}</td>
+                                                            <td>
+                                                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeFee(i,$event)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="Security">
+                                    <div class="row">
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Security Not Mapped</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Collateral Security Name</td>
+                                                            <td style="width: 20%">
+                                                                <a style="text-decoration: none;" href="#" (click)="mapMultipleSecurity($event)"><i class="glyphicon glyphicon-plus"></i> Add Multiple</a>
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let sec of securityNotMapped; let i = index">
+                                                            <td>
+                                                                {{sec.collateralTypeName}}
+                                                            </td>
+                                                            <td style="text-align:right">
+                                                                <a style="text-decoration: none;" href="#" (click)="mapSecurity(i,$event)"><i class="glyphicon glyphicon-plus"></i> Add</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                        <div style="padding-top:20px" class="col-md-6">
+                                            <fieldset>
+                                                <legend>Security Mapped</legend>
+
+                                                <table class="table table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>
+                                                                Collateral Security Name</td>
+                                                            <td style="width: 15%">
+
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let sec of securityMapped; let i = index">
+                                                            <td>
+                                                                {{sec.collateralTypeName}}
+                                                            </td>
+                                                            <td>
+                                                                <a style="text-decoration: none;color:#ff0000" href="#" (click)="removeSecurity(i,$event)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitProductForm()" class="btn btn-success pull-right" *ngIf="editProductDetails" [disabled]="productFormGroup.invalid">Submit</button>
+                            <button type="button" (click)="editProductDetails = false" class="btn btn-danger pull-right" *ngIf="editProductDetails" style="margin-right:5px">Close</button>
+                            <button style="margin-right:5px" type="button" *ngIf="activeIndex > 0 && editProductDetails" class="btn btn-primary pull-left" (click)="prev()">Previous</button>
+                            <button style="margin-right:5px" type="button" *ngIf="activeIndex != 2 && editProductDetails" (click)="next()" class="btn btn-primary pull-left">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="display" modal="modal" showEffect="fade" width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Map Fee to Product
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="feeEdit" (ngSubmit)="onFormSubmitted(feeEdit)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="feeName" class="control-label col-md-2">
+                                    Charge Name
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeName" formControlName="feeName" [attr.disabled]="true">
+                        </div>
+
+                        <label for="target" class="control-label col-md-2">
+                                    Target
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeTargetName" formControlName="feeTargetName" [attr.disabled]="true">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="interval" class="control-label col-md-2">
+                                    Category
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="accountCategoryName" formControlName="accountCategoryName" [attr.disabled]="true">
+                        </div>
+
+                        <label for="interval" class="control-label col-md-2">
+                                    Frequency
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="feeIntervalName" formControlName="feeIntervalName" [attr.disabled]="true">
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="rateValue" class="control-label col-md-2">
+                                    Rate Value
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="number" min="0" max="100" class="form-control" name="rateValue" formControlName="rateValue" style="text-align:right">
+                        </div>
+
+                        <label for="confirmPass" class="control-label col-md-2">
+                                    Dependent Amount
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="dependentAmount" formControlName="dependentAmount" formatM style="text-align:right">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--{{ user.value | json }} [disabled]="user.invalid"-->
+                        <button type="submit" [disabled]="feeEdit.invalid" class="btn btn-success pull-right">Map to Product</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="display=false">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayCurrencyModal" modal="modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Select Product Currencies
+            </h2>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="productCurrencies" [(selection)]="selectedCurrencies" dataKey="currencyId">
+                <p-column field="currencyId" header="Currency ID" hidden="true" [filter]="true" filterMatchMode="contains"></p-column>
+                <p-column field="currencyName" header="Currency Name"></p-column>
+                <p-column [style]="{'width':'60px'}" selectionMode="multiple"></p-column>
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" [disabled]="selectedCurrencies == null" (click)="hideCurrencyModal()" class="btn btn-success pull-right">Save</button>
+                    <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="displayCurrencyModal=false">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

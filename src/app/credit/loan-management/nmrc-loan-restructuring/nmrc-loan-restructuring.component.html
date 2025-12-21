@@ -1,0 +1,248 @@
+
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">Loan Schedule & Application</h2>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Loans Table -->
+        <p-tabView [activeIndex]="activeSearchTabindex" (onChange)="onSearchTabChange($event)">
+          <p-dataTable [value]="loans" [paginator]="true" [rows]="10" [(selection)]="selectedLoan"  
+                       [rowsPerPageOptions]="[10, 20, 30]" [totalRecords]="itemTotal">
+            
+            <!-- Radio Button Column -->
+            <p-column selectionMode="single" [style]="{'width':'38px'}">
+              <ng-template let-loan="rowData" pTemplate="body">
+                <p-radioButton name="selectedLoan" [value]="loan" [(ngModel)]="selectedLoan"></p-radioButton>
+              </ng-template>
+            </p-column>
+  
+            <p-column field="tranchNumber" header="Tranch Number" sortable="true" [filter]="true"></p-column>
+            <p-column field="tenor" header="Tenor" sortable="true" [filter]="true"></p-column>
+            <p-column field="totalAmount" header="Total Amount" sortable="true" [filter]="true"></p-column>
+            <p-column field="totalApprovalAmount" header="Total Approval Amount" sortable="true" [filter]="true"></p-column>
+            <p-column field="applicationDate" header="Application Date" sortable="true" [filter]="true"></p-column>
+            <p-column [style]="{'width':'130px', 'text-align':'center'}">
+              <ng-template let-loan="rowData" pTemplate="body">
+                <button pButton type="button" label="Restructure Loan" (click)="openUWSModal(loan)">
+                </button>
+              </ng-template>
+            </p-column>
+  
+          </p-dataTable>
+        </p-tabView>
+  
+      </div>
+    </div>
+  </div>
+  
+  <!-- Restructure Loan Modal (Using PrimeNG p-dialog) -->
+  <!-- <p-dialog [responsive]="true" [(visible)]="displayRestructureModal" id="restructureLoanModal" modal="modal" showEffect="fade" [style]="{'width': '500px', 'height': 'auto', 'max-height': '600px', 'overflow-y': 'auto'}"> -->
+  <p-dialog [(visible)]="displayRestructureModal" [modal]="true"
+          [style]="{ width: '50%', maxWidth: '90vw', maxHeight: '85vh', margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-8%, -0%)'}"
+          [closable]="false">
+  <div class="panel-heading" style="text-shadow: 1px 1px 2px #dee2e6; padding: 10px; border-bottom: 1px solid #ccc;">
+    <h2 class="panel-title" style="margin: 0;">Restructure Loan Request</h2>
+    <div class="pull-right">
+      <a class="close" (click)="closeRestructureModal()">×</a>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <form novalidate id="loanRestructureForm" [formGroup]="loanRestructureForm" (ngSubmit)="onSubmit(loanRestructureForm)" autocomplete="off">
+      <div class="form-horizontal">
+        <div class="form-group row" style="margin: 0px">
+          <div class="col-md-6">
+            <label for="scheduleMethod" class="control-label">Schedule Method</label>
+            <select [disabled]="viewOnly" name="scheduleMethod" class="form-control" id="scheduleMethod" formControlName="scheduleMethod" (change)="onScheduleMethodChange($event)"
+                    [ngClass]="{'required-input': loanRestructureForm.get('scheduleMethod')?.invalid && (loanRestructureForm.get('scheduleMethod')?.touched || loanRestructureForm.get('scheduleMethod')?.dirty), 'valid-input': loanRestructureForm.get('scheduleMethod')?.valid}">
+              <option value="" disabled selected>Select Schedule Method</option>
+              <option *ngFor="let st of scheduleTypes" value="{{st.lookupId}}">{{st.lookupName}}</option>
+            </select>
+          </div>
+          <div class="col-md-6" *ngIf="isFieldVisible('principalAmount')">
+            <label for="principalAmount" class="control-label" style="margin-top: 4px;">Loan Amount</label>
+            <input type="text" class="form-control" id="principalAmount" formControlName="principalAmount"
+                   [ngClass]="{'required-input': loanRestructureForm.get('principalAmount')?.invalid && (loanRestructureForm.get('principalAmount')?.touched || loanRestructureForm.get('principalAmount')?.dirty), 'valid-input': loanRestructureForm.get('principalAmount')?.valid}">
+          </div>
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('effectiveDate')">
+          <label for="effectiveDate" class="form-label" style="margin-top: 5px;">Effective Date</label>
+          <p-calendar id="effectiveDate" dateFormat="dd/mm/yy" formControlName="effectiveDate" placeholder="Select Effective Date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%' }" [style]="{'width': '100%', 'overflow': 'visible' }"
+                      [ngClass]="{'required-input': loanRestructureForm.get('effectiveDate')?.invalid && (loanRestructureForm.get('effectiveDate')?.touched || loanRestructureForm.get('effectiveDate')?.dirty), 'valid-input': loanRestructureForm.get('effectiveDate')?.valid}" (onSelect)="calculateMaturityDate('frontEnd')"></p-calendar>
+        </div>
+        <div class="col-md-6" *ngIf="isFieldVisible('interestRate')">
+          <label for="interestRate" class="control-label" style="margin-top: 5px;">Contractual Interest Rate (%)</label>
+          <input type="text" class="form-control" id="interestRate" formControlName="interestRate"
+                 [ngClass]="{'required-input': loanRestructureForm.get('interestRate')?.invalid && (loanRestructureForm.get('interestRate')?.touched || loanRestructureForm.get('interestRate')?.dirty), 'valid-input': loanRestructureForm.get('interestRate')?.valid}">
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('interestFrequency')">
+          <label for="interestFrequency" class="control-label" style="margin-top: 5px;">Interest Frequency</label>
+          <select [attr.disabled]="viewOnly" name="interestFrequency" id="interestFrequency" formControlName="interestFrequency" class="form-control"
+                  [ngClass]="{'required-input': loanRestructureForm.get('interestFrequency')?.invalid && (loanRestructureForm.get('interestFrequency')?.touched || loanRestructureForm.get('interestFrequency')?.dirty), 'valid-input': loanRestructureForm.get('interestFrequency')?.valid}">
+            <option value="" disabled selected>Select Frequency</option>
+            <option *ngFor="let feq of frequencies" value="{{feq.lookupId}}">{{feq.lookupName}}</option>
+          </select>
+        </div>
+        <div class="col-md-6" *ngIf="isFieldVisible('principalFrequency')">
+          <label for="principalFrequency" class="control-label" style="margin-top: 5px;">Principal Frequency</label>
+          <select [attr.disabled]="viewOnly" name="principalFrequency" id="principalFrequency" formControlName="principalFrequency" class="form-control"
+                  [ngClass]="{'required-input': loanRestructureForm.get('principalFrequency')?.invalid && (loanRestructureForm.get('principalFrequency')?.touched || loanRestructureForm.get('principalFrequency')?.dirty), 'valid-input': loanRestructureForm.get('principalFrequency')?.valid}">
+            <option value="" disabled selected>Select Frequency</option>
+            <option *ngFor="let feq of frequencies" value="{{feq.lookupId}}">{{feq.lookupName}}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('intrestFirstDate')">
+          <label for="intrestFirstDate" class="control-label" style="margin-top: 5px;">Interest First Pmt Date</label>
+          <p-calendar id="intrestFirstDate" dateFormat="dd/mm/yy" formControlName="intrestFirstDate" (onSelect)="setFirstPrincipalPaymentDate($event)" placeholder="Select Interest First Date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%' }" [style]="{'width': '100%', 'overflow': 'visible' }"
+                      [ngClass]="{'required-input': loanRestructureForm.get('intrestFirstDate')?.invalid && (loanRestructureForm.get('intrestFirstDate')?.touched || loanRestructureForm.get('intrestFirstDate')?.dirty), 'valid-input': loanRestructureForm.get('intrestFirstDate')?.valid}"></p-calendar>
+        </div>
+        <div class="col-md-6" *ngIf="isFieldVisible('principalFirstDate')">
+          <label for="principalFirstDate" class="control-label" style="margin-top: 5px;">Principal First Pmt Date</label>
+          <p-calendar id="principalFirstDate" dateFormat="dd/mm/yy" formControlName="principalFirstDate" placeholder="Select Principal First Date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%' }" [style]="{'width': '100%', 'overflow': 'visible' }"
+                      [ngClass]="{'required-input': loanRestructureForm.get('principalFirstDate')?.invalid && (loanRestructureForm.get('principalFirstDate')?.touched || loanRestructureForm.get('principalFirstDate')?.dirty), 'valid-input': loanRestructureForm.get('principalFirstDate')?.valid}"></p-calendar>
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('maturityDate')">
+          <label for="maturityDate" class="control-label" style="margin-top: 5px;">Maturity Date</label>
+          <p-calendar id="maturityDate" dateFormat="dd/mm/yy" (onSelect)="calculateTenor()" formControlName="maturityDate" placeholder="Select Maturity Date" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%' }" [style]="{'width': '100%', 'overflow': 'visible' }"
+                      [ngClass]="{'required-input': loanRestructureForm.get('maturityDate')?.invalid && (loanRestructureForm.get('maturityDate')?.touched || loanRestructureForm.get('maturityDate')?.dirty), 'valid-input': loanRestructureForm.get('maturityDate')?.valid}"></p-calendar>
+        </div>
+        <div class="col-md-6" *ngIf="isFieldVisible('tenor')">
+          <label for="tenor" class="control-label" style="margin-top: 5px;">Tenor in Days</label>
+          <input type="text" (change)="calculateMaturity()" class="form-control" id="tenor" formControlName="tenor"
+                 [ngClass]="{'required-input': loanRestructureForm.get('tenor')?.invalid && (loanRestructureForm.get('tenor')?.touched || loanRestructureForm.get('tenor')?.dirty), 'valid-input': loanRestructureForm.get('tenor')?.valid}">
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('accrualBasis')">
+          <label for="accrualBasis" class="control-label" style="margin-top: 5px;">Basis</label>
+          <select [attr.disabled]="viewOnly" name="accrualBasis" id="accrualBasis" formControlName="accrualBasis" class="form-control"
+                  [ngClass]="{'required-input': loanRestructureForm.get('accrualBasis')?.invalid && (loanRestructureForm.get('accrualBasis')?.touched || loanRestructureForm.get('accrualBasis')?.dirty), 'valid-input': loanRestructureForm.get('accrualBasis')?.valid}">
+            <option value="" disabled selected>Select Basis</option>
+            <option *ngFor="let b of basis" value="{{b.lookupId}}">{{b.lookupName}}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6" *ngIf="isFieldVisible('tenormonths')">
+          <label for="tenormonths" class="control-label" style="margin-top: 5px;">Tenor in Months</label>
+          <input type="text" id="tenormonths" (change)="calculateMaturityMonth()" formControlName="tenormonths" class="form-control"
+                 [ngClass]="{'required-input': loanRestructureForm.get('tenormonths')?.invalid && (loanRestructureForm.get('tenormonths')?.touched || loanRestructureForm.get('tenormonths')?.dirty), 'valid-input': loanRestructureForm.get('tenormonths')?.valid}">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel-footer" style="border-top: 1px solid #ccc;">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="clearForm()" class="btn btn-secondary pull-right" style="margin-left: 15px;">Clear</button>
+        <button type="submit" [disabled]="!loanRestructureForm.valid" form="loanRestructureForm" class="btn pull-right btn btn-success" style="width: 160px; font-weight: bold; color: white;">Generate</button>
+        <button type="button" [disabled]="!loanRestructureForm.valid" (click)="onSubmitLoanTerm(loanRestructureForm)" class="btn btn-danger pull-left">Submit</button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+  
+  
+  <p-dialog [responsive]=true resizable="true" [(visible)]="displayScheduleModalForm" id="add-modal" modal="modal" showEffect="fade" width="1200" height="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Schedule Details
+                </h2>
+                <!-- <a href="" (click)="displayScheduleModalForm=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                    </i>
+                </a> -->
+                <div class="pull-right" style="margin-right: 15px; margin-top: 15px;">
+                  <!-- <a class="close" (click)="displayScheduleModalForm = false">&times;</a> -->
+                  <a class="close" (click)="closeModal()">&times;</a>
+              </div>            
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <fieldset>
+                <!-- <legend style="width: 45%">
+                    Details
+                </legend> -->
+                <table style="margin-bottom: 20px">
+                    <tr>
+                        <td style="font-size: 12px;font-weight: bold;padding: 4px">Granted Amount</td>
+                        <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.principalAmount}}</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Interest Rate</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.interestRate}} %</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Effective Interest Rate</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.effectiveInterestRate | number: '1.2-2'}} %</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px;font-weight: bold;padding: 4px">Effective Date</td>
+                        <td style="text-align: right;padding-left: 10px;padding: 4px">{{scheduleHeader?.effectiveDate | date}}</td>
+                        <td style="font-size: 12px;font-weight: bold;padding-left: 20px;padding: 4px">Maturity Date</td>
+                        <td style="text-align: right;padding: 4px">{{scheduleHeader?.maturityDate | date}}</td>
+                    </tr>
+                </table>
+            </fieldset>
+  
+            <p-dataTable scrollable="true" #dt scrollHeight="300px" [value]="schedules" [responsive]=true selectionMode="single">
+                <p-header>
+                    <div class="ui-helper-clearfix">
+                        <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()"
+                            style="float:left"></button>
+                        <button type="button" pButton icon="fa-file" iconPos="left" label="Export to Excel"
+                            (click)="DownloadSchedule(loanRestructureForm)" style="float:right"></button>
+                    </div>
+                </p-header>
+                <p-column [style]="{'width':'80px'}" field="paymentNumber" header="No"></p-column>
+                <p-column field="paymentDate" header="Payment Date">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span>{{schedule[col.field] | date}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="startPrincipalAmount" header="Start Principal">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodPaymentAmount" header="Periodic Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodPrincipalAmount" header="Principal Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="periodInterestAmount" header="Interest Amount">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+                <p-column field="endPrincipalAmount" header="Balance">
+                    <ng-template let-col let-schedule="rowData" pTemplate="body">
+                        <span style="text-align: right">{{schedule[col.field] | number: '1.2-2'}}</span>
+                    </ng-template>
+                </p-column>
+  
+            </p-dataTable>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="closeModal()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </p-dialog>
+  

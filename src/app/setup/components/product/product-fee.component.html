@@ -1,0 +1,241 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Fees
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <p-dataTable [value]="productFees" [paginator]="true" [rows]="10" (onPageChange)="paginate($event)">
+
+                        <!--<p-column field="accountCategoryName" header="Fee Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+                        <p-column field="feeName" header="Fee Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="feeTargetName" header="Target" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!--<p-column field="glAccountId" header="_HEADER_" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+                        <p-column field="productTypeName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!--<p-column field="feeDate" header="_HEADER_" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+                        <p-column field="feeTypeName" header="Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="feeIntervalName" header="Interval" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column field="includeCutOffDay" header="Cut-Off" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ model.includeCutOffDay ? 'Yes' : 'No' }}
+                            </ng-template>
+                        </p-column>
+                        <p-column field="isIntegral" header="Integral" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ model.isIntegral ? 'Yes' : 'No' }}
+                            </ng-template>
+                        </p-column>
+
+                        <!--<p-column field="cutOffDay" header="Cut-Off Day" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>-->
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editProductFee(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<!--add modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New {{ entityName }}
+                <!--{{createUpdateForm.value | json}} -->
+                <!--{{filteredGLAccounts | json}} -->
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <input type="hidden" name="productFeeId" formControlName="productFeeId" id="productFeeId">
+
+                    <div class="form-group">
+                        <label for="feeName" class="control-label col-md-2">
+                                        Fee Name
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" name="feeName" formControlName="feeName" id="feeName" class="form-control" [ngClass]="!createUpdateForm.controls['feeName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="feeTypeId" class="control-label col-md-2">
+                                        Product Type
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="productTypeId" id="productTypeId" formControlName="productTypeId" class="form-control" [ngClass]="!createUpdateForm.controls['productTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Product --</option>
+                                                <option *ngFor="let product of productTypes" [value]="product.productTypeId">
+                                                    {{ product.productTypeName }}
+                                                </option>
+                                        </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feeTypeId" class="control-label col-md-2">
+                                        Fee Type
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="feeTypeId" id="feeTypeId" formControlName="feeTypeId" class="form-control" [ngClass]="!createUpdateForm.controls['feeTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Fee Type --</option>
+                                                <option *ngFor="let pft of productFeeTypes" [value]="pft.lookupId">
+                                                    {{ pft.lookupName }}
+                                                </option>
+                                        </select>
+                        </div>
+
+                        <label for="feeIntervalId" class="control-label col-md-2">
+                                        Fee Interval
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="feeIntervalId" id="feeIntervalId" formControlName="feeIntervalId" class="form-control" [ngClass]="!createUpdateForm.controls['feeIntervalId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Fee Interval --</option>
+                                                <option *ngFor="let interval of productFeeIntervals" [value]="interval.lookupId">
+                                                    {{ interval.lookupName }}
+                                                </option>
+                                        </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="accountCategoryId" class="control-label col-md-2">
+                                        Fee Category
+                                    </label>
+                        <div class="col-md-4">
+                            <select (change)="onAccountCategoryChange($event.target.value)" name="accountCategoryId" id="accountCategoryId" formControlName="accountCategoryId" class="form-control" [ngClass]="!createUpdateForm.controls['accountCategoryId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Fee Category --</option>
+                                                <option *ngFor="let cat of accountCategories" [value]="cat.lookupId">
+                                                    {{ cat.lookupName }}
+                                                </option>
+                                        </select>
+                        </div>
+
+                        <label for="feeTargetId" class="control-label col-md-2">
+                                        Fee Target
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="feeTargetId" id="feeTargetId" formControlName="feeTargetId" class="form-control" [ngClass]="!createUpdateForm.controls['feeTargetId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Fee Target --</option>
+                                                <option *ngFor="let target of productFeeTargets" [value]="target.lookupId">
+                                                    {{ target.lookupName }}
+                                                </option>
+                                        </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="glAccountId" class="control-label col-md-2">
+                                        Fee GL 
+                                        <!--{{ createUpdateForm.value['glAccountId'] }}-->
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="glAccountId" id="glAccountId" formControlName="glAccountId" class="form-control" [ngClass]="!createUpdateForm.controls['glAccountId'].valid ? 'required-input' : 'valid-input'" [attr.disabled]="disableFeeGlSelect ? true : null">
+                                                <option value="">-- Select Fee GL --</option>
+                                                <option *ngFor="let acc of filteredGLAccounts" [value]="acc.accountId">
+                                                    {{ acc.accountName }}
+                                                </option>
+                                        </select>
+                        </div>
+
+                        <!--<label for="feeDate" class="control-label col-md-2">
+                                        Fee Date
+                                    </label>
+                                    <div class="col-md-4">
+                                        <p-calendar [ngClass]="!createUpdateForm.controls['feeDate'].valid ? 'required-input' : 'valid-input'" id="feeDate" formControlName="feeDate" [inputStyle]="{'width': '265px'}" [style]="{'position': 'fixed', 'overflow': 'visible', 'z-index': '999'}" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2050" [showIcon]="true"></p-calendar>
+                                    </div>-->
+
+                        <label for="feeAmortisationTypeId" class="control-label col-md-2">
+                                        Amortisation Type
+                                    </label>
+                        <div class="col-md-4">
+                            <select name="feeAmortisationTypeId" id="feeAmortisationTypeId" formControlName="feeAmortisationTypeId" class="form-control" [ngClass]="!createUpdateForm.controls['feeAmortisationTypeId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Amortisation Type --</option>
+                                                <option *ngFor="let amortisation of amortisationTypes" [value]="amortisation.lookupId">
+                                                    {{ amortisation.lookupName }}
+                                                </option>
+                                        </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="includeCutOffDay" class="control-label col-md-2">
+                                        Include Cut-Off Day
+                                    </label>
+                        <div class="col-md-1">
+                            <input type="checkbox" name="includeCutOffDay" formControlName="includeCutOffDay" id="includeCutOffDay" style="box-shadow: none;margin-top: 10px;margin-left: 0px;" (change)="onChangeIncludeCutOffDay()">
+                        </div>
+
+                        <div class="col-md-3">
+                            <input type="text" [attr.disabled]="disableCutOffDay ? true : null" name="cutOffDay" formControlName="cutOffDay" id="cutOffDay" class="form-control" [ngClass]="!createUpdateForm.controls['cutOffDay'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="isIntegral" class="control-label col-md-2">
+                                        Is Integral
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isIntegral" formControlName="isIntegral" id="isIntegral" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+
+                    </div>
+
+
+                    <!--{{disableCutOffDay | json}}-->
+                    <!--</fieldset>-->
+                </div>
+            </div>
+
+            <!--button-->
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!--</div>-->
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of add modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

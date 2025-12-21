@@ -1,0 +1,394 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding" *ngIf="!displayLoanDetails">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Offer Letter Review
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <!-- <p-dataTable [value]="applications" [responsive]=true [paginator]="true" [rows]="10" [(selection)]="applicationSelection"
+            dataKey="loanApplicationId" [rowsPerPageOptions]="[10,20,30]" [lazy]="true" [totalRecords]="itemTotal" (onLazyLoad)="loadData($event)"
+            [loading]="showLoadIcon" > -->
+
+                    <p-dataTable [value]="applications" dataKey="loanApplicationId" [rows]="10" [paginator]="true"
+                        [responsive]="true">
+
+
+
+                        <!-- <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column> -->
+
+                        <p-column [style]="{'width':'50px'}" field="applicationReferenceNumber" header="Reference"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'50px'}" field="loanTypeName" header="Type" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'100px'}" field="productTypeName" header="Product Type"
+                            [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column header="Customer Name/Group" [filter]="true" filterMatchMode="contains"
+                            [style]="{'width':'150px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.customerName }} {{ d.customerGroupName }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="approvedAmount" header="Amount" [filter]="true" filterMatchMode="contains"
+                            [style]="{'width':'110px','text-align':'right'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.approvedAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column field="applicationDate" header="Date" [filter]="true" filterMatchMode="contains"
+                            [style]="{'width':'40px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'50px'}">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <div style="text-align:center">
+                                    <a (click)="viewOfferLetter(d)" href="javascript:void(0)">View</a>
+                                </div>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+
+
+                </div>
+
+                <div class="panel-footer">
+
+                </div>
+
+            </div>
+        </div>
+        <div class="card no-padding">
+            <div class="panel panel-default" *ngIf="displayLoanDetails">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">Loan Application Details</h2>
+                            <div class="pull-right">
+                                <!-- <a class="close" (click)="displayLoanDetails=false">&times;</a> -->
+                                <button type="button" class="btn btn-success pull-right" *ngIf="goForAvailment"
+                                    (click)="sendForAvailment($event)">Submit For Availment</button>
+                                <button type="button" class="btn btn-success pull-right" *ngIf="goForRMReview"
+                                    (click)="sendApplicationBackToRM()">Refer Back</button>
+                                <button type="button" class="btn btn-success pull-right" *ngIf="goForCAPReview"
+                                    (click)="sendApplicationForReview()">Submit</button>
+                                <!-- <button type="button" class="btn btn-success pull-right" *ngIf="goForCAPReview" (click)="sendApplicationForReview()">Submit For Review</button> -->
+
+                                <button type="button" class="btn btn-danger pull-right" style="margin-right: 5px;"
+                                    (click)="closeDetailsPanel($event)">Go Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form autocomplete="off">
+                    <div class="panel-content">
+                        <div class="form-horizontal">
+                            <p-tabView [activeIndex]="activeIndex" (change)="handleChange($event)">
+                                <p-tabPanel header="Approval Memorandum" [selected]="true">
+                                    <div class="row">
+                                        <div class="col-md-12" style="margin-bottom:5px">
+                                            <app-form-3800b-los
+                                                [applicationReferenceNumber]="applicationSelection?.applicationReferenceNumber">
+                                            </app-form-3800b-los>
+                                            <!-- <app-form-3800b-los [applicationReferenceNumber]="this.applicationSelection?.applicationReferenceNumber" ></app-form-3800b-los> -->
+                                            <!-- <iframe [src]="reportSource" id="report" name="report" frameborder="2" height="500px" width="1000px" style="overflow:auto"></iframe> -->
+                                            <!-- <div [innerHTML]="form3800bSrc.documentTemplate" class="paper" style="overflow:auto;height:400px"></div> -->
+                                        </div>
+                                        <br />
+                                        <hr />
+                                        <div class="col-md-12">
+                                            <div class="text-center">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-primary"
+                                                        (click)="validateOfferLetter()" style="margin-right:5px">
+                                                        <i class="glyphicon glyphicon-check"></i> Refer back to Offer
+                                                        Letter Review</button>
+                                                    <button type="button"
+                                                        [ngClass]="goForAvailment ? 'btn btn-danger' : 'btn btn-success'"
+                                                        style="margin-right:5px" (click)="indicateLetterAcceptance()">
+                                                        <i class="glyphicon glyphicon-ok"></i> Indicate Customer
+                                                        Acceptance</button>
+                                                    <!-- <button (click)="print(form3800bSrc.documentTemplate)" class="btn btn-default">
+                                                        <i class="glyphicon glyphicon-print"></i> print</button> -->
+                                                    <!-- <button (click)="print()" class="btn btn-default">
+                                                            <i class="glyphicon glyphicon-print"></i> print</button> -->
+                                                    <!-- <button type="button" *ngIf="showAsDraft" style="margin-left:5px" (click)="offerLetterChecklist()" class="btn btn-success">
+                                                        <i class="glyphicon glyphicon-ok"></i> Offer Letter Checklist</button> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-tabPanel>
+                                <!-- <p-tabPanel header="Generated Offer Letter">
+                                    <div class="row">
+                                        <div class="col-md-12" style="margin-bottom:5px">
+                                            <div *ngIf="!showAsDraft" [innerHTML]="form3800bSrc.documentTemplate" id="offerLetter" class="paper" style="overflow:auto;height:400px"></div>
+                                            <div *ngIf="showAsDraft" [innerHTML]="form3800bSrc.documentTemplate"  class="paper" style="overflow:auto;height:400px"></div>
+                                        </div>
+                                        <hr />
+                                        <div class="col-md-12">
+                                            <div class="text-center">
+                                                <div class="btn-group">
+                                                    <button (click)="print(form3800bSrc.documentTemplate)" class="btn btn-default">
+                                                                <i class="glyphicon glyphicon-print"></i> print</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-tabPanel> -->
+                                <!-- <p-tabPanel header="Relationship Managers Credit Appraisal Memorandum" *ngIf="isCAMBased">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div [innerHTML]="rmCamDocument.camDocumentation" class="paper" style="overflow:auto;height:400px"></div>
+                                        </div>
+                                        <hr />
+                                        <div class="col-md-12">
+                                            <div class="text-center">
+                                                <div class="btn-group">
+                                                    <button (click)="print(rmCamDocument.camDocumentation)" class="btn btn-default">
+                                                        <i class="glyphicon glyphicon-print"></i> print</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-tabPanel> -->
+                                <!-- <p-tabPanel header="Credit Analyst Credit Appraisal Memorandum" *ngIf="isCAMBased">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div [innerHTML]="creditAnalystDocument.camDocumentation" class="paper" style="overflow:auto;height:400px"></div>
+                                        </div>
+                                        <hr />
+                                        <div class="col-md-12">
+                                            <div class="text-center">
+                                                <div class="btn-group">
+                                                    <button (click)="print(creditAnalystDocument.camDocumentation)" class="btn btn-default">
+                                                        <i class="glyphicon glyphicon-print"></i> print</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p-tabPanel> -->
+                                <p-tabPanel header="Other Supporting Documentation">
+                                    <document-upload 
+                                        [reload]="applicationSelection?.loanApplicationId" 
+                                        [operationId]="applicationSelection?.appraisalOperationId" 
+                                        [targetId]="applicationSelection?.loanApplicationId"
+                                        [targetReferenceNumber]="applicationSelection?.applicationReferenceNumber" 
+                                        [deleteLink]="false" 
+                                        [panelTitle]="'Committee Minutes'"
+                                        [isOperationSpecific]="false"
+                                        [showUploadForm]="false">
+                                    </document-upload>
+                                    <!-- <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label for="documentTitle" class="control-label col-md-2">Document
+                                                Title</label>
+                                            <div class="col-md-8">
+                                                <input type="text" [(ngModel)]="uploadFileTitle"
+                                                    [ngModelOptions]="{standalone: true}" class="form-control"
+                                                    name="description" placeholder="Document title...">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2">Select Document</label>
+                                            <div class="col-md-8">
+                                                <input type="file" (change)="onFileChange($event)"
+                                                    placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg"
+                                                    #fileInput name="fileInput" style="padding-top:2px;"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="document" class="control-label col-md-2"></label>
+                                            <div class="col-md-4">
+                                                <button (click)="uploadFile()" class="btn btn-sm btn-primary"
+                                                    [disabled]="uploadFileTitle==null || file==undefined">
+                                                    <span class="glyphicon glyphicon-upload"></span> Upload</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                        <p-column field="documentTitle" header="Document Title" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="fileExtension" header="Type" [filter]="true"
+                                            filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                        <p-column field="physicalFileNumber" header="File Number" sortable="true"
+                                            [filter]="true" filterMatchMode="contains" [style]="{'width':'150px'}">
+                                        </p-column>
+                                        <p-column field="physicalLocation" header="Physical Location" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'100px'}">
+                                            <ng-template pTemplate="header"> </ng-template>
+                                            <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                                                    (click)="viewDocument(d.documentId)"
+                                                    href="javascript:void(0)">View</a>
+                                                <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                                                    (click)="DownloadDocument(d.documentId)"
+                                                    href="javascript:void(0)">Download</a>
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable> -->
+                                </p-tabPanel>
+                                <p-tabPanel *ngIf="applicationSelection != null" header="Job Request">
+                                    <job-request-template [operationAvailable]="true" [jobSourceId]=jobSourceId
+                                        [moduleReferenceNumber]=applicationSelection.applicationReferenceNumber
+                                        [operationsId]=37 (displayOption)="CallRequestClose()"
+                                        [isApplicationLevel]="false" [useFacilityDropdownToDetermineTarget]="true"
+                                        [facilityList]="facilityList">
+                                    </job-request-template>
+
+                                    <div class="panel-body" style="overflow:auto;height:250px">
+                                        <job-request-view [loanApplicationId]=loanApplicationId
+                                            [loanApplicationDetailId]=applicationSelection.loanApplicationDetailId
+                                            [operationId]=applicationSelection.operationId [showTitle]=false>
+                                        </job-request-view>
+                                    </div>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12 pull-left">
+                                <button type="button" class="btn btn-primary" (click)="popoverSeeMore()">View Offer
+                                    Letter
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<app-condition-checklist [isLMSChecklist]="false" [showOrHideList]='false'></app-condition-checklist>
+
+<p-dialog [responsive]=true [(visible)]="displayValidationModal" modal="modal" showEffect="fade" width="550">
+
+    <app-refer-back 
+        [getAllReferTrail]="false"
+        [currentLevelId]="applicationSelection?.currentApprovalLevelId"
+        [referBackTargetId]="targetId" [referBackOperationId]="operationId"
+        (notify)="displayValidationModal=false" (notifyAfterReferBack)="referBackResultControl($event)">
+    </app-refer-back>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayLetterAcceptanceModal" modal="modal" showEffect="fade" width="550">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Indicate Offer Letter Acceptance</h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayLetterAcceptanceModal=false">&times;</a>
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="comments" class="col-md-4 control-label">Comments</label>
+                    <div class="col-md-8">
+                        <textarea name="" id="" [(ngModel)]="rmComment" class="form-control"
+                            [ngClass]="!rmComment ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="sendForAvailment($event)"
+                        [disabled]="!rmComment && offerLetterAccepted !='true'"
+                        class="btn btn-success pull-right">Submit</button>
+                    <button type="button" (click)="displayLetterAcceptanceModal=false" style="margin-right: 5px;"
+                        class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="800" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        {{ReportType}}
+
+                    </h2>
+                    <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button> -->
+
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:750px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px"
+                    style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<div [innerHTML]="printDocument" id="print-section"></div>
+
+<!-- <div [innerHTML]="form3800bSrc.documentTemplate" id="print-section-OL"></div> -->
+<!-- <pre>{{trail | json}}</pre> -->
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                    [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+<!-- <pre>{{ applicationSelection | json }}</pre> -->

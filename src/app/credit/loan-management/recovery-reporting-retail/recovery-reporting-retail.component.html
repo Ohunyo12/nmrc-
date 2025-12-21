@@ -1,0 +1,171 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Recovery Reporting
+              </h2>
+
+            </div>
+          </div>
+        </div>
+
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <form novalidate [formGroup]="retailReportForm" autocomplete="off">
+
+              <div class="form-group">
+                <label for="startDate" class="control-label col-md-1">Start Date </label>
+                <div class="col-md-4">
+                  <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!retailReportForm.controls['startDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+
+                <label for="endDate" class="control-label col-md-1">End Date </label>
+                <div class="col-md-4">
+                  <p-calendar id="endDate" formControlName="endDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!retailReportForm.controls['endDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="consultant" class="control-label col-md-1">Recovery Agent </label>
+                <div class="col-md-4">
+                  <select class="form-control" (change)="customerList($event)" formControlName="consultant"
+                    id="consultant"
+                    [ngClass]="!retailReportForm.controls['consultant'].valid ? 'required-input' : 'valid-input'">
+                    <option value="0">-- Select Recovery Agent --</option>
+                    <option *ngFor="let x of recoveryAgents" [value]="x.accreditedConsultantId">
+                      {{ x.firmName }}</option>
+                  </select>
+                </div>
+                <label for="customer" *ngIf="displayCustomerField" class="control-label col-md-1">Customer</label>
+                <div class="col-md-4" *ngIf="displayCustomerField">
+                  <select class="form-control" formControlName="customer" id="customer">
+                    <option value="0">-- Select Customer --</option>
+                    <option value="0">All</option>
+                    <option *ngFor="let x of recoveryCustomers" [value]="x.customerId">
+                      {{ x.customerName }}</option>
+                  </select>
+                </div>
+
+                <div class="col-md-1 pull-left">
+                  <button type="button" (click)="popoverSeeMore(retailReportForm)" class="btn btn-success pull-left"
+                    [disabled]="!retailReportForm.valid">Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12"></div>
+          </div>
+        </div>
+        <!-- end of panel-body element -->
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-default" *ngIf="displayReportSearch">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+        </h2>
+
+      </div>
+    </div>
+  </div>
+  <div class="panel-body">
+    <p-dataTable #dt [value]="firstTransaction" [paginator]="true" [rows]="5" selectionMode="single">
+      <p-header>
+        <div class="ui-helper-clearfix">
+          <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()"
+            style="float:left"></button>
+        </div>
+      </p-header>
+      <p-column field="accreditedConsultantCompany" header="Consultant" sortable="true" [filter]="true"
+        filterMatchMode="contains"></p-column>
+      <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+
+      <p-column field="accountNumber" header="Account Number" sortable="true" [filter]="true"
+        filterMatchMode="contains"></p-column>
+
+      <p-column field="productAccountName" header="Account Type" sortable="true" [filter]="true"
+        filterMatchMode="contains"></p-column>
+
+      <p-column field="totalUnsettledAmount" header="Total Amount Due" [filter]="false" sortable="true"
+        filterMatchMode="contains" [style]="{'text-align':'right'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.totalUnsettledAmount | number : '1.2' }}
+        </ng-template>
+      </p-column>
+      <p-column field="totalExposure" header="Total Exposure" [filter]="false" sortable="true"
+        filterMatchMode="contains" [style]="{'text-align':'right'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.totalExposure | number : '1.2' }}
+        </ng-template>
+      </p-column>
+
+      <p-column field="productName" header="Product Name" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+      <p-column field="loanReference" header="Loan Reference" sortable="true" [filter]="true"
+        filterMatchMode="contains"></p-column>
+
+      <p-column field="description" header="Narration" sortable="true" [filter]="true" filterMatchMode="contains">
+      </p-column>
+
+      <p-column field="debitAmount" header="Debit Amount" [filter]="false" sortable="true" filterMatchMode="contains"
+        [style]="{'text-align':'right'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.debitAmount | number : '1.2' }}
+        </ng-template>
+      </p-column>
+
+      <p-column field="creditAmount" header="Credit Amount" [filter]="false" sortable="true" filterMatchMode="contains"
+        [style]="{'text-align':'right'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.creditAmount | number : '1.2' }}
+        </ng-template>
+      </p-column>
+
+      <p-column field="valueDate" header="Value Date" [filter]="false" sortable="true" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.creditAmount | date : 'dd/MM/yyyy' }}
+        </ng-template>
+      </p-column>
+
+      <p-column field="postedDate" header="Posted Date" [filter]="false" sortable="true" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.postedDate | date : 'dd/MM/yyyy' }}
+        </ng-template>
+      </p-column>
+
+    </p-dataTable>
+  </div>
+</div>
+
+<div class="panel-footer">
+  <div class="row">
+    <div class="col-md-12">
+    </div>
+  </div>
+</div>

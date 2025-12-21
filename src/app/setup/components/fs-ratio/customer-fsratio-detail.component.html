@@ -1,0 +1,129 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Financial Statement Derived Detail
+                            </h2>
+
+                            <div class="pull-right">
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form #searchForm novalidate autocomplete="off">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <label for="" class="control-label col-md-2">FS Caption Group</label>
+                                <div class="col-md-4">
+                                    <select name="fsCaptionGroup" id="fsCaptionGroup" class="form-control" ([ngModel])="selectedFSCaptionGroup" (change)="onFsCaptionGroupSelect($event.target.value)" [ngClass]="selectedFSCaptionGroup ? 'required-input' : 'valid-input'">
+                                        <option value="">--- Select FS Caption Group ---</option>
+                                        <option *ngFor="let item of fsCaptionGroupData"  [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                                    </select>
+                                </div>
+                                <label for="" class="control-label col-md-2">FS Derived Caption</label>
+                                <div class="col-md-4">
+                                    <select name="fsRatioCaption" id="fsRatioCaption" class="form-control" ([ngModel])="selectedFSRatioCaption" (change)="onFSRatioCaptionSelect($event.target.value)" [ngClass]="selectedFSRatioCaption ? 'required-input' : 'valid-input'" [disabled]="disableRCaptionBtn">
+                                        <option value="">--- Select Derived Caption --</option>
+                                        <option *ngFor="let item of fsRatioCaptionForGroupData" [value]="item.ratioCaptionId">{{item.ratioCaptionName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <p-dataTable [value]="fsRatioDetailData" [sortMode]="multiple">
+                        <p-column *ngFor="let col of fsRatioDetailTableCols" [field]="col.field" [header]="col.header" [filter]="true" [sortable]="true"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                <a (click)="editFSRatioDetail(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                <a (click)="deleteFSRatioDetail(i)" href="javascript:void(0)">Delete</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Financial Statement Derived Detail
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createEditForm" (ngSubmit)="submitFSRatioDetailForm(createEditForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="fsRatioCaption" class="control-label col-md-2">FS Derived Caption</label>
+                        <div class="col-md-4">
+                            <select name="fsRatioCaption" id="fsRatioCaption" class="form-control" formControlName="ratioCaptionId" [ngClass]="createEditForm.controls['ratioCaptionId'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="true">
+                                <option value="">--- Select Derived Caption --</option>
+                                <option *ngFor="let item of fsRatioCaptionData" [value]="item.ratioCaptionId">{{item.ratioCaptionName}}</option>
+                            </select>
+                        </div>
+                        <label for="fsCaptionGroup" class="control-label col-md-2">FS Caption Group</label>
+                        <div class="col-md-4">
+                            <select name="fsCaptionGroup" id="fsCaptionGroup" class="form-control" formControlName="fsCaptionGroupId" [ngClass]="createEditForm.controls['fsCaptionGroupId'].valid ? 'valid-input' : 'required-input'" [attr.disabled]="true">
+                                <option value="">--- Select FS Group --</option>
+                                <option *ngFor="let item of fsCaptionGroupData" [value]="item.fsCaptionGroupId">{{item.fsCaptionGroupName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fsCaption" class="control-label col-md-2">FS Caption</label>
+                        <div class="col-md-4">
+                            <select name="fsCaption" id="fsCaption" class="form-control" formControlName="fscaptionId" [ngClass]="createEditForm.controls['fscaptionId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">--- Select FS Caption --</option>
+                                <option *ngFor="let item of fsCaptionData" [value]="item.fsCaptionId">{{item.fsCaptionName}}</option>
+                            </select>
+                        </div>
+                        <!-- <label for="divType" class="control-label col-md-2">Divisor Type</label> -->
+                        <label for="divType" class="control-label col-md-2">Operation Type</label>
+                        <div class="col-md-4">
+                            <select name="divType" id="divType" class="form-control" formControlName="divisorTypeId" [ngClass]="createEditForm.controls['divisorTypeId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">--- Select Divisor Type --</option>
+                                <option *ngFor="let item of divisorTypeData" [value]="item.divisorTypeId">{{item.divisorTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="valType" class="control-label col-md-2">Value/Previous Type</label>
+                        <div class="col-md-4">
+                            <select name="valType" id="valType" class="form-control" formControlName="valueTypeId" [ngClass]="createEditForm.controls['valueTypeId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">--- Select Value/Previous Type --</option>
+                                <option *ngFor="let item of valueTypeData" [value]="item.valueTypeId">{{item.valueTypeName}}</option>
+                            </select>
+                        </div>
+                        <label for="multiplier" class="control-label col-md-2">Multiplier</label>
+                        <div class="col-md-2">
+                            <input type="number" min="0" max="100" name="multiplier" class="form-control" formControlName="multiplier" [ngClass]="createEditForm.controls['multiplier'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="createEditForm.invalid" class="btn btn-success pull-right">Save FS Derived Detail</button>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

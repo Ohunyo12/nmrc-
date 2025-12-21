@@ -1,0 +1,696 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Limit Maintenance
+                                <!-- <span *ngIf="selectedGroupName.length > 0">of group <b>{{ selectedGroupName }}</b></span>
+                                <span *ngIf="selectedLevelName.length > 0">and level <b>{{ selectedLevelName }}</b></span> -->
+                            </h2>
+                            <div class="pull-right">
+								<button (click)="addNewSector()" pButton type="button" label="Add New Sector" icon="fa-plus"></button>
+                                <button (click)="addObligorLimit()" pButton type="button" label="Add New Obligor Risk Rating" icon="fa-plus"></button>
+                                <button (click)="addCurrencyLimit()" pButton type="button" label="Add Currency Limit" icon="fa-plus"></button>
+								<button (click)="addGroupLimit()" pButton type="button" label="Add Group Limit" icon="fa-plus"></button>
+							
+							</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- tabs here -->
+                    <p-tabView>
+
+                        <!-- Branch Limit -->
+                        <p-tabPanel header="Branch NPL Limit">
+
+                            <p-dataTable [value]="branchLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="branchCode" header="Branch Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="branchName" header="Branch Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="branchLimit" header="Branch Limit Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.branchLimit | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editBranchLimit(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+                        </p-tabPanel>
+
+
+                        <!-- Company Limit -->
+                        <p-tabPanel header="Company Limit">
+                            <p-dataTable [value]="companyLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="companyName" header="Company Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="companyLimit" header="Bank Limit" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.companyLimit | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="shareHoldersFund" header="shareHolder's Fund" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.shareHoldersFund | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editCompanyLimits(i)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+
+                        </p-tabPanel>
+
+                        <!-- Sector Limit -->
+                        <p-tabPanel header="Sector Limit">
+                            <p-dataTable [value]="sectorLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="sectorCode" header="Sector Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="sectorName" header="Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="sectorLimit" header="Sector Limit Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.sectorLimit | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editSectorLimits(i)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                        <a (click)="deleteSector(d)" href="javascript:void(0)">
+                                            | Remove
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+
+                        </p-tabPanel>
+                         <p-tabPanel header="Global Sector Limit">
+                            <p-dataTable [value]="globalSectorLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="date" header="Last Date Updated" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.date | date: 'medium'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="cbnSector" header="CBN Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="cbnSectorId" header="CBN Sector Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="totalExposureLcy" header="Total Exposure LCY" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.totalExposureLcy | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="percentageExposures" header="Percentage Exposures" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="percentageSectorLimit" header=" Percentage Threshold Limit" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editGlobalSectorLimits(d)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                        <!-- <a (click)="deleteSector(d)" href="javascript:void(0)">
+                                            | Remove
+                                        </a> -->
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+
+                        </p-tabPanel>
+
+                        <!-- Obligor Limit -->
+                        <p-tabPanel header="Single Obligor Limit">
+                            <p-dataTable [value]="singleObligorLimit" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="obligorLimit" header="Obligor Limit">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.obligorLimit | number: '1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="obligorPerecent" header="% of SHF"></p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editObligorLimit(d, $event)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                            
+                        </p-tabPanel>
+                        <p-tabPanel header="Obligor Risk Rating">
+                            <p-dataTable [value]="obligorLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                                <p-column field="riskRating" header="Risk Rating" [style]="{'width':'100px'}"></p-column>
+                                <p-column field="description" header="Description"></p-column>
+                                <p-column field="isInvestmentGrade" header="Investment Grade" [style]="{'width':'100px'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="d.isInvestmentGrade">Yes</span>
+                                        <span *ngIf="!d.isInvestmentGrade">No</span>
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="maxShareholderPercentage" header=" % Of SHF" [style]="{'width':'100px'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        {{d.maxShareholderPercentage}} %
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'100px'}">
+                                    <ng-template pTemplate="header">
+                                        Edit
+                                    </ng-template>
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="editObligorLimits(d, $event)" href="javascript:void(0)">
+                                            Edit
+                                        </a>
+                                        <a (click)="deleteObligor(d)" href="javascript:void(0)">
+                                            | Remove
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+
+                            </p-dataTable>
+
+                        </p-tabPanel>
+
+                    <p-tabPanel header="Currency Limit">
+                        <p-dataTable [value]="currencyLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                            <p-column field="currencyLimitName" header="Currency Limit Name" [style]="{'width':'100px'}"></p-column>
+                            <p-column field="currencyLimitValue" header=" Currency Limit Value" [style]="{'width':'150px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.currencyLimitValue | number:'1.2'}}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="description" header="Description"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">
+                                    Edit
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editCurrencyLimits(d, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                    <a (click)="deleteCurrencyLimit(d)" href="javascript:void(0)">
+                                        | Remove
+                                    </a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                    </p-tabPanel>
+
+                    <p-tabPanel header="Group Limit">
+                        <p-dataTable [value]="groupLimits" [paginator]="true" [rows]="10" [responsive]=true>
+                            <p-column field="groupName" header="Group Name" [style]="{'width':'150px'}"></p-column>
+                            <p-column field="groupLimitValue" header=" Group Limit Value" [style]="{'width':'150px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{d.groupLimitValue | number:'1.2'}} 
+                                </ng-template>
+                            </p-column>
+                            <p-column field="limitNumber" header="Limit Number"></p-column>
+                            <p-column field="description" header="Description"></p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header">
+                                    Edit
+                                </ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editGroupLimits(d, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                    <a (click)="deleteGroupLimit(d)" href="javascript:void(0)">
+                                        | Remove
+                                    </a>
+                                </ng-template>
+                            </p-column>
+
+                        </p-dataTable>
+
+                    </p-tabPanel>
+                </p-tabView>
+                    <!-- end tabs here -->
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--end of panel2-->
+
+        </div>
+        <!--end of card2-->
+
+
+    </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+<!--modal forms starts here-->
+
+<!-- Branch Limit -->
+<p-dialog [responsive]=true [(visible)]="branchDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="branchLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="branchCode" class="control-label col-md-2">Branch Code</label>
+                        <div class="col-md-4">
+                            <input type="text" name="branchCode" formControlName="branchCode" id="branchCode" class="form-control" [ngClass]="!branchLimitForm.controls['branchCode'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="branchName" class="control-label col-md-2">Branch Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="branchName" id="branchName" class="form-control" formControlName="branchName" [ngClass]="branchLimitForm.controls['branchName'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="branchLimit" class="control-label col-md-2">Branch Limit</label>
+                        <div class="col-md-4">
+                            <input type="text" name="branchLimit" id="branchLimit" class="form-control" formControlName="branchLimit" [ngClass]="branchLimitForm.controls['branchLimit'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(branchLimitForm)" [disabled]="branchLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="branchDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- Company Limit -->
+<p-dialog [responsive]=true [(visible)]="companyDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="companyLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="companyName" class="control-label col-md-2">Company Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="companyName" formControlName="companyName" id="companyName" class="form-control" [ngClass]="!companyLimitForm.controls['companyName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="shareHoldersFund" class="control-label col-md-2">ShareHolders Fund</label>
+                        <div class="col-md-4">
+                            <input type="text" name="shareHoldersFund" id="shareHoldersFund" class="form-control" formControlName="shareHoldersFund"
+                                [ngClass]="companyLimitForm.controls['shareHoldersFund'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="companyLimit" class="control-label col-md-2">Bank Limit</label>
+                        <div class="col-md-4">
+                            <input type="text" name="companyLimit" formControlName="companyLimit" id="companyLimit" class="form-control" [ngClass]="!companyLimitForm.controls['companyLimit'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <!-- <label for="shareHoldersFund" class="control-label col-md-2">ShareHolders Fund</label>
+                        <div class="col-md-4">
+                            <input type="text" name="shareHoldersFund" id="shareHoldersFund" class="form-control" formControlName="shareHoldersFund"
+                                [ngClass]="companyLimitForm.controls['shareHoldersFund'].valid ? 'valid-input' : 'required-input'">
+                        </div> -->
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormCompanyLimits(companyLimitForm)" [disabled]="companyLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="companyDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- Obligor Limit -->
+<p-dialog [responsive]=true [(visible)]="obligorDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="obligorLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="riskRating" class="control-label col-md-2">Risk Rating</label>
+                        <div class="col-md-4">
+                            <input type="text" name="riskRating" formControlName="riskRating" id="riskRating" class="form-control" [ngClass]="!obligorLimitForm.controls['riskRating'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="maxShareholderPercentage" class="control-label col-md-2">% Shareholder Fund</label>
+                        <div class="col-md-4">
+                            <input type="text" name="maxShareholderPercentage" formControlName="maxShareholderPercentage" id="maxShareholderPercentage"
+                                class="form-control" [ngClass]="!obligorLimitForm.controls['maxShareholderPercentage'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="control-label col-md-2">Description</label>
+                        <div class="col-md-4">
+                            <textarea type="text" name="description" id="description" class="form-control" formControlName="description" rows="5" [ngClass]="obligorLimitForm.controls['description'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                        <label for="isInvestmentGrade" class="control-label col-md-2">Is Investment Grade</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isInvestmentGrade" id="isInvestmentGrade" formControlName="isInvestmentGrade" [ngClass]="obligorLimitForm.controls['isInvestmentGrade'].valid ? 'valid-input' : 'required-input'"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormObligorLimits(obligorLimitForm)" [disabled]="obligorLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="obligorDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- Sector Limit -->
+<p-dialog [responsive]=true [(visible)]="sectorDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="sectorLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="sectorCode" class="control-label col-md-2">Sector Code</label>
+                        <div class="col-md-4">
+                            <input type="text" name="sectorCode" formControlName="sectorCode" id="sectorCode" class="form-control" [ngClass]="!sectorLimitForm.controls['sectorCode'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="sectorName" class="control-label col-md-2">Sector Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="sectorName" id="sectorName" class="form-control" formControlName="sectorName" [ngClass]="sectorLimitForm.controls['sectorName'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="sectorLimit" class="control-label col-md-2">Sector Limit Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="sectorLimit" id="sectorLimit" class="form-control numeric" maxlength="20" formatM formControlName="sectorLimit" [ngClass]="sectorLimitForm.controls['sectorLimit'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormSectorLimits(sectorLimitForm)" [disabled]="sectorLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="sectorDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="globalSectorDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="globalSectorLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="percentageSectorLimit" class="control-label col-md-2">Percentage Threshold Limit</label>
+                        <div class="col-md-4">
+                            <input type="text" name="percentageSectorLimit" formControlName="percentageSectorLimit" id="percentageSectorLimit" class="form-control" [ngClass]="!globalSectorLimitForm.controls['percentageSectorLimit'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <em>(Note: you can only update percentage sector limit)</em>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitFormGlobalSectorLimits(globalSectorLimitForm)" [disabled]="globalSectorLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="globalSectorDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="singleObligorLimitModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="singleObligorLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="obligorLimitValue" class="control-label col-md-2">Value</label>
+                        <div class="col-md-4">
+                            <input type="text" [attr.disabled]="true" name="obligorLimitValue" formControlName="obligorLimitValue" id="obligorLimitValue" class="form-control" [ngClass]="!singleObligorLimitForm.controls['obligorLimitValue'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="obligorLimitPercent" class="control-label col-md-2">% of SHF</label>
+                        <div class="col-md-4">
+                            <input type="text" (blur)="updateObligorLimitValue()" name="obligorLimitPercent" id="obligorLimitPercent" class="form-control" formControlName="obligorLimitPercent"
+                                [ngClass]="singleObligorLimitForm.controls['obligorLimitPercent'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitObligorLimtForm(singleObligorLimitForm)" [disabled]="singleObligorLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="singleObligorLimitModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- currency limit -->
+<p-dialog [responsive]=true [(visible)]="currencyDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="currencyLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    
+                    <!-- <div class="col-sm-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="currencyId" class="control-label col-sm-4">Currency Name</label>
+                            <div class="col-sm-8">
+                                <select name="currencyId" class="form-control" formControlName="currencyId" [ngClass]="currencyLimitForm.controls['currencyId'].valid ? 'valid-input': 'required-input'"
+                                    >
+                                    <option value="">--- Select Currency ---</option>
+                                    <option *ngFor="let item of currencies" [value]="item.currencyId">{{item.currencyCode + ' -- ' +item.currencyName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="col-sm-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="currencyLimitName" class="control-label col-sm-4">Currency Limit Name</label>
+                            <div class="col-sm-8">
+                                <input type="text"  name="currencyLimitName" class="form-control" formControlName="currencyLimitName" [ngClass]="currencyLimitForm.controls['currencyLimitName'].valid ? 'valid-input': 'required-input'"
+                                    >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="currencyLimitValue" class="control-label col-sm-4">Value</label>
+                            <div class="col-sm-8">
+                                <input type="text"  name="currencyLimitValue" class="form-control" formatM formControlName="currencyLimitValue" [ngClass]="currencyLimitForm.controls['currencyLimitValue'].valid ? 'valid-input': 'required-input'"
+                                    >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="description" class="control-label col-sm-4">Description</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" formControlName="description" id="description" [ngClass]="currencyLimitForm.controls['description'].valid ? 'valid-input' : 'required-input'"
+                                placeholder="Limit Description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitCurrencyLimtForm(currencyLimitForm)" [disabled]="currencyLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="currencyDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+
+<!-- group limit -->
+<p-dialog [responsive]=true [(visible)]="groupDisplayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="groupLimitForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="groupName" class="control-label col-md-2">Group Name</label>
+                        <div class="col-md-4">
+                            <input type="text" name="groupName" id="groupName" class="form-control" formControlName="groupName" [ngClass]="groupLimitForm.controls['groupName'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="groupLimit" class="control-label col-md-2">Group Limit Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="groupLimit" id="groupLimit" class="form-control numeric" maxlength="20" formatM formControlName="groupLimit" [ngClass]="groupLimitForm.controls['groupLimit'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="limitNumber" class="control-label col-md-2">Group Limit Number</label>
+                        <div class="col-md-4">
+                            <input type="text" name="limitNumber" id="limitNumber" class="form-control numeric" maxlength="20" formControlName="limitNumber" [ngClass]="groupLimitForm.controls['limitNumber'].valid ? 'valid-input' : 'required-input'">
+                        </div>
+                        <label for="description" class="control-label col-md-2">Description</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" formControlName="description" id="description" [ngClass]="groupLimitForm.controls['description'].valid ? 'valid-input' : 'required-input'"
+                            placeholder="Limit Description"></textarea>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitGroupLimtForm(groupLimitForm)" [disabled]="groupLimitForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="groupDisplayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</p-dialog>

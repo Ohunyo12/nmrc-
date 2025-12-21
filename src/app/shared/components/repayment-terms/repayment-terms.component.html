@@ -1,0 +1,120 @@
+<!-- repayment schedule terms -->
+
+<div class="panel panel-default" *ngIf="isAnalyst == true">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Repayment Schedule Terms</h2>
+                <div class="pull-right">
+                    <!-- <button (click)="addRepaymentTerms()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <p-dataTable [value]="repaymentTerms" [paginator]="true" [rows]="5" selectionMode="single">
+
+            <p-column field="productCustomerName" header="Facility"></p-column>
+            <p-column field="schedule" header="Schedule"></p-column>
+            <p-column field="terms" header="Terms"></p-column>
+            <!-- <p-column field="nextReviewDate" header="Review Date">
+                    <ng-template let-col let-review="rowData" pTemplate="body">
+                        {{review[col.field] | date : 'dd/MM/yyyy' }}
+                    </ng-template>
+            </p-column> -->
+            <p-column [style]="{'width':'50px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a (click)="editRepaymentTerms(d)" href="javascript:void(0)">Edit</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+</div>
+
+<!-- end repayment schedule terms -->
+
+<!--terms form modal-->
+<p-dialog [responsive]=true [(visible)]="displayRepaymentTermsForm" id="terms-modal" modal="modal" showEffect="fade" width="450">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{ formState }} Schedule Repayment Terms</h2>
+        </div>
+
+        <form novalidate [formGroup]="repaymentTermsForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="collateralDetail">Facility</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId" class="form-control"
+                                [ngClass]="!repaymentTermsForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{ x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="schedule">Schedule</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="repaymentScheduleId" formControlName="repaymentScheduleId" id="repaymentScheduleId" class="form-control"
+                                [ngClass]="!repaymentTermsForm.controls['repaymentScheduleId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Principal Repayment Pattern--</option>
+                                <option *ngFor="let x of repaymentPatterns" [value]="x.repaymentScheduleId">{{ x.repaymentScheduleDetail }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                            <div class="col-md-12">
+                                <label for="nextReviewDate">Review Date</label>
+                            </div>
+                            <div class="col-md-12">
+                                    <p-calendar id="nextReviewDate" formControlName="nextReviewDate" [monthNavigator]="true" [yearNavigator]="true"
+                                    yearRange="2000:2050" [showIcon]="true" [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                    [style]="{'width': '100%', 'z-index': '999'}" [ngClass]="!repaymentTermsForm.controls['nextReviewDate'].valid ? 'required-input' : 'valid-input'"></p-calendar>
+                            </div>
+                    </div> -->
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label for="terms">Terms</label>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea style="height:120px;" name="terms" formControlName="terms" id="terms" class="form-control" [ngClass]="!repaymentTermsForm.controls['terms'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveRepaymentTerms(repaymentTermsForm)" [disabled]="repaymentTermsForm.invalid" class="btn btn-success pull-right">
+                            Save and Close</button>
+                        <button type="button" (click)="displayRepaymentTermsForm=false" style="margin-right:5px" class="btn btn-danger pull-right">
+                            Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!-- <pre>{{ proposedItems | json }}</pre> -->

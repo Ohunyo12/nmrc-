@@ -1,0 +1,112 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">Suggested Conditions</h2>
+                <div *ngIf="!isAnalyst" class="pull-right">
+                    <button (click)="showLoanSuggestionsForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <p-dataTable [value]="suggestedConditions" [paginator]="true" [rows]="5" selectionMode="single"
+        (onRowUnselect)="removeSelectedCondition($event.data)" (onHeaderCheckboxToggle)="onSelectedAllCondition($event)"
+        (onRowSelect)="onSelectedCondition($event.data)" [(selection)]="selectedConditions">
+
+            <p-column [style]="{'width':'30px'}">
+                <ng-template let-i="rowIndex" let-line pTemplate="rowexpansion">{{ i + 1 }}</ng-template>
+            </p-column>
+            <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple" *ngIf="isAnalyst"></p-column> -->
+            
+            <p-column field="approvedProductName" header="Facility"></p-column>
+            <p-column field="suggestionTypeName" header="Suggestion Type"></p-column>
+            <p-column field="description" header="Description"></p-column>
+
+            <p-column [style]="{'width':'130px'}">
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <div style="text-align:center">
+                        <a *ngIf="!isAnalyst" (click)="deleteLoanSuggestedConditions(d)" href="javascript:void(0)">Remove</a>
+                        <span *ngIf="!isAnalyst" style="padding:3px;">|</span>
+                        <a *ngIf="!isAnalyst" (click)="editLoanSuggestedConditions(d)" href="javascript:void(0)">Edit</a>
+                        <!-- <span *ngIf="isAnalyst" style="padding:3px;">|</span> -->
+                        <a *ngIf="isAnalyst" (click)="addSuggestedConditionsAtAnalyst(d)" href="javascript:void(0)">Add</a>
+                    </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayLoanSuggestionsForm" id="reccol-modal" modal="modal" showEffect="fade"
+    width="450">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">{{formState}} RM Suggestion</h2>
+        </div>
+
+        <form novalidate [formGroup]="suggestionsForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Facility</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="loanApplicationDetailId" formControlName="loanApplicationDetailId" id="loanApplicationDetailId"
+                                class="form-control" [ngClass]="!suggestionsForm.controls['loanApplicationDetailId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Facility--</option>
+                                <option *ngFor="let x of proposedItems" [value]="x.loanApplicationDetailId">{{
+                                    x.approvedProductName }} -- {{ x.obligorName }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Suggestion Type</label>
+                        </div>
+                        <div class="col-md-12">
+                            <select name="suggestionTypeId" formControlName="suggestionTypeId" id="suggestionTypeId"
+                                class="form-control" [ngClass]="!suggestionsForm.controls['suggestionTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Suggestion Type --</option>
+                                <option *ngFor="let x of rmSuggestionTypes" [value]="x.suggestionTypeId">
+                                    {{ x.suggestionTypeName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <label>Description</label>
+                        </div>
+                        <div class="col-md-12">
+                                <textarea name="description" formControlName="description" id="description" class="form-control"
+                                    [ngClass]="!suggestionsForm.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="saveLoanConsultant(suggestionsForm)" [disabled]="suggestionsForm.invalid"
+                            class="btn btn-success pull-right">Save and Close</button>
+                        <button type="button" (click)="displayLoanSuggestionsForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>

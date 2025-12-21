@@ -1,0 +1,208 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Collateral Insurance Policy Report
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+
+          <div class="ui-g ui-fluid">
+            <div class="form-group" style="margin-right:10px">
+              <label for="searchItem" class="control-label col=md-3">
+                Policy End Date 1
+              </label>
+
+              <div class="col=md-9">
+                <p-calendar [(ngModel)]="startDate" [showIcon]="true"></p-calendar> <span
+                  style="margin-left:35px"></span>
+
+              </div>
+            </div>
+            <div class="form-group" style="margin-right:10px">
+              <label for="searchItem" class="control-label col=md-3 ">
+                Policy End Date 2
+              </label>
+
+              <div class="col=md-9">
+                <p-calendar [(ngModel)]="endDate" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+
+              </div>
+            </div>
+            <div class="form-group" style="margin-right:10px">
+              <label for="searchItem" class="control-label col=md-3">
+                Business Unit
+              </label>
+            
+              <div class="col=md-9">
+               <select  name="businessUnitId" id="businessUnitId" [(ngModel)]="businessUnitId" class="form-control"> <!--[(ngModel)]="businessUnitId" -->
+                <option value="">--Select Business Unit--</option>
+                <option *ngFor="let sbu of businessUnit" value="{{sbu.businessUnitId}}">
+                  {{sbu.businessUnitName}}
+                </option>
+              </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-right:10px">
+              <label for="searchItem" class="control-label col=md-3">
+                Policy Status
+              </label>
+
+              <div class="col=md-9">
+                <select [(ngModel)]="valueCode" name="valueCode" id="valueCode" class="form-control">
+                  <option value="">-- All Policy Status --</option>
+                  <option value="All">All</option>
+                  <option value="Active">Active</option>
+                  <option value="Expired">Expired</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-right:10px">
+              <label for="searchItem" class="control-label col=md-3">
+                .
+              </label>
+              <div class="col=md-9">
+                <button pButton type="button" (click)="popoverSeeMore()" label="Preview Report"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<p-dialog [responsive]="true" [(visible)]="displayReport" width="1500" modal="modal" showEffect="fade" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+                           'max-height': '80vh','min-height':'250px'}">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="panel-title pull-left">
+            Collateral Insurance Policy Report
+
+          </h2>
+          <button type="button" (click)="displayReport=false" style="margin-right:5px"
+            class="btn btn-danger pull-right">Cancel</button>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <p-dataTable #dt [responsive]="true" [value]="insurancePolicies" [paginator]="true" [rows]="10">
+        <p-header>
+          <div class="ui-helper-clearfix">
+            <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()"
+              style="float:left"></button>
+          </div>
+        </p-header>
+        <p-column [hidden]="true" field="applicationreferenceNumber" header="Application Reference Number"
+          [style]="{'width':'15px'}"></p-column>
+        <p-column field="accountOfficerName" header="Account Officer Name" [style]="{'width':'15px'}"></p-column>
+        <p-column field="accountOfficerEmail" header="Account Officer Email" [style]="{'width':'15px'}"></p-column>
+        <p-column field="teamName" header="Team" [style]="{'width':'15px'}"></p-column>
+        <p-column field="groupHead" header="Group Head" [style]="{'width':'15px'}"></p-column>
+        <p-column field="divisionName" header="Division" [style]="{'width':'15px'}"></p-column>
+        <p-column field="customerName" header="Customer Name" [style]="{'width':'15px'}"></p-column>
+        <p-column field="customerAccount" header="Account Number" [style]="{'width':'15px'}"></p-column>
+        <p-column field="customerCode" header="Customer Id" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="customerEmail" header="Customer Email" [style]="{'width':'15px'}"></p-column>
+        <p-column field="customerPhone" header="Customer Phone Number" [style]="{'width':'15px'}"></p-column>
+        <p-column field="customerAddress" header="Customer Address" [style]="{'width':'15px'}"></p-column>
+        <p-column field="collateralDetails" header="Collateral Description" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="collateralCode" header="Collateral Code" [style]="{'width':'15px'}"></p-column>
+        <p-column field="sumInsured" header="Sum Insured" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.sumInsured | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column field="premiumAmount" header="Premium Paid" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.premiumAmount | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column field="startDate" header="Insurance Start date" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.startDate | date }}
+          </ng-template>
+        </p-column>
+        <p-column field="expiryDate" header="Insurance End Date" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.expiryDate | date }}
+          </ng-template>
+        </p-column>
+        
+        <p-column [hidden]="true" field="insurancePolicyType" header="Insurance Policy Type" [style]="{'width':'15px'}">
+        </p-column>
+        <p-column [hidden]="true" field="valuationStartDate" header="Valuation Date" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.valuationStartDate | date }}
+          </ng-template>
+        </p-column>
+        <p-column [hidden]="true" field="valuationEndDate" header="Valuation End Date" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.valuationEndDate | date }}
+          </ng-template>
+        </p-column>
+
+        <p-column [hidden]="true" field="omv" header="Open Market Value" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.omv | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column [hidden]="true" field="fsv" header="Forced Sale Value" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.fsv | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column [hidden]="true" field="insurableValue" header="Insurable Value" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.insurableValue | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column [hidden]="true" field="valuer" header="Valuer's Name" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="loanAmount" header="Loan Amount" [style]="{'width':'15px'}">
+          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+            {{ d.loanAmount | number : '1.2' }}
+          </ng-template>
+        </p-column>
+        <p-column [hidden]="true" field="loanStatus" header="Loan Status" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="loanTypeName" header="Loan Type" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="insuranceStatus" header="Insurance Status" [style]="{'width':'15px'}">
+        </p-column>
+        <p-column [hidden]="true" field="referenceNumber" header="Policy Number" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="insuranceCompany" header="Insurance Company" [style]="{'width':'15px'}">
+        </p-column>
+        <p-column [hidden]="true" field="securityReleaseStatus" header="Security Release Status"
+          [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="taxNumber" header="Tax Identification Number" [style]="{'width':'15px'}">
+        </p-column>
+        <p-column [hidden]="true" field="rcNumber" header="RC Number" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="firstLossPayee" header="First Loss Payee" [style]="{'width':'15px'}">
+        </p-column>
+        <p-column [hidden]="true" field="requestComment" header="Comment" [style]="{'width':'15px'}"></p-column>
+        <p-column [hidden]="true" field="confirmedAdmin" header="Credit Admin Officer" [style]="{'width':'15px'}">
+        </p-column>
+      </p-dataTable>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" (click)="displayReport=false" style="margin-right:5px"
+          class="btn btn-danger pull-right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</p-dialog>

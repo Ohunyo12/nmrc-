@@ -1,0 +1,308 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Related Employers
+        </h2>
+        <div class="pull-right">
+          <button (click)="addNewRelatedEmployer()" pButton type="button" label="Add New" icon="fa-plus"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <p-dataTable [value]="relatedEmployers" [paginator]="true" [rows]="10">
+      <!-- <p-column field="dateTimeCreated" header="Date Created" sortable="true" filterMatchMode="contains">
+        <ng-template let-col let-apr="rowData" pTemplate="body">
+          {{apr[col.field] | date: 'dd MMM yyyy' }}
+        </ng-template>
+      </p-column> -->
+      <!-- <p-column field="loanAmount" header="Loan Amount" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.loanAmount | number : '1.2' }}
+        </ng-template>
+      </p-column> -->
+      <p-column field="employerName" header="Employer Name" filterMatchMode="contains">
+      </p-column>
+      <p-column field="emailAddress" header="Email Address" filterMatchMode="contains">
+      </p-column>
+      <p-column field="phoneNumber" header="Phone Number" filterMatchMode="contains">
+      </p-column>
+      <p-column field="address" header="Address" filterMatchMode="contains">
+      </p-column>
+
+      <!-- <p-column field="insurance" header="Insurance" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.insurance }} %
+        </ng-template>
+      </p-column> -->
+
+      <p-column field="cityName" header="City Name" filterMatchMode="contains">
+      </p-column>
+      <p-column field="employerSubTypeName" header="Employer Type" filterMatchMode="contains">
+      </p-column>
+
+      <p-column field="approvalStatus" header="Approval Status" filterMatchMode="contains">
+      </p-column>
+
+      <p-column [style]="{'width':'100px'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          <div style="text-align:center">
+            <a (click)="approveRelatedEmployer(d)" href="javascript:void(0)">Send for Approval</a>
+          </div>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+
+  </div>
+
+  <div class="panel-footer ">
+    <div class="row ">
+      <div class="col-md-12 ">
+        <!-- <button type="submit" [disabled]="consumerProtectionForm.invalid" (click)="submitConsumerProtection(consumerProtectionForm)"
+          class="btn btn-success pull-right">Submit Details</button>
+
+        <button type="button" (click)="showSubmitModal = false;" style="margin-right:5px"
+          class="btn btn-danger pull-right">Close</button> -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayRelatedEmployerForm" id="add-modal" modal="modal" showEffect="fade"
+  width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Add Related Employer
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="customerEmploymentHistoryForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <br />
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer Name
+            </label>
+            <div class="col-md-4">
+              <!-- <input *ngIf="selfEmployed" [attr.disabled]="true" name="employerName" formControlName="employerName"
+                type="text" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'"> -->
+              <input name="employerName" formControlName="employerName" type="text" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'">
+
+              <!-- <select *ngIf="!otherEmployer && !selfEmployed" type="text" name="employerName"
+                formControlName="employerName" id="employerName" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerName'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Employer --</option>
+                <option *ngFor="let emp of employerlist" value="{{emp.employerName}}">
+                  {{ emp.employerName }}
+                </option>
+              </select> -->
+
+              <!-- <label class="radio-inline">
+                <input type="radio" name="employmentType" (change)="onSelfEmployedChecked($event.target.checked)"
+                  [checked]="selfEmployedCheck == true">Self Employed
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="employmentType" (change)="onOtherEmployerChecked($event.target.checked)"
+                  [checked]="selfEmployedCheck == false">Other Employer
+              </label> -->
+            </div>
+            <label for="" class="control-label col-md-2">
+              Employer Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="employerAddress"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerAddress'].valid ? 'required-input' : 'valid-input'"
+                name="employerAddress" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer Country
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="employerCountryId" formControlName="employerCountryId" id="employerCountryId"
+                class="form-control" (click)="onEmploymentCountryChange()"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerCountryId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select Country --</option>
+                <option *ngFor="let country of countries" value="{{country.countryId}}">
+                  {{ country.countryName }}
+                </option>
+              </select>
+            </div>
+            <label for="" class="control-label col-md-2">
+              Employer State
+            </label>
+            <div class="col-md-4" *ngIf="activeCountry">
+              <select name="employerStateId" formControlName="employerStateId"
+                (click)="onEmploymentStateChange()"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerStateId'].valid ? 'required-input' : 'valid-input'"
+                id="employerStateId" class="form-control">
+                <option value="">--- Select State ---</option>
+                <option *ngFor="let state of states" value="{{state.stateId}}">
+                  {{state.stateName}}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-4" *ngIf="!activeCountry">
+              <input name="employerState" formControlName="employerState" type="text" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerState'].valid ? 'required-input' : 'valid-input'">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Office Phone
+            </label>
+            <div class="col-md-4">
+              <input type="text" name="officePhone" formControlName="officePhone"
+                [ngClass]="!customerEmploymentHistoryForm.controls['officePhone'].valid ? 'required-input' : 'valid-input'"
+                class="form-control">
+            </div>
+            <label for="" class="control-label col-md-2">
+              Establishment Date
+            </label>
+            <div class="col-md-4">
+              <p-calendar id="establishmentDate" formControlName="establishmentDate" [monthNavigator]="true"
+                [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                [ngClass]="!customerEmploymentHistoryForm.controls['establishmentDate'].valid ? 'required-input' : 'valid-input'"
+                [style]="{'width': '100%', 'overflow': 'visible', 'z-index': '120000'}"></p-calendar>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer Type
+            </label>
+            <div class="col-md-4">
+              <select name="employerSubTypeId" formControlName="employerSubTypeId"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerSubTypeId'].valid ? 'required-input' : 'valid-input'"
+                id="employerSubTypeId" class="form-control">
+                <option value="">--- Select Employer Type ---</option>
+                <option *ngFor="let employerSubType of employerSubTypes" value="{{employerSubType.employerSubTypeId}}">
+                  {{employerSubType.employerSubTypeName}}
+                </option>
+              </select>
+              <!-- <input type="text" name="previousEmployer" formControlName="previousEmployer"
+                [ngClass]="!customerEmploymentHistoryForm.controls['previousEmployer'].valid ? 'required-input' : 'valid-input'"
+                class="form-control"> -->
+            </div>
+            <label for="" class="control-label col-md-2">
+              Active
+            </label>
+            <div class="col-md-4">
+              <input type="checkbox" name="active" formControlName="active" [ngClass]="'valid-input'">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="" class="control-label col-md-2">
+              Employer City
+            </label>
+            <div class="col-md-4">
+              <select type="text" name="employerCityId" formControlName="employerCityId" id="employerCityId"
+                class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerCityId'].valid ? 'required-input' : 'valid-input'">
+                <option value="">-- Select City --</option>
+                <option *ngFor="let city of cities" value="{{city.cityId}}">
+                  {{ city.cityName }}
+                </option>
+              </select>
+            </div>
+            <label for="" class="control-label col-md-2">
+              Email Address
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="emailAddress"
+                [ngClass]="!customerEmploymentHistoryForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'"
+                name="registrationNumber" class="form-control">
+              <!--[attr.disabled]="flexcubeEmailAddress"-->
+            </div>
+            <!-- <label for="" class="control-label col-md-2">
+              Employer State
+            </label>
+            <div class="col-md-4" *ngIf="activeCountry">
+              <select name="state" formControlName="employerStateId"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerStateId'].valid ? 'required-input' : 'valid-input'"
+                id="employerStateId" class="form-control">
+                <option value="">--- Select State ---</option>
+                <option *ngFor="let state of states" value="{{state.stateId}}">
+                  {{state.stateName}}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-4" *ngIf="!activeCountry">
+              <input name="employerState" formControlName="employerState" type="text" class="form-control"
+                [ngClass]="!customerEmploymentHistoryForm.controls['employerState'].valid ? 'required-input' : 'valid-input'">
+            </div> -->
+          </div>
+
+          <br />
+          <br />
+          <br />
+
+        </div>
+      </div>
+      <!--buttons-->
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="submit" [disabled]="customerEmploymentHistoryForm.invalid"
+              (click)="submitRelatedEmployer(customerEmploymentHistoryForm)"
+              class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayRelatedEmployerForm = false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Close</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [modal]=true [dismissableMask]=true [(visible)]="showCsForward" width="800"
+  [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <form novalidate [formGroup]="csForwardForm" (ngSubmit)="goForApproval()" autocomplete="off">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Related Employer
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="comment" class="control-label col-md-12"><strong>Comment</strong></label>
+          <div class="col-md-12">
+            <textarea [ngClass]="csForwardForm.controls['comment'].valid ? 'valid-input' : 'required-input'"
+              class="form-control" formControlName="comment" name="comment" cols="15" rows="3"></textarea>
+          </div>
+          <!-- <label for="forward" class="control-label col-md-12">Status</label>
+								<div class="col-md-12">
+										<select name="forward" (change)="resetButton($event.target.value)" id="forward" class="form-control" formControlName="forward" [ngClass]="csForwardForm.controls['forward'].valid ? 'valid-input' : 'required-input'">
+											<option value="">--- Select Approval Status ---</option>
+											<option *ngFor="let item of approvalStatusData" [value]="item.approvalStatusId">{{item.approvalStatusName}}</option>
+										</select>
+          </div> -->
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="goForApproval()" [disabled]="csForwardForm.invalid"
+              class="btn btn-success pull-right">Submit</button>
+            <button type="button" (click)="showCsForward = false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</p-dialog>

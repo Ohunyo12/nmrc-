@@ -1,0 +1,1254 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Collateral Release
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-g" *ngIf="requirementItems">
+
+
+
+                <button pButton type="button" style="margin:5px; width:150.168px" (click)="showRequestForm()" label="Initiate Request"
+                    class="cyan-btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+                <button pButton type="button" style="margin:5px; width:150.168px" label="Collateral Information"
+                    (click)="viewCollateralInformation()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+
+
+                <button pButton type="button" (click)="displayUploadOtherDocument = true" style="margin:5px;  width:150.168px"
+                    label="Uploads" class="deep-orange-btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ink ripple-animate" style="height: 290.25px;width: 290.25px;top: -130.313px;left: -19.625px;pointer-events: none;"></span>
+                </button>
+
+            </div>
+
+
+            <div class="panel-body">
+                <p-dataTable [paginator]="true" (onRowSelect)="onRowSelect2($event)" [(selection)]="collateralReleaseDetails"
+                    [rows]="15" [value]="collateralReleaseLists" [responsive]=true selectionMode="single">
+                    <p-column field="collateralCode" header="Collateral Code " sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                  <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                  <p-column field="collateralReleaseTypeName" header="Release Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                </p-dataTable>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- [disabled]="groupForm.invalid" -->
+                        <!-- <button type="button" (click)="gotoLoanApplication()" class="btn  btn-primary pull-left">Previous</button> -->
+                        <button type="button" (click)="submitForm()" class="btn  btn-success pull-right">Next</button>
+                        <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="returnToStart()">Back
+                            To List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--job request form modal-->
+<p-dialog [responsive]=true [(visible)]="displayRequestForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <job-request-template 
+        [requestComment]="requestComment" 
+        [pageHeaderTitle]="requestPageHeaderTitle" 
+        [isReassigned]="isRequestReassigned"
+        [isAcknowledged]="isRequestAcknowledged" 
+        [targetId]="collateralId" 
+        [jobSourceId]= jobSourceId
+        [moduleReferenceNumber]="loanApplicationReferance"
+        [operationsId]="lmsOperationId" 
+        [operationAvailable]=true 
+        [requestStatusId]="requestStatusId" 
+        (notify)="getRequestData($event)"
+        (displayOption)="CallRequestClose()">
+    </job-request-template>
+</p-dialog>
+
+
+<!-- <p-dialog [responsive]=true [(visible)]="allowForEdit" id="add-modal" modal="modal" showEffect="fade" width="900"> -->
+
+
+<p-dialog [responsive]=true [(visible)]="displayUploadOtherDocument" id="add-modal" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Upload Supporting Documents
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <button (click)="showAddNewUpload()" pButton type="button" label="Add New Upload" icon="fa-plus"></button>
+                        </div>
+                    </div>
+                </div>
+                <p-dataTable [value]="loanDocumentUploadList" [paginator]="true" [rows]="5">
+                    <p-column field="fileName" header="File Name" sortable="true" [filter]="true"
+                        filterMatchMode="contains"></p-column>
+                    <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>                   
+                    <p-column field="capturedBy" header="Uploaded By" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column> 
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                            <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d.documentId)"
+                                href="javascript:void(0)">View</a>
+                            <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                                (click)="DownloadDocument(d.documentId)" href="javascript:void(0)">Download</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayUploadOtherDocument=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentUpload" id="add-modal" modal="modal" showEffect="fade" width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                New Release Document Upload
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <!-- <div class="form-group">
+                    <label for="documentTitle" class="control-label col-md-2">Upload Title</label>
+                    <div class="col-md-8">
+                        <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="description"
+                            placeholder="Document title...">
+                    </div>
+                </div> -->
+                <div class="form-group">
+                    <label for="document" class="control-label col-md-2">Select Document</label>
+                    <div class="col-md-8">
+                        <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                            #fileInput name="fileInput" style="padding-top:2px;" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="uploadFile()" [disabled]="file==undefined"
+                        class="btn btn-success pull-right">
+                        <span class="glyphicon glyphicon-upload"></span> Upload</button>
+                    <button type="button" (click)="displayDocumentUpload=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayUpload" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayUpload" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayUpload=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:500px">
+            <div style="margin: auto; width: 50%">
+                <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile"
+                    alt="" class="img-thumbnail">
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900" [contentStyle]="{'overflow':'auto','max-height':'600px'}">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Release {{ entityName }} <b>-- ({{collateralCode}})</b>
+                </h2>
+            </div>
+    
+            <p-tabView [activeIndex]="activeTabIndex">
+                <p-tabPanel header="Customer Collateral">
+    
+    
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <label for="collateralTypeId" class="control-label col-md-2">Collateral Type</label>
+    
+                                    <div class="col-md-4">
+                                            {{selectedRecord?.collateralTypeName}}  
+                                    </div>
+                                    <label for="collateralSubTypeId" class="control-label col-md-2">Collateral Sub Type</label>
+    
+                                    <div class="col-md-4">
+                                            {{selectedRecord?.collateralSubTypeName}}  
+                                    </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="collateralCode" class="control-label col-md-2">{{referenceNumberLabel}}</label>
+                                    <div class="col-md-4">
+                                         {{selectedRecord?.collateralCode}}                             
+                                    </div>
+                                    <label for="haircut" class="control-label col-md-2">Haircut (%)</label>
+                                    <div class="col-md-4">
+                                    {{selectedRecord?.haircut}}                                  
+                                    </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="collateralValue" class="control-label col-md-2">Collateral Value</label>
+                                    <div class="col-md-4">
+                                            {{selectedRecord?.collateralValue | number:'1.2'}}
+    
+                                    </div>
+                                    <label for="valuationCycle" class="control-label col-md-2">Valuation Cycle</label>
+                                    <div class="col-md-4">
+                                            {{selectedRecord?.valuationCycle}}  
+                                        </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="currencyId" class="control-label col-md-2">Currency</label>
+                                    <div class="col-md-4">
+                                            {{selectedRecord?.currency}}  
+                                    </div>
+    
+                                </div>
+                               
+                            </div>
+                        </div>
+                </p-tabPanel>
+    
+                <!--sub forms-->
+    
+                <p-tabPanel header="{{ selectedCollateralTypeName }} Details" [headerStyle]="{'width': '200px'}">
+    
+                        <div class="panel-body"  *ngIf="showSecurityForm">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="securityType" class="control-label col-md-2">Security Type</label>
+                                    <div class="col-md-4">
+                                        {{subItems?.securityType}}
+                                    </div>
+                                    <label for="effectiveDate" class="control-label col-md-2">Effective Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.effectiveDate | date:'dd-MM-yyyy'}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="maturityDate" class="control-label col-md-2">Maturity Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.maturityDate | date:'dd-MM-yyyy'}}
+                                        </div>
+                                    <label for="dealAmount" class="control-label col-md-2">Deal Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.dealAmount}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityValue}}
+                                        </div>
+                                    <label for="lienUsableAmount" class="control-label col-md-2">Current Liened Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.lienUsableAmount}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="issuerName" class="control-label col-md-2">Issuer Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.issuerName}}
+                                        </div>
+                                    <label for="issuerReferenceNumber" class="control-label col-md-2">Issuer Ref Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.issuerReferenceNumber}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="unitValue" class="control-label col-md-2">Unit Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.unitValue}}
+                                        </div>
+                                    <label for="numberOfUnits" class="control-label col-md-2">Number Of Units</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.numberOfUnits}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rating" class="control-label col-md-2">Rating</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.rating}}
+                                        </div>
+                                    <label for="interestPaymentFrequency" class="control-label col-md-2">Interest Payment
+                                        Frequency</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.interestPaymentFrequency}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fundName" class="control-label col-md-2">Fund/Scheme</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.fundName}}
+                                        </div>
+                                    <label for="bank" class="control-label col-md-2">Bank</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.bank}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark}}
+                                        </div>
+    
+                                   
+                                        
+                                </div>
+    
+                            </div>
+                        </div>
+                    ​
+    
+                        <div class="panel-body"  *ngIf="showPropertyForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <div *ngIf="showAllowedForCollateral" class="col-md-10 offset-md-2">
+                                        <label class="control-label">
+                                            <h4><b style="color:rebeccapurple"> {{allowedForCollateral}} </b></h4>
+                                        </label>
+                                    </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="propertyName" class="control-label col-md-2"> Description</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.propertyName}}
+                                        </div>
+                                    <label for="countryId" class="control-label col-md-2">Country</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.countryName}}
+                                    </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="constructionDate" class="control-label col-md-2">Construction Date</label>
+                                    <div class="col-md-4">
+                                            {{ subItems?.constructionDate | date: 'dd-MM-yyyy' }}
+                                        </div>
+                                    <label for="cityId" class="control-label col-md-2">City/Location</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.cityName}}
+                                    </div>
+    
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyAddress" class="control-label col-md-2">Property Address</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.propertyAddress}}
+                                        </div>
+                                    <label for="dateOfAcquisition" class="control-label col-md-2">Date Of Acquisition</label>
+                                    <div class="col-md-4">
+                                            {{ subItems?.dateOfAcquisition | date: 'dd-MM-yyyy' }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastValuationDate" class="control-label col-md-2">Last Valuation Date</label>
+                                    <div class="col-md-4">
+                                            {{ subItems?.lastValuationDate | date: 'dd-MM-yyyy' }}
+                                        </div>
+                                    <label for="valuerId" class="control-label col-md-2">Valuer</label>
+                                    <div class="col-md-4">
+                                        {{subItems?.collateralValuer}}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="valuationAmount" class="control-label col-md-2">Valuation Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.valuationAmount | number:'1.2'}}
+                                        </div>
+                                    <label for="valuerReferenceNumber" class="control-label col-md-2">Valuer Reference
+                                        Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.valuerReferenceNumber}}
+                                        </div>
+    
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertyValueBaseTypeId" class="control-label col-md-2">Property Base Type</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.propertyValueBaseTypeName}}
+                                    </div>
+                                    <label for="openMarketValue" class="control-label col-md-2">Open Market Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.openMarketValue}}
+                                        </div>
+    
+                                </div>
+                                <div class="form-group">
+                                    <label for="forcedSaleValue" class="control-label col-md-2">Forced Sale Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.forcedSaleValue}}
+                                        </div>
+                                    <label for="stampToCover" class="control-label col-md-2">Stamp To Cover</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.stampToCover}}
+                                        </div>
+    
+    
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityValue}}
+                                        </div>
+                                    <label for="perfectionStatusId" class="control-label col-md-2">Perfection Status</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.perfectionStatusName}}
+                                        </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="isOwnerOccupied" class="control-label col-md-2">Is Owner Occupied</label>
+                                    <div class="checkbox-container col-md-4">
+                                            {{subItems?.isOwnerOccupied}}
+                                        </div>
+                                    <label for="isResidential" class="control-label col-md-2">Is Residential</label>
+                                    <div class="checkbox-container col-md-4">
+                                            {{subItems?.isResidential}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="latitude" class="control-label col-md-2">Latitude</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.latitude}}
+                                        </div>
+                                    <label for="longitude" class="control-label col-md-2">Longitude</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                                {{subItems?.longitude}}
+                                                <span class="input-group-btn">
+                                                <!-- <button type="button" (click)="ViewMap()" class="btn btn-success pull-right">View
+                                                    Map</button> -->
+                                            </span>
+                                        </div>
+    
+                                    </div>
+                                </div>
+    
+                                <div class="form-group">
+    
+                                    <label for="perfectionStatusReason" class="control-label col-md-2">Reason for Non
+                                        Perfection</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.perfectionStatusReason}}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark}}
+                                        </div>
+                                </div>
+                                
+    
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showEquipmentForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <label for="machineName" class="control-label col-md-2">Machine Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.machineName}}
+                                        </div>
+                                    <label for="description" class="control-label col-md-2">Description</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.description}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="machineNumber" class="control-label col-md-2">Machine Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.machineNumber}}
+                                        </div>
+                                    <label for="manufacturerName" class="control-label col-md-2">Manufacturer Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.manufacturerName}}
+                                        </div>
+                                </div>
+    
+    
+                                <div class="form-group">
+                                    <label for="yearOfManufacture" class="control-label col-md-2">Year Of Manufacture</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.yearOfManufacture}}
+                                        </div>
+                                    <label for="yearOfPurchase" class="control-label col-md-2">Year Of Purchase</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.yearOfPurchase}}
+                                        </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="valueBaseTypeId" class="control-label col-md-2">Value Base Type</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.valueBaseTypeName}}
+                                        </div>
+                                    <label for="machineCondition" class="control-label col-md-2">Machine Condition</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.machineCondition}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="machineryLocation" class="control-label col-md-2">Machine Location</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.machineryLocation}}
+                                        </div>
+                                    <label for="replacementValue" class="control-label col-md-2">Replacement Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.replacementValue}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="equipmentSize" class="control-label col-md-2">Equipment Size</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.equipmentSize}}
+                                        </div>
+                                    <label for="intendedUse" class="control-label col-md-2">Intended Use</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.intendedUse}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark}}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"></label>
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="panel-body" *ngIf="showGuaranteeForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group" [hidden]="personal">
+                                    <label for="firstName" class="control-label col-md-2"> First Name</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="firstName" maxlength="50" formControlName="firstName" id="firstName"
+                                            class="form-control" [ngClass]="!guaranteeForm.controls['firstName'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <label for="middleName" class="control-label col-md-2"> Middle Name</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="middleName" maxlength="50" formControlName="middleName" id="middleName"
+                                            class="form-control" [ngClass]="!guaranteeForm.controls['middleName'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div>
+                                <div class="form-group" [hidden]="personal">
+                                    <label for="lastName" class="control-label col-md-2"> Last Name</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="lastName" maxlength="50" formControlName="lastName" id="lastName"
+                                            class="form-control" [ngClass]="!guaranteeForm.controls['lastName'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <label for="bvn" class="control-label col-md-2"> BVN</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="bvn" formControlName="bvn" maxlength="12" id="bvn" class="form-control"
+                                            [ngClass]="!guaranteeForm.controls['bvn'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+    
+                                </div>
+    
+                                <div class="form-group" [hidden]="corporate">
+                                    <label for="institutionName" class="control-label col-md-2"> Name</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="institutionName" maxlength="100" formControlName="institutionName"
+                                            id="institutionName" class="form-control" [ngClass]="!guaranteeForm.controls['institutionName'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                    <label for="rcNumber" class="control-label col-md-2"> RC Number</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="rcNumber" maxlength="20" formControlName="rcNumber" id="rcNumber"
+                                            class="form-control" [ngClass]="!guaranteeForm.controls['rcNumber'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phoneNumber1" class="control-label col-md-2"> Phone Number 1</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.phoneNumber1}}
+                                        </div>
+                                    <label for="phoneNumber2" class="control-label col-md-2"> Phone Number 2</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.phoneNumber2}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="guarantorAddress" class="control-label col-md-2"> Address</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.guarantorAddress}}
+                                        </div>
+                                    <label for="taxNumber" class="control-label col-md-2"> Tax Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.taxNumber}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="relationship" class="control-label col-md-2"> Relationship</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.relationship}}
+                                        </div>
+                                    <label for="relationshipDuration" class="control-label col-md-2">Relationship Duration</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.relationshipDuration}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="emailAddress" class="control-label col-md-2"> Email Address</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.emailAddress}}
+                                        </div>
+                                    <label for="guaranteeValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.guaranteeValue}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="cStartDate" class="control-label col-md-2">Start Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.cStartDate | date: 'dd-MM-yyyy'}}
+                                        </div>
+                                    <label for="endDate" class="control-label col-md-2">End Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.endDate | date: 'dd-MM-yyyy'}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark}}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"></label>
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+                                </div>
+    
+                            </div>
+                            <div class="form-group" [hidden]="!enabledJoinCollaterGuarantee" style="max-height: 100px; overflow:auto">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th *ngIf="showPersonalCollateralGuaranteeTableColumn ? true : false">First
+                                                Name</th>
+                                            <th *ngIf="showPersonalCollateralGuaranteeTableColumn ? true : false">Last Name</th>
+                                            <th *ngIf="showPersonalCollateralGuaranteeTableColumn ? false : true">Name</th>
+                                            <th *ngIf="showPersonalCollateralGuaranteeTableColumn ? false : true">RC Number</th>
+                                            <th>Phone Number</th>
+                                            <th>Relationship</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th></th>
+                                        </tr>
+    
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of garanteeList;let indx=index">
+    
+                                            <td *ngIf="showPersonalCollateralGuaranteeTableColumn ? true : false">
+                                                {{p.firstName}}
+                                            </td>
+                                            <td *ngIf="showPersonalCollateralGuaranteeTableColumn ? true : false">
+                                                {{p.lastName}}
+                                            </td>
+                                            <td *ngIf="showPersonalCollateralGuaranteeTableColumn ? false : true">
+                                                {{p.institutionName}}
+                                            </td>
+                                            <td *ngIf="showPersonalCollateralGuaranteeTableColumn ? false : true">
+                                                {{p.rcNumber}}
+                                            </td>
+                                            <td>
+                                                {{p.phoneNumber1}}
+                                            </td>
+                                            <td>
+                                                {{p.relationship}}
+                                            </td>
+                                            <td>
+                                                {{p.cStartDate | date}}
+                                            </td>
+                                            <td>
+                                                {{p.endDate | date}}
+                                            </td>
+                                            <td>
+                                                {{p.endDate | date}}
+                                            </td>
+                                            <!-- <td>
+                                                <label (click)="ViewCollateralGuaranteeDocument(p.targetId)" class="control-label">View</label>
+                                            </td> -->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- <p-dataTable [value]="garanteeList" [responsive]=true [paginator]="false" [rows]="3" >
+                                <p-column field="firstName" header="First Name" filterMatchMode="contains" ></p-column>
+                                <p-column field="lastName" header="Last Name" filterMatchMode="contains" ></p-column>
+                                <p-column field="phoneNumber1" header="phone Number" filterMatchMode="contains"></p-column>
+                                <p-column field="relationship" header="Relationship" filterMatchMode="contains" ></p-column>
+                                <p-column field="cStartDate" header="Start Date" filterMatchMode="contains"></p-column>
+                                <p-column field="endDate" header="end Date" filterMatchMode="contains"></p-column>
+                            </p-dataTable> -->
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showPolicyForm">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="insuranceCompanyName" class="control-label col-md-2">Insurance Company Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.insuranceCompanyName}}
+                                        </div>
+                                    <label for="policyinsuranceType" class="control-label col-md-2">Insurance Type</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.policyinsuranceType}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="insurancePolicyNumber" class="control-label col-md-2">Insurance Policy
+                                        Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.insurancePolicyNumber}}
+                                        </div>
+                                    <label for="insurerDetails" class="control-label col-md-2">Insurance Detail</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.insurerDetails}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="insurerAddress" class="control-label col-md-2">Insurer Address</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.insurerAddress}}
+                                        </div>
+                                    <label for="policyStartDate" class="control-label col-md-2">Policy Start Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.policyStartDate | date: 'dd-MM-yyyy'}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="assignDate" class="control-label col-md-2">Assign Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.assignDate | date: 'dd-MM-yyyy'}}
+                                        </div>
+    
+                                    <label for="policyRenewalDate" class="control-label col-md-2">Policy Renewal Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.policyRenewalDate | date: 'dd-MM-yyyy'}}
+                                        </div>
+    
+                                </div>
+    
+                                <div class="form-group">
+    
+                                    <label for="policyAmount" class="control-label col-md-2">Policy Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.policyAmount | number: '1.2'}}
+                                        </div>
+    
+                                    <label for="premiumAmount" class="control-label col-md-2">Premium Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.premiumAmount | number: '1.2'}}
+                                        </div>
+                                </div>
+    
+                                <div class="form-group">
+    
+                                    <label for="renewalFrequencyTypeId" class="control-label col-md-2">Renewal Frequency</label>
+                                    <div class="col-md-4">
+                                        {{subItems?.renewalFrequencyTypeName}}
+                                    </div>
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark}}
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showVehicleForm">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="vehicleType" class="control-label col-md-2">Vehicle Type</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.vehicleType}}
+                                        </div>
+                                    <label for="vehicleStatus" class="control-label col-md-2">Vehicle Status</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.vehicleStatus}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="vehicleMake" class="control-label col-md-2">Vehicle Make</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.vehicleMake}}
+                                        </div>
+                                    <label for="modelName" class="control-label col-md-2">Model Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.modelName}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dateOfManufacture" class="control-label col-md-2">Manufactured Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.dateOfManufacture | date: 'dd-MM-yyyy'}}
+                                        </div>
+                                    <label for="registrationNumber" class="control-label col-md-2">Registration Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.registrationNumber}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="serialNumber" class="control-label col-md-2">Serial Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.serialNumber}}
+                                        </div>
+                                    <label for="chasisNumber" class="control-label col-md-2">Chasis Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.chasisNumber}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="engineNumber" class="control-label col-md-2">Engine Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.engineNumber}}
+                                        </div>
+                                    <label for="nameOfOwner" class="control-label col-md-2">Name Of Owner</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.nameOfOwner}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="registrationCompany" class="control-label col-md-2">Registration Company</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.registrationCompany}}
+                                        </div>
+                                    <label for="resaleValue" class="control-label col-md-2">Resale Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.resaleValue}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="valuationDate" class="control-label col-md-2">Valuation Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.valuationDate | date:'dd-MM-yyyy'}}
+                                        </div>
+                                    <label for="lastValuationAmount" class="control-label col-md-2">Last Valuation Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.lastValuationAmount | number:'1.2'}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="invoiceValue" class="control-label col-md-2">Invoice Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.invoiceValue }}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark }}
+                                        </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showPreciousMetalForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <label for="metalType" class="control-label col-md-2"> Metal Type</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.metalType }}
+                                        </div>
+                                    <label for="preciousMetalName" class="control-label col-md-2">Precious Metal Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.preciousMetalName }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="weightInGrammes" class="control-label col-md-2">Weight In Grammes</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.weightInGrammes }}
+                                        </div>
+                                    <label for="metalValuationAmount" class="control-label col-md-2">Valuation Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.metalValuationAmount }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="metalUnitRate" class="control-label col-md-2">Unit Rate</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.metalUnitRate }}
+                                        </div>
+                                    <label for="preciousMetalFrm" class="control-label col-md-2">Precious Metal Form</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.preciousMetalFrm }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark }}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"></label>
+                                    <div class="col-md-4">
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showDepositForm">
+                            <div class="form-horizontal">
+                                    <div class="form-group">
+                                            <label for="effectiveDate" class="control-label col-md-2">Account Number</label>
+                                            <div class="col-md-4">
+                                                    {{subItems?.effectiveDate  | date:'dd-MM-yyyy'}}
+                                                </div>
+                                            
+                                        </div>
+                                <div class="form-group">
+                                    <label for="accountName" class="control-label col-md-2">Account Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.accountName  }}
+                                        </div>
+                                    <label for="maturityDate" class="control-label col-md-2">Maturity Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.maturityDate | date:'dd-MM-yyyy' }}
+                                        </div>
+                                </div>
+    
+                                <div class="form-group">
+                                    <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityValue  }}
+                                        </div>
+                                    <label for="lienAmount" class="control-label col-md-2">Current Liened Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.lienAmount  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="availableBalance" class="control-label col-md-2">Available Balance</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.availableBalance  }}
+                                        </div>
+                                    <label for="bank" class="control-label col-md-2">Bank</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.bank  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark  }}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"> </label>
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showCasaForm">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="accountNumber" class="control-label col-md-2">Account Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.accountNumber  }}
+                                        </div>
+                                    <label for="accountName" class="control-label col-md-2">Account Name</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.accountName  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityValue | number:'1.2'  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+    
+                                    <label for="lienAmount" class="control-label col-md-2">Current Liened Amount</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.lienAmount | number:'1.2'  }}
+                                        </div>
+                                    <label for="availableBalance" class="control-label col-md-2">Available Balance</label>
+                                    <div class="col-md-4">
+                                        {{subItems?.availableBalance | number:'1.2'  }}
+    
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="remark" class="control-label col-md-2">Remark</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.remark  }}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"> </label>
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+                                </div>
+                                <!-- <div class="form-group">
+                                    <label for="existingLienAmount" class="control-label col-md-2">Maturity Amount</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="existingLienAmount" formControlName="existingLienAmount" formatM id="existingLienAmount" class="form-control" [ngClass]="!depositForm.controls['existingLienAmount'].valid ? 'required-input' : 'valid-input'">
+                                    </div>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="checkbox-container">
+                                            <input formControlName="isOwnedByCustomer" id="isOwnedByCustomer" type="checkbox">
+                                        </div><label class="checkbox">Owned By Customer</label>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showStockForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <label for="companyName" class="control-label col-md-2">Company</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.company  }}
+                                        </div>
+                                    <label for="shareQuantity" class="control-label col-md-2">Share Quantity</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.shareQuantity  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="marketPrice" class="control-label col-md-2">Market Price</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.marketPrice  }}
+                                        </div>
+                                    <label for="amount" class="control-label col-md-2">Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.amount  }}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sharesSecurityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.sharesSecurityValue  }}
+                                        </div>
+    
+                                </div>
+                                <div class="form-group">
+                                    <label for="sharesSecurityValue" class="control-label col-md-2"></label>
+                                    <div class="col-md-4">
+                                        <!-- <button type="button" (click)="AddStockValue()" class="btn btn-success pull-right">Add</button> -->
+                                    </div>
+                                    <label for="shareValueAmountToUse" class="control-label col-md-2">Total Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.shareValueAmountToUse  | number:'1.2'}}
+                                        </div>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                    ​
+                        <div class="panel-body"  *ngIf="showMiscellaneousForm">
+                            <div class="form-horizontal">
+    
+                                <div class="form-group">
+                                    <label for="securityName" class="control-label col-md-2">Name of Security</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityName}}
+                                        </div>
+                                    <label for="securityValue" class="control-label col-md-2">Security Value</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.securityValue}}
+                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="remark" class="control-label col-md-2">NOTE:</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.note}}
+                                        </div>
+                                    <label for="remark" class="control-label col-md-2"> </label>
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+                                </div>
+                                <!-- <fieldset>
+                                    <legend>
+                                     <a style="text-decoration: none;" href="#" (click)="createNoteField($event)"><i
+                                                class="glyphicon glyphicon-plus"></i> Add New</a> 
+                                    </legend>
+    
+                                    <div formArrayName="notes">
+    
+    
+                                        <div class="form-group" *ngFor="let i of inputRows">
+                                            <div *ngFor="let x of miscellaneousForm.controls.notes.controls | slice:(i*2):(i+1)*2; let n=index">
+                                                <div [formGroupName]="n">
+                                                    <label class="control-label col-md-2">{{ x.value.labelName }}</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" formControlName="labelValue" class="form-control"
+                                                            id="controlName" name="controlName">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+    
+                                    </div>
+    
+                                </fieldset> -->
+    
+                            </div>
+                        </div>
+    
+                        <div class="panel-body"  *ngIf="showPromissoryForm">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+    
+                                    <label for="promissoryEffectiveDate" class="control-label col-md-2">Effective Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.promissoryEffectiveDate | date:'dd-MM-yyyy'}}
+                                        </div>
+    
+                                    <label for="promissoryMaturityDate" class="control-label col-md-2">Maturity Date</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.promissoryMaturityDate | date:'dd-MM-yyyy'}}
+                                        </div>
+    
+                                </div>
+    
+                                <div class="form-group">
+                                    <!-- <label for="promissoryValue" class="control-label col-md-2">Amount</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="promissoryValue" maxlength="20"
+                                            formControlName="promissoryValue" id="promissoryValue" class="form-control" [ngClass]="!promissoryForm.controls['promissoryValue'].valid ? 'required-input' : 'valid-input'">
+                                    </div> -->
+                                    <label for="promissoryNoteRefferenceNumber" class="control-label col-md-2">Promissory Note Ref Number</label>
+                                    <div class="col-md-4">
+                                            {{subItems?.promissoryNoteRefferenceNumber}}
+                                        </div>                               
+                                </div>
+                            </div>
+                        </div>
+    
+                </p-tabPanel>
+                <p-tabPanel header="Document Uploads">
+                    <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                        <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="fileExtension" [style]="{'width':'50px'}" header="Type" [filter]="true"
+                            filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                        <p-column field="isPrimaryDocument" [style]="{'width':'70px'}" header="is Primary Document"
+                            [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewSupportingDocument(d.documentId)"
+                                    href="javascript:void(0)">View</a>
+                                <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                                    (click)="DownloadSupportingDocument(d.documentId)" href="javascript:void(0)">Download</a>
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                <a *ngIf="d.fileExtension=='jpg' || d.fileExtension=='jpeg'" (click)="viewDocument(d.documentId)" href="javascript:void(0)">View</a>
+                            </ng-template>
+                        </p-column> -->
+                    </p-dataTable>
+    
+                </p-tabPanel>
+
+            </p-tabView>
+            <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="closeForm()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                        </div>
+                    </div>
+                </div>
+         
+    
+        </div>
+    
+        <!--<pre>{{ payload | json }}</pre>-->
+    
+    </p-dialog>
+
+    
+    <p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+            <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+        
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        Document Title: <strong>{{ selectedDocument }}</strong>
+                    </h2>
+                    <div class="pull-right"><a class="close" (click)="displayDocument=false">&times;</a></div>
+                </div>
+        
+                <div class="panel-body" style="overflow:auto;height:450px">
+        
+                    <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile"
+                        alt="" class="img-thumbnail">
+        
+                </div>
+        
+            </div>
+        </p-dialog>

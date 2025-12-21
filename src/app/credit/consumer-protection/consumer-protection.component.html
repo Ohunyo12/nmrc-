@@ -1,0 +1,375 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-md-12">
+        <h2 class="panel-title pull-left">
+          Consumer Protection KFS
+        </h2>
+        <div class="pull-right">
+          <button (click)="addNewConsumerProtection()" pButton type="button" label="Add New" icon="fa-plus"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-body">
+
+    <p-dataTable [value]="consumerProtections" [paginator]="true" [rows]="10">
+      <p-column field="dateTimeCreated" header="Date Created" sortable="true" filterMatchMode="contains">
+        <ng-template let-col let-apr="rowData" pTemplate="body">
+          {{apr[col.field] | date: 'dd MMM yyyy' }}
+        </ng-template>
+      </p-column>
+      <p-column field="loanAmount" header="Loan Amount" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.loanAmount | number : '1.2' }}
+        </ng-template>
+      </p-column>
+      <p-column field="actualAmountBorrowed" header="Actual Amount Borrowed" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.actualAmountBorrowed | number : '1.2' }}
+        </ng-template>
+      </p-column>
+      <p-column field="monthlyPayment" header="Monthly Payment" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.monthlyPayment | number : '1.2' }}
+        </ng-template>
+      </p-column>
+      <p-column field="totalFeesAndCharges" header="Total Fees & Charges" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.totalFeesAndCharges | number : '1.2' }}
+        </ng-template>
+      </p-column>
+      <p-column field="annualInterestRate" header="Annual Interest Rate" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.annualInterestRate }} %
+        </ng-template>
+      </p-column>
+      <p-column field="insurance" header="Insurance" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.insurance }} %
+        </ng-template>
+      </p-column>
+      <p-column field="loanAPR" header="Loan APR" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.loanAPR }} %
+        </ng-template>
+      </p-column>
+      <p-column field="totalFees" header="Total Fees" filterMatchMode="contains">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          {{ d.totalFees }} %
+        </ng-template>
+      </p-column>
+      <p-column field="termOfLoanInYears" header="Term Of Loan (Y)" filterMatchMode="contains">
+      </p-column>
+
+      <p-column [style]="{'width':'100px'}">
+        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+          <div style="text-align:center">
+            <a (click)="viewConsumerProtectionMemo(d)" href="javascript:void(0)">View Memo</a>
+          </div>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+
+  </div>
+
+  <div class="panel-footer ">
+    <div class="row ">
+      <div class="col-md-12 ">
+        <!-- <button type="submit" [disabled]="consumerProtectionForm.invalid" (click)="submitConsumerProtection(consumerProtectionForm)"
+          class="btn btn-success pull-right">Submit Details</button>
+
+        <button type="button" (click)="showSubmitModal = false;" style="margin-right:5px"
+          class="btn btn-danger pull-right">Close</button> -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayConsumerProtectionForm" id="add-modal" modal="modal" showEffect="fade"
+  width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Add Consumer Protection KFS
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="consumerProtectionForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="loanAmount" class="control-label col-md-2">
+              Loan Amount
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="loanAmount" formatM
+                [ngClass]="!consumerProtectionForm.controls['loanAmount'].valid ? 'required-input' : 'valid-input'"
+                name="loanAmount" class="form-control numeric">
+            </div>
+
+            <label for="annualInterestRate" class="control-label col-md-2">
+              Annual Interest Rate (%)
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="annualInterestRate"
+                [ngClass]="!consumerProtectionForm.controls['annualInterestRate'].valid ? 'required-input' : 'valid-input'"
+                name="annualInterestRate" class="form-control numeric">
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="totalFees" class="control-label col-md-2">
+              Total Fees (%)
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="totalFees"
+                [ngClass]="!consumerProtectionForm.controls['totalFees'].valid ? 'required-input' : 'valid-input'"
+                name="totalFees" class="form-control numeric">
+            </div>
+
+            <label for="insurance" class="control-label col-md-2">
+              Insurance (%)
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="insurance"
+                [ngClass]="!consumerProtectionForm.controls['insurance'].valid ? 'required-input' : 'valid-input'"
+                name="insurance" class="form-control numeric">
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="termOfLoanInYears" class="control-label col-md-2">
+              Term of Loan in Years
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="termOfLoanInYears"
+                [ngClass]="!consumerProtectionForm.controls['termOfLoanInYears'].valid ? 'required-input' : 'valid-input'"
+                name="termOfLoanInYears" class="form-control numeric">
+            </div>
+
+            <label for="loanAPR" class="control-label col-md-2">
+              Loan APR
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="loanAPR"
+                [ngClass]="!consumerProtectionForm.controls['loanAPR'].valid ? 'required-input' : 'valid-input'"
+                name="loanAPR" class="form-control numeric">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="monthlyPayment" class="control-label col-md-2">
+              Monthly Payment
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="monthlyPayment"
+                [ngClass]="!consumerProtectionForm.controls['monthlyPayment'].valid ? 'required-input' : 'valid-input'"
+                name="monthlyPayment" class="form-control numeric">
+            </div>
+
+            <label for="loanAPR" class="control-label col-md-2">
+              Number of Payments
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="numberOfPayments"
+                [ngClass]="!consumerProtectionForm.controls['numberOfPayments'].valid ? 'required-input' : 'valid-input'"
+                name="numberOfPayments" class="form-control numeric">
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="totalFeesAndCharges" class="control-label col-md-2">
+              Total Fees and Charges
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="totalFeesAndCharges"
+                [ngClass]="!consumerProtectionForm.controls['totalFeesAndCharges'].valid ? 'required-input' : 'valid-input'"
+                name="totalFeesAndCharges" class="form-control numeric">
+            </div>
+
+            <label for="totalFeesAndCharges" class="control-label col-md-2">
+              Actual Amount Borrowed
+            </label>
+            <div class="col-md-4">
+              <input type="text" formControlName="actualAmountBorrowed"
+                [ngClass]="!consumerProtectionForm.controls['actualAmountBorrowed'].valid ? 'required-input' : 'valid-input'"
+                name="actualAmountBorrowed" class="form-control numeric">
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </form>
+
+    <div class="panel-footer ">
+      <div class="row ">
+        <div class="col-md-12 ">
+          <button type="submit" [disabled]="consumerProtectionForm.invalid"
+            (click)="submitConsumerProtection(consumerProtectionForm)" class="btn btn-success pull-right">Submit
+            Details</button>
+
+          <button type="button" (click)="displayConsumerProtectionForm = false;" style="margin-right:5px"
+            class="btn btn-danger pull-right">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayConsumerProtectionMemo" id="add-modal" modal="modal" showEffect="fade"
+  width="800" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Consumer Protection KFS Memo
+      </h2>
+    </div>
+
+    <form novalidate [formGroup]="appendForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+
+          <div class="form-group">
+            <label for="creditTemplateId" class="control-label col-md-4">Document Template</label>
+            <div class="col-md-8">
+              <select name="creditTemplateId" id="creditTemplateId" formControlName="creditTemplateId"
+                class="form-control" [ngClass]="appendForm.controls['creditTemplateId'].valid ? 'valid-input' : 'required-input'">
+                <option value="">-- Select Document Template --</option>
+                <option *ngFor="let x of documentTemplates" [value]="x.templateId">{{ x.templateName }}</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="loadDocumentTemplate(appendForm)" [disabled]="appendForm.invalid"
+              class="btn btn-warning pull-right">Load Document</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayConsumerProtectionModal" modal="modal" id="searchModal" showEffect="fade"
+  width="1000">
+  <p-tabView>
+    <p-tabPanel header="Approval Memorandum">
+      <div class="card no-padding">
+        <div class="panel panel-default">
+
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-9">
+                <form novalidate [formGroup]="documentSectionForm" autocomplete="off">
+
+                  <select (change)="onDocumentSectionChange($event.target.value)" formControlName="sectionId"
+                    name="sectionId" id="sectionId" class="form-control">
+                    <option value="">-- Select Document Section --</option>
+                    <option *ngFor="let x of documentationSections" [value]="x.sectionId">{{ x.staffRoleName }} ::
+                      {{ x.title }}</option>
+                  </select>
+
+                </form>
+              </div>
+
+              <div class="col-md-3">
+                <div class="pull-right">
+                    <button (click)="previewDocumentation()" style="padding: 3px 6px 3px 6px;">
+                        <span class="glyphicon glyphicon-file"></span> Preview</button>
+                    <button (click)="previewDocumentation(true)" style="padding: 3px 6px 3px 6px;">
+                        <span class="glyphicon glyphicon-print"></span> Print</button>
+                </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- CAM -->
+          <div class="panel-body" style="min-height:350px;">
+            <CKEDITOR *ngIf="editMode" [content]="sectionContent" [height]="250"
+              (contentChange)="contentChange($event)"></CKEDITOR>
+            <div *ngIf="!editMode" [innerHTML]="sectionContent" style="overflow:auto;height:320px"></div>
+            <div><i>{{ sectionDescription }}</i></div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="row" style="padding-left:inherit;">
+              <div class="col-md-12">
+                <div class="form-horizontal">
+                  <div class="form-group">
+
+                    <button type="button" (click)="getDocumentTemplate(true)" class="btn btn-warning">
+                      <span class="glyphicon glyphicon-plus" style="padding-right:4px;"></span> Load Template</button>
+
+                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(1)"
+                      class="btn btn-default">
+                      <span class="glyphicon glyphicon-chevron-left" style="padding-right:4px;"></span>
+                      Previous</button>
+
+                    <button [disabled]="selectedSectionIdIndex == null" type="button" (click)="nextSection(2)"
+                      class="btn btn-default">
+                      <span class="glyphicon glyphicon-chevron-right" style="padding-right:4px;"></span> Next</button>
+
+                    <button [disabled]="!editMode" type="button" (click)="saveSection(true)" class="btn btn-success"
+                      style="margin-right:10px;">
+                      <span class="glyphicon glyphicon-floppy-disk" style="padding-right:4px;"></span> Save
+                      Changes</button>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col-md-12">
+                <button (click)="displayConsumerProtectionModal=false" type="button" class="btn btn-danger pull-right "
+                  style="margin-right:5px">Close</button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Consumer Protection Documentation
+              <!-- <strong>{{ application?.applicationReferenceNumber }}</strong> of OBLIGOR:
+              <strong>{{ application?.customerName }}</strong> -->
+          </h2>
+          <div class="pull-right">
+              <a class="close" (click)="closeDocumentation()">&times;</a>
+          </div>
+      </div>
+
+      <div class="panel-body" style="overflow:auto;height:450px">
+          <div *ngFor="let x of documentations">
+              <p><strong>{{x.title}}</strong></p>
+              <span [innerHtml]="x.templateDocument"></span>
+          </div>
+      </div>
+
+  </div>
+</p-dialog>

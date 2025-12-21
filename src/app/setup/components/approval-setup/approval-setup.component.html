@@ -1,0 +1,101 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Approval Setups
+              </h2>
+              <div class="pull-right">
+                <button (click)="showAprovalSetupwModal()" pButton type="button" label="Add Approval Setup" icon="fa-plus"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="panel-body"> 
+          <p-tabView>
+            <p-tabPanel header="Approval Setup" [selected]="true">
+              <p-dataTable [value]="approvalSetup" [responsive]="true" [paginator]="true" [rows]="15">
+                <p-column field="useRoundRublin" header="Enable Round Rublin"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.useRoundRublin==true">Yes</span>
+                    <span *ngIf="d.useRoundRublin==false">No</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column field="isRetailOnlyRoundRobin" header="Is Retail Specific"  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <span *ngIf="d.isRetailOnlyRoundRobin==true">Yes</span>
+                    <span *ngIf="d.isRetailOnlyRoundRobin==false">No</span>
+                  </ng-template>
+                </p-column>
+                <!-- <p-column field="companyName" header="Company Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                <p-column [style]="{'width':'100px'}">
+                  <ng-template pTemplate="header"></ng-template>
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    <a (click)="editApprovalSetUp(d, $event)" href="javascript:void(0)">
+                      Edit
+                    </a>
+                  </ng-template>
+                </p-column>
+
+              </p-dataTable>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+
+      </div>
+      <!--end of panel-->
+    </div>
+  </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayApprovalSetupModal" [contentStyle]="{'overflow':'auto','max-height':'600px'}" id="add-modal" modal="modal" showEffect="fade" width="700">
+  <div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {{entityName}}
+      </h2>
+    </div>
+    <form novalidate [formGroup]="approvalSetUpForm" autocomplete="off">
+      <div class="panel-body">
+        <div class="form-horizontal">
+          <p-tabView>
+
+            <p-tabPanel header="Approval Setup">
+              <div class="form-group">
+                <label for="isRetailOnlyRoundRobin" class="control-label col-md-2">Is Retail Specific Round Rublin</label>
+                <div class="col-md-8">
+                  <input type="checkbox" name="isRetailOnlyRoundRobin" id="isRetailOnlyRoundRobin" formControlName="isRetailOnlyRoundRobin" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="useRoundRublin" class="control-label col-md-2">Use Round Rublin</label>
+                <div class="col-md-8">
+                  <input type="checkbox" name="useRoundRublin" id="useRoundRublin" formControlName="useRoundRublin" />
+                </div>
+              </div>
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="submitApprovalSetupForm(approvalSetUpForm)" [disabled]="approvalSetUpForm.invalid" class="btn btn-success pull-right">Save</button>
+            <button type="button" (click)="displayApprovalSetupModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+</p-dialog>
+

@@ -1,0 +1,983 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <div class="card no-padding">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              List Of Completed Facilities
+                              <span *ngIf="loanSelection != null && loanSelection.loanTypeId == 3">{{loanSelection.applicantName}}</span>
+                              <span *ngIf="loanSelection != null && loanSelection.loanTypeId != 3">{{loanSelection.customerName}}</span>
+                          </h2>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="panel-body">
+                <div class="form-horizontal">
+                  <form novalidate [formGroup]="searchForm" autocomplete="off">
+            
+                    <div class="form-group">
+                      <label for="startDate" class="control-label col-md-1">Start Date </label>
+                      <div class="col-md-2">
+                        <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true"
+                          yearRange="1900:2030" [showIcon]="true"
+                          [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                          [style]="{'width': '100%', 'z-index': '999'}"
+                          [ngClass]="!searchForm.controls['startDate'].valid ? 'required-input' : 'valid-input'">
+                        </p-calendar>
+                      </div>
+            
+                      <label for="endDate" class="control-label col-md-1">End Date </label>
+                      <div class="col-md-2">
+                        <p-calendar id="endDate" formControlName="endDate" [monthNavigator]="true" [yearNavigator]="true"
+                          yearRange="1900:2030" [showIcon]="true"
+                          [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                          [style]="{'width': '100%', 'z-index': '999'}"
+                          [ngClass]="!searchForm.controls['endDate'].valid ? 'required-input' : 'valid-input'">
+                        </p-calendar>
+                      </div>
+                      <div class="col-md-1 pull-left">
+                        <button type="button" (click)="submitForm(searchForm)" class="btn btn-success pull-left"
+                          [disabled]="!searchForm.valid">Search
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="panel-body">
+                  <div *ngIf="displayLoanList" class="card no-padding">
+                      <div class="card no-padding">
+                          <p-dataTable  #dt  [paginator]="true" [responsive]="true" [value]="loans" [(selection)]="multipLoanData" (onRowSelect)="pushSelectedLoans($event)" (onRowUnselect)="popSelectedLoans($event)"
+                              [rows]="20">
+                              <p-header>
+                                  <div class="ui-helper-clearfix">
+                                      <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                  </div>
+                              </p-header>  
+                              <p-column *ngIf="routableUser && routableMode" [style]="{'width':'38px'}" [selection]=false selectionMode="multiple" (onRowSelect)="pushSelectedLoans($event)" [(selection)]="multipLoanData"></p-column>
+                              <p-column *ngIf="!routableMode" [style]="{'width':'38px'}">
+
+                                      
+                                      <ng-template let-loan="rowData" let-i="rowIndex" pTemplate="body">
+                                          <a (click)="onSelectedLoanChange(loan)" style="display: block" href="javascript:void(0)">
+                                              <i class="glyphicon glyphicon-eye-open"></i>
+                                          </a>
+                                      </ng-template>
+                                  </p-column>
+                                  <p-column field="approvalDate" [style]="{'width':'100px'}" header="Arrival Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                      <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                          {{ row.approvalDate | date: 'medium' }}
+                                      </ng-template>
+                                      </p-column>
+                              <p-column [style]="{'width':'40px'}" field="divisionShortCode" header="Unit" [filter]="true" filterMatchMode="contains"></p-column>
+
+                              <p-column field="productTypeName" [style]="{'width':'107px'}" header="Facility Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                              <p-column [style]="{'width':'70px'}" field="productClassName" header="Class" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                  
+                              <p-column [style]="{'width':'95px'}" field="applicationReferenceNumber" header="Ref No" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              
+                              <p-column [style]="{'width':'40px'}" field="isLineFacilityString" header="Is A Line"
+                                  sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                              <p-column field="applicantName" [style]="{'width':'150px'}" header="Obligor's Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      <span *ngIf="item.loanTypeId == 1">{{item.customerName}}</span>
+                                      <span *ngIf="item.loanTypeId != 1">{{item.customerName}} ({{item.customerGroupName}})</span>
+                                  </ng-template>
+                              </p-column>
+                              <p-column [style]="{'text-align':'right','width':'120px'}" field="approvedAmount" header="Approved Amount" sortable="true"
+                                  >
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      {{item.approvedAmount | currency:item.currencyCode:true:'1.2-2'}}
+                                  </ng-template>
+                              </p-column>
+                              <p-column [style]="{'text-align':'right','width':'120px'}" field="bookingAmountRequested" header="Requested Amount" sortable="true"
+                                  >
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      {{item.bookingAmountRequested | currency:item.currencyCode:true:'1.2-2'}}
+                                  </ng-template>
+                              </p-column> 
+                              <p-column [style]="{'text-align':'right','width':'120px'}" field="amountDisbursed" header="Disbursed Amount" sortable="true"
+                                  > 
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                          <!-- <span *ngIf="routableUser">{{item.routedToStaff != null ? item.routedToStaff : 'None'}}</span> -->
+                                          <!-- <span *ngIf="!routableUser">{{item.amountDisbursed | currency:item.currencyCode:true:'1.2-2'}}</span> -->
+                                          {{item.amountDisbursed | currency:item.currencyCode:true:'1.2-2'}}
+                                  </ng-template>
+                              </p-column>
+                              <!-- <p-column [style]="{'text-align':'right','width':'120px'}" field="customerAvailableAmount" header="Available Amount" sortable="true"
+                                  >
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      {{item.customerAvailableAmount | currency:item.currencyCode:true:'1.2-2'}}
+                                  </ng-template>
+                              </p-column>  -->
+                              <p-column [style]="{'width':'40px'}" field="interestRate" header="Rate">
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      <span *ngIf="item.productPriceIndex != null || item.productPriceIndex != undefined ">{{item.interestRate}}  ({{item.productPriceIndex.substring(0,3)}}) </span>
+                                      <span *ngIf="item.productPriceIndex == null ">{{item.interestRate}} </span>
+                                  </ng-template>
+                              </p-column>
+                              <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor" sortable="true">
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      {{item.approvedTenorString}} 
+                                  </ng-template>
+                              </p-column> 
+                              
+                              <p-column *ngIf="routableUser" [style]="{'text-align':'right','width':'120px'}" field="routedToStaff" header="Routed To" sortable="true" [filter]="true" filterMatchMode="contains">
+                                  <ng-template pTemplate="body" let-item="rowData">
+                                      {{item.routedToStaff != null ? item.routedToStaff : 'None'}}
+                                  </ng-template> </p-column>
+                                  
+                          </p-dataTable>
+                      </div>
+                  </div>
+                  <div *ngIf="displayBookedLoans" class="card no-padding">
+                      <form novalidate [formGroup]="loanBookingForm" autocomplete="off">
+                          <p-tabView (onChange)="onTabChange($event)">
+                              <p-tabPanel header="Customer Information">
+                                  <p-accordion *ngIf="loanSelection.canReRouteBooking" #accordion2>
+                                      <p-accordionTab header="Show Facility Routing" >
+                                          <app-workflow-routing 
+                                              [currentSelection]="workflowTarget" 
+                                              [multiCurrentSelection]="workflowTargets"
+                                              [enableRoutePreset]="false" 
+                                              [enableReroute]="enableReroute" 
+                                              [panelLabel]="'Facility Booking Routing'"
+                                              [referenceNumber]="loanSelection?.applicationReferenceNumber" 
+                                              (rerouted)="resetGrid($event)"
+                                          ></app-workflow-routing>
+                                      </p-accordionTab>
+                                  </p-accordion>
+                                  <p-accordion #accordion>
+                                      <p-accordionTab [selected]="true" header="Overview">
+                                          <table class="table table-customer-information" border="1" id="print-section-overview-information">
+                                              <tbody>
+                                                  <tr>
+                                                      <td>
+                                                          <strong>Customer Name</strong>
+                                                      </td>
+                                                      <td>
+                                                          <span>{{loanSelection.customerName}} </span>
+                                                          </td>
+                                                      <td>
+                                                          <strong>Customer Code</strong>
+                                                      </td>
+                                                      <td>{{ customerCode ? customerCode : 'N/A' }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>
+                                                          <strong>Application Reference Number</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.applicationReferenceNumber }}</td>
+                                                      <td>
+                                                          <strong>Product </strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.productName }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>
+                                                          <strong>Loan Facility Type</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.productTypeName }}</td>
+                                                      <td>
+                                                          <strong>Loan Type</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.loanTypeName }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>
+                                                          <strong>Is Related Party</strong>
+                                                      </td>
+                                                      <td *ngIf="loanSelection.isRealatedParty"> Yes</td>
+                                                      <td *ngIf="!loanSelection.isRealatedParty"> No</td>
+                                                      <td>
+                                                          <strong>Politically Exposed?</strong>
+                                                      </td>
+                                                      <td *ngIf="loanSelection.isPoliticallyExposed"> Yes</td>
+                                                      <td *ngIf="!loanSelection.isPoliticallyExposed"> No</td>
+                                                  </tr>
+                                                  <tr>
+                                                      <td>
+                                                          <strong>Type of Customer</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.customerType }}</td>
+                                                      <td>
+                                                          <strong>Branch</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.branchName }}</td>
+                                                  </tr>
+                                                  <tr *ngIf="isCommercialLoan">
+                                                      <td>
+                                                          <strong>Receiving Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" [attr.disabled]="true" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Customer Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <strong> Paying Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" [attr.disabled]="true" name="casaAccountId2" id="casaAccountId2" formControlName="casaAccountId2"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId2'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Customer Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                  </tr>
+
+                                                  <tr *ngIf="isForeignExchangeLoan">
+                                                      <td>
+                                                          <strong>Customer Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" [attr.disabled]="true" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Collecting Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                      
+                                                  </tr>
+                                                  <tr *ngIf="isForeignExchangeLoan">
+                                                      <td>
+                                                          <strong>Rate Code</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="getExchangeRate()" name="nostroRateCodeId" id="nostroRateCodeId" formControlName="nostroRateCodeId"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['nostroRateCodeId'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Rate Code --</option>
+                                                              <option *ngFor="let x of rateCodes" [value]="x.lookupId">{{ x.lookupName }}</option>
+                                                          </select>
+                                                      </td>
+                                                      <td ><strong> Rate Amount</strong></td>
+                                                      <td ><input type="text" (blur)="setNostroRateCode($event.target.value)" formControlName="nostroRateAmount" name="nostroRateAmount" [ngClass]="!loanBookingForm.controls['nostroRateAmount'].valid ? 'required-input' : 'valid-input'" class="form-control"></td>
+                                                  </tr>
+                                                  <tr *ngIf="isForeignExchangeLoan">
+                                                          <td *ngIf="destinationCurrencyCode != null">
+                                                              <strong> {{destinationCurrencyCode}} Rate</strong>
+                                                          </td>
+                                                          <td *ngIf="destinationCurrencyCode != null && destinationCurrencyAmount > 0 ">
+                                                              {{destinationCurrencyAmount | currency:destinationCurrencyCode:true:'1.2-2'}} <span> (@{{sellingRate}})</span>
+                                                          </td>
+                                                  </tr>
+
+                                                  <tr *ngIf="!isCommercialLoan && !isForeignExchangeLoan && isIDF">
+                                                      <td>
+                                                          <strong>Customer Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <strong>Receiving Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" [attr.disabled]="true" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Customer Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                      <td>
+                                                          <strong> Collection Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" name="casaAccountId2" id="casaAccountId2" formControlName="casaAccountId2"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId2'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Collection Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                  </tr>
+                                                  <tr *ngIf="!isCommercialLoan && !isForeignExchangeLoan && !isIDF">
+                                                      <td>
+                                                          <strong>Sector</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.sectorSubSectorName }}</td>
+                                                      <td>
+                                                          <strong> Customer Account</strong>
+                                                      </td>
+                                                      <td>
+                                                          <select (change)="onCustomerAccountChange($event.target.value)" [attr.disabled]="true" name="casaAccountId" id="casaAccountId" formControlName="casaAccountId"
+                                                              class="form-control" [ngClass]="!loanBookingForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                              <option value="">-- Select Customer Account --</option>
+                                                              <option *ngFor="let x of loanSelection.customerAccounts" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                          </select>
+                                                      </td>
+                                                  </tr>
+                                                  
+                                                  <tr *ngIf="loanSelection.productTypeName.toLowerCase() === 'commercial loans'">
+                                                      <td>
+                                                          <strong>Sector</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.sectorSubSectorName }}</td>
+                                                      <td>
+                                                          <strong> </strong>
+                                                      </td>
+                                                      <td></td>
+                                                  </tr>
+
+                                                  <tr >
+                                                      <td>
+                                                          <strong>CRMS CODE</strong>
+                                                      </td>
+                                                      <td>{{ loanSelection.crmsCode }}</td>
+                                                      <td>
+                                                          <strong> </strong>
+                                                      </td>
+                                                      <td class="btn-group pull-right"> <button (click)="printOverviewInformation()" type="button" class="btn btn-success" style="margin-right:5px">Print</button>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                          
+                                      
+                                      </p-accordionTab>
+                                      <p-accordionTab header="Customer Information">
+                                          <div class="panel-body" style="overflow:auto; height:350px">
+                                              <app-customer-information-detail [loadWithCustomerId]="loanSelection.customerId">
+                                              </app-customer-information-detail>
+                                              <div class="panel-footer">
+                                                  <div class="row">
+                                                      <div class="col-md-12">
+                                                          <div class="btn-group pull-right">
+                                                          <button (click)="printCustomerInformation()" type="button" class="btn btn-success" style="margin-right:5px">Print General Information</button>
+                                                          <button (click)="printCorporateInformation()" type="button" class="btn btn-success" style="margin-right:5px">Print Corporate Information</button>
+                                                              
+                                                          </div>
+                                                          
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </p-accordionTab>
+                                  </p-accordion>
+                              </p-tabPanel>
+                              <p-tabPanel header="Facility Appraisal Memorandum" [disabled]="isLoanInfoDisabled">
+                                  <div class="row">
+                                      <div class="col-md-12" style="margin-bottom:5px">
+                                          <app-form-3800b-los [applicationReferenceNumber]="loanSelection?.applicationReferenceNumber"></app-form-3800b-los>
+                                          </div>
+                                      <hr />
+                                      <div class="col-md-12">
+                                          <button type="button" (click)="popoverSeeMore()"
+                                                      class="btn btn-primary pull-right" style="padding-right:5px;">
+                                                      Print Offer Letter</button>
+                                          <button type="button" (click)="previewDocumentation(true)"
+                                                      class="btn btn-primary pull-right" style="padding-right:5px;">
+                                                      Print FAM</button>
+                                      </div>
+                                      
+                                  </div>
+                              </p-tabPanel>
+                              <p-tabPanel header="Loan Information" [disabled]="isLoanInfoDisabled">
+                                  <p-accordion #accordion>
+                                      <p-accordionTab [selected]="true" header="Primary Loan Information" id="print-section-loan-information">
+                                          <div class="panel panel-default" >
+                                              <div class="panel-heading">
+                                                  <div class="row">
+                                                      <div class="col-md-12">
+                                                          <h2 class="panel-title pull-left">
+
+                                                          </h2>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                              <div class="panel-body">
+                                                  <div class="form-horizontal">
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Application Ref. No.</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="applicationReferenceNumber" name="applicationReferenceNumber" [ngClass]="!loanBookingForm.controls['applicationReferenceNumber'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control" [disabled]="true">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Loan Type</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="loanTypeName" name="loanTypeName" [ngClass]="!loanBookingForm.controls['loanTypeName'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="form-group ">
+                                                          <label for="" class="control-label col-md-2">Account Officer</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="relationshipOfficerName" name="relationshipOfficerName" [ngClass]="!loanBookingForm.controls['relationshipOfficerName'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Relationship Manager</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="relationshipManagerName" name="relationshipManagerName" [ngClass]="!loanBookingForm.controls['relationshipManagerName'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Group Approved Amount ({{ loanSelection.currencyCode }})</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formatM formControlName="groupApprovedAmount" [ngClass]="!loanBookingForm.controls['groupApprovedAmount'].valid ? 'required-input' : 'valid-input'"
+                                                                  formatM name="groupApprovedAmount" class="form-control">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Customer Approved Amount ({{ loanSelection.currencyCode }})</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formatM formControlName="approvedAmount" name="approvedAmount" [ngClass]="!loanBookingForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Available Amount ({{ loanSelection.currencyCode }})</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="availableAmount" [ngClass]="!loanBookingForm.controls['availableAmount'].valid ? 'required-input' : 'valid-input'"
+                                                                  formatM name="availableAmount" class="form-control">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Interest Rate</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formControlName="interestRate" name="interestRate" [ngClass]="!loanBookingForm.controls['interestRate'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Disbursement Amount ({{ loanSelection.currencyCode }})</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" formatM name="disbursementAmount" (onClick)="onTabChange()" (onfocus)="onTabChange()" (blur)="onTabChange()"
+                                                                  formControlName="disbursementAmount" [ngClass]="!loanBookingForm.controls['disbursementAmount'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Facility </label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="productName" formControlName="productName" [ngClass]="!loanBookingForm.controls['productName'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Currency</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="currencyCode" formControlName="currencyCode" [ngClass]="!loanBookingForm.controls['currencyCode'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                          <label for="" class="control-label col-md-2">Exchange Rate</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="exchangeRate" formControlName="exchangeRate" [ngClass]="!loanBookingForm.controls['exchangeRate'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+                                                      
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Approved Line Effective Date</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="tenor" formControlName="approvedEffectiveDate" [ngClass]="!loanBookingForm.controls['approvedEffectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+
+                                                          <label for="" class="control-label col-md-2">Account to debit </label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="accountToCredit" formControlName="accountToCredit" [ngClass]="!loanBookingForm.controls['accountToCredit'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+                                                      <div class="form-group">
+                                                          <label for="" class="control-label col-md-2">Approved Tenor (in days)</label>
+                                                          <div class="col-md-4 no-data-div">
+                                                              <input type="text" name="tenor" formControlName="tenor" [ngClass]="!loanBookingForm.controls['tenor'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                          <label *ngIf="!isCommercialLoan" for="" class="control-label col-md-2">Approved Tenor (in months)</label>
+                                                          <div *ngIf="!isCommercialLoan" class="col-md-4 no-data-div">
+                                                              <input type="text" name="tenorInMonths" formControlName="tenorInMonths" [ngClass]="!loanBookingForm.controls['tenorInMonths'].valid ? 'required-input' : 'valid-input'"
+                                                                  class="form-control">
+                                                          </div>
+                                                      </div>
+                                                      <div class="form-group">
+                                                          
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                              <div class="panel-footer">
+                                                  <div class="row">
+                                                      <div class="col-md-12">
+                                                          <div class="btn-group pull-right">
+                                                          <button (click)="printLoanInformation()" type="button" class="btn btn-success" style="margin-right:5px">Print</button>
+                                                              
+                                                          </div>
+                                                          
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </p-accordionTab>
+                                      <p-accordionTab header="Loan Covenant Information">
+                                              <div class="panel panel-default">
+                                                      <div class="panel-heading">
+                                                          <div class="row">
+                                                              <div class="col-md-12">
+                                                                  <h2 class="panel-title pull-left">
+                                                                      Loan Covenant
+                                                                  </h2>
+                                                                  
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                      <div class="panel-body">
+                                                          <p-dataTable #dt [value]="covenantDetails" [responsive]="true" [paginator]="true" [rows]="5">
+                                                              <p-header>
+                                                                  <div class="ui-helper-clearfix">
+                                                                      <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                                                  </div>
+                                                              </p-header>   
+                                                              <p-column field="covenantTypeName" header="Covenant Type" sortable="true" filterMatchMode="contains"></p-column>
+                                                              <p-column field="covenantDetail" header="Covenant Detail" sortable="true" filterMatchMode="contains"></p-column>
+                                                              <p-column field="frequencyTypeName" header="Frequency Type" sortable="true" filterMatchMode="contains"></p-column>
+                                                              <p-column field="covenantAmount" header="Amount" sortable="true" filterMatchMode="contains"></p-column>
+                                                              <p-column field="covenantDate" header="Date" sortable="true" filterMatchMode="contains">
+                                                                  <ng-template let-col let-cov="rowData" pTemplate="body">
+                                                                      {{cov[col.field] | date : 'dd/MM/yyyy' }}
+                                                                  </ng-template>
+                                                              </p-column>
+                                                          </p-dataTable>
+                                                      </div>
+                                                  </div>
+                                      </p-accordionTab>
+                                      <p-accordionTab header="Loan Collateral(s)">
+                                              <app-collaterals-proposed *ngIf="loanApplicationDetailId>0"
+                                                  [loanApplicationId]="loanSelection?.loanApplicationId"
+                                                  [currencyId]="loanSelection?.currencyId"
+                                                  [reload]="loanSelection?.loanApplicationId"
+                                                  [isForSwap]="false">
+                                              </app-collaterals-proposed>
+                                      </p-accordionTab>
+                                      <p-accordionTab header="Loan Documents">
+                                          <div class="panel panel-default">
+                                              <div class="panel-heading">
+                                                  <h2 class="panel-title">
+                                                      Supporting Documents
+                                                  </h2>
+                                              </div>
+                                              <div *ngIf="loanSelection != null" class="panel-body">
+                                                  <document-upload 
+                                                      [deleteLink]="false"
+                                                      [showUploadForm]="false"
+                                                      [panelTitle]="CREDITAPPRIASALDOC"
+                                                      [reload]="reload" 
+                                                      [operationId]="loanSelection?.appraisalOperationId" 
+                                                      [customerId]="loanSelection?.customerId"
+                                                      [isOperationSpecific]="false"
+                                                      [targetId]="loanSelection?.loanApplicationId" 
+                                                      [targetReferenceNumber]="loanSelection?.applicationReferenceNumber">
+                                                  </document-upload> 
+
+
+                                              </div>
+                                          </div>
+                                      </p-accordionTab>
+                                      <p-accordionTab header="Loan Job Requests">
+                                          <div *ngIf="loanSelection != null" class="panel-body" style="overflow:auto;height:250px">
+                                              <job-request-view 
+                                                  [loanApplicationId]=loanSelection.loanApplicationId 
+                                                  [loanApplicationDetailId]=loanSelection.loanApplicationDetailId 
+                                                  [operationId]=loanSelection.operationId
+                                                  [jobSourceId]=jobSourceId
+                                                  [showTitle]=false>
+                                              </job-request-view>
+                                          </div>
+                                      </p-accordionTab>
+                                  </p-accordion>
+                              </p-tabPanel>
+
+                              <p-tabPanel *ngIf="!loanSelection.canReRouteBooking" header="Charge Fees" [disabled]="isChargesDisabled ">
+                                  <div class="card no-padding">
+                              
+                                      <div class="panel panel-default">
+                                          <div class="panel-heading">
+                                              <div class="row">
+                                                  <div class="col-md-12">
+                                                      <h2 class="panel-title pull-left">
+                                                          Loan Charge/Fee
+                                                      </h2>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="panel-body">
+                                              <p-dataTable #dt *ngIf="displayLoanCharges1" [value]="loanProductFees " [responsive]="true"
+                                                  [paginator]="false" [rows]="5">
+                                                  <p-header>
+                                                      <div class="ui-helper-clearfix">
+                                                          <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                                      </div></p-header>
+                                                  <p-column field="feeName" header="Fee Name" sortable="true" filterMatchMode="contains"></p-column>
+                                                  <p-column [style]="{'width':'60px'}" header="" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="body" let-item="rowData">
+                                                          {{valueBase}}
+                                                      </ng-template>
+                                                  </p-column>
+                                                  <p-column field="recommededFeeRateValue" header="Value" sortable="true" filterMatchMode="contains">
+                                                  </p-column>
+                                                  <p-column field="feeAmount" header="Fee Amount" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="body" let-item="rowData">
+                                                          {{item.feeAmount | number:'1.2'}}
+                                                      </ng-template>
+                                                  </p-column>
+                                                  <p-column field="isIntegralFee" header="Integral?" sortable="true" filterMatchMode="contains">
+                                                  </p-column>
+                                                  <p-column field="hasConsession" header="Concession?" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="header"> Concession? </ng-template>
+                                                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                          <span *ngIf="d.hasConsession == false"> No</span>
+                                                          <span *ngIf="d.hasConsession == true"> Yes</span>
+                                                      </ng-template>
+                                                  </p-column>
+                              
+                                              </p-dataTable>
+                                              <p-dataTable #dt *ngIf="displayLoanCharges2" [value]="loanProductFees " [responsive]="true"
+                                                  [paginator]="false" [rows]="5">
+                                                  <p-header>
+                                                      <div class="ui-helper-clearfix">
+                                                          <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                                      </div></p-header>
+                                                  <p-column field="feeName" header="Fee Name" sortable="true" filterMatchMode="contains"></p-column>
+                                                  <p-column [style]="{'width':'60px'}" header="" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="body" let-item="rowData">
+                                                          {{valueBase}}
+                                                      </ng-template>
+                                                  </p-column>
+                                                  <p-column field="recommededFeeRateValue" header="Value" sortable="true" filterMatchMode="contains">
+                                                  </p-column>
+                                                  <p-column field="feeAmount" header="Fee Amount" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="body" let-item="rowData">
+                                                          {{item.feeAmount | number:'1.2'}}
+                                                      </ng-template>
+                                                  </p-column>
+                                                  <p-column field="isIntegralFee" header="Integral?" sortable="true" filterMatchMode="contains">
+                                                      <ng-template let-user="rowData" let-i="rowIndex" pTemplate="body">
+                                                          <span *ngIf="false"> No</span>
+                                                          <span *ngIf="true"> Yes</span>
+                                                      </ng-template>
+                                                  </p-column>
+                                                  <p-column field="hasConsession" header="Concession?" sortable="true" filterMatchMode="contains">
+                                                      <ng-template pTemplate="header"> Concession? </ng-template>
+                                                      <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                          <span *ngIf="d.hasConsession == false"> No</span>
+                                                          <span *ngIf="d.hasConsession == true"> Yes</span>
+                                                      </ng-template>
+                                                  </p-column>
+                              
+                                              </p-dataTable>
+                                          </div>
+                                          <table class="table table-customer-information">
+                                              <tbody>
+                                                  <tr>
+                                                      <td></td>
+                                                      <td>
+                                                          
+                                                          <strong>{{ selectedAccountBalance | currency:loanSelection.currencyCode:true:
+                                                                                              '1.2-2' }}</strong>
+                                                      </td>
+                                                      <td></td>
+                                                      <td>
+                                                          <strong>Total Fee Amount:
+                                                              {{ feeAmountTotal | currency:loanSelection.currencyCode:true:'1.2-2'}}</strong>
+                                                      </td>
+                                                  </tr>
+                                                  <tr
+                                                      *ngIf="loanSelection != null && !loanSelection.isLocalCurrrency && !isIDF && loanSelection.feeAccountName != null">
+                                                      <td></td>
+                                                      <td>
+                                                          Fee will be deducted from account : <strong>{{loanSelection.feeAccountName}}</strong>
+                                                      </td>
+                                                      <td></td>
+                                                      <td>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                          <div *ngIf="override != null && override != undefined " class="panel-body">
+                                              <p-accordion #accordion>
+                                                  <p-accordionTab header="Fee Concession">
+                                                      <p-dataTable #dt [value]="override" [responsive]="true" [paginator]="true" [rows]="5">
+                                                          <p-header>
+                                                              <div class="ui-helper-clearfix">
+                                                                  <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                                              </div></p-header>  
+                                                          <p-column field="consessionReason" header="Consession Reason" sortable="true"
+                                                              filterMatchMode="contains"></p-column>
+                                                          <p-column field="recommededFeeRateValue" header="Recommeded Rate" sortable="true"
+                                                              filterMatchMode="contains"></p-column>
+                                                          </p-dataTable>
+                                                  </p-accordionTab>
+                                              </p-accordion>
+                                          </div>
+                                      </div>
+                                      <!--end of panel--> 
+                                  </div>
+                              </p-tabPanel>
+                              <p-tabPanel *ngIf="!loanSelection.canReRouteBooking" header="Transaction Dynamics" [disabled]="isLoanInfoDisabled">
+                                  <div class="card no-padding">
+                                      <div class="panel panel-default">
+                                          <div class="panel-heading">
+                                              <div class="row">
+                                                  <div class="col-md-12">
+                                                      <h2 class="panel-title pull-left">
+                                                          Loan Transaction Dynamics
+                                                      </h2>
+                                                  </div>
+                                              </div>
+                                          </div>
+
+                                          <div class="panel-body">
+                                              <p-dataTable #dt  [value]="loanSelection.loanTransationDynamics" [responsive]="true" [paginator]="false"
+                                                  [rows]="10">
+                                                  <p-header>
+                                                      <div class="ui-helper-clearfix">
+                                                          <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV" (click)="dt.exportCSV()" style="float:left"></button>
+                                                      </div></p-header>
+                                                  <p-column field="dynamics" header="Transaction Dynamics" sortable="true" filterMatchMode="contains"></p-column>
+                                              </p-dataTable>
+                                          </div>
+                                      </div>
+                                      <!--end of panel-->
+                                  </div>
+                              </p-tabPanel>
+
+                              <p-tabPanel header="Approval Comments">
+                              <app-approval-comments [all]="true" [tableLabel]="'Approval Process Comments'" [operationId]="loanSelection?.appraisalOperationId" [applicationId]="loanSelection?.loanApplicationId"></app-approval-comments>
+                                                      
+                                  
+                              </p-tabPanel>
+                              <p-tabPanel header="Drawdown Memo">
+                                  <div class="panel panel-default">
+                                      <div class="panel-heading">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <h2 class="panel-title pull-left">
+                                                      Drawdown Memo
+                                                  </h2>
+                                                  <button  (click)="printMemo()" style="margin-left:25px" >Generate Drawdown Memo</button>
+                                                          
+                                                  <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+                                              </div>
+                                          </div>
+                                      </div>
+                                      
+                                      <div id="print-section" class="panel-body" [innerHtml]="drawdownHtml">
+                                      </div>
+                                  </div>
+                          </p-tabPanel>
+                          
+                          </p-tabView>
+                          <div class="panel-footer">
+                              <div class="row">
+                                  <div class="col-md-12">
+                                      <button style="margin-right:5px" type="button" class="btn btn-danger pull-right" (click)="BackToLoanBookingGridList()">Back</button>
+                                      </div>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+                  <div *ngIf="showEditLoan"  class="card no-padding">
+                      Edittable Content
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- <div class="body">
+          <div class="row">
+              <div *ngIf="workflowTargets.length > 0" class="col-md-12">
+                      <app-workflow-routing 
+                      [currentSelection]="workflowTarget" 
+                      [multiCurrentSelection]="workflowTargets"
+                      [enableRoutePreset]="false" 
+                      [enableReroute]="enableReroute" 
+                      [panelLabel]="'Facility Booking Routing'"
+                      [referenceNumber]="loanSelection?.applicationReferenceNumber" 
+                      (rerouted)="resetGrid($event)"
+                  ></app-workflow-routing>
+              </div>
+          </div>
+          
+      </div> -->
+  </div>
+</div>
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)">
+</fintrakbanking-message>
+
+<p-dialog [responsive]=true [(visible)]="displayBeneficiaryForm" id="ct-modal" modal="modal" showEffect="fade" width="450">
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Loan Beneficiary Form
+        </h2>
+    </div>
+
+    <form novalidate [formGroup]="beneficiaryForm" autocomplete="off">
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="beneficiaryAmount" class="control-label col-md-4">Amount ({{destinationCurrencyCode}})</label>
+                    <div class="col-md-8 ">
+                            <input  type="text" formartM formControlName="beneficiaryAmount" (blur)="formatFeeValue()" [(ngModel)]="data.beneficiaryAmount" class="form-control" [ngClass]="!beneficiaryForm.controls['beneficiaryAmount'].valid ? 'required-input' : 'valid-input'">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="beneficiaryReason" class="control-label col-md-4">Narration</label>
+                    <div class="col-md-8 ">
+                        <textarea class="col-md-4" type="text" formControlName="beneficiaryReason" [(ngModel)]="beneficiaryReason" class="form-control" [ngClass]="!beneficiaryForm.controls['beneficiaryReason'].valid ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayBeneficiaryForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                <button type="button" (click)="addToList(beneficiaryForm)" style="margin-right:5px" class="btn btn-success pull-right">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]=displayJobrequest showHeader="false" id="Job-request-modal" modal="modal" showEffect="fade"
+width="700">
+<div *ngIf="loanApplicationDetailId != null">
+    <job-request-template 
+        [targetId]=loanApplicationDetailId 
+        [jobSourceId]= jobSourceId
+        [operationAvailable]="true" 
+        [operationsId]=1 
+        (displayOption)="CallRequestClose()">
+    </job-request-template>
+</div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+        <h2 class="panel-title">
+            Authentication Token
+        </h2>
+        <div class="pull-right">
+            <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div *ngIf="!userSpecific" class="form-group">
+                <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                <div class="col-md-12">
+                    <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                <div class="col-md-12">
+                    <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer ">
+        <div class="row ">
+            <div class="col-md-12 ">
+                <div class="form-group text-center">
+                    <div class="col-md-12">
+                        <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="submitLoanDetailsWith2FA()" style="margin-right:5px "
+                            class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="800" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Generated Offer Letter
+                    </h2>
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px" style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayOperationRouteCommentForm" modal="modal" showEffect="fade" width="450">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Re-route
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayOperationRouteCommentForm = false">&times;</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <form novalidate [formGroup]="operationForm" autocomplete="off">
+            <div class="form-horizontal">
+                                
+
+                <div class="form-group">
+                    <label class="control-label col-md-6">Approval Level</label>
+                    <div class="col-md-12">
+                        <select name="approvalLevelId" formControlName="approvalLevelId" id="approvalLevelId" class="form-control" [ngClass]="operationForm.controls['approvalLevelId'].valid ? 'valid-input' : 'required-input'">
+                            <option value="">-- Select Approval Level --</option>
+                            <option *ngFor="let x of approvalLevels" [value]="x.approvalLevelId">{{ x.approvalLevelAndRoleName }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-12">Comment</label>
+                    <div class="col-md-12">
+                        <textarea style="height:60px;" name="comment" formControlName="comment" id="comment" class="form-control" [ngClass]="operationForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div *ngIf="errorMessage.length > 0" class="alert alert-danger col-md-12" role="alert" style="padding:15;">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error: </span>{{ errorMessage }}
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <div class="col-md-12" style="text-align:right">
+                    <button type="button" (click)="displayOperationRouteCommentForm = false" class="btn btn-danger">Cancel</button>
+                    <button type="button"  [disabled]="operationForm.invalid" (click)="returnBackToRM()" class="btn btn-success">
+                        <span class="glyphicon glyphicon-send"></span> Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</p-dialog>

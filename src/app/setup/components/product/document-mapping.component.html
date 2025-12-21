@@ -1,0 +1,155 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Product Document Mapping
+                </h2>
+                <div class="pull-right">
+                    <button type="button" (click)="showProductDocumentMappingForm()" pButton icon="fa-plus" label="Add New Product Document Mapping"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+       
+        <p-dataTable [value]="productDocumentMappingsData" [responsive]="true" [paginator]="true" [rows]="10">
+
+            <p-column field="productName" [filter]="true" header="Product Name" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="productClassName" [filter]="true" header="Product Class Name" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="sectorName" header="Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="subSectorName" header="Subsector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="documentType" header="Document Type Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="required" [filter]="true" header="Is Required" sortable="true" filterMatchMode="contains"></p-column>
+
+            <p-column [style]="{'width':'80px'}">
+                <ng-template pTemplate="header"></ng-template>
+                <ng-template pTemplate="body" let-col let-i="rowData">
+                    <a (click)="editProductDocMap(i)" href="javascript:void(0)">
+                        Edit
+                    </a>
+                    |
+                    <a (click)="removeProductDocumentMapping(i.productDocMapId)" href="javascript:void(0)">
+                        Remove
+                    </a>
+                </ng-template>
+            </p-column>
+        </p-dataTable>
+                
+    </div>
+
+
+    <p-dialog [responsive]=true [(visible)]="displayProductDocumentMappingForm" [modal]=true showEffect="fade"
+        width="700">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {{itemPanelHeader}}
+                </h2>
+            </div>
+
+            <form novalidate [formGroup]="productDocumentMappingForm" (ngSubmit)="submitProductDocumentMappingForm(productDocumentMappingForm)" autocomplete="off">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="mapToProductClass" class="control-label col-md-2">Map To Product Class</label>
+                            <div class="col-md-2">
+                                <input type="checkbox" name="mapToProductClass" id="mapToProductClass" formControlName="mapToProductClass"
+                                (click)="setProductClassInput($event)">
+                            </div>
+                            <label for="productClassId" class="control-label col-md-2">Select Product Class</label>
+                            <div class="col-md-6">
+                                <select [attr.disabled]="isMapToProductClass() ? null : true" name="productClassId" id="productClassId" class="form-control" formControlName="productClassId" [ngClass]="productDocumentMappingForm.controls['productClassId'].valid ? 'valid-input':'required-input'">
+                                    <option value="">--- Select Product class ---</option>
+                                    <option *ngFor="let productclass of productClassesData" [value]="productclass.lookupId">{{productclass.lookupName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="required" class="control-label col-md-2">Map To Product</label>
+                            <div class="col-md-2">
+                                <input type="checkbox" name="mapToProduct" id="mapToProduct" formControlName="mapToProduct"
+                                (click)="setProductInput($event)">
+                            </div>
+                            <label for="productId" class="control-label col-md-2">Select Product</label>
+                            <div class="col-md-6">
+                                <select [attr.disabled]="isMapToProduct() ? null : true" name="productId" id="productId" class="form-control" formControlName="productId" [ngClass]="productDocumentMappingForm.controls['productId'].valid ? 'valid-input':'required-input'">
+                                    <option value="">--- Select Product ---</option>
+                                    <option *ngFor="let product of productsData" [value]="product.productId">{{product.productName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="required" class="control-label col-md-2">Map To Sector</label>
+                            <div class="col-md-2">
+                                <input type="checkbox" name="mapToSector" id="mapToSector" formControlName="mapToSector"
+                                (click)="setSectorInput($event)">
+                            </div>
+                            <label for="sectorId" class="control-label col-md-2">Select Sector</label>
+                            <div class="col-md-6">
+                                <select [attr.disabled]="isMapToSector() ? null : true" name="sectorId" id="sectorId" class="form-control" formControlName="sectorId" [ngClass]="productDocumentMappingForm.controls['sectorId'].valid ? 'valid-input':'required-input'">
+                                    <option value="">--- Select Sector ---</option>
+                                    <option *ngFor="let sector of sectorsData" [value]="sector.sectorId">{{sector.sectorName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="required" class="control-label col-md-2">Map To SubSector</label>
+                            <div class="col-md-2">
+                                <input type="checkbox" name="mapToSubSector" id="mapToSubSector" formControlName="mapToSubSector"
+                                (click)="setSubSectorInput($event)">
+                            </div>
+                            <label for="subSectorId" class="control-label col-md-2">Select SubSector</label>
+                            <div class="col-md-6">
+                                <select [attr.disabled]="isMapToSubSector() ? null : true" name="SectorId" id="subSectorId" class="form-control" formControlName="subSectorId" [ngClass]="productDocumentMappingForm.controls['subSectorId'].valid ? 'valid-input':'required-input'">
+                                    <option value="">--- Select SubSector ---</option>
+                                    <option *ngFor="let SubSector of SubSectorsData" [value]="SubSector.subSectorId">{{SubSector.sectorName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="documentCategoryId" class="control-label col-md-4">Select Document Category</label>
+                            <div class="col-md-8">
+                                <select name="documentCategoryId" (change)="filterDocumenttypes($event.target.value)" id="documentCategoryId" class="form-control" formControlName="documentCategoryId">
+                                    <option value=null>--- Select Document Category ---</option>
+                                    <option *ngFor="let category of documentCategoriesData" [value]="category.documentCategoryId">{{category.documentCategoryName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="documentTypeId" class="control-label col-md-4">Select Document Type</label>
+                            <div class="col-md-8">
+                                <select name="documentTypeId" id="documentTypeId" class="form-control" formControlName="documentTypeId" [ngClass]="productDocumentMappingForm.controls['documentTypeId'].valid ? 'valid-input':'required-input'">
+                                    <option value=null>--- Select Document Type ---</option>
+                                    <option *ngFor="let type of documentTypesData2" [value]="type.documentTypeId">{{type.documentTypeName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="required" class="control-label col-md-4">Is Required</label>
+                            <div class="col-md-8">
+                                <input type="checkbox" name="required" id="required" formControlName="required">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="submit" [disabled]="productDocumentMappingForm.invalid" class="btn btn-success pull-right">{{buttonTitle}} Product Mapping</button>
+                            <button type="button" (click)="displayProductDocumentMappingForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </p-dialog>
+    
+</div> 
+

@@ -1,0 +1,243 @@
+<div class="panel panel-default">
+    <div class="panel panel-default" *ngIf="!viewDetail">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Written-Off Accounts / Black-Book Approval List
+                    </h2>
+                    <div class="pull-right">
+                        <!-- <button (click)="AddCamSol()" pButton type="button" label="Add New" icon="fa-plus"></button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="loanCamsolData" [paginator]="true" [rows]="5" [responsive]=true
+                [(selection)]="multipleCamsolData" dataKey="customercode" selectionMode="multiple">
+                <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                <p-column field="customercode" header="Customer Code" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <!-- <p-column field="loansystemtype" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                <p-column field="camsolType" header="camsol Type" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="customername" header="Customer Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="date" header="Date" sortable="true" [filter]="true" filterMatchMode="contains"
+                    [style]="{'text-align':'right'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.date | date : 'dd MMM yyyy' }}
+                    </ng-template>
+                </p-column>
+                <!-- <p-column field="loanRef" header="loan Ref" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                <!-- <p-column field="customername" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains">
+                    </p-column> -->
+
+                <p-column field="principal" header="Principal" sortable="true" [filter]="true"
+                    filterMatchMode="contains" [style]="{'width':'100px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.principal | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="balance" header="Balance" sortable="true" [filter]="true" filterMatchMode="contains"
+                    [style]="{'width':'100px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.balance | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                <p-column field="cantakeloan" header="Can Take Loan" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'110px'}">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <div style="text-align:center">
+                            <a (click)="ViewCamsolAwaingApprovalById(d)" href="javascript:void(0)">View</a>
+                            <span style="padding:3px;"></span>
+                        </div>
+                    </ng-template>
+                </p-column>
+                <p-footer>
+                    <button [disabled]=null style="width: 100%;" type="button" (click)="ShowApproveBulkStaff()"
+                        class="btn btn-warning">Submit For Approval</button>
+                </p-footer>
+            </p-dataTable>
+
+
+        </div>
+    </div>
+
+    <p-tabView [activeIndex]="0" *ngIf="viewDetail">
+        <p-tabPanel header="Written-off Accounts/Black-Book Details">
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="panel-body">
+                        <div class="row" style="padding:0 15px 0 15px;">
+                            <h4>Written-Off Accounts / Black-Book Detail</h4>
+                            <table class="table table-casa-information">
+                                <tbody>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Customer Name:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.customername }}</td>
+                                        <td>
+                                            <strong>Balance:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.balance | number:'1.2' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Loan System Type:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.loansystemtype }}</td>
+                                        <td>
+                                            <strong>camsolType</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.camsolType }}</td>
+                                        <td>
+                                            <strong>Interest Insuspense:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.interestinsuspense | number:'1.2'  }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Loan Reference:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.loanRef }}</td>
+                                        <td>
+                                            <strong>Date Logged:</strong>
+                                        </td>
+                                        <td>{{ loanCamsolValue.date | date : 'dd MMM yyyy'}}</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+
+
+    <div class="well" *ngIf="viewDetail">
+        <hr />
+        <div class="row">
+            <div class="col-md-9">
+                <textarea class="form-control" placeholder="Comment" rows="3" [(ngModel)]="comment"
+                    [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'"></textarea>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" [(ngModel)]="approvalStatusId"
+                    [ngClass]="approvalStatusId < 0 ? 'required-input' : 'valid-input'">
+                    <option value="0">--- Select Approval ---</option>
+                    <option value="1"> Approve </option>
+                    <option value="3"> Decline </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="viewDetail" class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group pull-right">
+                    <button type="button" (click)="turnOnSearch()" style="margin-right:5px" class="btn btn-danger"
+                        style="margin-right:5px">Back to List</button>
+                    <button type="button" (click)="forwardCollateralApproval()"
+                        [disabled]="comment == null || comment == '' || approvalStatusId < 1" class="btn btn-success">
+                        Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayMultipleModel" id="multiCamsol" modal="modal" showEffect="fade"
+    width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Approve Multiple Camsol Details
+            </h2>
+        </div>
+
+        <div class="panel-body">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <p-dataTable [paginator]="true" [rows]="10" [value]="multipleCamsolData" [responsive]=true
+                            selectionMode="single">
+                            <p-column field="customercode" header="Customer Code" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <!-- <p-column field="loansystemtype" header="Loan Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                            <p-column field="camsolType" header="camsol Type" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="customername" header="Customer Name" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="date" header="Date" sortable="true" [filter]="true"
+                                filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.date | date : 'dd MMM yyyy' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="principal" header="Principal" sortable="true" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'100px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.principal | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="balance" header="Balance" sortable="true" [filter]="true"
+                                filterMatchMode="contains" [style]="{'width':'100px'}">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ d.balance | number : '1.2' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column field="cantakeloan" header="Can Take Loan" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                        </p-dataTable>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="control-label col-md-2">Comment</label>
+                    <div class="col-md-4">
+                        <textarea [ngClass]="!multipleData.comment ? 'required-input' : 'valid-input'"
+                            class="form-control" [(ngModel)]="multipleData.comment" name="comment" cols="30"
+                            rows="3"></textarea>
+                    </div>
+                    <label for="" class="control-label col-md-2">Status</label>
+                    <div class="col-md-4">
+                        <select name="approvalStatus" id="approvalStatus" class="form-control"
+                            [(ngModel)]="multipleData.approvalStatusId"
+                            [ngClass]="!multipleData.approvalStatusId ? 'required-input' : 'valid-input'">
+                            <option value="0">--- Select Approval ---</option>
+                            <option value="1"> Approve </option>
+                            <option value="3"> Decline </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <button (click)="displayMultipleModel=false" type="button" class="btn btn-danger"
+                            style="margin-right:5px">Close</button>
+                        <button [disabled]="!multipleData.comment || !multipleData.approvalStatusId" type="button"
+                            (click)="goForBulkApproval()" class="btn btn-success">Submit For Approval</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>

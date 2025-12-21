@@ -1,0 +1,137 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding"  >
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Loan Principal
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showDialog()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="loanPrincipal" [responsive]=true selectionMode="single">
+                        <p-column [style]="{'width':'110px'}" field="principalsRegNumber" header="RC Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="name" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="accountNumber" header="Customer Account" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="emailAddress" header="Email Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="address" header="Address" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'60px'}">
+
+                            <ng-template pTemplate="header">
+                            </ng-template>
+                            <ng-template let-staff="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editLoanPrincipal(staff) " href="javascript:void(0)">
+                                    Edit
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<p-dialog [responsive]=true [(visible)]="displayLoanPrincipal" modal="modal" showEffect="fade" width="900">
+        <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                             {{TitleName}}
+                            </h2>
+                            
+                        </div>
+                    </div>
+                </div>
+    <div class="panel-body">
+        
+       <form novalidate [formGroup]="loanPrincipalForm" autocomplete="off">
+
+           <div class="panel-body">
+               <div class="form-horizontal">                                                       
+                       <div class="form-group">
+                           <label for="" class="control-label col-md-2">RC Number</label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control " minlength="3" maxlength="20" formControlName="principalSpecialNumber" 
+                               [ngClass]="!loanPrincipalForm.controls['principalSpecialNumber'].valid ? 'required-input' : 'valid-input'"
+                               name="principlaSpecialNumber" >
+                           </div>
+                           <label for="" class="control-label col-md-2">
+                               Name
+                           </label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control "  minlength="3" maxlength="100"
+                               [ngClass]="!loanPrincipalForm.controls['name'].valid ? 'required-input' : 'valid-input'"
+                               formControlName="name" name="name">
+                           </div>
+                       </div>
+
+                       <div class="form-group">
+                           <label for="" class="control-label col-md-2">
+                            Customer Account
+                           </label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control " minlength="10" maxlength="10" formControlName="customerAccount"
+                               [ngClass]="!loanPrincipalForm.controls['customerAccount'].valid ? 'required-input' : 'valid-input'"
+                               name="customerAccount">
+                           </div>
+                           <label for="" class="control-label col-md-2">
+                               Email Address
+                           </label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control "  minlength="3" maxlength="50"
+                               [ngClass]="!loanPrincipalForm.controls['emailAddress'].valid ? 'required-input' : 'valid-input'"
+                               formControlName="emailAddress"  name="emailAddress" > 
+                           </div>
+                       </div>
+
+                       <div class="form-group">
+                           <label for="" class="control-label col-md-2">
+                               Phone Number
+                           </label>
+                           <div class="col-md-4 ">
+                               <input type="text" class="form-control " minlength="3" maxlength="25"
+                               [ngClass]="!loanPrincipalForm.controls['phoneNumber'].valid ? 'required-input' : 'valid-input'"
+                               formControlName="phoneNumber" name="phoneNumber"> 
+                           </div>
+                           <label for="" class="control-label col-md-2">
+                               Address
+                           </label>
+                           <div class="col-md-4 ">
+                               <textarea class="form-control " minlength="3" maxlength="500"
+                               [ngClass]="!loanPrincipalForm.controls['address'].valid ? 'required-input' : 'valid-input'"
+                               formControlName="address"></textarea> 
+                           </div>
+                       </div>
+
+
+               </div>
+           </div>
+       </form>
+   </div>
+       <div class="panel-footer">
+           <div class="row">
+               <div class="col-md-12">
+                    <button type="submit" (click)="saveLoanPrincipal()"  [disabled]="loanPrincipalForm.invalid" class="btn btn-success pull-right">Save</button>                    
+                    <button type="button" (click)="displayLoanPrincipal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+               </div>
+           </div>
+       </div>
+  </div>
+  
+
+
+</p-dialog>
+

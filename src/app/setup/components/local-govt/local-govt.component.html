@@ -1,0 +1,94 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Local Govts
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showCityForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [paginator]="true" [rows]="15" [value]="localGovt" [responsive]=true selectionMode="single">
+                        <p-column field="stateName" header="State" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="localGovtName" header="Local Govt" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'50px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template pTemplate="body" let-col="rowData" let-i="rowIndex">
+                                <a (click)="editLga(col)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+            <!--add modal-->
+            <p-dialog [responsive]=true [(visible)]="display" id="add-modal" modal="modal" showEffect="fade" width="650">
+                <div style="margin-bottom:0" class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            {{panelHeader}}
+                        </h2>
+                    </div>
+
+
+                    <form novalidate [formGroup]="localGovtForm" autocomplete="off">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    <label for="state" class="control-label col-md-2">
+                                        State
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select name="stateId" formControlName="stateId"
+                                         [ngClass]="!localGovtForm.controls['stateId'].valid ? 'required-input' : 'valid-input'"
+                                            id="stateId" class="form-control">
+                                        <option value="">--- Select State ---</option>
+                                        <option *ngFor="let state of states" value="{{state.stateId}}">
+                                            {{state.stateName}}
+                                        </option>   
+			                            </select>
+                                    </div>
+                                    <label for="city" class="control-label col-md-2">
+                                        Local Govt
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="localGovtName" formControlName="localGovtName" 
+                                        [ngClass]="!localGovtForm.controls['localGovtName'].valid ? 'required-input' : 'valid-input'"
+                                            id="localGovtName" class="form-control">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!--buttons-->
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="button" (click)="submitForm(localGovtForm)" [disabled]="localGovtForm.invalid" class="btn btn-success pull-right">Save</button>
+                                    <button type="button" (click)="display=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </p-dialog>
+            <!--end of add modal-->
+
+            <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+        </div>
+    </div>
+</div>

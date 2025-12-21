@@ -1,0 +1,240 @@
+<div class="ui-g" *ngIf="displayProspects">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Prospective Customer Information
+              </h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4 pull-right" style="padding-bottom: 9px">
+              <input type="text" id="filterProspect" [(ngModel)]="filterProspect" class="form-control" placeholder="Type in your search parameter ...">
+              <!-- <input type="text" id="search" (keyup)="searchList($event.target.value)" class="form-control" placeholder="Type in your search parameter ..."> -->
+            </div>
+          </div>
+
+          <p-dataTable [value]="filteredProspectCustomers" [responsive]="true" [paginator]="true" [rows]="10" [(selection)]="prospectCustomerSelection"
+            dataKey="customerId" (onRowSelect)="onSelectedProspectChanged($event)" [rowsPerPageOptions]="[10,20,30]">
+            <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+            <p-column field="customerCode" header="Prospect Code" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerName" header="Prospect Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="customerTypeName" header="Prospect Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+            <p-column field="branchName" header="Prospect Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+          </p-dataTable>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+  <div style="margin-bottom:0; position: relative; z-index: 30000;" class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        Search Customer from Flexcube
+      </h2>
+      <div class="pull-right">
+        <a class="close" (click)="colseSearchModal()">&times;</a>
+      </div>
+    </div>
+    <div style="padding:3px" class="panel-body">
+      <div class="form-group">
+        <div class="col-md-12 input-group" style="margin-top: 20px">
+          <input type="text" id="search" [(ngModel)]="stagingSearch" class="form-control" placeholder="Enter Customer Account Number ...">
+          <span (click)="searchCustomerWithAccountNumber(stagingSearch, isProspectConversion)" class="input-group-addon btn btn-info">
+            <span class="glyphicon glyphicon-search"></span> Search
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-12" style="max-height: 500px; overflow: auto">
+          <p>
+
+          </p>
+          <table *ngIf="searchResults" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Customer Code</th>
+                <th>Customer Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr (click)="selectedSearchCustomer(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                <td>
+                  {{res.customerCode}}
+                </td>
+                <td>
+                  {{res.customerName}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+
+<div *ngIf="displayProspectDetails" class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Prospect Customer Update for:
+                <strong>{{ prospectFullName }}</strong>
+              </h2>
+              <!--button type="button" class="btn btn-primary pull-right" (click)="proceedEvent.emit({continue: 'true'})">Proceed To Application</button-->
+            </div>
+          </div>
+
+        </div>
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <form novalidate [formGroup]="propspectCustomerForm" autocomplete="off">
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Code
+                </label>
+                <div class="col-md-4">
+                  <input type="text" formControlName="prospectCode" [ngClass]="!propspectCustomerForm.controls['prospectCode'].valid ? 'required-input' : 'valid-input'"
+                    [attr.disabled]="true" name="prospectCode" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Code
+                </label>
+                <div class="col-md-4">
+                  <input type="text" formControlName="customerCode" [ngClass]="!propspectCustomerForm.controls['customerCode'].valid ? 'required-input' : 'valid-input'"
+                    [attr.disabled]="true" name="customerCode" class="form-control">
+                </div>
+
+              </div>
+
+              <div class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Type
+                </label>
+                <div class="col-md-4">
+                  <select type="text" [attr.disabled]="true" name="prospectTypeId" formControlName="prospectTypeId" id="prospectTypeId" class="form-control"
+                    [ngClass]="!propspectCustomerForm.controls['prospectTypeId'].valid ? 'required-input' : 'valid-input'">
+                    <option value="">-- Select Type --</option>
+                    <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                      {{ type.name }}
+                    </option>
+                  </select>
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Type
+                </label>
+                <div class="col-md-4">
+                  <select [attr.disabled]="true" type="text" name="customerTypeId" formControlName="customerTypeId" id="customerTypeId" class="form-control"
+                    [ngClass]="!propspectCustomerForm.controls['customerTypeId'].valid ? 'required-input' : 'valid-input'">
+                    <option value="">-- Select Type --</option>
+                    <option *ngFor="let type of customerTypes" [value]="type.customerTypeId">
+                      {{ type.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div *ngIf="isCorporate" class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Corporate Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="prospectFirstName" [ngClass]="!propspectCustomerForm.controls['prospectFirstName'].valid ? 'required-input' : 'valid-input'"
+                    name="prospectFirstName" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Corporate Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="firstName" [ngClass]="!propspectCustomerForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                    name="firstName" class="form-control">
+                </div>
+              </div>
+              <div *ngIf="!isCorporate" class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Name
+                  <!-- Prospect  {{firstNameLabel}} -->
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="prospectFirstName" [ngClass]="!propspectCustomerForm.controls['prospectFirstName'].valid ? 'required-input' : 'valid-input'"
+                    name="prospectFirstName" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Name
+                  <!-- Customer {{firstNameLabel}} -->
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="firstName" [ngClass]="!propspectCustomerForm.controls['firstName'].valid ? 'required-input' : 'valid-input'"
+                    name="firstName" class="form-control">
+                </div>
+              </div>
+              <div *ngIf="!isCorporate" class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Middle Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="prospectMiddleName" [ngClass]="!propspectCustomerForm.controls['prospectMiddleName'].valid ? 'required-input' : 'valid-input'"
+                    name="prospectMiddleName" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Middle Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="middleName" [ngClass]="!propspectCustomerForm.controls['middleName'].valid ? 'required-input' : 'valid-input'"
+                    name="middleName" class="form-control">
+                </div>
+              </div>
+              <div *ngIf="!isCorporate" class="form-group">
+                <label for="" class="control-label col-md-2">
+                  Prospect Last Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="prospectLastName" [ngClass]="!propspectCustomerForm.controls['prospectLastName'].valid ? 'required-input' : 'valid-input'"
+                    name="prospectLastName" class="form-control">
+                </div>
+                <label for="" class="control-label col-md-2">
+                  Customer Last Name
+                </label>
+                <div class="col-md-4">
+                  <input [attr.disabled]="true" type="text" formControlName="lastName" [ngClass]="!propspectCustomerForm.controls['lastName'].valid ? 'required-input' : 'valid-input'"
+                    name="lastName" class="form-control">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+
+              <button type="submit" [disabled]="propspectCustomerForm.invalid" (click)="submitUpdateProspectDetails(propspectCustomerForm)"
+                class="btn btn-success pull-right">Update</button>
+              <button type="button" (click)="backToList()" style="margin-right:5px" class="btn btn-danger pull-right">Back To List</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

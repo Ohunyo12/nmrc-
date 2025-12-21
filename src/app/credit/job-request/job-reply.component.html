@@ -1,0 +1,1010 @@
+<div style="margin-bottom:0" class="panel panel-default">
+    <div class="panel-heading">
+        <div style="margin-left:0" class="row">
+            <h2 class="panel-title  pull-left">
+                Job Posted by {{fromSender}}
+            </h2>
+            <!-- <div class="col-md-12">
+                <button type="button" (click)="emitCloseNoRefresh()" style="margin-right:5px" class="btn link-danger pull-right">Close</button>
+            </div> -->
+            <span href="#" (click)="emitCloseNoRefresh()" class="pull-right remove-btn" style="margin-right:5px">
+                <i class="glyphicon glyphicon-remove-sign"></i>
+            </span>
+        </div>
+        
+    </div>
+    <div class="panel-body" style="overflow:auto;">
+        <div class="form-horizontal">
+            <p-tabView [activeIndex]="tabIndex">
+                <p-tabPanel header="JOB REVIEW & PROCESSING">
+                        <p-tabView [activeIndex]="0">
+                            <p-tabPanel [selected]="true" header="Request">
+                                <div class="panel-body" >
+                                     <div class="col-md-12 ">
+                                        <strong>{{contentSubject}}</strong>
+                                    </div>
+                                    <!-- <p-accordionTab *ngIf="viewOnly" header="Re-route">
+                                            <div class="panel-body ">
+                                                <div class="form-group">
+                                                   
+                                                    <div class="col-md-4 ">
+                                                        <select name="departmentUnitId" id="departmentUnitId" class="form-control" (change)="onDepartmentUnitSelect($event.target.value)" >
+                                                            <option value="">-- New Destination Unit --</option>
+                                                            <option *ngFor="let x of jobDestinationUnits" [value]="x.jobTypeUnitId">{{ x.unitName }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </p-accordionTab> -->
+                                    <p-accordion #accordion>
+                                        <p-accordionTab *ngIf="viewOnly" header="Re-route">
+                                            <div class="panel-body ">
+                                                <div class="form-group">
+                                                    <!-- <label for="departmentUnitId" class="control-label col-md-2"></label> -->
+                                                    <div class="col-md-4 ">
+                                                        <select name="departmentUnitId" id="departmentUnitId" class="form-control" (change)="onDepartmentUnitSelect($event.target.value)" >
+                                                            <option value="">-- New Destination Unit --</option>
+                                                            <option *ngFor="let x of jobDestinationUnits" [value]="x.jobTypeUnitId">{{ x.unitName }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-accordionTab>
+                                        <p-accordionTab [selected]="true"  header="Request Message">
+                                            <div class="form-group">
+                                                <div class="col-md-12 ">
+                                                    <div class="panel-body" style="min-height:220px;">
+                                                        <div [innerHTML]="contentInfo" class="paper" style="overflow:auto;height:200px"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-accordionTab>
+                                        <p-accordionTab *ngIf="responseComment != null" [selected]="false"  header="Response Message">
+                                            <div class="form-group">
+                                                <div class="col-md-12 ">
+                                                    <div class="panel-body" style="min-height:220px;">
+                                                        <div [innerHTML]="responseComment" class="paper" style="overflow:auto;height:200px"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p-accordionTab>
+                                    </p-accordion>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Customer Info">
+                                <div style="overflow:auto; height:200px">
+                                    <div class="form-horizontal">
+                                        <div class="panel-body">
+                                             <button type="button" class="btn btn-primary" (click)="showCustomerInformation()" style="margin-right:5px">
+                                                <i class="glyphicon glyphicon-info"></i> Show Customer Information</button> 
+                                                <app-customer-information-detail [loanApplicationId]="loanApplicationId"></app-customer-information-detail>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Loan Info">
+                                <div style="overflow:auto; height:300px">
+                                    <div class="form-horizontal">
+                                        <div class="panel-body">
+                                         <div *ngIf="loanData != null && isApplicationDetailBased">
+                                            <app-loan-application-details-view 
+                                                [isRecommendedInfo]="true" 
+                                                [loanApplicationId]="loanApplicationId" 
+                                                [loanApplicationDetail]="loanApplicationDetailId"> 
+                                            </app-loan-application-details-view>
+                                        </div>
+                                        <div *ngIf="loanData != null && isLoanManagementSystemDrivenRequest && lmsRData[0] != null ">
+                                            <app-disbursed-facility-detail 
+                                                [termLoanId]="lmsRData[0]['loanId']" 
+                                                [displayDetails]=true 
+                                                [customerId]="loanData['customerId']" 
+                                                [loanSystemTypeId]="lmsRData[0]['loanSystemTypeId']"> 
+                                            </app-disbursed-facility-detail>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel  header="Facility Appraisal Memorandum" >
+                                <div class="row">
+                                    <div class="col-md-12" style="margin-bottom:5px">
+                                        <app-form-3800b-los [applicationReferenceNumber]="applicationReferenceNumber"></app-form-3800b-los>
+                                        <!-- <iframe [src]="reportSource" id="report" name="report" frameborder="2" height="500px" width="1000px" style="overflow:auto"></iframe> -->
+                                        <!-- <div [innerHTML]="form3800bSrc.documentTemplate" id="letter" class="paper" style="overflow:auto;height:400px"></div> -->
+                                    </div>
+                                   
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Supporting Documents">
+                                    <!-- <document-upload *ngIf="jobRequestId>0"
+                                            [reload]="reload"
+                                            [operationId]="OPERATION_ID"
+                                            [customerId]="loanData.customerId"
+                                            [targetId]="jobRequestId"
+                                            [targetReferenceNumber]="lcReferenceNumber">
+                                    </document-upload> -->
+                                <!-- <div class="form-group">
+                                    <label for="documentTitle" class="control-label col-md-2">Document Description</label>
+                                    <div class="col-md-8">
+                                        <input type="text" [(ngModel)]="uploadFileTitle" class="form-control" name="uploadFileTitle"  placeholder="Document title...">
+                                    </div>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                        <label for="document" class="control-label col-md-2">Select Document</label>
+                                        <div class="col-md-8">
+                                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".xls,.xlsx,.pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                #fileInput name="fileInput"  style="padding-top:2px;"
+                                                class="form-control">
+                                        </div>
+                                </div> -->
+                                <!-- <div class="form-group">
+                                    <label for="document" class="control-label col-md-2"></label>
+                                    <div class="col-md-2">
+                                        <button (click)="validateUpload()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null || uploadFileTitle ==undefined || file==undefined">
+                                            <span class="glyphicon glyphicon-upload"></span> Upload</button> 
+                                    </div>
+                                </div> -->
+                                
+                                <div class="form-group">
+                                    <div class="panel-body col-md-12 ">
+                                        <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                            <p-column field="documentTitle" header="Document Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                            <p-column field="systemDateTime" header="Arrival Date" sortable="true" [filter]="true"
+                                                    filterMatchMode="contains">
+                                                    <ng-template let-col let-row="rowData" pTemplate="body">
+                                                        <span  *ngIf="row.systemDateTime != null && row.systemDateTime != undefined">
+                                                            {{ row.systemDateTime | date : 'yMdjm'  }}
+                                                    </span>
+                                                    <span  *ngIf="row.systemDateTime == null || row.systemDateTime == undefined">
+                                                            n/a
+                                                    </span>
+                                                    </ng-template>
+                                                </p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                     <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d)" href="javascript:void(0)">View</a> 
+                                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d)" href="javascript:void(0)">Download</a>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="!viewOnly" header="{{jobDataText}}">
+                                <div class="form-horizontal">
+                                    <div class="panel-body" style="overflow:auto;height:250px">
+                                                        <div *ngIf="invoiceDiscountDetail.length > 0">
+                                                            <p-dataTable [responsive]="true" [paginator]="false" [pageLinks]="true" [value]="invoiceDiscountDetail" [(selection)]="invoiceDiscountItem" (onRowSelect)="onSelectedInvoiceItem($event)">
+                                                                <p-column field="principalName" header="Principal Name"></p-column>
+                                                                <p-column [style]="{'width':'90px'}" field="contractNumber" header="Contract No."></p-column>
+                                                                <p-column field="purchaseOrderNumber" header="Purchase Order No."></p-column>
+                                                                <p-column [style]="{'width':'90px'}" field="invoiceNo" header="Invoice No."></p-column> 
+                                                                <p-column field="invoiceAmount" header="Invoice Amount">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{item.invoiceAmount | currency:item.invoiceCurrencyCode:true:'1.2-2' }}
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="invoiceDate" header="Invoice Date">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{item.invoiceDate | date : 'dd/MM/yyyy' }}
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="contractStartDate" header="Contract Start Date">
+                                                                        <ng-template pTemplate="body" let-item="rowData">
+                                                                            {{item.contractStartDate | date : 'dd/MM/yyyy' }}
+                                                                        </ng-template>
+                                                                    </p-column>
+                                                                    <p-column field="contractEndDate" header="Contract End Date">
+                                                                            <ng-template pTemplate="body" let-item="rowData">
+                                                                                {{item.contractEndDate | date : 'dd/MM/yyyy' }}
+                                                                            </ng-template>
+                                                                        </p-column>
+                                                                    <!-- <p-column *ngIf="filteredJobData['loggedInStaffId'] ==filteredJobData['reassignedTo'] || filteredJobData['loggedInStaffId'] ==filteredJobData['receiverStaffId']" [style]="{'text-align':'right','width':'135px'}" field="approvaStatusId" header="Status">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        <select (change)="onApprovalStatusChange($event.target.value,false,item)" class="form-control">
+                                                                            <option value="">-- Status --</option>
+                                                                            <option *ngFor="let x of jobInvoiceApprovalStatus" [value]="x.approvalStatusId">{{ x.approvalStatusName }}</option>
+                                                                        </select>
+                                                                    </ng-template>
+                                                                </p-column> -->
+                                                                
+                                                                <p-column header="Revalidated" [style]="{'width':'7%'}">
+                                                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                                            <span *ngIf="d.revalidated" style="color:#a9a9a9;" class="glyphicon glyphicon-ok"></span>
+                                                                        </ng-template>
+                                                                    </p-column>
+                                                            </p-dataTable>
+                                                        </div>
+                
+                                                        <div *ngIf="bondsAndGaurantees.length > 0">
+                                                            <p-dataTable [responsive]="true" [paginator]="false" [pageLinks]="true" [value]="bondsAndGaurantees" (onRowSelect)="onSelectedBondItem($event)">
+                                                                <p-column field="amount" header="Amount">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{item.amount | currency:item.invoiceCurrencyCode:true:'1.2-2'}}
+                                                                    </ng-template>
+                
+                                                                </p-column>
+                                                                <p-column field="isTenored" header="Tenured?">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        <span *ngIf="item.isTenored">Yes</span>
+                                                                        <span *ngIf="!item.isTenored">No</span>
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="contractStartDate" header="Contract Start Date">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{ item.contractStartDate | date : 'dd/MM/yyyy'}}
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="contractEndDate" header="Contract End Date">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{ item.contractEndDate | date : 'dd/MM/yyyy'}}
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="isBankFormat" header="Bank's Format?">
+                                                                    <ng-template pTemplate="body" let-item="rowData">
+                                                                        <span *ngIf="item.isBankFormat">Yes</span>
+                                                                        <span *ngIf="!item.isBankFormat">No</span>
+                                                                    </ng-template>
+                                                                </p-column>
+                                                                <p-column field="principalName" header="Principal"></p-column>
+                                                            </p-dataTable>
+                                                        </div>
+                
+                                                        <div *ngIf="firstEduDetail != null">
+                                                            <table class="table table-casa-information">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><strong>Students#</strong></td>
+                                                                        <td><strong>Average School Fees</strong></td>
+                                                                        <td><strong>Previous School Fees Per Term </strong></td>
+                                                                        <td><strong>Product Class</strong></td>
+                                                                    </tr>
+                                                                    <tr *ngFor="let x of firstEduDetail">
+                                                                        <td>{{ x.numberOfStudent}}</td>
+                                                                        <td>{{ x.averageSchoolFees | number:'1.2'}}</td>
+                                                                        <td>{{ x.totalPreviousTermSchoolFees | number:'1.2'}}</td>
+                                                                        <td>{{ x.productClassName}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div *ngIf="firstTraderDetail != null">
+                                                            <table class="table table-casa-information">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td><strong>Market</strong></td>
+                                                                        <td><strong>Monthly Turnover</strong></td>
+                                                                    </tr>
+                                                                    <tr *ngFor="let x of firstTraderDetail">
+                                                                        <td>{{ x.marketName }}</td>
+                                                                        <td>{{ x.averageMonthlyTurnover | number:'1.2-2'}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                    </div>
+                                    <div *ngIf="invoiceDiscountItem.length > 0 && lastTabText != null" class="panel-body" style="overflow:auto;height:137px">
+                                        <strong class="primary-font">{{ lastTabText}}</strong>
+                                        <table *ngIf="loanData" class="table table-customer-information" title="{{lastTabText}}">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Principal Name</strong></td>
+                                                    <td>{{invoiceDiscountItem['principalName']}}</td>
+                                                    <td><strong>Invoice Number</strong></td>
+                                                    <td>{{invoiceDiscountItem['invoiceNo']}}</td>
+                                                    <td><strong>Invoice Amount</strong></td>
+                                                    <td> {{invoiceDiscountItem['invoiceAmount'] | currency:invoiceDiscountItem['currencyCode']:true:'1.2-2' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Contract Start Date</strong></td>
+                                                    <td>{{invoiceDiscountItem['contractStartDate'] | date : 'dd/MM/yyyy' }}</td>
+                                                    <td><strong>Contract End Date</strong></td>
+                                                    <td>{{invoiceDiscountItem['contractEndDate'] | date : 'dd/MM/yyyy' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Invoice Date</strong></td>
+                                                    <td>{{invoiceDiscountItem['invoiceDate'] | date : 'dd/MM/yyyy' }}</td>
+                                                    <td><strong>Pricipal Name</strong></td>
+                                                    <td>{{invoiceDiscountItem['principalName']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong> Principal Account</strong></td>
+                                                    <td>{{invoiceDiscountItem['principalAccount'] }}</td>
+                                                    <td><strong>Pricipal Registration No.</strong></td>
+                                                    <td>{{invoiceDiscountItem['principalRegNo']}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                
+                            <p-tabPanel *ngIf="!viewOnly" header="{{jobCollateralText}}" [disabled]="!hasCollateral">
+                                <div class="panel-body" *ngIf="hasCollateral" style="overflow:auto;height:350px">
+                                    <form [formGroup]="jobForm" *ngIf="userInfo.staffRole =='LEGAL' && !filteredJobData['hasLegalRecommendedSearch']" autocomplete="off">
+                                        <div class="form-group ">
+                                            <div class=" col-md-12">
+                                                <label for="stateId" class="control-label col-md-2"> State</label>
+                                                <div class="col-md-4">
+                                                    <select (change)="onSelectedStateChange($event.target.value)" id="stateId" name="stateId" formControlName="stateId" class="form-control" [ngClass]="!jobForm.controls['stateId'].valid ? 'required-input' : 'valid-input'">
+                                                      <option value="">-- Select Collateral State --</option>
+                                                      <option *ngFor="let x of states" [value]="x.stateId">{{ x.stateName }}</option>
+                                                    </select>
+                                                </div>
+                                                <label for="collateralState" class="control-label col-md-2">Solicitor</label>
+                                                <div class="col-md-4">
+                                                    <select (change)="onSelectedSolicitorChange($event.target.value)" id="solicitorId" name="solicitorId" formControlName="solicitorId" class="form-control" [ngClass]="!jobForm.controls['solicitorId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Solicitor --</option>
+                                                        <option *ngFor="let x of solicitors" [value]="x.accreditedConsultantId">{{ x.firmName }}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="collateralState != null" class="form-group">
+                                            <div class=" col-md-12">
+                                                <label for="stateId" class="control-label col-md-2">Search Class</label>
+                                                <div class="col-md-4">
+                                                    <select (change)="onSelectedSearchClass($event.target.value)" id="jobSubTypeClassId" name="jobSubTypeClassId" formControlName="jobSubTypeClassId" class="form-control" [ngClass]="!jobForm.controls['jobSubTypeClassId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Search Class --</option>
+                                                        <option *ngFor="let x of jobSubTypeClass" [value]="x.jobSubTypeclassId">{{ x.jobSubTypeclassName }}</option>
+                                                    </select>
+                                                </div>    
+                                                <label  for="searchAmount" class="control-label col-md-2">Search Amount</label>
+                                                <div  class="col-md-4">
+                                                  <input type="text" formartM formControlName="searchAmount"  name="searchAmount" [ngClass]="!jobForm.controls['searchAmount'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div *ngIf="collateralState != null" class="form-group ">
+                                            <div class=" col-md-12">
+                                                    <label  for="searchAmount" class="control-label col-md-2"></label>
+                                                <div class="col-md-4">
+                                                    <button type="button" [disabled]="jobForm.invalid" (click)="AddCharge()" class="btn btn-primary pull-right"> Add Charge </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="searchModel.length > 0" class="form-group ">
+                                            <label for="collateralState" class="control-label col-md-2">Search Information</label>
+                                            <div class=" col-md-10">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>S/No</th>
+                                                            <th >Search Class</th>
+                                                            <th >Amount</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let p of searchModel; let indx=index">
+                                                            <td> {{indx + 1}}</td>
+                                                            <td>{{p.jobSubTypeclassName}}</td>
+                                                            <td style="width:150px">{{p.amount | number : '1.2'}}</td>
+                                                            <td style="padding: 0;width:50px">
+                                                                <a (click)="removeSearchFee($event,indx)" style="color:#ff0000" href="#">
+                                                                    <i class="fa fa-times" aria-hidden="true"></i>X</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                                                            
+                                        <div class="form-group ">
+                                            <label for="collateralState" class="control-label col-md-2"></label>
+                                            <div class=" col-md-10">
+                                                <table *ngIf="selectedSolictor != null" class="table table-bordered table-customer-information">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><strong>Contact Name</strong></td>
+                                                            <td>{{selectedSolictor[0].name}}</td>
+                                                            <td><strong>Phone</strong></td>
+                                                            <td>{{selectedSolictor[0].phoneNumber}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Firm Name</strong></td>
+                                                            <td>{{selectedSolictor[0].firmName}}</td>
+                                                            <td><strong>Core Competence</strong></td>
+                                                            <td>{{selectedSolictor[0].coreCompetence}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>Email</strong></td>
+                                                            <td>{{selectedSolictor[0].emailAddress}}</td>
+                                                            <td><strong>Reg. Number</strong></td>
+                                                            <td>{{selectedSolictor[0].registrationNumber}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <label for="solicitorMail" class="control-label col-md-2">Mail To Solicitor</label>
+                                                <div class="col-md-10">
+                                                    <p-editor placeholder="Message Body"  id="solicitorMail"  name="solicitorMail" formControlName="solicitorMail" id="solicitorMail" [ngClass]="jobForm.controls['solicitorMail'].valid ? 'valid-input' : 'required-input'"
+                                                    [style]="{'height':'145px'}" >
+                                                        <p-header>
+                                                            <span class="ql-formats">
+                                                            <select class="ql-header">
+                                                            <option value="1">Heading</option>
+                                                            <option value="2">Subheading</option>
+                                                            <option selected>Normal</option>
+                                                            </select>
+                                                            <select class="ql-font">
+                                                            <option selected>Sans Serif</option>
+                                                            <option value="serif">Serif</option>
+                                                            <option value="monospace">Monospace</option>
+                                                            </select>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                            <button class="ql-bold" aria-label="Bold"></button>
+                                                            <button class="ql-italic" aria-label="Italic"></button>
+                                                            <button class="ql-underline" aria-label="Underline"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                            <select class="ql-color"></select>
+                                                            <select class="ql-background"></select>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                            <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                                            <button class="ql-list" value="bullet" aria-label="Unordered List"></button>
+                                                            <select class="ql-align">
+                                                            <option selected></option>
+                                                            <option value="center"></option>
+                                                            <option value="right"></option>
+                                                            <option value="justify"></option>
+                                                            </select>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                            <button class="ql-link" aria-label="Insert Link"></button>
+                                                            <button class="ql-code-block" aria-label="Insert Code Block"></button>
+                                                            </span>
+                                                            <span class="ql-formats">
+                                                            <button class="ql-clean" aria-label="Remove Style"></button>
+                                                            </span>
+                                                        </p-header>
+                                                    </p-editor>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class=" col-md-12">
+                                                <div class="col-md-4">
+                                                    <button type="button" [disabled]="jobForm.invalid && searchModel.length <= 0" (click)="SaveCollateralSearchInstruction()" class="btn btn-primary pull-right"> Forward To RM </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    
+                                    <div *ngIf="userInfo.staffRole =='LEGAL' && filteredJobData['hasLegalRecommendedSearch'] == true ">
+                                        <span>Collateral related charges already recommended!</span>
+                                    </div> 
+                                    <div *ngIf="userInfo.staffRole =='LEGAL' && filteredJobData['consultantPaid'] == true">
+                                        <span>Solicitor has been paid!</span>
+                                    </div>
+
+                                    <div *ngIf="userInfo.staffRole =='RELATIONSHIP MANAGER' && filteredJobData['hasLegalRecommendedSearch'] == true && !filteredJobData['customerCharged'] ">
+                                         <form [formGroup]="rmJobForm" autocomplete="off">
+                                            <div class="form-group">
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-10 ">
+                                                    <p-checkbox label="Charge Business" (onChange)="setVerificationChargeBase($event)"></p-checkbox>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="rmSearchModel.length > 0" class="form-group ">
+                                                <label for="collateralState" class="control-label col-md-2">Search Information</label>
+                                                <div class=" col-md-10">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>S/No</th>
+                                                                <th >Search Class</th>
+                                                                <th >Amount</th>
+                                                                <!-- <th></th> -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let p of rmSearchModel; let indx=index">
+                                                                <td> {{indx + 1}}</td>
+                                                                <td>{{p.jobSubTypeclassName}}</td>
+                                                                <td style="width:150px">{{p.amount | number : '1.2'}}</td>
+                                                                <!-- <td style="padding: 0;width:50px">
+                                                                    <a (click)="removeSearchFee($event,indx)" style="color:#ff0000" href="#">
+                                                                        <i class="fa fa-times" aria-hidden="true"></i>X</a>
+                                                                </td> -->
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="form-group">
+                                                    <div class=" col-md-12">
+                                                        <label for="searchAmount" class="control-label col-md-2">Search Amount</label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" [attr.disabled]="true" formartM formControlName="searchAmount" name="searchAmount" [ngClass]="!rmJobForm.controls['searchAmount'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <label for="verificationAmount" class="control-label col-md-2">Verification Amount</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" [attr.disabled]="true" formartM formControlName="verificationAmount" name="verificationAmount" [ngClass]="!rmJobForm.controls['verificationAmount'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <label for="chartAmount" class="control-label col-md-2">Chart Amount</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" [attr.disabled]="true" formartM formControlName="chartAmount" name="chartAmount" [ngClass]="!rmJobForm.controls['chartAmount'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <label for="additionalChargeAmount" class="control-label col-md-2">Additional Charge</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" [attr.disabled]="true" formartM formControlName="additionalChargeAmount" name="additionalChargeAmount" [ngClass]="!rmJobForm.controls['additionalChargeAmount'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <label for="additionalChargeJustification" class="control-label col-md-2">Additional Charge Description</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" [attr.disabled]="true" formartM formControlName="additionalChargeJustification" name="additionalChargeJustification" [ngClass]="!rmJobForm.controls['additionalChargeJustification'].valid ? 'required-input' : 'valid-input'" class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                            <div *ngIf="!canChargeBusiness" class="form-group ">
+                                                <div class=" col-md-12">
+                                                    <label *ngIf="!canChargeBusiness" for="collateralState" class="control-label col-md-2">Customer Account</label>
+                                                    <div *ngIf="!canChargeBusiness" class="col-md-4">
+                                                        <select   id="casaAccountId" name="casaAccountId" formControlName="casaAccountId" class="form-control" [ngClass]="!rmJobForm.controls['casaAccountId'].valid ? 'required-input' : 'valid-input'">
+                                                            <option value="">-- Select Customer Account --</option>
+                                                            <option *ngFor="let x of customerAccount" [value]="x.casaAccountId">{{ x.productAccountNumber }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <label for="feeNarration" class="control-label col-md-2">Narration</label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" formControlName="feeNarration" name="feeNarration" [ngClass]="!rmJobForm.controls['feeNarration'].valid || rmJobForm.controls['feeNarration'] ? 'required-input' : 'valid-input'" class="form-control" >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class=" col-md-12">
+                                                    <!-- <label for="stateId" class="control-label col-md-2"></label> -->
+                                                    <div class="col-md-4">
+                                                        <button type="button" [disabled]="rmJobForm.invalid" (click)="promptToGoForApproval()" class="btn btn-primary pull-right"> Post Charges</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                         </form>
+                                    </div>
+                                    <div *ngIf="userInfo.staffRole =='RELATIONSHIP MANAGER' && filteredJobData['hasLegalRecommendedSearch'] == true && filteredJobData['customerCharged']  && !filteredJobData['consultantPaid']">
+                                        <span>Collateral related charges has been committed.</span>
+                                    </div>
+                                    <div *ngIf="userInfo.staffRole =='RELATIONSHIP MANAGER' && filteredJobData['consultantPaid'] == true">
+                                        <span>Note: Payment for collateral related service has been made to the solicitor.</span>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                
+                            <p-tabPanel *ngIf="!viewOnly" header="{{collateralDetailsText}}" [disabled]="hideCollateralDetailsTab">
+                                <div class="panel-body" style="overflow:auto;height:300px">
+                                    <div class="form-horizontal">
+                                        <collateral-information-view [showCollateralInformation]=true [isHeaderInfoBased]=false [jobReply]="true" [collateralCustomerId]=collateralCustomerId [useSearch]=false [collateralTypeId]=collateralTypeId [repeatbleSearch]=false>
+                                        </collateral-information-view>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                
+                        </p-tabView>
+                </p-tabPanel>
+                <p-tabPanel *ngIf="!viewOnly" header="RESPONSE">
+                    <form [formGroup]="replyForm" autocomplete="off">
+                        <div *ngIf="isReplied" class="panel-body" style="overflow:auto; ">
+                            <span>You are not enabled to respond to this request. The request has already been responded </span>
+                            <div *ngIf="responseComment != null || responseComment != undefined || filteredJobData['requestStatusId'] == 5" class="form-group" class="form-group">
+                                <div class="col-md-12 ">
+                                    <div class="panel-body" style="min-height:220px;">
+                                        <div [innerHTML]="responseComment" class="paper" style="overflow:auto;height:200px"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="Status" class="control-label col-md-2">Job request status </label>
+                                    <div class="col-md-4 ">
+                                        {{filteredJobData['requestStatusname']}}
+                                    </div>
+                                    <label for="Status" class="control-label col-md-2" *ngIf="filteredJobData['jobStatusFeedBack'] != null && filteredJobData['jobStatusFeedBack'] != undefined">Reason for rejection  </label>
+                                    <div class="col-md-4 " *ngIf="filteredJobData['jobStatusFeedBack'] != null && filteredJobData['jobStatusFeedBack'] != undefined">
+                                        {{filteredJobData['jobStatusFeedBack']}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div *ngIf="!isReplied" class="panel-body" style="overflow:auto;height:390px">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <p-editor placeholder="Message Body" formControlName="responseComment" id="responseComment" [ngClass]="replyForm.controls['responseComment'].valid ? 'valid-input' : 'required-input'" name="responseComment"
+                                            [style]="{'height':'145px'}" >
+                                            <p-header>
+                                                <span class="ql-formats">
+                                                <select class="ql-header">
+                                                <option value="1">Heading</option>
+                                                <option value="2">Subheading</option>
+                                                <option selected>Normal</option>
+                                                </select>
+                                                <select class="ql-font">
+                                                <option selected>Sans Serif</option>
+                                                <option value="serif">Serif</option>
+                                                <option value="monospace">Monospace</option>
+                                                </select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-bold" aria-label="Bold"></button>
+                                                <button class="ql-italic" aria-label="Italic"></button>
+                                                <button class="ql-underline" aria-label="Underline"></button>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <select class="ql-color"></select>
+                                                <select class="ql-background"></select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                                <button class="ql-list" value="bullet" aria-label="Unordered List"></button>
+                                                <select class="ql-align">
+                                                <option selected></option>
+                                                <option value="center"></option>
+                                                <option value="right"></option>
+                                                <option value="justify"></option>
+                                                </select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-link" aria-label="Insert Link"></button>
+                                                <button class="ql-code-block" aria-label="Insert Code Block"></button>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-clean" aria-label="Remove Style"></button>
+                                                </span>
+                                            </p-header>
+                                        </p-editor>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Status" class="control-label col-md-2">Request Status</label>
+                                    <div class="col-md-4">
+                                        <select (change)="onApprovalStatusChange($event.target.value,true)" formControlName="statusId" [ngClass]="replyForm.controls['statusId'].valid ? 'valid-input' : 'required-input'" class="form-control">
+                                            <option *ngFor="let x of jobApprovalStatus" [value]="x.approvalStatusId">{{ (isLegal && x.approvalStatusName == 'Approved') ? 'Submit' : (isLegal && x.approvalStatusName == 'Disapproved') ? 'Reject' : x.approvalStatusName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div *ngIf="isRejection" class="form-group">
+                                    <label for="Status" class="control-label col-md-2">Reason For Disapproval </label>
+                                    <div *ngIf="isRejection" class="col-md-4 ">
+                                        <select name="feedBackId" id="feedBackId" formControlName="feedBackId" [ngClass]="replyForm.controls['feedBackId'].valid ? 'valid-input' : 'required-input'" class="form-control" >
+                                        <option value="">-- Select Reason --</option>
+                                        <option *ngFor="let x of statusFeedbackList" [value]="x.jobStatusFeedbackId">{{ x.jobStatusFeedbackName }}</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                        <label for="documentTitle" class="control-label col-md-2">Document Description</label>
+                                        <div class="col-md-10">
+                                        <input type="text" [(ngModel)]="uploadFileTitle" onblur="mandateFileAttachment()" class="form-control" name="description" formControlName="description" [ngClass]="replyForm.controls['description'].valid ? 'valid-input' : 'required-input'" placeholder="Document title..." >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="document" class="control-label col-md-2">Supporting Document</label>
+                                        <div class="col-md-10">
+                                            <input type="file" (change)="onFileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg" #fileInput name="fileInput" formControlName="fileInput" style="padding-top:2px;" class="form-control" >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="document" class="control-label col-md-2"></label>
+                                        <div class="col-md-4">
+                                            <button (click)="validateUpload()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null || file==undefined"><span class="glyphicon glyphicon-upload"></span>  Upload</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="panel-body col-md-12 ">
+                                            <p-dataTable [value]="supportingDocuments" [paginator]="true" [rows]="5">
+                                                <p-column field="documentTitle" header="Document Title" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                                <p-column field="fileExtension" header="Type" [filter]="true" filterMatchMode="contains" [style]="{'width':'60px'}"></p-column>
+                                                <p-column field="systemDateTime" header="Arrival Date" sortable="true" [filter]="true"
+                                                    filterMatchMode="contains">
+                                                    <ng-template let-col let-row="rowData" pTemplate="body">
+                                                        <span  *ngIf="row.systemDateTime != null && row.systemDateTime != undefined">
+                                                            {{ row.systemDateTime | date : 'dd/MM/yyyy'  }}
+                                                    </span>
+                                                    <span  *ngIf="row.systemDateTime == null || row.systemDateTime == undefined">
+                                                            n/a
+                                                    </span>
+                                                    </ng-template>
+                                                </p-column>
+                                                <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"> </ng-template>
+                                                    <ng-template pTemplate="body" let-d="rowData" let-i="rowIndex">
+                                                        <a *ngIf="['jpg','jpeg', 'png'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="viewDocument(d)" href="javascript:void(0)">View</a>
+                                                        <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="DownloadDocument(d)" href="javascript:void(0)">Download</a>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
+                                </div>
+                                <div class="panel-footer">
+                                    <div class="input-group">
+                                        <span class=" input-group-btn ">
+                                            <button type="button" (click)="replyJobRequest(replyForm)" [disabled]="replyForm.invalid"  class="btn btn-warning btn-sm pull-right"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span>Send</button>
+                                        </span>
+                                    </div>
+                                    
+                                </div>
+                            <!-- </div> -->
+                        </div>
+                    </form>
+                </p-tabPanel>
+                <p-tabPanel  header="REFER BACK">       
+                     <form  [formGroup]="commentForm" autocomplete="off">
+                        <div class="panel-body">
+                            <button type="button" (click)="getJobComments(this.jobRequestId)" class="btn btn-default btn-sm pull-right">
+                                <span class="glyphicon glyphicon-refresh"></span> Refresh
+                            </button>
+                        </div>
+                
+                        <div class="panel-body" style="overflow-y: scroll; height:200px;">
+                            <ul class="chat" *ngFor="let entry of jobComments">
+                                <li class="left clearfix"><span class="chat-img pull-right">
+                                    <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" />
+                                    </span>
+                                    <div class="chat-body clearfix">
+                                        <div class="header">
+                                            <strong class="primary-font">{{ entry.staffName}}</strong> <small class="pull-right text-muted">
+                                                <span class="glyphicon glyphicon-time"></span>{{entry.datetimeSent | timeago }}</small>
+                                        </div>
+                                        <p>
+                                            {{ entry.message}}
+                                        </p>
+                                    </div>
+                                </li>
+        
+                            </ul>
+                        </div>
+                        <div *ngIf="!viewOnly && !isReplied" class="panel-footer">
+                            <div class="input-group"> 
+                                    <!-- <span class="pull-left">
+                                            <a  style="display: block" href="#">
+                                                <i class="glyphicon glyphicon-paperclip"></i>
+                                            </a>
+                                        </span> -->
+                                        
+                                     <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your comment here..." id="comment" [ngClass]="commentForm.controls[ 'comment'].valid ? 'valid-input' : 'required-input' " class="form-control" formControlName="comment"/> 
+                                    <!-- <p-editor placeholder="Type your comment here..." id="comment" [ngClass]="commentForm.controls[ 'comment'].valid ? 'valid-input' : 'required-input' " class="form-control input-sm" formControlName="comment"
+                                            [style]="{'height':'50px'}" >
+                                            <p-header>
+                                                <span class="ql-formats">
+                                                <select class="ql-header">
+                                                <option value="1">Heading</option>
+                                                <option value="2">Subheading</option>
+                                                <option selected>Normal</option>
+                                                </select>
+                                                <select class="ql-font">
+                                                <option selected>Sans Serif</option>
+                                                <option value="serif">Serif</option>
+                                                <option value="monospace">Monospace</option>
+                                                </select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-bold" aria-label="Bold"></button>
+                                                <button class="ql-italic" aria-label="Italic"></button>
+                                                <button class="ql-underline" aria-label="Underline"></button>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <select class="ql-color"></select>
+                                                <select class="ql-background"></select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                                <button class="ql-list" value="bullet" aria-label="Unordered List"></button>
+                                                <select class="ql-align">
+                                                <option selected></option>
+                                                <option value="center"></option>
+                                                <option value="right"></option>
+                                                <option value="justify"></option>
+                                                </select>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-link" aria-label="Insert Link"></button>
+                                                <button class="ql-code-block" aria-label="Insert Code Block"></button>
+                                                </span>
+                                                <span class="ql-formats">
+                                                <button class="ql-clean" aria-label="Remove Style"></button>
+                                                </span>
+                                            </p-header>
+                                        </p-editor> -->
+                                     <span class=" input-group-btn ">
+                                        <button class="btn btn-warning btn-sm " id="btn-chat" (click)="submitCommentForm(commentForm) " [disabled]="commentForm.invalid ">Send</button>
+                                        <a class="pull-right" style="display: block" href="javascript:void(0)">
+                                            <i class="glyphicon glyphicon-upload"></i>
+                                        </a>
+                                    </span>
+                                    <span class="pull-right">
+                                        <a  style="display: block" (click)="displayReferBackUpload =true" href="javascript:void(0)"> Attach file 
+                                            <!-- <i class="glyphicon glyphicon-upload"></i> -->
+                                         </a>
+                                    </span>
+                            </div>
+                        </div>
+                    </form> 
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12" style="height:50px">
+                <!-- <button type="button" (click)="emitCloseNoRefresh()" style="margin-right:5px" class="btn btn-danger pull-right">Close</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayStatusFeedbackList" [closable]="true" id="add-modal" showEffect="fade" width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Verification - Reason for Disapproval
+            </h2>
+        </div>
+        <form [formGroup]="invoiceFeedbackForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div *ngIf="isRejection" class="form-group col-md-12 ">
+                        <select name="feedBackId" id="feedBackId" formControlName="feedBackId" [ngClass]="invoiceFeedbackForm.controls['feedBackId'].valid ? 'valid-input' : 'required-input'" class="form-control" >
+                        <option value="">-- Reason For Disapproval --</option>
+                        <option *ngFor="let x of statusFeedbackList" [value]="x.jobStatusFeedbackId">{{ x.jobStatusFeedbackName }}</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row ">
+                    <div class="col-md-12">
+                        <button type="button" [disabled]="invoiceFeedbackForm.invalid" (click)="logRejectionStatus(invoiceFeedbackForm)" class="btn btn-success pull-right"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span> Save</button>
+                        <button type="button" (click)="displayStatusFeedbackList = false" style="margin-right:5px " class="btn btn-danger pull-right ">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+        <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Document Title:
+                    <strong>{{ selectedDocument }}</strong>
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayDocument=false">&times;</a>
+                </div>
+            </div>
+
+            <div class="panel-body" style="overflow:auto;height:500px">
+                <div style="margin: auto; width: 50%">
+                    <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt=""
+                        class="img-thumbnail">
+                </div>
+            </div>
+
+        </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayTwoFactorAuth" id="auth-token" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Authentication Token
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayTwoFactorAuth=false">&times;</a>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div *ngIf="!userSpecific" class="form-group">
+                        <label for="twoFactorAuthStaffCode" class="control-label col-md-12">Staff Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="twoFactorAuthStaffCode" [(ngModel)]="twoFactorAuthStaffCode" id="twoFactorAuthStaffCode" class="form-control">
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="twoFactorAuthPassCode" class="control-label col-md-12">Pass Code</label>
+                        <div class="col-md-12">
+                            <input type="password" name="twoFactorAuthPassCode" [(ngModel)]="twoFactorAuthPassCode" id="twoFactorAuthPassCode" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+    
+            <div class="panel-footer ">
+                <div class="row ">
+                    <div class="col-md-12 ">
+                        <div class="form-group text-center">
+                            <div class="col-md-12">
+                                <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="DebitAccountWithLegalFees()" style="margin-right:5px "
+                                    class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayReferBackUpload" id="auth-token" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Attach Document
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="displayReferBackUpload=false">&times;</a>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="documentTitle" class="control-label col-md-2">Document Title</label>
+                        <div class="col-md-8">
+                            <input type="text" [(ngModel)]="uploadFileTitle"  class="form-control" name="uploadFileTitle"  placeholder="Document title..." [ngClass]="uploadFileTitle != null ? 'valid-input' : 'required-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="document" class="control-label col-md-2">Select Document</label>
+                        <div class="col-md-8">
+                            <input type="file"  (change)="onFileChange($event)" placeholder="Upload file" accept=".xls,.xlsx,.pdf,.doc,.docx,.jpg,.jpeg,.png,.PNG,.JPG,.JPEG"
+                                    #fileInput name="fileInput"  style="padding-top:2px;" class="form-control" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="document" class="control-label col-md-2"></label>
+                        <div class="col-md-2">
+                            <button (click)="validateUpload()" class="btn btn-sm btn-primary" [disabled]="uploadFileTitle==null && file==undefined">
+                                <span class="glyphicon glyphicon-upload"></span> Upload</button> 
+                        </div>
+                        <!-- <span class=" input-group-btn col-md-2">
+                            <button class=" input-group-btn col-md-2" type="button" (click)="saveDocument()" [disabled]="file == undefined || file == null"  class="btn btn-warning btn-sm pull-left"><span class="glyphicon glyphicon-send" style="padding-right:4px;"></span>Upload</button>
+                        </span> -->
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer ">
+                <div class="row ">
+                    <div class="col-md-12 ">
+                        <div class="form-group text-center">
+                            <!-- <div class="col-md-12">
+                                <button type="button" [disabled]="!twoFactorAuthPassCode" (click)="DebitAccountWithLegalFees()" style="margin-right:5px "
+                                    class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light">Authenticate</button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</p-dialog>
+
+<!-- <pre> {{ selectedSolictor | json }}</pre> -->

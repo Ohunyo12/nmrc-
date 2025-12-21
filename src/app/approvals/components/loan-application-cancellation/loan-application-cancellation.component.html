@@ -1,0 +1,200 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <!-- <span [innerHtml]="test"></span> -->
+      <!--module header-->
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h2 class="panel-title pull-left">
+                          Loan Application Cancellation Approval
+                      </h2>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!--endof module header-->
+
+      <!-- <expfacility [customerId]="33"></expfacility> -->
+
+      <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+          <p-tabPanel header="Loan Applications">
+
+              <!-- loan applications -->
+              <div class="card no-padding">
+                  <div class="panel panel-default">
+
+                      <div class="panel-heading">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <h2 class="panel-title pull-left">
+                                      Loan Applications
+                                  </h2>
+          
+                                  <!-- <div class="pull-right">
+                                      <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                  </div> -->
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="panel-body">
+
+
+                          <p-dataTable [value]="applications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]"
+                              >
+
+                              <!-- <p-column [style]="{'width':'10px'}" selectionMode="single"></p-column> -->
+
+                              <p-column field="applicationDate" header="Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.applicationDate | date: 'dd-MM-yyyy' }}
+                                  </ng-template>
+                              </p-column>
+
+                              <p-column field="applicationReferenceNumber" header="Reference" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              
+                              <p-column field="applicationAmount" header="Amount" sortable="true" [filter]="true" filterMatchMode="contains" [style]="{'text-align':'right'}">
+                                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.applicationAmount | number : '1.2' }}
+                                  </ng-template>
+                              </p-column>
+
+                              <p-column field="tenorString" header="Tenor" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                              <!-- <p-column field="approvalStatus" header="Status" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+
+                              <!-- <p-column field="staffName" header="Initiated By" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                              <p-column>
+                                  <ng-template pTemplate="header"></ng-template>
+                                  <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                      <a (click)="viewLoanDetail(row)" href="javascript:void(0)"><i class="glyphicon glyphicon-eye"></i>View</a>
+                                  </ng-template>
+                              </p-column>  
+
+                          </p-dataTable>
+                      </div>
+
+                      <div class="panel-footer">
+                          <div class="row">
+                              <div class="col-md-3 col-md-offset-9 ">
+                                  <!-- buttons -->
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+              <!-- endof loan applications -->
+
+          </p-tabPanel>        
+      </p-tabView>
+
+  </div>
+</div>
+
+<!--modal for obligor / Loan details starts-->
+
+<p-dialog [responsive]=true [(visible)]="displayApplicationDetail" modal="modal" showEffect="fade" width="1200">
+  <div *ngIf="displayApplicationDetail" style="margin-bottom:0" class="panel panel-default">
+
+      <div class="panel-heading">
+          <h2 class="panel-title">
+              Loan Application Information
+          </h2>
+          <div class="pull-right"><a class="close" (click)="displayApplicationDetail=false">&times;</a></div>
+      </div>
+
+      <div class="panel-body">
+          <p-tabView>
+
+              <p-tabPanel header="General Information" >
+                  <table class="table table-casa-information">
+                      <tbody>
+                          <tr>
+                              <td><strong>Application Reference Number:</strong></td>
+                              <td>{{ application.applicationReferenceNumber }}</td>
+                              <td><strong>Group Name:</strong></td>
+                              <td colspan="2" style="text-align:left">{{ application.customerGroupName }}</td>
+                          </tr>
+                        <tr>
+                              <td><strong>Relationship Officer:</strong></td>
+                              <td>{{ application.relationshipOfficerName }}</td>
+                              <td><strong>Relationship Manager:</strong></td>
+                              <td>{{ application.relationshipManagerName }}</td>
+                              <td><strong></strong></td>
+                              <td></td>
+                          </tr>
+                          <tr>
+                              <td><strong>Amount:</strong></td>
+                              <td>{{ application.applicationAmount | number:'1.2' }}</td>
+                              <td><strong>Approved Amount:</strong></td>
+                              <td>{{ application.approvedAmount | number:'1.2' }}</td>
+                              <td><strong></strong></td>
+                              <td></td>
+                          </tr>
+                             <tr>
+                              <td><strong>Tenor:</strong></td>
+                              <td>{{ application.applicationTenor }}</td>
+                              <td><strong>Interest Rate:</strong></td>
+                              <td>{{ application.interestRate | number:'1.2' }}</td>
+                              <td><strong>Application Date:</strong></td>
+                              <td>{{ application.applicationDate | date:"dd-MM-yyyy" }}</td>
+                          </tr>
+                       <tr>
+                              <td><strong>Investment Grade:</strong></td>
+                              <td>{{ application.isInvestmentGrade ? 'Yes' : 'No' }}</td>
+                              <td><strong>Politically Exposed:</strong></td>
+                              <td>{{ application.isPoliticallyExposed ? 'Yes' : 'No' }}</td>
+                              <td><strong>Related Party:</strong></td>
+                              <td></td>
+                              <td>{{ application.isRelatedParty ? 'Yes' : 'No' }}</td> 
+                      </tr>
+                          <tr>
+                              <td><strong>Approval Status:</strong></td>
+                              <td>{{ getApprovalStatus(application.approvalStatusId) }}</td>
+                              <td><strong>Application Status:</strong></td>
+                              <td>{{ getApprovalStatus(application.applicationStatusId) }}</td>
+                              <td><strong>submitted For Appraisal:</strong></td>
+                              <td>{{ application.submittedForAppraisal ? 'Yes' : 'No' }}</td>
+                          </tr> 
+                          <tr>
+                              <td><strong>Details:</strong></td>
+                              <td colspan="3" [innerHTML]="application.loanInformation"></td>
+                          </tr> 
+                      </tbody>
+                  </table>
+                  </p-tabPanel>
+                  <p-tabPanel header="Approval Process Comments" >
+                    <div class="panel-body">
+                        <app-approval-comments [tableLabel]="'Approval Process Comments'" [operationId]="application?.operationId" [applicationId]="application?.loanApplicationId"></app-approval-comments>
+                    </div>  
+                  </p-tabPanel>
+                  <div class="well">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" placeholder="Comment" [(ngModel)]="comment" [ngClass]="comment == null || comment == '' ? 'required-input' : 'valid-input'">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" [(ngModel)]="approvalStatusId" [ngClass]="approvalStatusId =='' ? 'required-input' : 'valid-input'">
+                                <option value="">--- Select Approval ---</option>
+                                <option value="2"> Approve </option>
+                                <option value="3"> Decline </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="forward()" [disabled]="comment == null || comment == '' || approvalStatusId ==''" class="btn btn-success pull-right">
+                                Submit</button>
+                            <button type="button" (click)="displayApplicationDetail=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+          </p-tabView>
+      </div>
+
+  </div>
+</p-dialog>

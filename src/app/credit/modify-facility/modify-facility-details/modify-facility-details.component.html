@@ -1,0 +1,103 @@
+<div style="margin-bottom:0;" class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title">
+			Modify Facility
+		</div> 
+    </div>
+	<div class="panel-body" style="overflow: auto;">
+		<form [formGroup]="facilityDetailsForm" autocomplete="off">
+			<div class="form-horizontal">
+				<div class="form-group">
+					<label for="approvedProductId" class="control-label col-md-2">
+						Product
+					</label>
+					<div class="col-md-4">
+						<select name="approvedProductId" class="form-control" [ngClass]="!facilityDetailsForm.controls['approvedProductId'].valid ? 'required-input' : 'valid-input'"
+							formControlName="approvedProductId" id="approvedProductId">
+							<option value=""></option>
+							<option *ngFor="let pc of filteredProducts" value="{{pc.productId}}">
+								{{pc.productName}}
+							</option>
+						</select>
+					</div>
+
+					<!-- <label style="padding-top: 13px" for="sectorId" class="control-label col-md-2">Sector </label>
+					<div class="col-md-4">
+						<select (change)="onSectorClassChange($event.target.value)" [ngClass]="!facilityDetailsForm.controls['sectorId'].valid ? 'required-input' : 'valid-input'"
+							name="sectorId" class="form-control" formControlName="sectorId" id="sectorId">
+							<option value=""></option>
+							<option *ngFor="let pc of sectors" value="{{pc.lookupId}}">
+								{{pc.lookupName}}
+							</option>
+						</select>
+					</div> -->
+				</div>
+				<!-- <div class="form-group">
+					<label style="padding-top: 13px" for="subSectorId" class="control-label col-md-2">Subsector </label>
+					<div class="col-md-4">
+						<select [ngClass]="!facilityDetailsForm.controls['subSectorId'].valid ? 'required-input' : 'valid-input'" name="subSectorId"
+							class="form-control" formControlName="subSectorId" id="subSectorId">
+							<option value="">---Select Subsector---</option>
+							<option *ngFor="let pc of filteredSubsector" value="{{pc.subSectorId}}">
+								{{pc.sectorName}}
+							</option>
+						</select>
+					</div>
+				</div> -->
+				<div class="form-group">
+					<label for="approvedTenor" class="control-label col-md-2 pull-left">approved Tenor</label> 
+					<div>
+						<div class="col-md-2">
+							<input name="approvedTenor" formControlName="approvedTenor" [(ngModel)]="approvedTenor" [ngClass]="!facilityDetailsForm.controls['approvedTenor'].valid ? 'required-input' : 'valid-input'" class="form-control">
+						</div>
+						<div class="col-md-2">
+							<select class="form-control" formControlName="tenorModeId" [ngClass]="!facilityDetailsForm.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
+								name="tenorModeId" id="tenorModeId">
+								<option *ngFor="let item of tenorTypes" value="{{item.tenorModeId}}">{{item.name}}</option>
+							</select>
+						</div>
+					</div>
+					<div *ngIf="(isContingent != true)">
+						<label for="" class="control-label col-md-2">Interest Rate</label>
+						<div class="col-md-4">
+							<input class="form-control" [readonly]="false" type="text" formControlName="approvedInterestRate" [ngClass]="!facilityDetailsForm.controls['approvedInterestRate'].valid ? 'required-input' : 'valid-input'">
+						</div>
+					</div>
+				</div>
+
+				<product-fees [productId]="selectedProductId" [loanApplicationDetailId]="selectedDetailId" [editFee]="true" (feesCollection)="feesData($event)"> </product-fees>
+				
+				<div class="form-group">
+
+					<label for="approvedAmount" class="control-label col-md-2">Facility Amount</label>
+					<div class="col-md-4">
+					<input type="text" id="approvedAmount" formatM name="approvedAmount" [ngClass]="!facilityDetailsForm.controls['approvedAmount'].valid ? 'required-input' : 'valid-input'"
+						formControlName="approvedAmount" class="form-control">
+					</div>
+					<label for="loanDetailReviewTypeId" class="control-label col-md-2">
+						Review Type 
+					</label>
+					<div class="col-md-4">
+						<select class="form-control" id="loanDetailReviewTypeId" name="loanDetailReviewTypeId" formControlName="loanDetailReviewTypeId" [ngClass]="!facilityDetailsForm.controls['loanDetailReviewTypeId'].valid ? 'required-input' : 'valid-input'">
+							<option value=""> Select Review Type</option>
+							<option *ngFor="let item of loanReviewTypes" value="{{item.loanDetailReviewTypeId}}">{{item.loanDetailReviewTypeName}}
+							</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+				<div class="btn-group pull-right">
+					<button (click)="emitFinishModification()" type="button" class="btn btn-danger" style="margin-right:5px">Close</button>
+					<button [disabled]="facilityDetailsForm.invalid" type="button" (click)="updateFacilityDetails()"
+						class="btn btn-success">Update</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+

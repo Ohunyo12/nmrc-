@@ -1,0 +1,387 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+      <!-- <span [innerHtml]="test"></span> -->
+      <!--module header-->
+      <div class="panel panel-default">
+          <div class="panel-heading">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h2 class="panel-title pull-left">
+                          Exceptional Loan Application Search
+                      </h2>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!--endof module header-->
+
+      <!-- <expfacility [customerId]="33"></expfacility> -->
+
+      <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+          <p-tabPanel header="Exceptional Loan Applications">
+
+              <!-- loan applications -->
+              <div class="card no-padding">
+                  <div class="panel panel-default">
+
+                      <div class="panel-heading">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <h2 class="panel-title pull-left">
+                                    Exceptional Loan Applications
+                                  </h2>
+          
+                                  <div class="pull-right">
+                                      <button (click)="showSearchForm()" pButton type="button" label="Search" icon="fa-search"></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="panel-body">
+                          <p-tabView>
+                              <p-tabPanel header="Loan Applications" *ngIf="displaySearchTable" >
+                                <p-dataTable [value]="applications" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]">
+                                  <p-column field="dateTimeCreated" header="Date Created" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.dateTimeCreated | date: 'dd MMM yyyy' }}
+                                    </ng-template>
+                                  </p-column>
+                                  <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                  <p-column field="applicationReferenceNumber" header="Reference Number" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                  <p-column field="proposedAmount" header="Proposed Amount" [filter]="false" filterMatchMode="contains"
+                                    [style]="{'width':'10%','text-align':'right'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.proposedAmount | number : '1.2' }}
+                                    </ng-template>
+                                  </p-column>
+                                  <p-column field="approvedAmount" header="Approved Amount" [filter]="false" filterMatchMode="contains"
+                                    [style]="{'width':'10%','text-align':'right'}">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      {{ d.approvedAmount | number : '1.2' }}
+                                    </ng-template>
+                                  </p-column>
+                                  <!-- <p-column field="customerName" header="Customer Name" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column> -->
+                                  <p-column field="loanPurpose" header="Loan Purpose" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                                  <p-column field="proposedTenor" header="Proposed Tenor" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                  </p-column>
+                                  <p-column field="currentApprovalLevel" header="Approval Level" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                  </p-column>
+                                  <p-column field="breachedLimitName" header="Breached Limit" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                  </p-column>
+                                  <p-column field="approvalStatus" header="Approval Status" sortable="true" [filter]="true"
+                                    filterMatchMode="contains"></p-column>
+                        
+                                  <p-column [style]="{'width':'100px'}" header="Action">
+                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                      <div style="text-align:center">
+                                        <!-- <a  (click)="view(d)" href="javascript:void(0)">View</a>
+                                        <span style="padding:3px;">|</span>    --> 
+                                        <a  (click)="loadedTemplate(d)" href="javascript:void(0)">Memo</a>
+                                                            
+                                      </div>
+                                    </ng-template>
+                                  </p-column>
+                                  <p-column *ngIf="isAmongActivities('Reassign Loan')">
+                                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a *ngIf="row.approvalTrailId > 0" (click)="selectapprover(row)" href="javascript:void(0)">
+                                            Reassign Request Approval
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                        
+                                </p-dataTable>
+                              </p-tabPanel>
+                              <p-tabPanel header="Loan Application Details"  *ngIf="displayApplicationDetail" >
+                                  <div *ngIf="displayApplicationDetail" style="margin-bottom:0" class="panel panel-default">
+
+                                      <div class="panel-heading">
+                                          <h2 class="panel-title">
+                                              Loan Application Information
+                                          </h2>
+                                          <div class="pull-right"><a class="close" (click)="displayApplicationDetail=false; displaySearchTable=true;">&times;</a></div>
+                                      </div>
+                              
+                                      <div class="panel-body">
+                                          <p-tabView>
+                                              <p-tabPanel header="General Information" *ngIf="hideGeneralInfoPanel">
+                                                  <table class="table table-casa-information">
+                                                      <tbody>
+                                                          <tr>
+                                                              <td><strong>Application Reference Number:</strong></td>
+                                                              <td>{{ application.applicationReferenceNumber }}</td>
+                                                              <td><strong>Group Name:</strong></td>
+                                                              <td colspan="2" style="text-align:left">{{ application.customerGroupName }}</td>
+                                                          </tr>
+                                                        <tr>
+                                                              <td><strong>Relationship Officer:</strong></td>
+                                                              <td>{{application.relationshipOfficerName}}</td>
+                                                              <td><strong>Relationship Manager:</strong></td>
+                                                              <td>{{application.relationshipManagerName}}</td>
+                                                              <td><strong></strong></td>
+                                                              <td></td>
+                                                          </tr>
+                                                          <tr>
+                                                              <td><strong>Amount:</strong></td>
+                                                              <td>{{ application.proposedAmount | number:'1.2' }}</td>
+                                                              <td><strong>Approved Amount:</strong></td>
+                                                              <td>{{ application.proposedAmount | number:'1.2' }}</td>
+                                                              <td><strong></strong></td>
+                                                              <td></td>
+                                                          </tr>
+                                                             <tr>
+                                                              <td><strong>Tenor:</strong></td>
+                                                              <td>{{ application.proposedTenor }}</td>
+                                                              <td><strong>Interest Rate:</strong></td>
+                                                              <td>{{ application.proposedInterestRate | number:'1.2' }}</td>
+                                                              <td><strong>Application Date:</strong></td>
+                                                              <td>{{ application.dateTimeCreated | date:"dd-MM-yyyy" }}</td>
+                                                          </tr>
+                                                       <tr>
+                                                              <td><strong>Investment Grade:</strong></td>
+                                                              <td>{{ application.isInvestmentGrade ? 'Yes' : 'No' }}</td>
+                                                              <td><strong>Politically Exposed:</strong></td>
+                                                              <td>{{ application.isPoliticallyExposed ? 'Yes' : 'No' }}</td>
+                                                              <td><strong>Related Party:</strong></td>
+                                                              <td></td>
+                                                              <td>{{ application.isRelatedParty ? 'Yes' : 'No' }}</td> 
+                                                      </tr>
+                                                          <tr>
+                                                              <td><strong>Approval Status:</strong></td>
+                                                              <td>{{ getApprovalStatus(application.approvalStatusId) }}</td>
+                                                              <td><strong>Application Status:</strong></td>
+                                                              <td>{{ getApprovalStatus(application.applicationStatusId) }}</td>
+                                                              <td><strong>submitted For Appraisal:</strong></td>
+                                                              <td>{{ application.submittedForAppraisal ? 'Yes' : 'No' }}</td>
+                                                          </tr> 
+                                                          <tr>
+                                                                  <td><strong>Approval Application:</strong></td>
+                                                                  <td>{{ application.applicationStatus }}</td>
+                                                              <td><strong>Details:</strong></td>
+                                                              <td colspan="2" [innerHTML]="application.loanInformation"></td>
+                                                          </tr> 
+                                                          <tr>
+                                                              <td><strong>Operation Type:</strong></td>
+                                                              <td>{{ application.operationTypeName }}</td>
+                                                          <td><strong>Review Detail:</strong></td>
+                                                          <td colspan="2">{{ application.reviewLoanDetaile }}</td> 
+                                                      </tr> 
+                                                      </tbody>
+                                                  </table>
+                                                 
+                                                  </p-tabPanel> 
+                                          </p-tabView>
+                                      </div>
+                              
+                                  </div>
+                              
+                              </p-tabPanel>
+                          </p-tabView> 
+
+                         
+                      </div>
+
+                      <div class="panel-footer">
+                          <div class="row">
+                              <div class="col-md-3 col-md-offset-9 ">
+                                  <!-- buttons -->
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+              <!-- endof loan applications -->
+
+          </p-tabPanel>        
+      </p-tabView>
+
+  </div>
+</div>
+
+<p-dialog [responsive]="true" [(visible)]="displayDocumentation" widgetVar="ajaxDialog"
+[contentStyle]="{'overflow':'scroll','max-height':'600px'}" modal="modal" showEffect="fade" width="1200">
+  <div class="card no-padding">
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <div class="row">
+          
+          <div class="col-md-12">
+            <div class="pull-right">
+              <button (click)="previewDocumentation2(false)" style="padding: 3px 6px 3px 6px;">
+                <span class="glyphicon glyphicon-print"></span> Preview</button>
+              <button (click)="previewDocumentation2(true)" style="padding: 3px 6px 3px 6px;">
+                <span class="glyphicon glyphicon-print"></span> Print</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="displayDocumentation" class="panel panel-default">
+        <div class="panel-heading">
+          <h2 *ngIf="documentations != null && documentations != undefined && documentations.length > 0"
+            class="panel-title">
+            FNo.:
+            <strong>{{ loanSelectedData?.applicationReferenceNumber }}</strong>
+          </h2>
+          <div class="pull-right">
+            <a class="close" (click)="closeDocumentation()">&times;</a>
+          </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:700px">
+          <div *ngFor="let x of documentations" style="width:1000px">
+            <div>
+              <p [innerHtml]="x.templateDocument" style="width:1000px"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <div class="row" style="padding-left:inherit;">
+          <div class="col-md-12">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog> 
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+      <div style="margin-bottom:0" class="panel panel-default">
+          <div class="panel-heading">
+              <h2 class="panel-title">
+                  Search Application
+              </h2>
+          </div>
+  
+          <form novalidate (ngSubmit)="submitForm(searchForm)" [formGroup]="searchForm" autocomplete="off">
+  
+              <div class="panel-body">
+                  <div class="form-horizontal">
+                      <div class="form-group">
+                          <label for="searchString" class="control-label col-md-12">Loan Application Reference Number/ Customer Name/ Staff Code</label>
+                          <div class="col-md-12">
+                              <input type="text" name="searchString" formControlName="searchString" id="searchString" class="form-control" [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+  
+              <div class="panel-footer">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid" class="btn btn-success pull-right">Search</button>
+                          <button type="button" (click)="displaySearchForm=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                      </div>
+                  </div>
+              </div>
+  
+          </form>
+  
+      </div>
+  </p-dialog>
+  <!--end of form modal-->
+  
+  
+  <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+  <p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+          <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+      
+              <div class="panel-heading">
+                  <h2 class="panel-title">
+                      Document Title:
+                      <strong>{{ selectedDocument }}</strong>
+                  </h2>
+                  <div class="pull-right">
+                      <a class="close" (click)="displayDocument=false">&times;</a>
+                  </div>
+              </div>
+      
+              <div class="panel-body" style="overflow:auto;height:450px">
+      
+                  <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;" [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+      
+              </div>
+      
+          </div>
+      </p-dialog>
+
+
+      <p-dialog [responsive]=true [(visible)]="displayReport" width="800" modal="modal" showEffect="fade">
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <h2 class="panel-title pull-left">
+                              Generated Offer Letter
+        
+                          </h2>
+                          <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+        
+        
+                      </div>
+                  </div>
+              </div>
+              <div class="panel-body">
+        
+                  <div class="col-md-12" style=" width:1200px; overflow:auto;" >
+                      <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px" style="overflow:auto"></iframe>
+                  </div>
+              </div>
+          </div>
+          <div class="panel-footer">
+              <div class="row">
+                  <div class="col-md-12">
+                      <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                  </div>
+              </div>
+          </div>
+        </p-dialog>
+
+      <p-dialog [responsive]=true [(visible)]="displayApproverSearchForm" [modal]="true" id="searchModal" showEffect="fade"
+      [appendTo]="'body'" width="650" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+          <app-reassign-request [approvalTrailId]="approvalTrailId"
+              (showCallerDialogue)="displayApproverSearchModal($event)">
+          </app-reassign-request>
+      </p-dialog>
+ 
+      <p-dialog [responsive]=true [(visible)]="displayDocumentation" modal="modal" showEffect="fade" width="1200">
+        <div *ngIf="displayDocumentation" style="margin-bottom:0" class="panel panel-default">
+      
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    Appraisal Documentation for REFERENCE:
+                    <strong>{{ loanSelectedData?.applicationReferenceNumber }}</strong> of OBLIGOR:
+                    <strong>{{ loanSelectedData?.customerName }}</strong>
+                </h2>
+                <div class="pull-right">
+                    <a class="close" (click)="closeDocumentation()">&times;</a>
+                </div>
+            </div>
+      
+            <div class="panel-body" style="overflow:auto;height:450px">
+                <div *ngFor="let x of documentations">
+                    <p><strong>{{x.title}}</strong></p>
+                    <span [innerHtml]="x.templateDocument"></span>
+                </div>
+            </div>
+      
+        </div>
+      </p-dialog>
+<!-- <PRE>{{ application | json }}</PRE> -->
+

@@ -1,0 +1,282 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Product Price Index
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddAddPricingIndexModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p-tabView [activeIndex]="activeIndex">
+                                <p-tabPanel header="Product Details">
+                                    <div class="row">
+                                        <p-dataTable [value]="productPriceIndexData" [paginator]="true" [rows]="20" [responsive]="true">
+                                            <p-column field="priceIndexName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="priceIndexRate" header="Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="priceIndexDescription" header="Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="priceIndexDuration" header="Duration" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="allowAutomaticRepricing" header="Allow Automatic Repricing" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <!-- <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a (click)="getCurrency(pGrp)" href="javascript:void(0)">Currencies</a>
+                                                </ng-template>
+                                            </p-column> -->
+                                            <p-column [style]="{'width':'100px'}">
+                                                    <ng-template pTemplate="header"></ng-template>
+                                                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                      <a (click)="editRow(d, $event)" href="javascript:void(0)">
+                                                        Edit
+                                                      </a>
+                                                    </ng-template>
+                                            </p-column>                                           
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <a style="text-decoration: none;color:#ff0000" href="javascript:void(0)" (click)="deleteProductIndex(pGrp)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </p-tabPanel>
+                                <p-tabPanel header="History">
+                                    <div class="row">
+                                            <div style="padding-top:20px" class="col-md-3">
+
+                                                </div>
+                                        <div style="padding-top:20px" class="col-md-6">
+                                                <div class="form-group">
+                                                        <label for="startDate" class="control-label col-md-4">Start Date</label>
+                                                        <div class="col-md-8">
+                                                                <p-calendar [(ngModel)]="startDate" dateFormat="dd-MM-yy" [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+                                                            </div>
+                                                    </div>
+                                    
+                                                    <div class="form-group">
+                                                        <label for="endDate" class="control-label col-md-4">End Date</label>
+                                                        <div class="col-md-8">
+                                                                <p-calendar [(ngModel)]="endDate"  dateFormat="dd-MM-yy"  [showIcon]="true"></p-calendar> <span style="margin-left:35px"></span>
+                                                            </div>
+                                                    </div>
+                                                    <br/>  <br/>  <br/>  <br/>
+                                                    <div class="panel-footer">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <button type="button" (click)="GetFilterRecord()" class="btn btn-success pull-right">Filter</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                        </div>
+                                        <div style="padding-top:20px" class="col-md-3">
+
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                            <p-dataTable [value]="productPriceIndexHistory" [paginator]="true" [rows]="20" [responsive]="true">
+                                                    <p-column field="priceIndexName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                                    <p-column field="priceIndexRate" header="Rate" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                                </p-dataTable>
+                                    </div>
+                                </p-tabPanel>
+                            </p-tabView>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+            Add/Update Price Index
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="createUpdateForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <input type="hidden" name="productPriceIndexId" formControlName="productPriceIndexId" id="productPriceIndexId">
+
+                    <div class="form-group">
+                        <label for="priceIndexName" class="control-label col-md-2">
+                                        Name
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="text" name="priceIndexName" formControlName="priceIndexName" id="priceIndexName" class="form-control" [ngClass]="!createUpdateForm.controls['priceIndexName'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+
+                        <label for="priceIndexRate" class="control-label col-md-2">
+                        Rate
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="priceIndexRate" formControlName="priceIndexRate" id="priceIndexRate" class="form-control" [ngClass]="!createUpdateForm.controls['priceIndexRate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priceIndexDescription" class="control-label col-md-2">
+                          Description
+                                    </label>
+                        <div class="col-md-4">
+                        <textarea type="text" name="priceIndexDescription" formControlName="priceIndexDescription" id="priceIndexDescription" class="form-control" [ngClass]="!createUpdateForm.controls['priceIndexDescription'].valid ? 'required-input' : 'valid-input'" >
+                        </textarea>                            
+                        </div>
+
+                        <label for="priceIndexDuration" class="control-label col-md-2">
+                          Duration
+                        </label>
+                        <div class="col-md-4">
+                            <input type="text" name="priceIndexDuration" formControlName="priceIndexDuration" id="priceIndexDuration" class="form-control" [ngClass]="!createUpdateForm.controls['priceIndexDuration'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="allowAutomaticRepricing" class="control-label col-md-2">
+                            Allow Automatic Repricing
+                                    </label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="allowAutomaticRepricing" formControlName="allowAutomaticRepricing" id="allowAutomaticRepricing" style="box-shadow: none;margin-top: 10px;margin-left: 0px;">
+                        </div>
+                        <!-- <label for="currencyId" class="control-label col-md-2">
+                            Currency ID
+                          </label>
+                          <div class="col-md-4">
+                            <select name="currencyId" id="currencyId" formControlName="currencyId" class="form-control" [ngClass]="!createUpdateForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Currency --</option>
+                                <option *ngFor="let a of currencies" [value]="a.currencyId">
+                                    {{a.currencyName}}
+                                </option>
+                        </select>
+                       </div> -->
+                    </div>
+
+                </div>
+            </div>
+
+            <!--button-->
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitPriceIndexForm(createUpdateForm)" [disabled]="createUpdateForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!--</div>-->
+        </form>
+
+    </div>
+</p-dialog>
+<p-dialog [responsive]=true [(visible)]="displayCurrencyModal" id="add-modal" modal="modal" [contentStyle]="{'overflow':'auto','max-height':'500px'}" showEffect="fade" width="800">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                    <h2 class="panel-title">
+                            Select Product Currencies
+                        </h2>
+                        <div class="pull-right">
+                                <button (click)="showAddPriceIndexCurrencyModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+            </div>
+
+                <div class="panel-body">
+                        <p-dataTable [value]="productCurrencies" [paginator]="true" [rows]="15" [responsive]="true">
+                                <p-column field="currencyId" header="Currency" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template let-i="rowIndex" let-d="rowData" pTemplate type="body">
+                                            {{ getCurrencyName(d.currencyId) }}
+                                        </ng-template>
+                                    </p-column>                
+                                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                            <a (click)="editCurrency(pGrp)" href="javascript:void(0)">Edit</a>
+                        </ng-template>
+                    </p-column>
+                    <p-column [style]="{'width':'100px'}">
+                        <ng-template pTemplate="header"> </ng-template>
+                        <ng-template let-pGrp="rowData" let-i="rowIndex" pTemplate="body">
+                            <a style="text-decoration: none;color:#ff0000" href="javascript:void(0)" (click)="deleteProductCurrency(pGrp)"><i class="glyphicon glyphicon-remove"></i> Remove</a>
+                        </ng-template>
+                    </p-column>
+                </p-dataTable>
+                </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- <button type="button" (click)="submitForm(documentForm)" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button> -->
+                        <button type="button" (click)="displayCurrencyModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    </p-dialog>
+    
+    <p-dialog [responsive]=true [(visible)]="displayCurrencyModalForm" id="add-modal" modal="modal" showEffect="fade" width="600">
+            <div style="margin-bottom:0" class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                    Add/Update Price Index Currency
+                    </h2>
+                </div>
+        
+                <form novalidate [formGroup]="createUpdateCurrencyForm" autocomplete="off">
+        
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <input type="hidden" name="priceIndexCurrencyId" formControlName="priceIndexCurrencyId" id="priceIndexCurrencyId">
+                            <input type="hidden" name="productPriceIndexId" formControlName="productPriceIndexId" id="productPriceIndexId">
+        
+                            <div class="form-group">
+                                <label for="currencyId" class="control-label col-md-2">
+                                                Currency
+                                            </label>
+                                <div class="col-md-4">
+                                        <select name="currencyId" id="currencyId" formControlName="currencyId" class="form-control" [ngClass]="!createUpdateCurrencyForm.controls['currencyId'].valid ? 'required-input' : 'valid-input'">
+                                                <option value="">-- Select Currency --</option>
+                                                <option *ngFor="let a of currencies" [value]="a.currencyId">
+                                                    {{a.currencyName}}
+                                                </option>
+                                        </select>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!--button-->
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" (click)="submitPriceIndexCurrencyForm(createUpdateCurrencyForm)" [disabled]="createUpdateCurrencyForm.invalid" class="btn btn-success pull-right">Save</button>
+                                <button type="button" (click)="displayCurrencyModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!--</div>-->
+                </form>
+        
+            </div>
+        </p-dialog>

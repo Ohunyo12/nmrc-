@@ -1,0 +1,596 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">Checklist Setup</h2>
+                        <div class="pull-right">
+                            <button type="button" (click)="showChecklistItemForm()" pButton icon="fa-plus" label="Add New Item"></button>
+                            <!-- <button type="button" (click)="showChecklistDefinitionForm()" pButton icon="fa-plus" label="Add New Definition"></button> -->
+                            <button type="button" (click)="showChecklistTypeMappingForm()" pButton icon="fa-plus" label="Add New Mapping"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <p-tabView>
+                    <p-tabPanel header="Checklist Item" [selected]="true">
+                        <p-dataTable [value]="checklistItemData" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="checkListItemName" header="Checklist Item" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="responseTypeName" header="Response Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="dateTimeCreated" header="Date Created" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.dateTimeCreated | date : 'dd/MM/yyyy' }}
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editChecklistItem(i, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                    <!-- <p-tabPanel header="Checklist Definition">
+                        <p-dataTable [value]="checklistDefData" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="productName" header="Product" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="checkListItemName" header="Checklist Item" [style]="{'width':'300px'}" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="itemDescription" header="Item Description" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="approvalLevelName" header="Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                            <!--- Referenced from Osemeke dont uncomment this portion-->
+                            <!-- <p-column field="isActive" header="Is Active" [style]="{'width':'90px'}" sortable="true" [filter]="true" filterMatchMode="contains"> -->
+                                <!--<ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.isActive ? 'Yes' : 'No' }}
+                                </ng-template>-->
+                            <!-- </p-column>
+                            <p-column field="isRequired" header="Is Required" [style]="{'width':'90px'}" sortable="true" [filter]="true" filterMatchMode="contains"> -->
+                                <!--<ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.isRequired ? 'Yes' : 'No' }}
+                                </ng-template>-->
+                            <!-- </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editChecklistDefinition(i, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel> -->
+                    <p-tabPanel header="Checklist Type Mapping">
+                        <p-dataTable [value]="checklistTypeMappings" [rows]="10" [paginator]="true" [responsive]="true">
+                            <p-column field="checkListTypeName" header="Checklist Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="approvalLevel" header="Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            <p-column field="validateChecklist" header="Can Validate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <span *ngIf="d.validateChecklist">Yes</span>
+                                    <span *ngIf="!d.validateChecklist">No</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'50px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="editChecklistTypeMapping(i, $event)" href="javascript:void(0)">
+                                        Edit
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                            <p-column [style]="{'width':'100px'}">
+                                <ng-template pTemplate="header"> </ng-template>
+                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                    <a (click)="deleteChecklistTypeMapping(i)" href="javascript:void(0)">
+                                        Remove
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistItemForm" id="create-edit-modal" modal="modal" showEffect="fade"
+    width="500">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{itemPanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistItemForm" (ngSubmit)="submitChecklistItemForm(checklistItemForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="itemName" class="control-label col-md-4">Checklist Item Name</label>
+                        <div class="col-md-8">
+                            <textarea rows="3" name="checkListItemName" id="checkListItemName" class="form-control" formControlName="checkListItemName"
+                                [ngClass]="checklistItemForm.controls['checkListItemName'].valid ? 'valid-input' : 'required-input'"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="responseTypeId" class="control-label col-md-4">Checklist Response Type</label>
+                        <div class="col-md-8">
+                            <select name="responseTypeId" id="responseTypeId" class="form-control" formControlName="responseTypeId" [ngClass]="checklistItemForm.controls['responseTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Response Type ---</option>
+                                <option *ngFor="let type of responseType" [value]="type.responseId">{{type.responseName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalLevel" class="control-label col-md-4">Checklist Type</label>
+                        <div class="col-md-8">
+                            <select name="checkListTypeId" id="checkListTypeId" class="form-control" formControlName="checkListTypeId" [ngClass]="checklistItemForm.controls['checkListTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Type ---</option>
+                                <option *ngFor="let type of checklistTypeList" [value]="type.targetTypeId">{{type.targetTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"> 
+                        <label for="requireUpload" class="control-label col-md-4">Require Document Upload</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" name="requireUpload" id="requireUpload" formControlName="requireUpload" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistItemForm.invalid" class="btn btn-success pull-right">Save Checklist Item</button>
+                        <button type="button" (click)="displayChecklistItemForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistForm" id="create-edit-modal" modal="modal" showEffect="fade" width="1000">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Checklist Definition Details
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistDefForm" (ngSubmit)="submitChecklistDefForm(checklistDefForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="approvalLevel" class="control-label col-md-2">Checklist Type</label>
+                        <div class="col-md-4">
+                            <select (change)="changeProductValidation($event.target.value)" name="checkListTypeId" id="checkListTypeId" class="form-control" formControlName="checkListTypeId" [ngClass]="checklistDefForm.controls['checkListTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Type ---</option>
+                                <option *ngFor="let type of checklistTypeList" [value]="type.targetTypeId">{{type.targetTypeName}}</option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-2">Operation Type</label>
+                        <div class="col-md-4">
+                            <select (change)="onOperationTypeChange($event.target.value)" name="operationTypeId" formControlName="operationTypeId" id="operationTypeId"
+                                class="form-control" [ngClass]="!checklistDefForm.controls['operationTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">--Select Operation Type--</option>
+                                <option *ngFor="let x of operationTypes" [value]="x.lookupId">
+                                    {{ x.lookupName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productId" class="control-label col-md-2">Product</label>
+                        <div class="col-md-4">
+                            <select (change)="onProductSelect($event.target.value)" name="productId" id="productId" class="form-control" formControlName="productId"
+                                [ngClass]="checklistDefForm.controls['productId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Product ---</option>
+                                <option *ngFor="let item of productData" [value]="item.productId">{{item.productName}}</option>
+                            </select>
+                        </div>
+                        <label for="operationId" class="control-label col-md-2">Operation</label>
+                        <div class="col-md-4">
+                            <select (change)="onOperationSelect($event.target.value)" name="operationId" formControlName="operationId" id="operationId"
+                                class="form-control" [ngClass]="checklistDefForm.controls['operationId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Operation --</option>
+                                <option *ngFor="let item of filteredOperations" [value]="item.lookupId">
+                                    {{ item.lookupName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6"></div>
+                        <label for="approvalLevel" class="control-label col-md-2">Approval Level</label>
+                        <div class="col-md-4">
+                            <select (change)="onApprovalLevelSelect($event.target.value)" name="approvalLevel" id="approvalLevel" class="form-control"
+                                formControlName="approvalLevelId" [ngClass]="checklistDefForm.controls['approvalLevelId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Level ---</option>
+                                <option *ngFor="let item of approvalLevelData" [value]="item.approvalLevelId">{{item.levelName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="showChecklistItemTable">
+                        <div class="col-md-6">
+                            <fieldset style="overflow: auto">
+                                <legend>Unmapped Checklist Items</legend>
+                                <p-dataTable [value]="unmappedChecklistItems" [editable]="true" [(selection)]="checklistItemModel" dataKey="checkListItemName"
+                                    [rows]="5" [paginator]="true" [responsive]="true">
+                                    <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column>
+                                    <p-column field="checkListItemName" header="Checklist Item" [editable]="false" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <!--<p-column field="itemDescription" header="Item Description">
+                                        <ng-template pTemplate="body" let-col let-model="rowData">
+                                            <input type="text" name="itemDescription" id="itemDescription" class="form-control" [(ngModel)]="model.itemDescription" [ngModelOptions]="{standalone: true}">
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="isActive" header="Active" [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="body" let-col let-model="rowData">
+                                            <input type="checkbox" name="isActive" id="isActive" [(ngModel)]="model.isActive" [ngModelOptions]="{standalone: true}">
+                                        </ng-template>
+                                    </p-column>
+                                    <p-column field="isRequired" header="Required" [style]="{'width':'100px'}">
+                                        <ng-template pTemplate="body" let-col let-model="rowData">
+                                            <input type="checkbox" name="isRequired" id="isRequired" [(ngModel)]="model.isRequired" [ngModelOptions]="{standalone: true}">
+                                        </ng-template>
+                                    </p-column>-->
+                                    <p-column [style]="{'width':'70px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-col let-i="rowData">
+                                            <a (click)="mapChecklistDefinition(i, $event)" href="javascript:void(0)">Add
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                                    <p-footer>
+                                        <div class="ui-helper-clearfix" style="width:100%">
+                                            <button type="button" pButton icon="fa-plus" style="float:left" (click)="addMultipleChecklistItems()" label="Add Multiple"></button>
+                                        </div>
+                                    </p-footer>
+                                </p-dataTable>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6">
+                            <fieldset style="overflow: auto">
+                                <legend>Mapped Checklist Items</legend>
+
+                                <p-dataTable [value]="mappedChecklistItems" [rows]="5" [paginator]="true" [responsive]="true">
+                                    <p-column field="checkListItemName" header="Checklist Item"></p-column>
+                                    <!--- Referenced from Osemeke -->
+                                    <p-column [style]="{'width':'100px'}" field="isActive" header="Active">
+                                        <!--<ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.isActive ? 'Yes' : 'No' }}
+                                </ng-template>-->
+                                    </p-column>
+                                    <p-column [style]="{'width':'100px'}" field="isRequired" header="Required">
+                                        <!--<ng-template let-model="rowData" let-i="rowIndex" pTemplate="body">
+                                    {{ model.isRequired ? 'Yes' : 'No' }}
+                                </ng-template>-->
+                                    </p-column>
+                                    <p-column [style]="{'width':'30px'}">
+                                        <ng-template pTemplate="header"> </ng-template>
+                                        <ng-template pTemplate="body" let-col let-i="rowData">
+                                            <a (click)="editChecklistItemMapping(i, $event)" href="javascript:void(0)">
+                                                Edit
+                                            </a>
+                                        </ng-template>
+                                    </p-column>
+                                    <!--<p-column [style]="{'width':'50px'}">
+                                    <ng-template pTemplate="header"> </ng-template>
+                                    <ng-template pTemplate="body" let-col let-i="rowIndex">
+                                        <a (click)="removeChecklistDefinition(i, $event)" href="javascript:void(0)"><span class="glyphicon glyphicon-trash" style="color:red"></span></a>
+                                    </ng-template>
+                                </p-column>-->
+                                </p-dataTable>
+                            </fieldset>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistDefForm.invalid" class="btn btn-success pull-right">Save Checklist Definition</button>
+                        <button type="button" (click)="displayChecklistForm=false" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistDefForm" id="create-edit-modal" modal="modal" showEffect="fade"
+    width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Checklist Item Details
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistDefForm" (ngSubmit)="submitChecklistDefForm(checklistDefForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <!--<div class="form-group">
+                        <label for="productId" class="control-label col-md-2">Product</label>
+                        <div class="col-md-4">
+                            <select name="productId" id="productId" class="form-control" formControlName="productId" [ngClass]="checklistDefForm.controls['productId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Product ---</option>
+                                <option *ngFor="let item of productData" [value]="item.lookupId">{{item.lookupName}}</option>
+                            </select>
+                        </div>
+                        <label for="operationId" class="control-label col-md-2">Operation</label>
+                        <div class="col-md-4">
+                            <select (change)="onOperationSelect($event.target.value)" name="operationId" formControlName="operationId" id="operationId" class="form-control" [ngClass]="checklistDefForm.controls['operationId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Operation --</option>
+                                <option *ngFor="let item of operationData" [value]="item.lookupId">
+                                    {{ item.lookupName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalLevel" class="control-label col-md-2">Approval Level</label>
+                        <div class="col-md-4">
+                            <select (change)="onApprovalLevelSelect($event.target.value)" name="approvalLevel" id="approvalLevel" class="form-control" formControlName="approvalLevelId" [ngClass]="checklistDefForm.controls['approvalLevelId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Level ---</option>
+                                <option *ngFor="let item of approvalLevelData" [value]="item.approvalLevelId">{{item.levelName}}</option>
+                            </select>
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label for="checklistItem" class="control-label col-md-2">Checklist Item</label>
+                        <div class="col-md-4">
+                            <select name="checklistItem" id="checklistItem" class="form-control" formControlName="checkListItemId" [ngClass]="checklistDefForm.controls['checkListItemId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Item ---</option>
+                                <option *ngFor="let item of checklistItemData" [value]="item.checkListItemId">{{item.checkListItemName}}</option>
+                            </select>
+                        </div>
+                        <label for="itemDescr" class="control-label col-md-2">Item Description</label>
+                        <div class="col-md-4">
+                            <input type="text" name="itemDescr" id="itemDescr" class="form-control" formControlName="itemDescription">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="isActive" class="control-label col-md-2">Is Active</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isActive" id="isActive" formControlName="isActive">
+                        </div>
+                        <label for="isRequired" class="control-label col-md-2">Is Required</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isRequired" id="isRequired" formControlName="isRequired">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistDefForm.invalid" class="btn btn-success pull-right">Save Checklist Definition</button>
+                        <button type="button" (click)="displayChecklistDefForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]="true" [(visible)]="displayChecklistItemMappingForm" id="edit-modal" modal="modal" showEffect="fade"
+    width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{defPanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistItemMappingForm" (ngSubmit)="submitChecklistDefForm(checklistItemMappingForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="productId" class="control-label col-md-2">Product</label>
+                        <div class="col-md-4">
+                            <select name="productId" id="productId" class="form-control" formControlName="productId" [ngClass]="checklistItemMappingForm.controls['productId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Product ---</option>
+                                <option *ngFor="let item of productData" [value]="item.lookupId">{{item.lookupName}}</option>
+                            </select>
+                        </div>
+                        <label for="operationId" class="control-label col-md-2">Operation</label>
+                        <div class="col-md-4">
+                            <select (change)="onOperationSelect($event.target.value)" name="operationId" formControlName="operationId" id="operationId"
+                                class="form-control" [ngClass]="checklistItemMappingForm.controls['operationId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Operation --</option>
+                                <option *ngFor="let item of operationData" [value]="item.lookupId">
+                                    {{ item.lookupName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalLevel" class="control-label col-md-2">Approval Level</label>
+                        <div class="col-md-4">
+                            <select name="approvalLevel" id="approvalLevel" class="form-control" formControlName="approvalLevelId" [ngClass]="checklistItemMappingForm.controls['approvalLevelId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Level ---</option>
+                                <option *ngFor="let item of approvalLevelData" [value]="item.approvalLevelId">{{item.levelName}}</option>
+                            </select>
+                        </div>
+                        <label for="checklistItem" class="control-label col-md-2">Checklist Item</label>
+                        <div class="col-md-4">
+                            <select name="checklistItem" id="checklistItem" class="form-control" formControlName="checkListItemId" [ngClass]="checklistDefForm.controls['checkListItemId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Item ---</option>
+                                <option *ngFor="let item of checklistItemData" [value]="item.checkListItemId">{{item.checkListItemName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDescr" class="control-label col-md-2">Item Description</label>
+                        <div class="col-md-10">
+                            <input type="text" name="itemDescr" id="itemDescr" class="form-control" formControlName="itemDescription">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="isActive" class="control-label col-md-2">Is Active</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isActive" id="isActive" formControlName="isActive">
+                        </div>
+                        <label for="isRequired" class="control-label col-md-2">Is Required</label>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="isRequired" id="isRequired" formControlName="isRequired">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistItemMappingForm.invalid" class="btn btn-success pull-right">Save Checklist Definition</button>
+                        <button type="button" (click)="displayChecklistItemMappingForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]="true" [(visible)]="displayMultipleMappingForm" id="create-multiple-modal" modal="modal" showEffect="fade"
+    width="700">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{defPanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistDefForm" (ngSubmit)="submitMultipleChecklistDefForm(checklistDefForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <!--<div class="form-group">
+                        <label for="productId" class="control-label col-md-2">Product</label>
+                        <div class="col-md-4">
+                            <select name="productId" id="productId" class="form-control" formControlName="productId" [ngClass]="checklistDefForm.controls['productId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Product ---</option>
+                                <option *ngFor="let item of productData" [value]="item.lookupId">{{item.lookupName}}</option>
+                            </select>
+                        </div>
+                        <label for="operationId" class="control-label col-md-2">Operation</label>
+                        <div class="col-md-4">
+                            <select (change)="onOperationSelect($event.target.value)" name="operationId" formControlName="operationId" id="operationId" class="form-control" [ngClass]="checklistDefForm.controls['operationId'].valid ? 'valid-input' : 'required-input'">
+                                <option value="">-- Select Operation --</option>
+                                <option *ngFor="let item of operationData" [value]="item.lookupId">
+                                    {{ item.lookupName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalLevel" class="control-label col-md-2">Approval Level</label>
+                        <div class="col-md-4">
+                            <select name="approvalLevel" id="approvalLevel" class="form-control" formControlName="approvalLevelId" [ngClass]="checklistDefForm.controls['approvalLevelId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Level ---</option>
+                                <option *ngFor="let item of approvalLevelData" [value]="item.approvalLevelId">{{item.levelName}}</option>
+                            </select>
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <fieldset>
+                                <legend>Selected Checklist Items</legend>
+                            </fieldset>
+                            <p-dataTable [value]="multipleMappingData" [editable]="true" [rows]="5" [paginator]="true" [responsive]="true">
+                                <p-column field="checkListItemName" header="Checklist Item" [editable]="false"></p-column>
+                                <p-column field="itemDescription" header="Item Description">
+                                    <ng-template pTemplate="body" let-col let-model="rowData">
+                                        <input type="text" name="itemDescription" id="itemDescription" class="form-control" [(ngModel)]="model.itemDescription" [ngModelOptions]="{standalone: true}">
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="isActive" header="Active" [style]="{'width':'80px'}">
+                                    <ng-template pTemplate="body" let-col let-model="rowData">
+                                        <input type="checkbox" name="isActive" id="isActive" [(ngModel)]="model.isActive" [ngModelOptions]="{standalone: true}">
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="isRequired" header="Required" [style]="{'width':'80px'}">
+                                    <ng-template pTemplate="body" let-col let-model="rowData">
+                                        <input type="checkbox" name="isRequired" id="isRequired" [(ngModel)]="model.isRequired" [ngModelOptions]="{standalone: true}">
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistDefForm.invalid" class="btn btn-success pull-right">Save Checklist Definitions</button>
+                        <button type="button" (click)="displayMultipleMappingForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayChecklistTypeMapping" id="create-edit-modal" modal="modal" showEffect="fade"
+    width="600">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{itemPanelHeader}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="checklistTypeMappingForm" (ngSubmit)="submitChecklistTypeMappingForm(checklistTypeMappingForm)" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="checkListTypeId" class="control-label col-md-4">Checklist Type</label>
+                        <div class="col-md-8">
+                            <select name="checkListTypeId" id="checkListTypeId" class="form-control" formControlName="checkListTypeId" [ngClass]="checklistTypeMappingForm.controls['checkListTypeId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Checklist Type ---</option>
+                                <option *ngFor="let type of checklistTypeList" [value]="type.targetTypeId">{{type.targetTypeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalGroupId" class="control-label col-md-4">Approval Group</label>
+                        <div class="col-md-8">
+                            <select name="approvalGroupId" id="approvalGroupId" (change)="getApprovalLevelWithGroupId($event.target.value)" class="form-control"
+                                formControlName="approvalGroupId" [ngClass]="checklistTypeMappingForm.controls['approvalGroupId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Group ---</option>
+                                <option *ngFor="let item of approvalGroupData" [value]="item.groupId">{{item.groupName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="approvalLevelId" class="control-label col-md-4">Approval Level</label>
+                        <div class="col-md-8">
+                            <select name="approvalLevelId" id="approvalLevelId" class="form-control" formControlName="approvalLevelId" [ngClass]="checklistTypeMappingForm.controls['approvalLevelId'].valid ? 'valid-input':'required-input'">
+                                <option value="">--- Select Approval Level ---</option>
+                                <option *ngFor="let item of filteredApprovalLevel" [value]="item.approvalLevelId">{{item.levelName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="validateChecklist" class="control-label col-md-4">Validate Checklist</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" formControlName="validateChecklist" name="validateChecklist" [ngClass]="'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="checklistTypeMappingForm.invalid" class="btn btn-success pull-right">Save Mapping</button>
+                        <button type="button" (click)="displayChecklistTypeMapping=false" style="margin-right:5px" class="btn btn-danger pull-right">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

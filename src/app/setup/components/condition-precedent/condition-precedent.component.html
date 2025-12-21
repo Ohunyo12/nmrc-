@@ -1,0 +1,188 @@
+<div class="ui-g">
+        <div class="ui-g-12 no-padding">
+            <div class="card no-padding">
+    
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title pull-left">
+                                    Conditions Precedent / Subsequent 
+                                </h2>
+                                <div class="pull-right">
+                                    <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="panel-body">
+                        <p-dataTable [value]="conditions" [responsive]=true [paginator]="true" [rows]="10">
+                            <p-column field="condition" header="Condition" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                            
+                            <!-- <p-column field="isExternal" header="Is Subsequent" [style]="{'width':'70px'}"></p-column> -->
+                            <p-column field="isExternal" header="Is External" [style]="{'width':'70px'}"></p-column>
+
+                            <!-- <p-column field="corporate" header="Corporate" [style]="{'text-align':'center','width':'68px'}">
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="row.corporate==true"><i class="glyphicon glyphicon-check"></i></span>
+                                </ng-template>
+                            </p-column> -->
+
+                            <!-- <p-column field="retail" header="Retail" [style]="{'text-align':'center','width':'50px'}">
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                        <span *ngIf="row.retail==true"><i class="glyphicon glyphicon-check"></i></span>
+                                </ng-template>
+                            </p-column> -->
+                                
+                            <p-column [style]="{'width':'30px'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="edit(row)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>    
+                            
+                            
+                            <p-column [style]="{'width':'30px','text-align':'center'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                
+                                    <a (click)="deleteCondition(d)" href="javascript:void(0)">
+                                        <i class="glyphicon glyphicon-remove"></i>
+                                    </a>
+                                </ng-template>
+                            </p-column>
+                        
+                        </p-dataTable>
+                    </div>
+    
+                </div>
+                <!--end of panel-->
+    
+    
+            </div>
+        </div>
+    </div>
+    
+    <!--form modal-->
+    <p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="450">
+        <div style="margin-bottom:0" class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    New {{ entityName }} 
+                </h2>
+            </div>
+    
+            <form novalidate [formGroup]="addForm" autocomplete="off">
+    
+                <div class="panel-body">
+                    <div class="form-horizontal">
+    
+                        <div class="form-group">
+                            <label for="condition" class="control-label col-md-12">Condition </label>
+                            <div class="col-md-12">
+                                <textarea rows="3" name="condition" formControlName="condition" id="condition" class="form-control" [ngClass]="!addForm.controls['condition'].valid ? 'required-input' : 'valid-input'"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="control-label col-md-6">Response Type</label>
+                            <label class="control-label col-md-6">Timeline for Compliance</label>
+                            <div class="col-md-6">
+                                <select name="responseTypeId" id="responseTypeId" formControlName="responseTypeId" class="form-control" [ngClass]="!addForm.controls['responseTypeId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Response Type --</option>
+                                    <option *ngFor="let x of responseTypes" [value]="x.responseTypeId">{{ x.responseType }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select name="timelineId" id="timelineId" formControlName="timelineId" class="form-control" [ngClass]="!addForm.controls['timelineId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Timeline --</option>
+                                    <option *ngFor="let x of complianceTimelines" [value]="x.timelineId">{{ x.timeline }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-6">Sector</label>
+                            <label class="control-label col-md-6">SubSector</label>
+                            <div class="col-md-6">
+                                <select (change)="onSectorClassChange($event.target.value)" 
+                                    name="sectorId" class="form-control" formControlName="sectorId" id="sectorId">
+                                    <option value=""></option>
+                                    <option *ngFor="let pc of sectors" value="{{pc.lookupId}}">
+                                        {{pc.lookupName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select  name="subSectorId"
+                                    class="form-control" formControlName="subSectorId" id="subSectorId">
+                                    <option value="">---Select Subsector---</option>
+                                    <option *ngFor="let pc of filteredSubsector" value="{{pc.subSectorId}}">
+                                        {{pc.sectorName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="control-label col-md-12">Product</label>
+                            <div class="col-md-12">
+                                <select name="productId" id="productId" formControlName="productId" class="form-control" [ngClass]="!addForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value="">-- Select Product --</option>
+                                    <option *ngFor="let x of products" [value]="x.productId">{{ x.productName }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <div class="checkbox-container">
+                                    <input formControlName="isSubsequent" id="isSubsequent" [(ngModel)]="checkBoxValue"
+                                    type="checkbox" (click) = "isSubsequentChanged(checkBoxValue)" /> 
+                                </div>
+                                <label class="checkbox">Is Condition Subsequent</label>
+                           
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="checkbox-container">
+                                    <input formControlName="isExternal" id="isExternal" type="checkbox">
+                                </div><label class="checkbox">Is External</label>
+                            </div>
+                          
+                        </div>
+                        
+                        <div class="form-group" *ngIf="showOrHide">
+                            <div class="col-md-6">
+                                <div class="checkbox-container">
+                                    <input formControlName="corporate" id="corporate" type="checkbox">
+                                </div><label class="checkbox">Corporate</label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="checkbox-container">
+                                    <input formControlName="retail" id="retail" type="checkbox">
+                                </div><label class="checkbox">Retail</label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+    
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" (click)="submitForm(addForm)" [disabled]="addForm.invalid" class="btn btn-success pull-right">Save</button>
+                            <button type="button" (click)="displayAddModal=false"  style="margin-right:5px"class="btn btn-danger pull-right">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </form>
+    
+        </div>
+    </p-dialog>
+    <!--end of form modal-->
+    
+    
+    <fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

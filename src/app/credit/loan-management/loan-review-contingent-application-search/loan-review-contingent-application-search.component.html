@@ -1,0 +1,464 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <!-- <span [innerHtml]="test"></span> -->
+        <!--module header-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left">
+                            Loan Review Contingent Application Search
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--endof module header-->
+
+        <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+            <p-tabPanel header="Loan Applications">
+                <div class="card no-padding">
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h2 class="panel-title pull-left">
+                                        Contingent Review Applications
+                                    </h2>
+
+                                    <div class="pull-right">
+                                        <button (click)="showSearchForm()" pButton type="button" label="Search"
+                                            icon="fa-search"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <p-tabView>
+                                <p-tabPanel header="Contingent Loan Applications" *ngIf="displaySearchTable">
+                                    <p-dataTable [value]="lmsOoperations" [paginator]="true" [rows]="10"
+                                        [rowsPerPageOptions]="[10,20,30]">
+                                        <p-column field="customersName" header="Customer Name" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="loanReferenceNumber" header="Loan Reference" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="operationName" header="Operation Name" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="reviewDetails" header="Review Details" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="proposedEffectiveDate" header="Effective Date" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.proposedEffectiveDate | date }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="approvalStatus" header="Approval Status" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="operationCompleted" header="Operation Completed"
+                                            sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+
+                                        <p-column field="rebookAmount" header="Rebook Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.rebookAmount | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="bondAmount" header="Bond Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.bondAmount | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="rebookDate" header="Rebook Date" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.rebookDate | date }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="exposureBeforeRebook" header="Exposure Before Rebook"
+                                            sortable="true" [filter]="true" filterMatchMode="contains">
+                                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                {{ d.exposureBeforeRebook | number : '1.2' }}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column field="previousOperator" header="Who Performed Previous Operation"
+                                            sortable="true" [filter]="true" filterMatchMode="contains">
+                                        </p-column>
+                                        <!-- <p-column>
+                                  <ng-template pTemplate="header"></ng-template>
+                                  <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="viewOperation(row)" href="javascript:void(0)"><i
+                                        class="glyphicon glyphicon-eye"></i>View</a>
+                                  </ng-template>
+                                </p-column> -->
+
+                                    </p-dataTable>
+                                </p-tabPanel>
+                                <p-tabPanel header="Loan Application Details" *ngIf="displayApplicationDetail">
+                                    <div *ngIf="displayApplicationDetail" style="margin-bottom:0"
+                                        class="panel panel-default">
+
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                Loan Application Information
+                                            </h2>
+                                            <div class="pull-right"><a class="close"
+                                                    (click)="displayApplicationDetail=false; displaySearchTable=true;">&times;</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-body">
+                                            <p-tabView>
+
+                                                <p-tabPanel header="General Information" *ngIf="hideGeneralInfoPanel">
+                                                    <table class="table table-casa-information">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td><strong>Application Reference Number:</strong></td>
+                                                                <td>{{ application.applicationReferenceNumber }}</td>
+                                                                <td><strong>Group Name:</strong></td>
+                                                                <td colspan="2" style="text-align:left">
+                                                                    {{ application.customerGroupName }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Relationship Officer:</strong></td>
+                                                                <td>{{application.relationshipOfficerName}}</td>
+                                                                <td><strong>Relationship Manager:</strong></td>
+                                                                <td>{{application.relationshipManagerName}}</td>
+                                                                <td><strong></strong></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Amount:</strong></td>
+                                                                <td>{{ application.applicationAmount | number:'1.2' }}
+                                                                </td>
+                                                                <td><strong>Approved Amount:</strong></td>
+                                                                <td>{{ application.approvedAmount | number:'1.2' }}</td>
+                                                                <td><strong></strong></td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Tenor:</strong></td>
+                                                                <td>{{ application.applicationTenor }}</td>
+                                                                <td><strong>Interest Rate:</strong></td>
+                                                                <td>{{ application.interestRate | number:'1.2' }}</td>
+                                                                <td><strong>Application Date:</strong></td>
+                                                                <td>{{ application.applicationDate | date:"dd-MM-yyyy" }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Investment Grade:</strong></td>
+                                                                <td>{{ application.isInvestmentGrade ? 'Yes' : 'No' }}
+                                                                </td>
+                                                                <td><strong>Politically Exposed:</strong></td>
+                                                                <td>{{ application.isPoliticallyExposed ? 'Yes' : 'No' }}
+                                                                </td>
+                                                                <td><strong>Related Party:</strong></td>
+                                                                <td></td>
+                                                                <td>{{ application.isRelatedParty ? 'Yes' : 'No' }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Approval Status:</strong></td>
+                                                                <td>{{ getApprovalStatus(application.approvalStatusId) }}
+                                                                </td>
+                                                                <td><strong>Application Status:</strong></td>
+                                                                <td>{{ getApprovalStatus(application.applicationStatusId) }}
+                                                                </td>
+                                                                <td><strong>submitted For Appraisal:</strong></td>
+                                                                <td>{{ application.submittedForAppraisal ? 'Yes' : 'No' }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Approval Application:</strong></td>
+                                                                <td>{{ application.applicationStatus }}</td>
+                                                                <td><strong>Details:</strong></td>
+                                                                <td colspan="2"
+                                                                    [innerHTML]="application.loanInformation"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td><strong>Operation Type:</strong></td>
+                                                                <td>{{ application.operationTypeName }}</td>
+                                                                <td><strong>Review Detail:</strong></td>
+                                                                <td colspan="2">{{ application.reviewLoanDetaile }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Customer Information" *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel-body">
+                                                        <app-customer-information-detail [isLMS]="true"
+                                                            [loanApplicationId]="application?.loanApplicationId">
+                                                        </app-customer-information-detail>
+                                                    </div>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Loan Information" *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel-body">
+                                                        <app-loan-application-details-view [isLMS]="true"
+                                                            [isRecommendedInfo]="true"
+                                                            [loanApplicationId]="application?.loanApplicationId"
+                                                            [loanApplicationDetail]=loanApplicationDetail
+                                                            [loanInformation]="loanApplicationDetail?.loanInformation"
+                                                            [visible]="false"> </app-loan-application-details-view>
+                                                    </div>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Transaction Dynamics" *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel panel-default">
+                                                        <!-- default -->
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <h2 class="panel-title pull-left">
+                                                                        Transaction Dynamics <small>-
+                                                                            {{ application.referenceNumber }}</small>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <app-transaction-dynamics [operation]="application?.operationId"
+                                                            [callerId]="2" [isAnalyst]="isAnalyst == true"
+                                                            [applicationId]="application?.loanApplicationId"
+                                                            [proposedItems]="proposedItems"></app-transaction-dynamics>
+                                                    </div>
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Condition Precidence" *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel panel-default">
+                                                        <!-- default -->
+                                                        <div class="panel-heading">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <h2 class="panel-title pull-left">
+                                                                        Conditions <small>-
+                                                                            {{ application.referenceNumber }}</small>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- <app-credit-condition  [callerId]="2" [isAnalyst]="isAnalyst == true" [applicationId]="application?.loanReviewApplicationId" [proposedItems]="proposedItems"></app-credit-condition> -->
+                                                        <app-credit-condition [operation]="application?.operationId"
+                                                            [callerId]="2" [isAnalyst]="isAnalyst == true"
+                                                            [applicationId]="application?.loanApplicationId"
+                                                            [proposedItems]="proposedItems"></app-credit-condition>
+                                                    </div>
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Supporting Documents" *ngIf="hideGeneralInfoPanel">
+                                                    <document-upload [reload]="reload"
+                                                        [operationId]="application?.operationId"
+                                                        [customerId]="application?.customerId"
+                                                        [customerGroupId]="application?.customerGroupId"
+                                                        [targetId]="application?.loanApplicationId" [deleteLink]="false"
+                                                        [isOperationSpecific]="false" [isLms]="true"
+                                                        (requiredDocumentsUploadSatisfied)="setrequiredUploadValue($event)"
+                                                        [targetReferenceNumber]="application?.relatedReferenceNumber == null ? application?.referenceNumber : application?.relatedReferenceNumber">
+                                                    </document-upload>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Approval Process Changes"
+                                                    *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel-body">
+                                                        <table class="table table-casa-information">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th>Customer Name</th>
+                                                                    <th>Product Name</th>
+                                                                    <th>Tenor</th>
+                                                                    <th>Rate</th>
+                                                                    <th>Amount</th>
+                                                                    <th>Exchange Rate</th>
+                                                                    <th>Approval Status</th>
+                                                                    <th>Staff</th>
+                                                                </tr>
+                                                                <tr *ngFor="let x of changeLog">
+                                                                    <td>{{ x.customerName }}</td>
+                                                                    <td>{{ x.approvedProductName }}</td>
+                                                                    <td>{{ x.approvedTenor/30 | number : '1.0-0' }}
+                                                                        months</td>
+                                                                    <td>{{ x.approvedRate | number:'1.2' }}</td>
+                                                                    <td>{{ x.approvedAmount | number:'1.2' }}</td>
+                                                                    <td>{{ x.exchangeRate | number:'1.2' }}</td>
+                                                                    <td>{{ getApprovalStatus(x.statusId) }}</td>
+                                                                    <td>{{ x.staffName }}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Offer Letter" *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel-body">
+                                                        <button type="button" class="btn btn-primary"
+                                                            style="margin-right: 5px;"
+                                                            [disabled]="isOfferLetterAvailable"
+                                                            (click)="popoverSeeMore()">View Offer Letter</button>
+                                                    </div>
+
+                                                </p-tabPanel>
+                                                <p-tabPanel header="Approval Process Comments"
+                                                    *ngIf="hideGeneralInfoPanel">
+                                                    <div class="panel-body">
+                                                        <app-approval-comments [operationId]="application?.operationId"
+                                                            [applicationId]="application?.loanApplicationId"
+                                                            (trailCount)="setTrailCount($event)">
+                                                        </app-approval-comments>
+
+                                                        <app-approval-comments *ngIf="application?.loanApplicationId>0"
+                                                            [requireAll]=false [operationId]="48"
+                                                            [applicationId]="application?.loanApplicationId"
+                                                            [tableLabel]="'LMS Availment Comments'">
+                                                        </app-approval-comments>
+                                                    </div>
+
+                                                </p-tabPanel>
+
+
+
+                                            </p-tabView>
+                                        </div>
+
+                                    </div>
+
+                                </p-tabPanel>
+                            </p-tabView>
+
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-9 ">
+                                    <!-- buttons -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- endof loan applications -->
+
+            </p-tabPanel>
+        </p-tabView>
+
+    </div>
+</div>
+
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displaySearchForm" id="add-modal" modal="modal" showEffect="fade" width="450">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Search Application
+            </h2>
+        </div>
+
+        <form novalidate (ngSubmit)="submitForm(searchForm)" [formGroup]="searchForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="searchString" class="control-label col-md-12">Loan Application Reference Number/
+                            Customer Name/ Staff Code</label>
+                        <div class="col-md-12">
+                            <input type="text" name="searchString" formControlName="searchString" id="searchString"
+                                class="form-control"
+                                [ngClass]="!searchForm.controls['searchString'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(searchForm)" [disabled]="searchForm.invalid"
+                            class="btn btn-success pull-right">Search</button>
+                        <button type="button" (click)="displaySearchForm=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>
+
+
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" showEffect="fade" width="1200">
+    <div *ngIf="displayDocument" style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{ selectedDocument }}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:450px">
+
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                [src]="'data:image/jpg;base64,'+binaryFile" alt="" class="img-thumbnail">
+
+        </div>
+
+    </div>
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displayReport" width="800" modal="modal" showEffect="fade">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Generated Offer Letter
+
+                    </h2>
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <div class="col-md-12" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1500px"
+                    style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayApproverSearchForm" modal="modal" id="searchModal" showEffect="fade"
+    width="650" [contentStyle]="{'overflow':'auto','max-height':'700px'}">
+    <app-reassign-request [approvalTrailId]="approvalTrailId" (showCallerDialogue)="displayApproverSearchModal($event)">
+    </app-reassign-request>
+</p-dialog>
+
+
+<!-- <PRE>{{ application | json }}</PRE> -->

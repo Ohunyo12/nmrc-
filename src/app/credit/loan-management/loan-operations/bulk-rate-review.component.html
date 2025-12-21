@@ -1,0 +1,251 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Rate Review
+                            </h2>
+                            <!-- <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-tabView>
+
+                        <p-tabPanel header="Rate Review">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h2 class="panel-title pull-left">
+                                                Review Bulk Interest Rates
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form novalidate [formGroup]="rateReviewForm" autocomplete="off">
+
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group">
+                                                <label for="rateIndexId" class="control-label col-md-2">Price Index</label>
+                                                <div class="col-md-4">
+                                                    <select type="text" (change)="onIndexChange($event.target.value)" name="rateIndexId" formControlName="rateIndexId" id="rateIndexId" class="form-control" [ngClass]="!rateReviewForm.controls['rateIndexId'].valid ? 'required-input' : 'valid-input'">
+                                                        <option value="">-- Select Price Index --</option>
+                                                        <option *ngFor="let index of productIndex" [value]="index.productPriceIndexId">
+                                                            {{ index.priceIndexName }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <label for="indexOldrate" class="control-label col-md-2">Old Rate</label>
+                                                <div class="col-md-4 no-data-div">
+                                                    <input type="text" name="indexOldrate" formControlName="indexOldrate" id="indexOldrate" class="form-control" [ngClass]="!rateReviewForm.controls['indexOldrate'].valid ? 'required-input' : 'valid-input'">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="rateEffectiveDate" class="control-label col-md-2">Effective Date</label>
+                                                <div class="col-md-4">
+                                                    <p-calendar id="rateEffectiveDate" [responsive]="true" formControlName="rateEffectiveDate" dateFormat="dd/mm/yy" [ngClass]="!rateReviewForm.controls['rateEffectiveDate'].valid ? 'required-input' : 'valid-input'"
+                                                        [inputStyle]="{'width': '310px' }" [monthNavigator]="true" [yearNavigator]="true" yearRange="1955:2030" [showIcon]="true">
+                                                    </p-calendar>
+                                                </div>
+
+                                                <label for="indexNewrate" class="control-label col-md-2">New Rate</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" name="indexNewrate" formControlName="indexNewrate" id="indexNewrate" class="form-control" [ngClass]="!rateReviewForm.controls['indexNewrate'].valid ? 'required-input' : 'valid-input'">
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="button" (click)="submitForm(rateReviewForm)" [disabled]="rateReviewForm.invalid" class="btn btn-success pull-right">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="panel-body">
+                                <p-dataTable [value]="newInterestRateReview">
+                                    <p-header>Interest Rate Review List</p-header>
+                                    <p-column field="productPriceIndexName" header="Product Price Index" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="effectiveDate" header="Effective Date" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                    <p-column field="oldInterestRate" header="Old Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template pTemplate="body" let-item="rowData">
+                                                                        {{item.oldInterestRate | number:'1.1'}}
+                                                                    </ng-template>
+                                    </p-column>
+                                    <p-column field="newInterestRate" header="New Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                        <ng-template pTemplate="body" let-item="rowData">
+                                                                            {{item.newInterestRate | number:'1.1'}}
+                                                                        </ng-template>
+                                    </p-column>
+
+                                </p-dataTable>
+
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="Rate Application">
+
+                            <div class="card no-padding">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Pending Rate Reviews
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p-dataTable [value]="newInterestRateReview" (onRowSelect)="onSelectedRateIndex($event)">
+                                            <p-header>Pending Interest Rate Review Application</p-header>
+                                            <p-column field="productPriceIndexName" header="Product Price Index" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="effectiveDate" header="Effective Date" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="oldInterestRate" header="Old Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template pTemplate="body" let-item="rowData">
+                                                    {{item.oldInterestRate | number:'1.1'}}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column field="newInterestRate" header="New Rate" sortable="true" [filter]="true" filterMatchMode="contains">
+                                                <ng-template pTemplate="body" let-item="rowData">
+                                                    {{item.newInterestRate | number:'1.1'}}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column [style]="{'width':'50px'}" selectionMode="single"></p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                                <!--end of panel-->
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel header="Rate Exemptions">
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    <label for="callLimitTypeId" class="col-md-2 control-label"></label>
+                                    <div class="col-md-4">
+                                    </div>
+
+                                    <label for="" class="control-label col-md-2">New Exemption</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <input (focus)="openSearchBox()" type="text" class="form-control" placeholder="Search for Loan Customer" name="loanReferenceNo" [ngClass]="'valid-input'">
+                                            <div class="input-group-btn">
+                                                <button (click)="openSearchBox()" style="padding-top:4px;padding-bottom: 4px" class="btn btn-default" type="button">
+                                                  <i class="glyphicon glyphicon-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p-dataTable [value]="excemptions">
+                                <p-header>Bulk Rate Review Exemption List</p-header>
+                                <p-column field="loanReferenceNumber" header="Loan Reference Number" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="customerName" header="Customer" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="branchName" header="Branch" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="currency" [style]="{'width':'35px'}" header=""></p-column>
+                                <p-column field="principalAmount" header="Principal Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.principalAmount | number:'1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="outstandingPrincipal" header="Outstanding Principal" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.outstandingPrincipal | number:'1.2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column field="interestRate" header="Interest Rate" [style]="{'width':'100px'}" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="outstandingInterest" header="Outstanding Interest" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.outstandingInterest | number:'1.2'}}
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+                        </p-tabPanel>
+                    </p-tabView>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<app-fintrakbanking-dialog [title]="title" [show]="displayConfirmDialog" [width]="width" [message]="message" (approveEvent)="applyNewBulkRate(selectedRateData)" (closeEvent)="hideConfirmDialog()"></app-fintrakbanking-dialog>
+
+<p-dialog [responsive]=true [(visible)]="displayAddInterestReviewModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+
+</p-dialog>
+
+
+<p-dialog [responsive]=true [(visible)]="displaySearchModal" modal="modal" id="searchModal" showEffect="fade" width="650">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <div style="margin-left:0" class="row">
+                <h2 class="panel-title pull-left">
+                    Search For Loan
+                </h2>
+                <a href="" (click)="displaySearchModal=false" class="pull-right remove-btn">
+                    <i class="glyphicon glyphicon-remove-sign">
+                </i>
+                </a>
+
+            </div>
+        </div>
+        <div style="padding:3px" class="panel-body">
+            <div class="form-group">
+                <div class="col-md-12">
+                    <input type="text" id="search" (keyup)="searchDB($event.target.value)" class="form-control" placeholder="Type in your search parameter">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <p>
+                        <!--{{mfacilityType}}-->
+                    </p>
+                    <table *ngIf="searchResults" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Loan Reference No</th>
+                                <th>Customer Name</th>
+                                <th>Loan Principal Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr (click)="pickSearchedData(res)" style="cursor: pointer" *ngFor="let res of searchResults; let i = index">
+                                <td>
+                                    {{res.loanReferenceNumber}}
+                                </td>
+                                <td>
+                                    {{res.customerName}}
+                                </td>
+                                <td>
+                                    {{res.principalAmount}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

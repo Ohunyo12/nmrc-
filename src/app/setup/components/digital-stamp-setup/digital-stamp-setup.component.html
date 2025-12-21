@@ -1,0 +1,123 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+
+        <!--card 2 list-->
+
+        <div  class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Digital Stamp Setup
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Upload Stamp" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="stamps" [paginator]="true" [rows]="10" [responsive]=true>
+                        <p-column field="stampName" header="Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <!-- <p-column field="staffRoleId" header="Approval Group" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column field="staffRoleId" header="Approval Level" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="staffRoleName" header="Staff Role" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editDigitalStamp(d)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <!-- <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="viewDigitalStamp(d)" href="javascript:void(0)">View</a>
+                            </ng-template>
+                        </p-column> -->
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="removeDigitalStamp(d)" href="javascript:void(0)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal" [contentStyle]="{'overflow':'auto','max-height':'600px'}"
+    modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+               {{ itemPanelHeader }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="documentForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-6">Stamp Name</label>
+                        <label for="" class="control-label col-md-6">Staff Role</label>
+                        <div class="col-md-6">
+                            <input type="text" formControlName="stampName" [ngClass]="!documentForm.controls['stampName'].valid ? 'required-input' : 'valid-input'"
+                            name="stampName" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <select name="staffRoleId" id="staffRoleId" class="form-control" formControlName="staffRoleId"
+                            [ngClass]="documentForm.controls['staffRoleId'].valid ? 'valid-input':'required-input'">
+                            <option value="">--- Select Staff Role ---</option>
+                            <option *ngFor="let x of staffRole" [value]="x.staffRoleId">{{ x.staffRoleName }}</option>
+                        </select>
+                        </div>
+                    </div>
+                   
+                    
+                </div>
+            </div>
+
+        </form>
+
+        <!--as p-editor is buggy within form tag-->
+        <div class="panel-body" [style]="{'padding-top':'0px'}">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <!-- <label class="control-label">{{documentContent}} </label> -->
+
+                    <div class="col-md-12">
+                        <CKEDITOR [content]="documentContent" [height]="250" (contentChange)="contentChange($event)"></CKEDITOR>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button *ngIf="editMode == true" type="submit" (click)="saveSection()" [disabled]="documentForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+

@@ -1,0 +1,998 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+
+
+        <!--card 2 list-->
+
+        <div *ngIf="displayList" class="card no-padding">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                {{ entityName }}
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add Template"
+                                    icon="fa-plus"></button>
+                                <button (click)="displayPlaceholderForm()" pButton type="button" label="Add Placeholder" icon="fa-plus"></button>
+                                <button (click)="displayBindingMethodForm()" pButton type="button" label="Add Binding Method" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p-tabView [activeIndex]="activeTabindex" (onChange)="onTabChange($event)">
+                <div class="panel-body">
+                    <p-tabPanel header="Templates">
+                    <p-dataTable #dt [value]="alerts" [paginator]="true" [rows]="10" [responsive]=true
+                        selectionMode="single">
+
+                        <p-column field="title" header="Title" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="businessOwner" header="Business Owner" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="senderName" header="Sender Name" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="bindingMethod" header="Binding Method" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column field="templateTypeName" header="Template Type" sortable="true" [filter]="true"
+                            filterMatchMode="contains"></p-column>
+                        <p-column header="Active Status" styleClass="col-button">
+                            <ng-template let-status="rowData" pTemplate="body">
+                                <div class="col-md-12">
+                                    <div class="pull-right">{{status.isActive ? "Enabled":"Disabled"}}</div>
+                                    <div class="pull-left">
+                                        <p-inputSwitch [(ngModel)]="status.isActive"
+                                            (onChange)="activeState($event,status)">
+                                        </p-inputSwitch>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editTitle(d)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'100px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="displaySetupRoleForm(d)" href="javascript:void(0)">Setup Group Email</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="previewTitle(d)" href="javascript:void(0)">Preview</a>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="removeTitle(d)" href="javascript:void(0)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                    </p-tabPanel>
+
+                    <!-- placeholders
+                     -->
+                     <p-tabPanel header="Placeholders">
+                        <p-dataTable #dt [value]="loadAlertsPlaceHolders" [paginator]="true" [rows]="10" [responsive]=true
+                            selectionMode="single">
+    
+                            <p-column field="placeHolder" header="Placeholder" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="description" header="Description" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="partition" header="Partition" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                                <ng-template pTemplate="header"></ng-template>
+                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                    <a (click)="editPlaceholder(d)" href="javascript:void(0)">Edit</a>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        </p-tabPanel>
+
+                        <!-- Binding methods
+                     -->
+                     <p-tabPanel header="Binding Methods">
+                        <p-dataTable #dt [value]="alerts" [paginator]="true" [rows]="10" [responsive]=true
+                            selectionMode="single">
+    
+                            <p-column field="title" header="Title" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                            <p-column field="bindingMethod" header="Binding Method" sortable="true" [filter]="true"
+                                filterMatchMode="contains"></p-column>
+                        </p-dataTable>
+                        </p-tabPanel>
+                </div>
+            </p-tabView>
+            </div>
+            <!--end of panel-->
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalForm" id="add-modal"
+    [contentStyle]="{'overflow':'auto','max-height':'600px'}" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName }}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="alertTitleForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Template Type</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="templateType" id="templateType" formControlName="templateType"
+                                class="form-control" [(ngModel)]="templateType"
+                                [ngClass]="!alertTitleForm.controls['templateType'].valid ? 'required-input' : 'valid-input'">
+                                <option value="0">--- Select Template Type ---</option>
+                                <option value="1">EMAIL</option>
+                                <option value="2">SMS</option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-1">Default Email</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" name="defaultEmail" id="defaultEmail" formControlName="defaultEmail"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Title</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="title"
+                                [ngClass]="!alertTitleForm.controls['title'].valid ? 'required-input' : 'valid-input'"
+                                name="templateName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Business Owner</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="businessOwner"
+                                [ngClass]="!alertTitleForm.controls['businessOwner'].valid ? 'required-input' : 'valid-input'"
+                                name="businessOwner" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Sender Name</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="senderName"
+                                [ngClass]="!alertTitleForm.controls['senderName'].valid ? 'required-input' : 'valid-input'"
+                                name="senderName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Sender Email</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="senderEmail"
+                                [ngClass]="!alertTitleForm.controls['senderEmail'].valid ? 'required-input' : 'valid-input'"
+                                name="senderEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Binding Mehtod</label>
+                        <div class="col-md-4 pull-left">
+                            <select id="bindingMethod" formControlName="bindingMethod" [disabled]="isDisabled"
+                                (change)="validateBinding($event.target.value)" name="bindingMethod"
+                                class="form-control"
+                                [ngClass]="!alertTitleForm.controls['bindingMethod'].valid ? 'required-input' : 'valid-input'">
+                                <option value="0">Select Binding Method</option>
+                                <!-- <option *ngFor="let x of alertsForDropdown" [value]="x.alertTitleId">
+                                    {{ x.title }}</option> -->
+                                    <option *ngFor="let x of alertsBindingMethod" [value]="x.bindingMethodId">
+                                        {{ x.title }}</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12" *ngIf="templateType==1">
+                            <app-ckeditior-project *ngIf="displayModalForm==true"
+                                (contentChange)="contentChange($event)" [content]="ckEditorContent" [height]="300">
+                            </app-ckeditior-project>
+                        </div>
+                        <div class="col-md-12" *ngIf="templateType==2">
+                            <textarea formControlName="senderEmail"
+                                [ngClass]="!alertTitleForm.controls['senderEmail'].valid ? 'required-input' : 'valid-input'"
+                                name="senderEmail" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <!-- schedule section -->
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                         <strong>ALERT SCHEDULE</strong>   
+                        </h2>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Frequency</label>
+                        <div class="col-md-4 pull-left">
+                            <select id="frequency" formControlName="frequency" name="frequency" class="form-control"
+                                [ngClass]="!alertTitleForm.controls['frequency'].valid ? 'required-input' : 'valid-input'">
+                                <option value="0">Select Frequecy</option>
+                                <option *ngFor="let x of frequencies" [value]="x.alertFrequencyId">
+                                    {{ x.frequencyMode }}</option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-1">Time</label>
+                        <div class="col-md-4 pull-left">
+                            <select id="alertTime" formControlName="alertTime" name="alertTime" class="form-control"
+                            [ngClass]="!alertTitleForm.controls['alertTime'].valid ? 'required-input' : 'valid-input'">
+                            <option value="0">Select Time</option>
+                            <option value="morning">Morning</option>
+                            <option value="midday">Midday</option>
+                            <option value="afternoon">Afternoon</option>
+                            <option value="evening">Evening</option>
+                            <option value="midnight">Midnight</option>
+                        </select>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">From</label>
+                        <div class="col-md-4 pull-left">
+                            <p-calendar id="timeFrom" showTime="true" timeOnly="true"  hourFormat="24"
+                             formControlName="timeFrom" [readonly]="true" [showIcon]="true" placeHolder="10:30"
+                             [inputStyle]="alertTitleForm.controls['timeFrom'].valid ? {'width': '100%','border-left':'3px solid #3cd225'} : {'width': '100%','border-left':'3px solid #ff0000'}"
+                            [style]="{'width': '100%', 'overflow': 'visible'}"></p-calendar>
+                        </div>
+                        <label for="" class="control-label col-md-1">To:</label>
+                        <div class="col-md-4 pull-left">
+                            <p-calendar id="timeTo" showTime="true" timeOnly="true"  hourFormat="24"
+                             formControlName="timeTo" [readonly]="true" [showIcon]="true" placeHolder="10:30"
+                             [inputStyle]="alertTitleForm.controls['timeTo'].valid ? {'width': '100%','border-left':'3px solid #3cd225'} : {'width': '100%','border-left':'3px solid #ff0000'}"
+                            [style]="{'width': '100%', 'overflow': 'visible'}"></p-calendar>
+                        </div>
+                    </div>
+
+                    <!-- schedule section end -->
+
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitForm(alertTitleForm)" [disabled]="alertTitleForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p>
+                Replace dynamic content with <code>@{{</code>PlaceholderName<code>}}</code>
+            </p>
+
+            <h4>List of placeholbers:</h4>
+            <ol>
+                <li *ngFor="let x of loadAlertsPlaceHolders">{{ x.placeHolder }} : {{ x.description }}</li>
+                <!-- <li>customerName</li>
+                <li>branchName</li>
+                <li>description</li>
+                <li>expiryDate</li>
+                <li>meetingDate</li>
+                <li>provideHolder</li>
+                <li>dueDate</li>
+                <li>accountOfficerName</li>
+                <li>AccountNumber</li>
+                <li>OwnerFirstName</li>
+                <li>RecipientName</li>
+                <li>CurrentLevel</li>
+                <li>OperationName</li>
+                <li>Status</li>
+                <li>Time</li>
+                <li>TAT</li>
+                <li>ReferenceNumber</li>
+                <li>FacilityType</li>
+                <li>Location</li>
+                <li>Link</li> -->
+
+            </ol>
+
+        </div>
+
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!--preview modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalPreview" id="ad-modal" modal="modal" showEffect="fade"
+    width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ alertTitle }}
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertPreviewForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Template Type</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly="readonly" value="{{templateTypeName}}" name="templateType"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Defaul Email</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly="readonly" value="{{defaultEmail}}" name="defaultEmail"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Title</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly="readonly" value="{{alertTitle}}" name="alertTitle"
+                                class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Business Owner</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly value="{{businessOwner}}" name="businessOwner"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Sender Name</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly value="{{senderName}}" name="senderName" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Sender Email</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" readonly value="{{senderEmail}}" name="senderEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Binding Mehtod</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" value="{{bindingMethod}}" readonly name="bindingMethod"
+                                class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <CKEDITOR *ngIf="displayModalPreview==true" (contentChange)="contentChange($event)"
+                                [content]="ckEditorContent" [height]="300"></CKEDITOR>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="displayModalPreview=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</p-dialog>
+<!--end of preview modal-->
+
+<!--level modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalLevel" id="ad-modal" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                ALERT STAFF GROUP EMAIL SETUP
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertLevelForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Group Email</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="staffRole" id="staffRole" formControlName="staffRole" class="form-control"
+                                [(ngModel)]="staffRole"
+                                [ngClass]="!alertLevelForm.controls['staffRole'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Group Code ---">--- Select Group Code ---</option>
+                                <option *ngFor="let levelcode of levelCodes" value="{{levelcode.groupEmailId}}">
+                                    {{levelcode.groupCode}} - {{levelcode.groupName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                    <label for="" class="control-label col-md-1">Email List</label>
+                    <div class="col-md-12" >
+                        <textarea name="emailList" id="emailList" formControlName="emailList"
+                        class="form-control" [(ngModel)]="emailList"
+                        [ngClass]="!alertLevelForm.controls['emailList'].valid ? 'required-input' : 'valid-input'"></textarea>
+                    </div>
+                </div> -->
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitLevelForm(alertLevelForm)" [disabled]="alertLevelForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalLevel=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="levels" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="title" header="Alert Title" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column field="groupCode" header="Email Group Code" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="groupName" header="Email Group Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editLevel(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeLevel(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+<!--end of level modal-->
+
+<!--level group modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalLevelGroup" id="ad-modal" modal="modal" showEffect="fade"
+    width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                LEVEL GROUP SETUP
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertLevelGroupForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Level Group Name</label>
+                        <div class="col-md-4 pull-left">
+                            <input name="levelGroupName" id="levelGroupName" formControlName="levelGroupName"
+                                class="form-control" [(ngModel)]="levelGroupName"
+                                [ngClass]="!alertLevelGroupForm.controls['levelGroupName'].valid ? 'required-input' : 'valid-input'">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Description</label>
+                        <div class="col-md-12">
+                            <textarea name="description" id="description" formControlName="description"
+                                class="form-control" [(ngModel)]="description"
+                                [ngClass]="!alertLevelGroupForm.controls['description'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitLevelGroupForm(alertLevelGroupForm)"
+                        [disabled]="alertLevelGroupForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalLevelGroup=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="levelGroups" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="levelGroupName" header="Group Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="description" header="Description" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editLevelGroup(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="processLevel(d)" href="javascript:void(0)">Level</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'100px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="displayLevelGroupMappingForm(d)" href="javascript:void(0)">Group/Level Mapping</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="displayConditionForm(d)" href="javascript:void(0)">Condition</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="displaySetupForm()" href="javascript:void(0)">Setup</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeLevelGroup(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+<!--end of level group modal-->
+
+<!--level modal alertLevelGroupMappingForm -->
+<p-dialog [responsive]=true [(visible)]="displayModalLevelGroupMapping" id="ad-modal" modal="modal" showEffect="fade"
+    width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                LEVEL GROUP MAPPING
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertLevelGroupMappingForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Level Code</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="levelCode" id="levelCode" formControlName="levelCode" class="form-control"
+                                [(ngModel)]="levelCode"
+                                [ngClass]="!alertLevelGroupMappingForm.controls['levelCode'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Level Code ---">--- Select Level Code ---</option>
+                                <option *ngFor="let levelcode of levelCodes"
+                                    value="{{levelcode.profitCenterDefinitionCode}}">
+                                    {{levelcode.profitCenterDefinitionCode}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" (click)="submitLevelGroupMappingForm(alertLevelGroupMappingForm)"
+                        [disabled]="alertLevelGroupMappingForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalLevelGroupMapping=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="levelGroupMapping" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="levelGroupName" header="Group Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="levelCode" header="Level Code" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editLevelGroupMapping(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeLevelGroupMapping(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+<!--end of level modal-->
+
+<!--level modal displayModalSetup -->
+<p-dialog [responsive]=true [(visible)]="displayModalSetup" id="ad-modal" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                FINAL SETUP
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertSetupForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Alert Title</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="alertTitle" id="alertTitle" formControlName="alertTitle" class="form-control"
+                                [(ngModel)]="alertTitle"
+                                [ngClass]="!alertSetupForm.controls['alertTitle'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Alert Title ---">--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of loadAlerts" value="{{alert.alertTitleId}}">
+                                    {{alert.title}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Group Name</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="levelgroupName" id="levelgroupName" formControlName="levelgroupName"
+                                class="form-control" [(ngModel)]="levelgroupName"
+                                [ngClass]="!alertSetupForm.controls['levelgroupName'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Level Group ---">--- Select Level Group ---</option>
+                                <option *ngFor="let levelGroup of levelGroups" value="{{levelGroup.alertLevelGroupId}}">
+                                    {{levelGroup.levelGroupName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Frequency</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="frequency" id="frequency" formControlName="frequency" class="form-control"
+                                [(ngModel)]="frequency"
+                                [ngClass]="!alertSetupForm.controls['frequency'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Frequency ---">--- Select Frequency ---</option>
+                                <option *ngFor="let frequency of frequencies" value="{{frequency.alertFrequencyId}}">
+                                    {{frequency.frequencyMode}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Condition</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="condition" id="condition" formControlName="condition" class="form-control"
+                                [(ngModel)]="condition"
+                                [ngClass]="!alertSetupForm.controls['condition'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Condition ---">--- Select Condition ---</option>
+                                <option *ngFor="let condition of conditions" value="{{condition.alertConditionId}}">
+                                    {{condition.titleName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" (click)="submitSetupForm(alertSetupForm)" [disabled]="alertSetupForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalSetup=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="alertSetups" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="title" header="Alert Title" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column field="levelGroupName" header="Group Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="levelCode" header="Level Code" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="operationName" header="Operation Name" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="formular" header="Formular" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editAlertSetup(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeAlertSetup(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+<!--end of  modal-->
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalConditionForm" id="add-modal" modal="modal" showEffect="fade"
+    width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                CONDITIONS SETUP
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="alertConditionForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Trigger Source</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="triggerSource"
+                                [ngClass]="!alertConditionForm.controls['triggerSource'].valid ? 'required-input' : 'valid-input'"
+                                name="triggerSource" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Action For Trigger</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="actionForTrigger"
+                                [ngClass]="!alertConditionForm.controls['actionForTrigger'].valid ? 'required-input' : 'valid-input'"
+                                name="actionForTrigger" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Formular</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="formular"
+                                [ngClass]="!alertConditionForm.controls['formular'].valid ? 'required-input' : 'valid-input'"
+                                name="formular" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Operations</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="operationId" id="operationId" formControlName="operationId"
+                                class="form-control" [(ngModel)]="operationId"
+                                [ngClass]="!alertConditionForm.controls['operationId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Operation ---">--- Select Operation---</option>
+                                <option *ngFor="let operation of operations" value="{{operation.operationId}}">
+                                    {{operation.operationName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Alert Title</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="conditionTitle" id="conditionTitle" formControlName="conditionTitle"
+                                class="form-control" [(ngModel)]="conditionTitle"
+                                [ngClass]="!alertConditionForm.controls['conditionTitle'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Alert Title ---">--- Select Alert Title ---</option>
+                                <option *ngFor="let alert of loadAlerts" value="{{alert.alertTitleId}}">
+                                    {{alert.title}}
+                                </option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-1">Alert Interval</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="alertInterval"
+                                [ngClass]="!alertConditionForm.controls['alertInterval'].valid ? 'required-input' : 'valid-input'"
+                                name="alertInterval" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Last Run Date</label>
+                        <div class="col-md-4 pull-left">
+                            <p-calendar id="lastRunDate" formControlName="lastRunDate" [monthNavigator]="true"
+                                [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                [style]="{'width': '100%', 'z-index': '999'}"
+                                [ngClass]="alertConditionForm.controls['lastRunDate'].valid ? 'valid-input' : 'required-input'">
+                            </p-calendar>
+                        </div>
+                        <label for="" class="control-label col-md-1">Next Run Date</label>
+                        <div class="col-md-4 pull-left">
+                            <p-calendar id="nextRunDate" formControlName="nextRunDate" [monthNavigator]="true"
+                                [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
+                                [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                [style]="{'width': '100%', 'z-index': '999'}"
+                                [ngClass]="alertConditionForm.controls['nextRunDate'].valid ? 'valid-input' : 'required-input'">
+                            </p-calendar>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Type</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="type"
+                                [ngClass]="!alertConditionForm.controls['type'].valid ? 'required-input' : 'valid-input'"
+                                name="type" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitConditionForm(alertConditionForm)"
+                        [disabled]="alertConditionForm.invalid" class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalConditionForm=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <p-dataTable [value]="conditions" [paginator]="true" [rows]="10" [responsive]=true>
+                <p-column field="titleName" header="Title" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column field="triggerSource" header="Trigger Source" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="actionForTrigger" header="Action For Trigger" sortable="true" [filter]="true"
+                    filterMatchMode="contains"></p-column>
+                <p-column field="type" header="Type" sortable="true" [filter]="true" filterMatchMode="contains">
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="editAlertCondition(d)" href="javascript:void(0)">Edit</a>
+                    </ng-template>
+                </p-column>
+                <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                    <ng-template pTemplate="header"></ng-template>
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        <a (click)="removeAlertCondition(d)" href="javascript:void(0)">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </a>
+                    </ng-template>
+                </p-column>
+
+            </p-dataTable>
+        </div>
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+<!--placeholder modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalPlaceholder" id="ad-modal" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                PLACEHOLDER SETUP
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertPlaceholderForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Placeholder</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="placeHolder"
+                                [ngClass]="!alertPlaceholderForm.controls['placeHolder'].valid ? 'required-input' : 'valid-input'"
+                                name="placeHolder" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-1">Placeholder Description</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="description"
+                                [ngClass]="!alertPlaceholderForm.controls['description'].valid ? 'required-input' : 'valid-input'"
+                                name="description" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-1">Binding Alert</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="bindingMethod" id="bindingMethod" formControlName="bindingMethod" class="form-control"
+                                [ngClass]="!alertPlaceholderForm.controls['bindingMethod'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Binding Alert ---">--- Select  Binding Alert ---</option>
+                                <option *ngFor="let x of alertsBindingMethod" [value]="x.bindingMethodId">
+                                    {{ x.title }}</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <label for="" class="control-label col-md-1">Partition</label>
+                        <div class="col-md-4 pull-left">
+                            <select name="partition" id="partition" formControlName="partition" class="form-control"
+                                [ngClass]="!alertPlaceholderForm.controls['partition'].valid ? 'required-input' : 'valid-input'">
+                                <option value="--- Select Partition ---">--- Select Partition ---</option>
+                                <option value="SYSTEM">SYSTEM</option>
+                                <option value="MANUAL">MANUAL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitPlaceholderForm(alertPlaceholderForm)" [disabled]="alertPlaceholderForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalPlaceholder=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+<!--end of placeholder modal-->
+
+<!--binding method modal-->
+<p-dialog [responsive]=true [(visible)]="displayModalBindingMethod" id="ad-modal" modal="modal" showEffect="fade" width="1200">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                BINDING METHOD SETUP
+            </h2>
+        </div>
+        <form novalidate [formGroup]="alertBindingMethodForm" autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="" class="control-label col-md-2">Method Title</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="methodTitle"
+                                [ngClass]="!alertBindingMethodForm.controls['methodTitle'].valid ? 'required-input' : 'valid-input'"
+                                name="methodTitle" class="form-control">
+                        </div>
+                        <label for="" class="control-label col-md-2">Method Name (<em>name of the method created</em>)</label>
+                        <div class="col-md-4 pull-left">
+                            <input type="text" formControlName="methodName"
+                                [ngClass]="!alertBindingMethodForm.controls['methodName'].valid ? 'required-input' : 'valid-input'"
+                                name="methodName" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" (click)="submitBindingMethodForm(alertBindingMethodForm)" [disabled]="alertBindingMethodForm.invalid"
+                        class="btn btn-success pull-right">Save</button>
+                    <button type="button" (click)="displayModalBindingMethod=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+<!--end of binding method modal-->
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass"
+    (closeEvent)="hideMessage($event)"></fintrakbanking-message>

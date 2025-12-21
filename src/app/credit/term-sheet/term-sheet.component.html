@@ -1,0 +1,286 @@
+<div class="panel panel-default">
+
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="panel-title pull-left">
+                    Term Sheet
+                </h2>
+                <div class="pull-right">
+                    <button (click)="showTermSheetForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+    <div class="panel-body">
+
+        <p-dataTable [value]="termSheets" [responsive]="true" [paginator]="false" [rows]="5">
+            <p-column field="termSheetCode" header="Term Sheet Code" sortable="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column field="borrower" header="Borrower" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="facilityAmount" header="Facility Amount" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="facilityType" header="Facility Type" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="purpose" header="Purpose" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="tenor" header="Tenor" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="permittedAccount" header="Permitted Account" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="debtServiceReserveAccount" header="Debt Service Reserve Account" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="cancellation" header="Cancellation" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="principalRepayment" header="Principal Repayment" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="interestPayment" header="Interest Payment" sortable="true" filterMatchMode="contains"></p-column> -->
+            <p-column field="computationOfInterest" header="Computation Of Interest" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="repaymentSource" header="Repayment Source" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="availability" header="Availability" sortable="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column field="currencyOfDisbursement" header="Currency Of Disbursement" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="documentation" header="Documentation" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="drawdown" header="Drawdown" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="earlyRepaymentOfPrincipal" header="Early Repayment Of Principal" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="interestRate" header="Interest Rate" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="pricing" header="Pricing" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="managementFees" header="Management Fees" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="facilityFee" header="Facility Fee" sortable="true" filterMatchMode="contains"></p-column> -->
+            <p-column field="processingFee" header="Processing Fee" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="securityCondition" header="Security Condition" sortable="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column field="transactionDynamics" header="Transaction Dynamics" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="conditionsPrecedentToUtilisation" header="Conditions Precedent To Utilisation" sortable="true" filterMatchMode="contains"></p-column> -->
+            <p-column field="otherCondition" header="Other Condition" sortable="true" filterMatchMode="contains"></p-column>
+            <p-column field="taxes" header="Taxes" sortable="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column field="presentationsAndWarrantees" header="Presentations And Warrantees" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="covenants" header="Covenants" sortable="true" filterMatchMode="contains"></p-column> -->
+            <!-- <p-column field="eventsOfDefault" header="Events Of Default" sortable="true" filterMatchMode="contains"></p-column> -->
+            <p-column field="transferability" header="Transferability" sortable="true" filterMatchMode="contains"></p-column>
+            <!-- <p-column field="governingLawAndJurisdiction" header="Governing Law And Jurisdiction" sortable="true" filterMatchMode="contains"></p-column> -->
+            <p-column field="termSheet" header="Additional Comment" sortable="true" filterMatchMode="contains"></p-column>
+
+            <p-column [style]="{'width':'100px'}" header="View">
+                <ng-template pTemplate="header"> </ng-template>
+                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                <div style="text-align:center" *ngIf="d.owner">
+                    <a (click)="deleteTermSheet(d)" href="javascript:void(0)">Remove</a>
+                    <span style="padding:3px;">|</span>
+                    <a (click)="editTermSheet(d)" href="javascript:void(0)">Edit</a>
+                </div>
+                </ng-template>
+            </p-column>
+
+        </p-dataTable>
+
+    </div>
+
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayTermSheetForm" id="ct-modal" modal="modal" showEffect="fade" width="1200"
+[contentStyle]="{'overflow':'auto','max-height':'800px'}">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+        
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ formState }} Term Sheet
+            </h2> 
+        </div>
+                    
+        <form novalidate [formGroup]="termSheetForm" autocomplete="off">
+           <div class="panel-body">
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label for="borrower" class="control-label col-md-2">Borrower</label>
+                        <div class="col-md-4">
+                        <textarea name="borrower" formControlName="borrower" id="borrower" class="form-control" [ngClass]="!termSheetForm.controls['borrower'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="purpose" class="control-label col-md-2">Purpose</label>
+                        <div class="col-md-4">
+                        <textarea name="purpose" formControlName="purpose" id="purpose" class="form-control" [ngClass]="!termSheetForm.controls['purpose'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="facilityType" class="control-label col-md-2">Facility Type</label>
+                        <div class="col-md-4">
+                        <input type="text" name="facilityType" formControlName="facilityType" id="facilityType" class="form-control" [ngClass]="!termSheetForm.controls['facilityType'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="facilityAmount" class="control-label col-md-2">Facility Amount</label>
+                        <div class="col-md-4">
+                        <input type="text" name="facilityAmount" formControlName="facilityAmount" formatM id="facilityAmount" class="numeric form-control" [ngClass]="!termSheetForm.controls['facilityAmount'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tenor" class="control-label col-md-2">Tenor</label>
+                        <div class="col-md-4">
+                        <input type="text" name="tenor" formControlName="tenor" id="tenor" class="form-control" [ngClass]="!termSheetForm.controls['tenor'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="permittedAccount" class="control-label col-md-2">Permitted Account</label>
+                        <div class="col-md-4">
+                        <textarea name="permittedAccount" formControlName="permittedAccount" id="permittedAccount" class="form-control" [ngClass]="!termSheetForm.controls['permittedAccount'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="debtServiceReserveAccount" class="control-label col-md-2">Debt Service Reserve Account</label>
+                        <div class="col-md-4">
+                        <textarea name="debtServiceReserveAccount" formControlName="debtServiceReserveAccount" id="debtServiceReserveAccount" class="form-control" [ngClass]="!termSheetForm.controls['debtServiceReserveAccount'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="cancellation" class="control-label col-md-2">Cancellation</label>
+                        <div class="col-md-4">
+                        <textarea name="cancellation" formControlName="cancellation" id="cancellation" class="form-control" [ngClass]="!termSheetForm.controls['cancellation'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="principalRepayment" class="control-label col-md-2">Principal Repayment</label>
+                        <div class="col-md-4">
+                        <textarea name="principalRepayment" formControlName="principalRepayment" id="principalRepayment" class="form-control" [ngClass]="!termSheetForm.controls['principalRepayment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="interestPayment" class="control-label col-md-2">Interest Payment</label>
+                        <div class="col-md-4">
+                        <textarea name="interestPayment" formControlName="interestPayment" id="interestPayment" class="form-control" [ngClass]="!termSheetForm.controls['interestPayment'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="computationOfInterest" class="control-label col-md-2">Computation Of Interest</label>
+                        <div class="col-md-4">
+                        <textarea name="computationOfInterest" formControlName="computationOfInterest" id="computationOfInterest" class="form-control" [ngClass]="!termSheetForm.controls['computationOfInterest'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="repaymentSource" class="control-label col-md-2">Repayment Source</label>
+                        <div class="col-md-4">
+                        <textarea name="repaymentSource" formControlName="repaymentSource" id="repaymentSource" class="form-control" [ngClass]="!termSheetForm.controls['repaymentSource'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="availability" class="control-label col-md-2">Availability</label>
+                        <div class="col-md-4">
+                        <textarea name="availability" formControlName="availability" id="availability" class="form-control" [ngClass]="!termSheetForm.controls['availability'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="currencyOfDisbursement" class="control-label col-md-2">Currency Of Disbursement</label>
+                        <div class="col-md-4">
+                        <input type="text" name="currencyOfDisbursement" formControlName="currencyOfDisbursement" id="currencyOfDisbursement" class="form-control" [ngClass]="!termSheetForm.controls['currencyOfDisbursement'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="documentation" class="control-label col-md-2">Documentation</label>
+                        <div class="col-md-4">
+                            <textarea name="documentation" formControlName="documentation" id="documentation" class="form-control" [ngClass]="!termSheetForm.controls['documentation'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="drawdown" class="control-label col-md-2">Drawdown</label>
+                        <div class="col-md-4">
+                            <textarea name="drawdown" formControlName="drawdown" id="drawdown" class="form-control" [ngClass]="!termSheetForm.controls['drawdown'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="earlyRepaymentOfPrincipal" class="control-label col-md-2">Early Repayment Of Principal</label>
+                        <div class="col-md-4">
+                            <textarea name="earlyRepaymentOfPrincipal" formControlName="earlyRepaymentOfPrincipal" id="earlyRepaymentOfPrincipal" class="form-control" [ngClass]="!termSheetForm.controls['earlyRepaymentOfPrincipal'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="interestRate" class="control-label col-md-2">Interest Rate</label>
+                        <div class="col-md-4">
+                            <input type="text" name="interestRate" formControlName="interestRate" formatM id="interestRate" class="numeric form-control" [ngClass]="!termSheetForm.controls['interestRate'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pricing" class="control-label col-md-2">Pricing</label>
+                        <div class="col-md-4">
+                            <textarea name="pricing" formControlName="pricing" id="pricing" class="form-control" [ngClass]="!termSheetForm.controls['pricing'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="managementFees" class="control-label col-md-2">Management Fees</label>
+                        <div class="col-md-4">
+                            <input type="text" name="managementFees" formControlName="managementFees" formatM id="managementFees" class="numeric form-control" [ngClass]="!termSheetForm.controls['managementFees'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="facilityFee" class="control-label col-md-2">Facility Fee</label>
+                        <div class="col-md-4">
+                            <input type="text" name="facilityFee" formControlName="facilityFee" formatM id="facilityFee" class="numeric form-control" [ngClass]="!termSheetForm.controls['facilityFee'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                        <label for="processingFee" class="control-label col-md-2">Processing Fee</label>
+                        <div class="col-md-4">
+                            <input type="text" name="processingFee" formControlName="processingFee" formatM id="processingFee" class="numeric form-control" [ngClass]="!termSheetForm.controls['processingFee'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="securityCondition" class="control-label col-md-2">Security Condition</label>
+                        <div class="col-md-4">
+                            <textarea name="securityCondition" formControlName="securityCondition" id="securityCondition" class="form-control" [ngClass]="!termSheetForm.controls['securityCondition'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="transactionDynamics" class="control-label col-md-2">Transaction Dynamics</label>
+                        <div class="col-md-4">
+                            <textarea name="transactionDynamics" formControlName="transactionDynamics" id="transactionDynamics" class="form-control" [ngClass]="!termSheetForm.controls['transactionDynamics'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conditionsPrecedentToUtilisation" class="control-label col-md-2">Conditions Precedent To Utilisation</label>
+                        <div class="col-md-4">
+                            <textarea name="conditionsPrecedentToUtilisation" formControlName="conditionsPrecedentToUtilisation" id="conditionsPrecedentToUtilisation" class="form-control" [ngClass]="!termSheetForm.controls['conditionsPrecedentToUtilisation'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="otherCondition" class="control-label col-md-2">Other Condition</label>
+                        <div class="col-md-4">
+                            <textarea name="otherCondition" formControlName="otherCondition" id="otherCondition" class="form-control" [ngClass]="!termSheetForm.controls['otherCondition'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taxes" class="control-label col-md-2">Taxes</label>
+                        <div class="col-md-4">
+                            <textarea name="taxes" formControlName="taxes" id="taxes" class="form-control" [ngClass]="!termSheetForm.controls['taxes'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="presentationsAndWarrantees" class="control-label col-md-2">Presentations And Warrantees</label>
+                        <div class="col-md-4">
+                            <textarea name="presentationsAndWarrantees" formControlName="presentationsAndWarrantees" id="presentationsAndWarrantees" class="form-control" [ngClass]="!termSheetForm.controls['presentationsAndWarrantees'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="covenants" class="control-label col-md-2">Covenants</label>
+                        <div class="col-md-4">
+                            <textarea name="covenants" formControlName="covenants" id="covenants" class="form-control" [ngClass]="!termSheetForm.controls['covenants'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="eventsOfDefault" class="control-label col-md-2">Events Of Default</label>
+                        <div class="col-md-4">
+                            <textarea name="eventsOfDefault" formControlName="eventsOfDefault" id="eventsOfDefault" class="form-control" [ngClass]="!termSheetForm.controls['eventsOfDefault'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transferability" class="control-label col-md-2">Transferability</label>
+                        <div class="col-md-4">
+                            <textarea name="transferability" formControlName="transferability" id="transferability" class="form-control" [ngClass]="!termSheetForm.controls['transferability'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                        <label for="governingLawAndJurisdiction" class="control-label col-md-2">Governing Law And Jurisdiction</label>
+                        <div class="col-md-4">
+                            <textarea name="governingLawAndJurisdiction" formControlName="governingLawAndJurisdiction" id="governingLawAndJurisdiction" class="form-control" [ngClass]="!termSheetForm.controls['governingLawAndJurisdiction'].valid ? 'required-input' : 'valid-input'"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="button" (click)="saveTermSheet(termSheetForm)" [disabled]="termSheetForm.invalid" class="btn btn-success pull-right">Save and Close</button>
+                    <button type="button" (click)="displayTermSheetForm=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                </div>
+            </div>
+        </div>
+		
+
+    </div>
+	
+</p-dialog>
+
+
+<!-- 
+                                <select name="responseTypeId" id="responseTypeId" formControlName="responseTypeId" class="form-control" [ngClass]="!addForm.controls['responseTypeId'].valid ? 'required-input' : 'valid-input'">
+                                    <option value=">-- Select Response Type --</option>
+                                    <option *ngFor="let x of responseTypes" [value]="x.responseTypeId">{ x.responseType }</option>
+                                </select>
+ -->

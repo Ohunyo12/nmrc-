@@ -1,0 +1,205 @@
+<div class="ui-g">
+  <div class="ui-g-12 no-padding">
+    <div class="card no-padding">
+      <div class="panel panel-default">
+
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-md-12">
+              <h2 class="panel-title pull-left">
+                Recovery Commission For Internal Agents
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <form novalidate [formGroup]="retailReportForm" autocomplete="off">
+              <div class="form-group">
+                <label for="startDate" class="control-label col-md-1">Month </label>
+                <div class="col-md-2">
+                  <p-calendar id="startDate" formControlName="startDate" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1900:2030" [showIcon]="true"
+                    [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                    [style]="{'width': '100%', 'z-index': '999'}"
+                    [ngClass]="!retailReportForm.controls['startDate'].valid ? 'required-input' : 'valid-input'">
+                  </p-calendar>
+                </div>
+
+                <div class="col-md-1 pull-left">
+                  <button type="button" (click)="submitForm(retailReportForm)" class="btn btn-success pull-left"
+                    [disabled]="!retailReportForm.valid">Submit
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12"></div>
+          </div>
+        </div>
+
+
+        <div class="panel-body" *ngIf="recoveryAgents.length > 0">
+          <p-tabView>
+            <p-tabPanel header="List Of Internal Recovery Agents">
+              <p-dataTable [paginator]="true" [rows]="10" [value]="recoveryAgents" [responsive]="true"
+                [(selection)]="schemeSelection" dataKey="accreditedConsultantId" selectionMode="single">
+                <p-column field="firmName" header="Recovery Agent" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="phoneNumber" header="Phone Number" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="emailAddress" header="Email Address" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="address" header="Contact Address" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                </p-column>
+                <p-column field="accountNumber" header="Account Number" sortable="false" [filter]="false"
+                  filterMatchMode="contains">
+                </p-column>
+                <p-column [style]="{'width':'95px', 'text-align':'center'}" header="Capture Commission">
+                  <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                    <button type="button" (click)="commission(row)">
+                      <i class="glyphicon glyphicon-pencil"></i>
+                    </button>
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+            </p-tabPanel>
+
+            <!-- <p-tabPanel header="Recovery Reporting">
+              <app-recovery-reporting-retail> </app-recovery-reporting-retail>
+            </p-tabPanel> -->
+
+            <p-tabPanel header="Recovery Commission Report">
+              <p-dataTable #dt [paginator]="true" [rows]="10" [value]="recoveryCommissionData" [responsive]="true"
+                [(selection)]="commissionSelection" dataKey="loanRecoveryCommissionId" selectionMode="single">
+                <p-header>
+                  <div class="ui-helper-clearfix">
+                    <button type="button" pButton icon="fa-file-o" iconPos="left" label="Export to CSV"
+                      (click)="dt.exportCSV()" style="float:left"></button>
+                  </div>
+                </p-header>
+                <p-column field="accreditedConsultantCompany" header="Consultant" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="agentAccountNumber" header="Agent Account Number" sortable="true" [filter]="true"
+                  filterMatchMode="contains"></p-column>
+                <p-column field="totalRecoveryAmount" header="Cumulative Total Amount Due" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.totalRecoveryAmount | number : '1.2' }}
+                  </ng-template>
+                </p-column>
+                <p-column field="amountRecovered" header="Cumulative Total Amount Recovered" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.amountRecovered | number : '1.2' }}
+                  </ng-template>
+                </p-column>
+                <!-- <p-column field="commissionRate" header="Commission Rate" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                </p-column> -->
+                <p-column field="commissionPayable" header="Commission Payable" sortable="true" [filter]="true"
+                  filterMatchMode="contains">
+                  <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                    {{ d.commissionPayable | number : '1.2' }}
+                  </ng-template>
+                </p-column>
+              </p-dataTable>
+
+            </p-tabPanel>
+          </p-tabView>
+        </div>
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-12">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p-dialog [responsive]=true [(visible)]="displayCommissionForm" modal="modal" id="searchModal" showEffect="fade"
+    width="1200" [contentStyle]="{'overflow':'auto','max-height':'600px'}">
+
+    <div style="margin-bottom:0" class="panel panel-default">
+      <div class="panel-heading">
+        <div style="margin-left:0" class="row">
+          <h2 class="panel-title pull-left">
+            Payment Of Recovery Commission
+          </h2>
+          <a href="" (click)="displayCommissionForm = false" class="pull-right remove-btn">
+            <i class="glyphicon glyphicon-remove-sign">
+            </i>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:0" class="panel panel-default">
+
+      <form novalidate [formGroup]="recoveryCommissionForm" autocomplete="off">
+        <div class="panel-body">
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="totalRecoveryAmount" class="control-label col-md-2">Cumulative Total Amount Due </label>
+              <div class="col-md-4">
+                <input type="text" readonly name="totalRecoveryAmount" formControlName="totalRecoveryAmount"
+                  id="totalRecoveryAmount" formatM class="numeric form-control"
+                  [ngClass]="recoveryCommissionForm.controls['totalRecoveryAmount'].valid ? 'valid-input' : 'required-input'">
+              </div>
+
+              <label for="amountRecovered" class="control-label col-md-2">Cumulative Total Amount Recovered</label>
+              <div class="col-md-4">
+                <input id="amountRecovered" readonly formatM formControlName="amountRecovered" name="amountRecovered"
+                  class="numeric form-control" (blur)="computeComission()"
+                  [ngClass]="!recoveryCommissionForm.controls['amountRecovered'].valid ? 'required-input' : 'valid-input'">
+
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="commissionRate" class="control-label col-md-2">Commission Rate</label>
+              <div class="col-md-4">
+                <input id="commissionRate" readonly formControlName="commissionRate" name="commissionRate"
+                  class="form-control"
+                  [ngClass]="!recoveryCommissionForm.controls['commissionRate'].valid ? 'required-input' : 'valid-input'">
+              </div>
+              <label for="commissionPayable" class="control-label col-md-2">Commission Payable </label>
+              <div class="col-md-4">
+                <input type="text" readonly formatM name="commissionPayable" formControlName="commissionPayable"
+                  id="commissionPayable" class=" form-control"
+                  [ngClass]="recoveryCommissionForm.controls['commissionPayable'].valid ? 'valid-input' : 'required-input'">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comment" class="control-label col-md-2">Comment </label>
+              <div class="col-md-10">
+                <textarea type="text" name="comment" formControlName="comment" id="comment" class=" form-control"
+                  [ngClass]="recoveryCommissionForm.controls['comment'].valid ? 'valid-input' : 'required-input'"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </form>
+      <div class="panel-footer">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" (click)="saveRecoveryCommissionForm(recoveryCommissionForm)"
+              [disabled]="recoveryCommissionForm.invalid" class="btn btn-success pull-right">Save and
+              Close</button>
+            <button type="button" (click)="displayCommissionForm = false" style="margin-right:5px"
+              class="btn btn-danger pull-right">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
