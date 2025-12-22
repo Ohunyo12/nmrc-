@@ -19,6 +19,9 @@ import { ProductService, CollateralService, StaffRoleService, StaffRealTimeSearc
 import { Subject ,  fromEvent } from 'rxjs';
 import { isNullOrUndefined } from 'util';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { IAppraisal } from "app/shared/models/appraisal.model";
+import { IAppraisalSub } from "app/shared/models/appraisal.model";
+import { UnifiedUnderwritingStandardService } from 'app/credit/services/underwriting-obligor.service';
 //import { JobRequestViewComponent } from 'app/credit/components';
 // import * as jspdf from 'jspdf';   
 // import html2canvas from 'html2canvas'; 
@@ -107,6 +110,22 @@ export class InitiateLoanBookingComponent implements OnInit {
     toStaffId: number;
     selectedApprover: string;
 
+    // Obligor Checklist
+    uwsList: any[] = [];
+    isPreviewModalVisible: boolean = false;
+    selectedDocumentUrl: SafeResourceUrl | null = null;
+    fileType: string = '';
+    zoomLevel: number = 1;
+    dragging: boolean = false;
+    startX: number = 0;
+    startY: number = 0;
+    imageList: string[] = [];
+    currentImageIndex: number = 0;
+    maxZoom: number = 3;
+    minZoom: number = 1;
+    selectedLoan: IAppraisal | null = null;
+
+
     readonly commentTitle: string = "CREDIT APPRAISAL COMMENTS";
     readonly commentTitle2: string = "DRAWDOWN COMMENTS";
     readonly CREDITAPPRIASALDOC: string ="CREDIT APPRAISAL DOCUMENTS";
@@ -177,6 +196,10 @@ export class InitiateLoanBookingComponent implements OnInit {
         private _loanApplServ: LoanApplicationService,
         private staffRole: StaffRoleService,
         private realSearchSrv: StaffRealTimeSearchService,
+        private loadingService: LoadingService,
+        private underwritingService: UnifiedUnderwritingStandardService
+        
+    
     ) { }
 
     ngOnInit() {
@@ -380,6 +403,7 @@ export class InitiateLoanBookingComponent implements OnInit {
                 
         //this.customerCode = data.customerCode;
         this.loanSelection = data;
+
         this.setLienPlacementForLoan(data.loanCollateral);
         this.approvalStatusId = data.approvalStatusId;
         if (this.loanSelection.customerAvailableAmount == 0 && data.approvalStatusId != ApprovalStatusEnum.Referred) {
@@ -479,6 +503,11 @@ export class InitiateLoanBookingComponent implements OnInit {
         }
         else {
             this.isProspective = true;
+        }
+
+         // Fetch UUS checklist for the selected loan's reference number
+        if (this.loanSelection.applicationReferenceNumber) {
+          this.fetchCustomerUusItems(this.loanSelection.applicationReferenceNumber);
         }
     }
 
@@ -1655,6 +1684,187 @@ formatFeeValue() {
     resetEmployerRelatedLoans() {
         this.employerRelatedLoans = [];
     }
+
+
+     // =========================== Fetch Obligor's Items ===============================
+    
+      getRowStyle(rowData: any): any {
+        if (rowData.option === 'Yes') {
+          return { 'background-color': '#28a745', 'color': '#fff' }; // Deep green
+        } else if (rowData.option === 'No') {
+          return { 'background-color': '#dc3545', 'color': '#fff' }; // Deep red
+        } else {
+          return {};
+        }
+      }     
+      
+      fetchCustomerUusItems(nhfNumber: string): void {
+        console.error('nhf number:', nhfNumber);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+          response => {
+            this.uwsList = (response.result || []).map(uws => ({
+              ...uws,
+              option: this.mapOptionToEnum(uws.option),
+              deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
+            }));
+            console.log('Processed UUS List:', this.uwsList);
+            //this.cdr.detectChanges();
+          },
+          error => {
+            console.error('Error fetching UWS list:', error);
+            this.uwsList = [];
+            this.loadingService.hide();
+          },
+          () => this.loadingService.hide()
+        );
+      }
+    
+      mapOptionToEnum(option: number): string {
+        const mapping: { [key: number]: string } = {
+          1: 'Yes',
+          2: 'No',
+          3: 'Waiver',
+          4: 'Deferred'
+        };
+        return mapping[option] || 'No';
+      }
+    
+      viewDocuments(uws: any): void {
+        console.log('Selected UWS:', uws);
+        if (!uws.employeeNhfNumber) {
+          swal('Error', 'No Employee NHF Number found!', 'error');
+          return;
+        }
+        if (!uws.itemId) {
+          swal('Error', 'No Item Found!', 'error');
+          return;
+        }
+        console.log('Fetching document for:', uws.employeeNhfNumber, uws.itemId);
+        this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
+      }
+    
+      private fetchAndPreviewDocument(employeeNumber: string, itemId: number): void {
+        console.log('Calling API with:', employeeNumber, itemId);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItemDoc(employeeNumber, itemId).subscribe({
+          next: (response) => {
+            console.log('API Response:', response);
+            if (!response.success || !response.result) {
+              console.error('Invalid document data received');
+              swal('Error', 'Invalid document data received.', 'error');
+              this.loadingService.hide();
+              return;
+            }
+            const base64Data = response.result.split(',')[1];
+            const fileTypeMatch = response.result.match(/data:(.*?);base64/);
+            if (!base64Data || !fileTypeMatch) {
+              console.error('Invalid Base64 format');
+              swal('Error', 'Invalid document format.', 'error');
+              this.loadingService.hide();
+              return;
+            }
+            const fileType = fileTypeMatch[1];
+            console.log('Detected file type:', fileType);
+            const blob = this.base64ToBlob(base64Data, fileType);
+            const url = URL.createObjectURL(blob);
+            console.log('Generated Blob URL:', url);
+            if (fileType.includes('image') || fileType === 'application/pdf' ||
+                fileType === 'application/vnd.openxmlformats-officedocument.w ordprocessingml.document' ||
+                fileType === 'application/msword') {
+              this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+              this.fileType = fileType;
+              this.isPreviewModalVisible = true;
+            } else {
+              swal('Error', 'Unsupported file type.', 'error');
+            }
+            this.loadingService.hide();
+          },
+          error: (error) => {
+            console.error('Error fetching document:', error);
+            swal('Error', 'Error fetching document.', 'error');
+            this.loadingService.hide();
+          }
+        });
+      }
+    
+      private base64ToBlob(base64: string, contentType: string): Blob {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
+        for (let i = 0; i < byteCharacters.length; i += 512) {
+          const slice = byteCharacters.slice(i, i + 512);
+          const byteNumbers = new Array(slice.length);
+          for (let j = 0; j < slice.length; j++) {
+            byteNumbers[j] = slice.charCodeAt(j);
+          }
+          byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        return new Blob(byteArrays, { type: contentType });
+      }
+    
+      getModalStyle() {
+        if (this.fileType === 'application/pdf' || this.fileType === 'application/msword' ||
+            this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          return { width: '70%', height: '75vh' };
+        } else {
+          return { width: '55%', height: '70vh' };
+        }
+      }
+    
+      zoomIn() {
+        this.zoomLevel += 0.2;
+      }
+    
+      zoomOut() {
+        if (this.zoomLevel > 0.5) this.zoomLevel -= 0.2;
+      }
+    
+      onScrollZoom(event: WheelEvent) {
+        event.preventDefault();
+        const zoomFactor = event.deltaY < 0 ? 0.1 : -0.1;
+        this.zoomLevel = Math.max(0.5, this.zoomLevel + zoomFactor);
+      }
+    
+      startDrag(event: MouseEvent) {
+        event.preventDefault();
+        this.dragging = true;
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+      }
+    
+      onDrag = (event: MouseEvent) => {
+        if (!this.dragging) return;
+        const dragSpeed = 2;
+        const deltaX = (event.clientX - this.startX) * dragSpeed;
+        const deltaY = (event.clientY - this.startY) * dragSpeed;
+        const imageElement = document.querySelector('img') as HTMLElement;
+        if (imageElement) {
+          imageElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${this.zoomLevel})`;
+        }
+      };
+    
+      toggleZoom() {
+        if (this.zoomLevel >= this.maxZoom) {
+          this.zoomLevel = this.minZoom;
+        } else {
+          this.zoomLevel += 0.5;
+        }
+      }
+    
+      stopDrag = () => {
+        this.dragging = false;
+        document.removeEventListener('mousemove', this.onDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
+      };
+    
+      closePreviewModal() {
+        this.isPreviewModalVisible = false;
+        this.selectedDocumentUrl = null;
+        this.zoomLevel = 1;
+      }
+     // =========================== END ==============================================
 
 }
 
