@@ -929,12 +929,12 @@ export class CreditAppraisalComponent implements OnInit {
   onSelectedApplicationChange(): void {
     if (!this.applicationSelection) return;
     
-    // Log the entire applicationSelection object to check for nhfNumber
-    console.log('Selected Application Data:', this.applicationSelection);
+    // // Log the entire applicationSelection object to check for nhfNumber
+    // console.log('Selected Application Data:', this.applicationSelection);
     
-    // Specifically check for nhfNumber or employeeNhfNumber
-    console.log('nhfNumber:', this.applicationSelection.nhfNumber);
-    console.log('employeeNhfNumber:', this.applicationSelection.applicationReferenceNumber);
+    // // Specifically check for nhfNumber or employeeNhfNumber
+    // console.log('nhfNumber:', this.applicationSelection.nhfNumber);
+    // console.log('employeeNhfNumber:', this.applicationSelection.applicationReferenceNumber);
 
     this.selectedLoan = this.applicationSelection;
    
