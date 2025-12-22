@@ -86,6 +86,9 @@ export class AppMenuComponent implements OnInit {
                         'city setup',
                         'tax setup',
                         'fee and charge setup',
+                        'season fee setup',
+                        'origination fee setup',
+                        'service fee setup',
                         'product process setup',
                         'product class setup',
                         'product group setup',
@@ -409,6 +412,18 @@ export class AppMenuComponent implements OnInit {
                                             visible: this.menuGuardSrv.hideOrShow(['fee and charge setup'])
                                         },
                                         {
+                                            label: 'Season Fee Setup', icon: '', routerLink: ['/setup/season-fee'],
+                                            visible: this.menuGuardSrv.hideOrShow(['season fee setup'])
+                                        },
+                                        {
+                                            label: 'Origination Fee Setup', icon: '', routerLink: ['/setup/origination-fee'],
+                                            visible: this.menuGuardSrv.hideOrShow(['origination fee setup'])
+                                        },
+                                        {
+                                            label: 'Service Fee Setup', icon: '', routerLink: ['/setup/service-fee'],
+                                            visible: this.menuGuardSrv.hideOrShow(['service fee setup'])
+                                        },
+                                        {
                                             label: 'Reference Document', icon: '', routerLink: ['/setup/reference-document'],
                                             visible: this.menuGuardSrv.hideOrShow(['document template setup'])
                                         },
@@ -654,6 +669,9 @@ export class AppMenuComponent implements OnInit {
                             visible: this.menuGuardSrv.hideOrShow([
                                 'tax setup',
                                 'fee and charge setup',
+                                'season fee setup',
+                                'service fee setup',
+                                'origination fee setup',
                                 'product process setup',
                                 'product class setup',
                                 'product group setup',
@@ -678,7 +696,18 @@ export class AppMenuComponent implements OnInit {
                                             label: 'Fees/Charges', icon: '', routerLink: ['/setup/charge/charge'],
                                             visible: this.menuGuardSrv.hideOrShow(['fee and charge setup'])
                                         },
-    
+                                        {
+                                            label: 'season fee setup', icon: '',
+                                            visible: this.menuGuardSrv.hideOrShow(['season fee setup'])
+                                        },
+                                        {
+                                            label: 'origination fee setup', icon: '',
+                                            visible: this.menuGuardSrv.hideOrShow(['origination fee setup'])
+                                        },
+                                        {
+                                            label: 'service fee setup', icon: '',
+                                            visible: this.menuGuardSrv.hideOrShow(['service fee setup'])
+                                        },
                                     ]
                                 },
                                 {

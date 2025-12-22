@@ -1,0 +1,135 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="panel-title pull-left" i18n>
+                            SEASONING FEE SETUP
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-6">
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pull-right">
+                                    <button (click)="showModalForm()" pButton type="button" label="Add New"
+                                        icon="fa-plus"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p-dataTable [value]="stampDutyData">
+                        <p-column i18n-header field="collateralSubType" header="Collateral Sub Type"
+                            ></p-column>
+                            <p-column i18n-header field="dutiableValue" header="Dutiable Value"
+                            ></p-column>
+                        <p-column i18n-header field="tenor" header="Tenor"
+                            ></p-column>
+                        <p-column i18n-header field="useTenor" header="Tenor Applicable"
+                            ></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editStampSetup(d)" href="javascript:void(0)" i18n>Edit</a>
+                            </ng-template>
+                        </p-column>
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"> </ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="deleteStampSetup(d)" href="javascript:void(0)" i18n>Delete</a>
+                            </ng-template>
+                        </p-column>
+                    </p-dataTable>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [responsive]=true [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade"
+    width="800">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title" i18n>
+                Season Fee
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="stampDutyFormGroup" (ngSubmit)="submitStampSetupForm(stampDutyFormGroup)"
+            autocomplete="off">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="collateralSubTypeId" class="control-label col-md-2" i18n>Product Type
+                            </label>
+                        <div class="col-md-4">
+                            <select name="collateralSubTypeId" class="form-control" 
+                                formControlName="collateralSubTypeId" id="collateralSubTypeId"
+                                [ngClass]="!stampDutyFormGroup.controls['collateralSubTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="" i18n>- Select Collateral Sub Type -</option>
+                                <option *ngFor="let x of collateralSubTypes" [value]="x.collateralSubTypeId">
+                                    {{ x.collateralSubTypeName }}</option>
+                            </select>
+                        </div>
+                        <label for="tenor" class="control-label col-md-2" *ngIf="showTenor" i18n>Tenor</label>
+                        <div class="col-md-4">
+                            <input type="number" min="1" id="tenor" name="tenor" *ngIf="showTenor"
+                                class="form-control" formControlName="tenor"
+                                [ngClass]="!stampDutyFormGroup.controls['tenor'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        
+                        <label for="dutiableValue" class="control-label col-md-2" i18n>Refinance Season</label>
+                        <div class="col-md-4">
+                            <input type="number" min="1" id="dutiableValue" name="dutiableValue" 
+                                class="form-control" formControlName="dutiableValue"
+                                [ngClass]="!stampDutyFormGroup.controls['dutiableValue'].valid ? 'required-input' : 'valid-input'">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="useTenor" class="control-label col-md-2" i18n></label>
+                        <div class="col-md-4">
+                            <div class="checkbox-container">
+                                <input formControlName="useTenor" id="useTenor" type="checkbox"
+                                (change)="toggleForm($event.target.checked)">
+                            </div><label class="checkbox pull-left" i18n>Use Tenor Condition</label>
+                        </div>
+                       
+                        <label for="tenorMode" class="control-label col-md-2" *ngIf="showTenor" i18n>Tenor Mode</label>
+                        <div class="col-md-4">
+                            <select class="form-control" formControlName="tenorModeId" *ngIf="showTenor"
+                                
+                                [ngClass]="!stampDutyFormGroup.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
+                                name="" id="">
+                                <option *ngFor="let item of tenorType" value="{{item.tenorModeId}}">
+                                    {{item.name}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" [disabled]="stampDutyFormGroup.invalid"
+                            class="btn btn-success pull-right" i18n>Save</button>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right" i18n>Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>

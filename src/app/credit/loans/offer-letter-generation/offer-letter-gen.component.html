@@ -236,6 +236,126 @@
                                 </job-request-view>
                             </div>
                         </p-tabPanel>
+
+                          <!-- Obligor UUS Checklist Tab -->
+                        <p-tabPanel i18n-header header="Obligor UUS Checklist">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">Obligor UUS Checklist Review</h2>
+                            </div>
+                                <div class="panel-body">
+                                    <p-dataTable [value]="uwsList"
+                                    [responsive]="true"
+                                    [paginator]="true"
+                                    [rows]="5"
+                                    [rowsPerPageOptions]="[5,10,20,30]"
+                                    [totalRecords]="uwsList?.length || 0">
+                
+                                    <p-column i18n-header field="item" header="Item" [style]="{'width':'15%'}">
+                                    <ng-template let-uws="rowData" pTemplate="body">
+                                        {{ uws.item }}
+                                    </ng-template>
+                                    </p-column>
+                                
+                                    <p-column i18n-header field="description" header="Description">
+                                    <ng-template let-uws="rowData" pTemplate="body">
+                                        {{ uws.description }}
+                                    </ng-template>
+                                    </p-column>
+                                
+                                    <p-column i18n-header header="Option" [style]="{'width':'20%','text-align':'center'}">
+                                    <ng-template let-uws="rowData" pTemplate="body">
+                                        <div [ngStyle]="getRowStyle(uws)"
+                                            style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
+                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="radio" [(ngModel)]="uws.option" value="Yes" [name]="'option' + uws.id" disabled> Met
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="radio" [(ngModel)]="uws.option" value="No" [name]="'option' + uws.id" disabled> Not Met
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="radio" [(ngModel)]="uws.option" value="Waiver" [name]="'option' + uws.id" disabled> Waiver
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                            <input type="radio" [(ngModel)]="uws.option" value="Deferred" [name]="'option' + uws.id" disabled> Deferred
+                                        </label>
+                                        </div>
+                                    </ng-template>
+                                    </p-column>
+                                
+                                    <p-column i18n-header header="Defer Date" [style]="{'width':'15%','text-align':'center'}">
+                                    <ng-template let-uws="rowData" pTemplate="body">
+                                        <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
+                                        <input type="date" [(ngModel)]="uws.deferredDate"
+                                                [name]="'deferredDate' + uws.id"
+                                                class="form-control" readonly disabled
+                                                style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
+                                        </ng-container>
+                                        <ng-template #showNA>N/A</ng-template>
+                                    </ng-template>
+                                    </p-column>
+                                
+                                    <p-column i18n-header header="View Document" [style]="{'width':'15%','text-align':'center'}">
+                                    <ng-template let-uws="rowData" pTemplate="body">
+                                        <div style="display: flex; justify-content: center; align-items: center;">
+                                        <button *ngIf="uws.option !== 'Deferred'" type="button" class="ui-button ui-button-primary"
+                                                (click)="viewDocument(uws)">
+                                            Preview
+                                        </button>
+                                        </div>
+                                    </ng-template>
+                                    </p-column>                      
+                                </p-dataTable>     
+                                </div>             
+                            </div>
+                        </p-tabPanel>
+                        <!-- END -->
+
+                        <!-- Document Preview Modal -->
+                        <p-dialog [(visible)]="isPreviewModalVisible" [modal]="true" [style]="getModalStyle()"
+                        [closable]="true" (onHide)="closePreviewModal()" [draggable]="false">
+                        <div style="display: flex; justify-content: center; align-items: center; padding: 10px; position: relative;">
+                            <h3 style="margin: 0; flex: 1; text-align: center;">
+                                Document Preview for {{ selectedLoan?.customerName }}
+                            </h3>
+                            <div style="cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center;
+                                        justify-content: center; border: 2px solid red; border-radius: 5px; background-color: white;
+                                        position: absolute; right: 10px;"
+                                (click)="closePreviewModal()">
+                                <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
+                            </div>
+                        </div>
+                        <hr style="margin: 0 10px; border-top: 1px solid gray;">
+                        <div style="padding: 15px; width: 100%; text-align: center;">
+                            <div *ngIf="fileType?.includes('image')"
+                                style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                <img [src]="selectedDocumentUrl"
+                                    [style.transform]="'scale(' + zoomLevel + ')'"
+                                    style="max-height: 500px; object-fit: contain; transition: transform 0.3s ease-in-out; cursor: grab;"
+                                    (wheel)="onScrollZoom($event)"
+                                    (mousedown)="startDrag($event)"
+                                    (click)="toggleZoom()" />
+                            </div>
+                            <div *ngIf="fileType === 'application/pdf'" style="overflow: hidden; position: relative;">
+                                <iframe #pdfFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                    (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
+                            </div>
+                            <div *ngIf="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                        || fileType === 'application/msword'"
+                                style="overflow: hidden; position: relative;">
+                                <iframe #docFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                    (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
+                            </div>
+                            <div *ngIf="!fileType?.includes('image') && fileType !== 'application/pdf'
+                                        && fileType !== 'application/msword'
+                                        && fileType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+                                style="color: red; font-weight: bold;">
+                                Unsupported file type.
+                            </div>
+                        </div>
+                        </p-dialog>
+                    <!-- END -->
+
                     </p-tabView>
                 </div>
                 <div class="panel-footer">

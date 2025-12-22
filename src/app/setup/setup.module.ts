@@ -104,7 +104,7 @@ import {
     AccreditedSolicitorsComponent,
     AccreditedPrincipalsComponent,
     LimitDetailsComponent,
-    CallLimitComponent
+    CallLimitComponent,
 } from './components';
 
 import {
@@ -175,6 +175,9 @@ import { CollectionsRetailCronSetupComponent } from './components/collections-re
 import { IblChecklistSetupComponent } from './components/ibl-checklist-setup/ibl-checklist-setup.component';
 import { StampDutyConditionSetupComponent } from './components/stamp-duty-condition-setup/stamp-duty-condition-setup.component';
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
+import { SeasonFeeSetupComponent } from './components/season-fee-setup/season-fee-setup.component';
+import { OriginationFeeSetupComponent } from './components/origination-fee-setup/origination-fee-setup.component';
+import { ServiceFeeSetupComponent } from './components/service-fee-setup/service-fee-setup.component';
 
 
 @NgModule({
@@ -245,6 +248,9 @@ import { DigitalStampSetupComponent } from './components/digital-stamp-setup/dig
         IblChecklistSetupComponent,
         StampDutyConditionSetupComponent,
         DigitalStampSetupComponent,
+        SeasonFeeSetupComponent,
+        OriginationFeeSetupComponent,
+        ServiceFeeSetupComponent
 
     ],
 
