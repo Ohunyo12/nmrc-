@@ -1,0 +1,128 @@
+<div class="ui-g">
+    <div class="ui-g-12 no-padding">
+        <div class="card no-padding">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="panel-title pull-left">
+                                Down Payment
+                            </h2>
+                            <div class="pull-right">
+                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <p-dataTable [value]="downPaymentss" [responsive]="true" [paginator]="true" [rows]="15">
+                        <p-column field="employmentTypeId" header="Employment Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productId" header="Products" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="minAmt" header="Minimum Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="maxAmt" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="percent" header="Percentage (%)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                        <p-column [style]="{'width':'100px'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editDownPayment(i)" href="javascript:void(0)">Edit</a>
+                            </ng-template>
+                        </p-column>
+
+                        <p-column [style]="{'width':'60px', 'text-align': 'center'}">
+                            <ng-template pTemplate="header"></ng-template>
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="removeDownpayment(d)" href="javascript:void(0)">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </ng-template>
+                        </p-column>
+
+                    </p-dataTable>
+                </div>
+
+            </div>
+            <!--end of panel-->
+
+
+        </div>
+    </div>
+</div>
+
+<!--form modal-->
+<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+    <div style="margin-bottom:0" class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                {{ entityName}}
+            </h2>
+        </div>
+
+        <form novalidate [formGroup]="downPaymentForm" autocomplete="off">
+
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="employmentType" class="control-label col-md-2">Employment Type</label>
+
+
+                        <div class="col-md-4">
+                            <select type="text" name="employmentTypeId" formControlName="employmentTypeId" id="employmentTypeId"
+                                class="form-control"
+                                [ngClass]="!downPaymentForm.controls['employmentTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Employment Status --</option>
+                                <option value="1">Self Employed</option>
+                                <option value="2">Employed</option>
+                            </select>
+                        </div>
+                        <label for="productId" class="control-label col-md-2">Products</label>
+                        <div class="col-md-4">
+                        <select type="text" name="productId" formControlName="productId" id="productId" class="form-control"
+                                [ngClass]="!downPaymentForm.controls['productId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="">-- Select Product --</option>
+                                <option *ngFor="let product of products " [value]="product.productId">
+                                {{ product.productName }}
+                                </option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="minAmt" class="control-label col-md-2">Minimum Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" formatM name="minAmt" id="minAmt" class="form-control" formControlName="minAmt" [ngClass]="downPaymentForm.controls['minAmt'].valid ? 'valid-input' : 'required-input'"/>
+                        </div>
+                        <label for="maxAmt" formatM class="control-label col-md-2">Maximum Amount</label>
+                        <div class="col-md-4">
+                            <input type="text" name="maxAmt" id="maxAmt" class="form-control" formControlName="maxAmt" [ngClass]="downPaymentForm.controls['maxAmt'].valid ? 'valid-input' : 'required-input'"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="percent" class="control-label col-md-2">Percentage (%)</label>
+                        <div class="col-md-3">
+                            <input type="text" name="percent" numbersOnly id="percent" class="form-control"  formControlName="percent" min="0" max="100" step="1" [ngClass]="downPaymentForm.controls['percent'].valid ? 'valid-input' : 'required-input'"/>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" (click)="submitForm(downPaymentForm)" [disabled]="downPaymentForm.invalid" class="btn btn-success pull-right">Save</button>
+                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</p-dialog>
+<!--end of form modal-->
+
+
+<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>

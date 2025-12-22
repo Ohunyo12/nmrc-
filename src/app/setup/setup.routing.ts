@@ -12,7 +12,6 @@ import { PrudentialGuidelinesComponent } from './components/prudential-guideline
 import { LoanRecoverySetupComponent } from './components/loanrecovery-setup/loanrecoverysetup.component';
 import { AlertInterfaceComponent } from './components/limit-and-monitoring-setting/alert-interface.component';
 import { CallLimitComponent, ApprovedMarketComponent, LoanPrincipalComponent, EmployerSetupComponent, FinancialStatementComponent } from './components';
-
 import {
     LimitDetailsComponent,
     AccreditedSolicitorsComponent,
@@ -20,6 +19,7 @@ import {
     StateComponent,
     EndOfDayProcessComponent,
     DepartmentComponent,
+
     DepartmentUnitComponent,
     ApprovalGroupComponent,
     ApprovalLevelComponent,BusinessRuleComponent,
@@ -69,7 +69,9 @@ import { CollectionsRetailCronSetupComponent } from './components/collections-re
 import { IblChecklistSetupComponent } from './components/ibl-checklist-setup/ibl-checklist-setup.component';
 import { StampDutyConditionSetupComponent } from './components/stamp-duty-condition-setup/stamp-duty-condition-setup.component';
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
-
+//import { DownPaymentComponent } from 'src/app/setup/components/down-payment-setup/down-payment-setup.component.ts';
+import { DownPaymentComponent } from './components/down-payment-setup/down-payment-setup.component';
+import { HousingExpenseDebitRatioComponent } from './components/house-expense-debit-ratio-setup/house-expense-debit-ratio-setup.component';
 //import { OperationalFlowPageOrderComponent } from 'app/setup/components/operational-flow-page-order/operational-flow-page-order.component';
 
 
@@ -209,6 +211,14 @@ const routes: Routes = [
             {
                 path: 'units', component: DepartmentUnitComponent, canActivate: [AuthGuard],
                 data: { activities: ['unit setup'] }
+            },
+                        {
+                path: 'down-payment-setup', component: DownPaymentComponent, canActivate: [AuthGuard],
+                data: { activities: ['down payment setup'] }
+            },
+            {
+                path: 'house-expense-debit-ratio-setup', component: HousingExpenseDebitRatioComponent, canActivate: [AuthGuard],
+                data: { activities: ['housing expense setup'] }
             },
             {
                 path: 'state', component: StateComponent, canActivate: [AuthGuard],

@@ -81,6 +81,7 @@ export class AppMenuComponent implements OnInit {
                         'region setup',
                         'branch setup',
                         'department setup',
+                         'down payment setup',
                         'unit setup',
                         'state setup',
                         'city setup',
@@ -314,6 +315,7 @@ export class AppMenuComponent implements OnInit {
                                 'city setup',
                                 'job hub management',
                                 'retail collection cron job',
+
                                
                             ]),
                             items: [
@@ -346,6 +348,8 @@ export class AppMenuComponent implements OnInit {
                                         'job hub management',
                                         'approval setup',
                                         'retail collection cron job',
+                                        'down payment setup',
+                                        'housing expense setup',
     
                                     ]),
                                     items: [
@@ -400,6 +404,7 @@ export class AppMenuComponent implements OnInit {
                                             label: 'Digital Stamp Setup', icon: '', routerLink: ['/setup/digital-stamp/setup'],
                                             visible: this.menuGuardSrv.hideOrShow(['document upload setup'])
                                         },
+
                                         {
                                             label: 'Document Upload Setup', icon: '', routerLink: ['/setup/document/upload-setup'],
                                             visible: this.menuGuardSrv.hideOrShow(['document upload setup'])
@@ -472,6 +477,16 @@ export class AppMenuComponent implements OnInit {
                                             label: 'Approval Setup', icon: '', routerLink: ['/setup/approval-setup'],
                                             visible: this.menuGuardSrv.hideOrShow(['approval setup'])
                                         },
+
+                                                                                                                      {
+                                            label: 'Down Payment', icon: '', routerLink: ['/setup/down-payment-setup'],
+                                            //visible: this.menuGuardSrv.hideOrShow(['down payment setup'])
+                                        },
+
+                                        {
+                                            label: 'Housing Expense And Debit Ratio', icon: '', routerLink: ['/setup/house-expense-debit-ratio-setup'],
+                                            //visible: this.menuGuardSrv.hideOrShow(['housing expense setup'])
+                                        },
                                         {
                                             label: 'FS Caption', icon: '',
                                             visible: this.menuGuardSrv.hideOrShow([
@@ -543,6 +558,7 @@ export class AppMenuComponent implements OnInit {
                                         'group relationship type',
                                         'customer group',
                                         'group caption-detail',
+
                                     ]),
                                     items: [
                                         {
@@ -629,6 +645,8 @@ export class AppMenuComponent implements OnInit {
                                             label: 'Department', icon: '', routerLink: ['/setup/department'],
                                             visible: this.menuGuardSrv.hideOrShow(['department setup'])
                                         },
+  
+
                                         {
                                             label: 'Unit', icon: '', routerLink: ['/setup/units'],
                                             visible: this.menuGuardSrv.hideOrShow(['unit setup'])
