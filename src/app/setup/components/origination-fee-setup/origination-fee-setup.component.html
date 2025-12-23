@@ -26,29 +26,25 @@
                         </div>
                     </div>
 
-                    <p-dataTable [value]="stampDutyData">
-                        <p-column i18n-header field="collateralSubType" header="Collateral Sub Type"
-                            ></p-column>
-                            <p-column i18n-header field="dutiableValue" header="Dutiable Value"
-                            ></p-column>
-                        <p-column i18n-header field="tenor" header="Tenor"
-                            ></p-column>
-                        <p-column i18n-header field="useTenor" header="Tenor Applicable"
-                            ></p-column>
+                    <p-dataTable [value]="originationFeeData">
+                        <p-column field="productName" header="Product Type"></p-column>
+                        <p-column field="percentage" header="Fee(%)"></p-column>
 
                         <p-column [style]="{'width':'100px'}">
                             <ng-template pTemplate="header"> </ng-template>
                             <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <a (click)="editStampSetup(d)" href="javascript:void(0)" i18n>Edit</a>
+                                <a (click)="editOriginationFeeSetup(d)" href="javascript:void(0)">Edit</a>
                             </ng-template>
                         </p-column>
+
                         <p-column [style]="{'width':'100px'}">
                             <ng-template pTemplate="header"> </ng-template>
                             <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <a (click)="deleteStampSetup(d)" href="javascript:void(0)" i18n>Delete</a>
+                                <a (click)="deleteOriginationFeeSetup(d)" href="javascript:void(0)">Delete</a>
                             </ng-template>
                         </p-column>
                     </p-dataTable>
+
                 </div>
 
             </div>
@@ -61,69 +57,42 @@
     <div style="margin-bottom:0" class="panel panel-default">
         <div class="panel-heading">
             <h2 class="panel-title" i18n>
-                Season Fee
+                Origination Fee
             </h2>
         </div>
 
-        <form novalidate [formGroup]="stampDutyFormGroup" (ngSubmit)="submitStampSetupForm(stampDutyFormGroup)"
-            autocomplete="off">
+        <form novalidate [formGroup]="originationFeeFormGroup"
+            (ngSubmit)="submitOriginationFeeSetupForm(originationFeeFormGroup)" autocomplete="off">
             <div class="panel-body">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label for="collateralSubTypeId" class="control-label col-md-2" i18n>Product Type
-                            </label>
+                        <label for="productTypeId" class="control-label col-md-2" i18n>Product Type
+                        </label>
                         <div class="col-md-4">
-                            <select name="collateralSubTypeId" class="form-control" 
-                                formControlName="collateralSubTypeId" id="collateralSubTypeId"
-                                [ngClass]="!stampDutyFormGroup.controls['collateralSubTypeId'].valid ? 'required-input' : 'valid-input'">
-                                <option value="" i18n>- Select Collateral Sub Type -</option>
-                                <option *ngFor="let x of collateralSubTypes" [value]="x.collateralSubTypeId">
-                                    {{ x.collateralSubTypeName }}</option>
+                            <select name="productTypeId" class="form-control" formControlName="productTypeId"
+                                id="productTypeId"
+                                [ngClass]="!originationFeeFormGroup.controls['productTypeId'].valid ? 'required-input' : 'valid-input'">
+                                <option value="" i18n>- Select Product Type -</option>
+                                <option *ngFor="let x of productTypes" [value]="x.productTypeId">
+                                    {{ x.productTypeName }}</option>
                             </select>
-                        </div>
-                        <label for="tenor" class="control-label col-md-2" *ngIf="showTenor" i18n>Tenor</label>
-                        <div class="col-md-4">
-                            <input type="number" min="1" id="tenor" name="tenor" *ngIf="showTenor"
-                                class="form-control" formControlName="tenor"
-                                [ngClass]="!stampDutyFormGroup.controls['tenor'].valid ? 'required-input' : 'valid-input'">
                         </div>
                     </div>
                     <div class="form-group">
-                        
-                        <label for="dutiableValue" class="control-label col-md-2" i18n>Origination Fee</label>
-                        <div class="col-md-4">
-                            <input type="number" min="1" id="dutiableValue" name="dutiableValue" 
-                                class="form-control" formControlName="dutiableValue"
-                                [ngClass]="!stampDutyFormGroup.controls['dutiableValue'].valid ? 'required-input' : 'valid-input'">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="useTenor" class="control-label col-md-2" i18n></label>
-                        <div class="col-md-4">
-                            <div class="checkbox-container">
-                                <input formControlName="useTenor" id="useTenor" type="checkbox"
-                                (change)="toggleForm($event.target.checked)">
-                            </div><label class="checkbox pull-left" i18n>Use Tenor Condition</label>
-                        </div>
-                       
-                        <label for="tenorMode" class="control-label col-md-2" *ngIf="showTenor" i18n>Tenor Mode</label>
-                        <div class="col-md-4">
-                            <select class="form-control" formControlName="tenorModeId" *ngIf="showTenor"
-                                
-                                [ngClass]="!stampDutyFormGroup.controls['tenorModeId'].valid ? 'required-input' : 'valid-input'"
-                                name="" id="">
-                                <option *ngFor="let item of tenorType" value="{{item.tenorModeId}}">
-                                    {{item.name}}</option>
-                            </select>
-                        </div>
 
+                        <label for="originationFee" class="control-label col-md-2" i18n>Origination Fee</label>
+                        <div class="col-md-4">
+                            <input type="number" min="1" id="originationFee" name="originationFee" class="form-control"
+                                formControlName="originationFee"
+                                [ngClass]="!originationFeeFormGroup.controls['originationFee'].valid ? 'required-input' : 'valid-input'">
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="panel-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <button type="submit" [disabled]="stampDutyFormGroup.invalid"
+                        <button type="submit" [disabled]="originationFeeFormGroup.invalid"
                             class="btn btn-success pull-right" i18n>Save</button>
                         <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px"
                             class="btn btn-danger pull-right" i18n>Close</button>
