@@ -175,7 +175,8 @@ import { CollectionsRetailCronSetupComponent } from './components/collections-re
 import { IblChecklistSetupComponent } from './components/ibl-checklist-setup/ibl-checklist-setup.component';
 import { StampDutyConditionSetupComponent } from './components/stamp-duty-condition-setup/stamp-duty-condition-setup.component';
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
-
+import { DownPaymentComponent } from './components/down-payment-setup/down-payment-setup.component';
+import { HousingExpenseDebitRatioComponent } from './components/house-expense-debit-ratio-setup/house-expense-debit-ratio-setup.component';
 
 @NgModule({
     imports: [
@@ -246,6 +247,8 @@ import { DigitalStampSetupComponent } from './components/digital-stamp-setup/dig
         IblChecklistSetupComponent,
         StampDutyConditionSetupComponent,
         DigitalStampSetupComponent,
+        DownPaymentComponent,
+        HousingExpenseDebitRatioComponent
 
     ],
 

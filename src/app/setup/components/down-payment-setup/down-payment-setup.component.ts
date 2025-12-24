@@ -7,6 +7,7 @@ import { GlobalConfig } from 'app/shared/constant/app.constant';
 import swal from 'sweetalert2';
 import { DocumentService, StaffRoleService } from 'app/setup/services';
 import { ProductService} from 'app/setup/services';
+import { GeneralSetupService } from '../../services';
 
 
 @Component({
@@ -14,6 +15,9 @@ import { ProductService} from 'app/setup/services';
   templateUrl: './down-payment-setup.component.html',
 })
 export class DownPaymentComponent implements OnInit {
+
+
+
   selectedId: number = null;
   displayAddModal: boolean = false;
   entityName: string = "New down payment";
@@ -32,14 +36,17 @@ export class DownPaymentComponent implements OnInit {
   private docServ: DocumentService,
   private productService: ProductService,
   private loadingSrv: LoadingService,
+    private generalSetupService: GeneralSetupService,
+
 ) { }
 
   ngOnInit() {
     this.getBranches();
-    this.getAllDepartment();
+    this.getAllDownPayment();
     this.getAllproducts();  
     this.clearControls();
     this.loadDownPayment();
+
   }
   showAddModal() {
     this.clearControls();
@@ -53,6 +60,31 @@ export class DownPaymentComponent implements OnInit {
       this.loadingService.hide();
     }, (err) => {
       this.loadingService.hide(1000);
+    });
+  }
+
+
+getEmploymentType(employmenttypeid: any): string {
+  //console.log(selectedId)
+  const numId = Number(employmenttypeid);  // convert string to number
+  switch(numId) {
+    case 0: return 'Self Employed';
+    case 1: return 'Employed';
+    case 2: 
+    case 3: return 'Unemployed';
+    default: return 'Unknown';
+  }
+}
+
+
+    getAllDownPayment(): void {
+    //this.loadingService.show();
+    this.generalSetupService.getAllDownPayment().subscribe((response: any) => {
+      this.downPayments = response.result;
+      console.log(this.downPayments)
+      this.loadingService.hide();
+    }, (err) => {
+      //this.loadingService.hide(1000);
     });
   }
   getBranches() {
@@ -96,30 +128,31 @@ export class DownPaymentComponent implements OnInit {
 
       getAllproducts() {
         this.loadingSrv.show();
-        this.productService.getAllProducts()
+        this.productService.getAllProducts1()
             .subscribe((res) => {
                 this.products =  res.result;
-            
+            //console.log(res)
                 this.products.slice;
                 this.loadingSrv.hide();
             }, (err) => {
                 this.loadingSrv.hide();
             });
     }
-  editDownPayment(index) {
+  editDownPayment(rowIndex) {
     this.entityName = "Edit Down Payment";
-    var row = this.downPayments[index];
-    this.selectedId = row.downPaymentId; 
+    var row = this.downPayments[rowIndex];
+    //console.log(row)
+    this.selectedId = row.id; 
     this.downPaymentForm = this.fb.group({
-      // branchName: [row.branchName],
-      downPaymentId: [row.downPaymentId],
-      minAmt: [row.minAmt],
-      productId: [row.productId],
-      // departmentCode: [row.departmentCode],
-      employmentTypeId: [row.employmentTypeId],
-      maxAmt: [row.maxAmt],
-      percent: [
-    '',
+
+      ID: [row.id],
+      MINAMOUNT: [row.minamount],
+      productId: [row.productid],
+     
+      employmentTypeId: [row.employmenttypeid],
+      MAXAMOUNT: [row.maxamount],
+  PERCENTAGE: [
+    row.percentage,
     [
       Validators.required,
       Validators.min(0),
@@ -132,12 +165,13 @@ export class DownPaymentComponent implements OnInit {
   submitForm(formObj) {
     this.loadingService.show();
     const bodyObj = formObj.value;
+    console.log(bodyObj)
     if (this.selectedId === null) {
-      this.departmentService.save(bodyObj).subscribe((res) => {
+      this.generalSetupService.saveDownPayment(bodyObj).subscribe((res) => {
         if (res.success == true) {
           this.finishGood(res.message);
-          this.getAllDepartment();
-          this.loadDownPayment();
+          this.getAllDownPayment();
+          //this.loadDownPayment();
           this.displayAddModal = false;
         } else {
           this.finishBad(res.message);
@@ -146,12 +180,12 @@ export class DownPaymentComponent implements OnInit {
         this.finishBad(JSON.stringify(err));
       });
     } else {
-      this.departmentService.update(bodyObj, this.selectedId).subscribe((res) => {
+      this.generalSetupService.updateDownPayment(bodyObj, this.selectedId).subscribe((res) => {
         if (res.success == true) {
           this.selectedId = null;
           this.finishGood(res.message);
-          this.getAllDepartment();
-          this.loadDownPayment();
+          this.getAllDownPayment();
+         // this.loadDownPayment();
           this.displayAddModal = false;
         } else {
           this.finishBad(res.message);
@@ -165,13 +199,13 @@ export class DownPaymentComponent implements OnInit {
     this.selectedId = null;
     this.downPaymentForm = this.fb.group({
       // branchName: [''],
-      downPaymentId: [''],
+      ID: [''],
       productId: ['', Validators.required],
-      minAmt : ['', Validators.required],
+      MINAMOUNT : ['', Validators.required],
       // departmentCode: ['', Validators.required],
       employmentTypeId: ['', Validators.required],
-      maxAmt: ['', Validators.required],
-      percent: ['', Validators.required],
+      MAXAMOUNT: ['', Validators.required],
+      PERCENTAGE: ['', Validators.required],
     });
   }
   finishBad(message) {
@@ -197,7 +231,7 @@ export class DownPaymentComponent implements OnInit {
   }
 
       removeDownpayment(row) {
-          let selectedDownpaymentId = row.downPaymentId;
+          let selectedDownpaymentId = row.id;
           const __this = this;
   
           swal({
@@ -214,12 +248,12 @@ export class DownPaymentComponent implements OnInit {
               buttonsStyling: true,
           }).then(function () {
               __this.loadingService.show();
-              __this.docServ.deleteDownpayment(selectedDownpaymentId).subscribe((response: any) => {
+              __this.generalSetupService.deleteDownpayment(selectedDownpaymentId).subscribe((response: any) => {
                   __this.loadingService.hide();
                   if (response.success === true) {
                       swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
-                      __this.getAllDepartment();
-                          this.loadDownPayment();
+                      __this.getAllDownPayment();
+                          //this.loadDownPayment();
   
                   } else {
                       swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');

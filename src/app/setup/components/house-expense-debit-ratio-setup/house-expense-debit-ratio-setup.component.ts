@@ -7,6 +7,7 @@ import { GlobalConfig } from 'app/shared/constant/app.constant';
 import swal from 'sweetalert2';
 import { DocumentService, StaffRoleService } from 'app/setup/services';
 import { ProductService} from 'app/setup/services';
+import { GeneralSetupService } from '../../services';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
   private docServ: DocumentService,
   private productService: ProductService,
   private loadingSrv: LoadingService,
+  private generalSetupService: GeneralSetupService,
 ) { }
 
   ngOnInit() {
@@ -97,7 +99,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
 
       getAllproducts() {
         this.loadingSrv.show();
-        this.productService.getAllProducts()
+        this.productService.getAllProducts1()
             .subscribe((res) => {
                 this.products =  res.result;
             
@@ -107,13 +109,13 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
                 this.loadingSrv.hide();
             });
     }
-  editHouseDebitRatio(index) {
+  editHouseDebitRatio(rowIndex) {
     this.entityName = "Edit Down Payment";
-    var row = this.debitRatios[index];
-    this.selectedId = row.debiRatiosId; 
+    var row = this.debitRatios[rowIndex];
+    this.selectedId = row.id; 
     this.houseExpenseForm = this.fb.group({
       // branchName: [row.branchName],
-      debiRatiosId: [row.debiRatiosId],
+      ID: [row.id],
       minAmt: [row.minAmt],
       productId: [row.productId],
       // departmentCode: [row.departmentCode],
@@ -128,7 +130,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
     this.loadingService.show();
     const bodyObj = formObj.value;
     if (this.selectedId === null) {
-      this.departmentService.save(bodyObj).subscribe((res) => {
+      this.generalSetupService.saveHousingExpense(bodyObj).subscribe((res) => {
         if (res.success == true) {
           this.finishGood(res.message);
           this.getAllDepartment();
@@ -141,7 +143,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
         this.finishBad(JSON.stringify(err));
       });
     } else {
-      this.departmentService.update(bodyObj, this.selectedId).subscribe((res) => {
+      this.generalSetupService.updateHousingExpense(bodyObj, this.selectedId).subscribe((res) => {
         if (res.success == true) {
           this.selectedId = null;
           this.finishGood(res.message);
@@ -206,7 +208,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
   }
 
       removeHouseDebitRatio(row) {
-          let selectedDebitRatioId = row.debitRatiosId;
+          let selectedDebitRatioId = row.id;
           const __this = this;
   
           swal({
@@ -223,7 +225,7 @@ export class HousingExpenseDebitRatioComponent implements OnInit {
               buttonsStyling: true,
           }).then(function () {
               __this.loadingService.show();
-              __this.docServ.deleteDebiRatio(selectedDebitRatioId).subscribe((response: any) => {
+              __this.generalSetupService.deleteHousingExpense(selectedDebitRatioId).subscribe((response: any) => {
                   __this.loadingService.hide();
                   if (response.success === true) {
                       swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');

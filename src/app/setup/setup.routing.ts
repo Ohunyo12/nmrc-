@@ -69,7 +69,8 @@ import { CollectionsRetailCronSetupComponent } from './components/collections-re
 import { IblChecklistSetupComponent } from './components/ibl-checklist-setup/ibl-checklist-setup.component';
 import { StampDutyConditionSetupComponent } from './components/stamp-duty-condition-setup/stamp-duty-condition-setup.component';
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
-
+import { DownPaymentComponent } from './components/down-payment-setup/down-payment-setup.component';
+import { HousingExpenseDebitRatioComponent } from './components/house-expense-debit-ratio-setup/house-expense-debit-ratio-setup.component';
 //import { OperationalFlowPageOrderComponent } from 'app/setup/components/operational-flow-page-order/operational-flow-page-order.component';
 
 
@@ -242,18 +243,7 @@ const routes: Routes = [
                 path: 'stamp-duty-condition', component: StampDutyConditionSetupComponent, canActivate: [AuthGuard],
                 data: { activities: ['fee and charge setup'] }
             },
-            {
-                path: 'season-fee', component: SeasonFeeSetupComponent, canActivate: [AuthGuard],
-                data: { activities: ['season fee setup'] }
-            },
-            {
-                path: 'origination-fee', component: OriginationFeeSetupComponent, canActivate: [AuthGuard],
-                data: { activities: ['origination fee setup'] }
-            },
-            {
-                path: 'service-fee', component: ServiceFeeSetupComponent, canActivate: [AuthGuard],
-                data: { activities: ['service fee setup'] }
-            },
+
             {
                 path: 'charge/tax', component: TaxComponent, canActivate: [AuthGuard],
                 data: { activities: ['tax setup'] }

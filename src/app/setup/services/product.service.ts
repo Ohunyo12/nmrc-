@@ -40,6 +40,13 @@ export class ProductService {
         catchError((error: any) => observableThrowError(error.error || 'Server error')),);
     }
 
+      getAllProducts1() {
+        return this.http.get(`${AppConstant.API_BASE}setups/all-products`)
+            .pipe(
+          map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+    }
+
     // searchForProducts(terms: Observable<any>) {
     //     return terms.debounceTime(400)
     //         .distinctUntilChanged()
