@@ -1,6 +1,6 @@
 
-import { throwError as observableThrowError, Observable } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { throwError as observableThrowError, Observable, throwError } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { AuthHttp } from '../../admin/services/token.service';
 import { Injectable } from '@angular/core';
 
@@ -1693,7 +1693,6 @@ export class CollateralService {
           catchError((error: any) => observableThrowError(error.error || 'Server error')),);
         }
 
-     
-    
+
 }
 //

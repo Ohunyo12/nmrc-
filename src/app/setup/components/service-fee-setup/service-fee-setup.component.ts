@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ProductService } from 'app/setup/services';
 import { CollateralService } from 'app/setup/services/collateral.service';
 import { GlobalConfig, TenorType } from 'app/shared/constant/app.constant';
 import { LoadingService } from 'app/shared/services/loading.service';
+import { finalize } from 'rxjs/operators';
 import swal from 'sweetalert2';
 
 @Component({
@@ -12,22 +14,23 @@ import swal from 'sweetalert2';
 })
 export class ServiceFeeSetupComponent implements OnInit {
   displayCreateEditModal: boolean;
-  stampDutyData: any;
-  stampDutyFormGroup: FormGroup;
-  showTenor: boolean = false;
-  collateralSubTypes: any[];
-  tenorType: any[] = []
-  conditionId: any;
+  serviceFeeFormGroup: FormGroup;
+  serviceId: any;
+  serviceFeeData: any[] = [];
+  productTypes: any[] = [];
+  productMap = new Map<number, string>();
 
-  constructor(private fb: FormBuilder, private loadingService: LoadingService,private collateralService: CollateralService
-    ) { }
+
+  constructor(private fb: FormBuilder,
+    private loadingService: LoadingService,
+    private collateralService: CollateralService,
+    private productService: ProductService
+  ) { }
 
   ngOnInit() {
     this.loadingService.show();
-    this.getAllStampSetup();
-    this.loadForms(); 
-    this.getCollateralSubTypes();
-    this.tenorType = TenorType.list;
+    this.loadForms();
+    this.getProductTypes();
     this.loadingService.hide();
   }
 
@@ -36,97 +39,109 @@ export class ServiceFeeSetupComponent implements OnInit {
     this.displayCreateEditModal = true;
   }
 
-  getAllStampSetup() {
-    this.collateralService.getAllStampSetup().subscribe((data) => {
-      this.stampDutyData = data.result;
-    }, (err) => {
-    });
+  getProductTypes() {
+    this.loadingService.show();
+
+    this.productService.getProductTypes().pipe(
+      finalize(() => this.loadingService.hide())).subscribe((response: any) => {
+        this.productTypes = response.result;
+
+        this.productTypes.forEach(p => {
+          this.productMap.set(p.productId, p.productName);
+        });
+
+       // console.log('Product Map:', this.productMap);
+
+        this.getAllServiceFeeSetup();
+      });
   }
 
-  toggleForm(ischecked){
-    if (ischecked){
-      this.showTenor = true;
-    }else{
-      this.showTenor = false
-    }
+
+  getAllServiceFeeSetup() {
+    this.loadingService.show();
+
+    this.productService.getAllServiceFeeSetup().pipe(
+      finalize(() => this.loadingService.hide())).subscribe((data: any) => {
+        const fees = data.result;
+
+       // console.log('service fees:', fees);
+
+        this.serviceFeeData = fees.map(fee => {
+          const productId = fee.productid;
+          const serviceId = fee.id;
+          const percentage = fee.percentage;
+
+          return {
+            serviceId: Number(serviceId),
+            productTypeId: Number(productId),
+            percentage: Number(percentage),
+            productName: this.productMap.get(productId) || 'Unknown Product'
+          };
+        });
+
+       // console.log('Final Service Fee Data:', this.serviceFeeData);
+      },
+        error => {
+        //  console.error('Error loading Service fees', error);
+        }
+      );
   }
 
-  
 
   loadForms() {
-    this.stampDutyFormGroup = this.fb.group({
-      conditionId:[''],
-      collateralSubTypeId: ['', Validators.required],
-      tenorModeId: [''],
-      tenor: [''],
-      useTenor: [false],
-      dutiableValue: ['', Validators.required]
-      
+    this.serviceFeeFormGroup = this.fb.group({
+      serviceId: [''],
+      productTypeId: ['', Validators.required],
+      serviceFee: ['', Validators.required]
     });
   }
 
-
-
-  editStampSetup(row) {
+  editServiceFeeSetup(row) {
     this.displayCreateEditModal = true;
-    if(row.useTenor){
-      this.showTenor = true;
-    }
-    //this.stampDutyData = row;
-     this.stampDutyFormGroup = this.fb.group({
-      conditionId:[row.conditionId],
-      collateralSubTypeId: [row.collateralSubTypeId, Validators.required],
-      tenorModeId: [row.tenorModeId],
-      tenor: [row.tenor],
-      useTenor: [row.useTenor],
-      dutiableValue: [row.dutiableValue, Validators.required]
-     });
-  }
 
-  deleteStampSetup(row) {
-  
-    //let row = this.stampDutyData[index];
-    this.conditionId = row.conditionId;
-
-    
-    this.collateralService.deleteStampSetup(row.conditionId).subscribe((res: any) => {
-      this.loadingService.hide();
-      this.displayCreateEditModal = false;
-      if (res.success === true) {
-        swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'success');
-      } else {
-        swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
-      }
-      this.getAllStampSetup();
-     
-    }, (err) => {
-      swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
-      this.loadingService.hide();
+    this.serviceFeeFormGroup = this.fb.group({
+      serviceId: [row.serviceId],
+      productTypeId: [row.productTypeId, Validators.required],
+      serviceFee: [row.percentage, Validators.required]
     });
+   // console.log('Form value after patch:', this.serviceFeeFormGroup.value);
   }
-  getCollateralSubTypes() {
-    this.collateralService.getCollateralSubTypes().subscribe((response:any) => {
-        this.collateralSubTypes = response.result;
-        
-    })
-}
 
-  submitStampSetupForm(form) {
 
+
+  deleteServiceFeeSetup(row) {
+    this.loadingService.show();
+    this.serviceId = row.serviceId;
+
+    this.productService.deleteServiceFeeSetup(row.serviceId).pipe(
+      finalize(() => this.loadingService.hide())).subscribe(
+      (res: any) => {
+        this.displayCreateEditModal = false;
+
+        if (res.success === true) {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'success');
+        } else {
+          swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
+        }
+
+        this.getAllServiceFeeSetup();
+      },
+      (err) => {
+        swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
+      }
+    );
+  }
+
+  submitServiceFeeSetupForm(form) {
     this.loadingService.show();
     let bodyObj = {
-      conditionId: form.value.conditionId,
-      collateralSubTypeId: form.value.collateralSubTypeId,
-      tenor: form.value.tenor,
-      tenorModeId: form.value.tenorModeId,
-      useTenor: form.value.useTenor,
-      dutiableValue: form.value.dutiableValue
-      
+      PRODUCTID: form.value.productTypeId,
+      PERCENTAGE: form.value.serviceFee
     };
 
-    let selectedId = form.value.conditionId;
-    if (selectedId === '' ) { // creating a new group
-      this.collateralService.addStampSetup(bodyObj).subscribe((res) => {
+    const selectedId = form.value.serviceId;
+    if (!selectedId) { // creating a new group
+      this.productService.addServiceFeeSetup(bodyObj).subscribe((res) => {
         this.loadingService.hide();
         if (res.success === true) {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'success');
@@ -134,14 +149,13 @@ export class ServiceFeeSetupComponent implements OnInit {
         } else {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
         }
-        this.getAllStampSetup();
-        this.showTenor = false;
+        this.getAllServiceFeeSetup();
       }, (err) => {
         swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
         this.loadingService.hide();
       });
     } else { // updating an existing group
-      this.collateralService.updateStampSetup(bodyObj, selectedId).subscribe((res) => {
+      this.productService.updateServiceFeeSetup(bodyObj, selectedId).subscribe((res) => {
         this.loadingService.hide();
         this.displayCreateEditModal = false;
         if (res.success === true) {
@@ -149,8 +163,7 @@ export class ServiceFeeSetupComponent implements OnInit {
         } else {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
         }
-        this.getAllStampSetup();
-        this.showTenor = false;
+        this.getAllServiceFeeSetup();
       }, (err) => {
         swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
         this.loadingService.hide();
