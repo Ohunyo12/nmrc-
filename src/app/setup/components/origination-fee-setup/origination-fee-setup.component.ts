@@ -50,7 +50,7 @@ export class OriginationFeeSetupComponent implements OnInit {
           this.productMap.set(p.productId, p.productName);
         });
 
-        console.log('Product Map:', this.productMap);
+        //console.log('Product Map:', this.productMap);
 
         this.getAllOriginationFeeSetup();
       });
@@ -64,7 +64,7 @@ export class OriginationFeeSetupComponent implements OnInit {
       finalize(() => this.loadingService.hide())).subscribe((data: any) => {
         const fees = data.result;
 
-        console.log('origination fees:', fees);
+       // console.log('origination fees:', fees);
 
         this.originationFeeData = fees.map(fee => {
           const productId = fee.productid;
@@ -79,10 +79,10 @@ export class OriginationFeeSetupComponent implements OnInit {
           };
         });
 
-        console.log('Final Origination Fee Data:', this.originationFeeData);
+       // console.log('Final Origination Fee Data:', this.originationFeeData);
       },
         error => {
-          console.error('Error loading origination fees', error);
+         // console.error('Error loading origination fees', error);
         }
       );
   }
@@ -104,7 +104,7 @@ export class OriginationFeeSetupComponent implements OnInit {
       productTypeId: [row.productTypeId, Validators.required],
       originationFee: [row.percentage, Validators.required]
     });
-    console.log('Form value after patch:', this.originationFeeFormGroup.value);
+   // console.log('Form value after patch:', this.originationFeeFormGroup.value);
   }
 
 

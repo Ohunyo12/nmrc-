@@ -50,7 +50,7 @@ export class SeasonFeeSetupComponent implements OnInit {
           this.productMap.set(p.productId, p.productName);
         });
 
-        console.log('Product Map:', this.productMap);
+        //console.log('Product Map:', this.productMap);
 
         this.getAllSeasonFeeSetup();
       });
@@ -64,7 +64,7 @@ export class SeasonFeeSetupComponent implements OnInit {
       finalize(() => this.loadingService.hide())).subscribe((data: any) => {
         const fees = data.result;
 
-        console.log('season fees:', fees);
+       // console.log('season fees:', fees);
 
         this.seasonFeeData = fees.map(fee => {
           const productId = fee.productid;
@@ -79,10 +79,10 @@ export class SeasonFeeSetupComponent implements OnInit {
           };
         });
 
-        console.log('Final Season Fee Data:', this.seasonFeeData);
+       // console.log('Final Season Fee Data:', this.seasonFeeData);
       },
         error => {
-          console.error('Error loading season fees', error);
+          //console.error('Error loading season fees', error);
         }
       );
   }
@@ -104,7 +104,7 @@ export class SeasonFeeSetupComponent implements OnInit {
       productTypeId: [row.productTypeId, Validators.required],
       duration: [row.duration, Validators.required]
     });
-    console.log('Form value after patch:', this.seasonFeeFormGroup.value);
+    //console.log('Form value after patch:', this.seasonFeeFormGroup.value);
   }
 
 

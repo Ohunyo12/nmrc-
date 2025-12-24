@@ -50,7 +50,7 @@ export class ServiceFeeSetupComponent implements OnInit {
           this.productMap.set(p.productId, p.productName);
         });
 
-        console.log('Product Map:', this.productMap);
+       // console.log('Product Map:', this.productMap);
 
         this.getAllServiceFeeSetup();
       });
@@ -64,7 +64,7 @@ export class ServiceFeeSetupComponent implements OnInit {
       finalize(() => this.loadingService.hide())).subscribe((data: any) => {
         const fees = data.result;
 
-        console.log('service fees:', fees);
+       // console.log('service fees:', fees);
 
         this.serviceFeeData = fees.map(fee => {
           const productId = fee.productid;
@@ -79,10 +79,10 @@ export class ServiceFeeSetupComponent implements OnInit {
           };
         });
 
-        console.log('Final Service Fee Data:', this.serviceFeeData);
+       // console.log('Final Service Fee Data:', this.serviceFeeData);
       },
         error => {
-          console.error('Error loading Service fees', error);
+        //  console.error('Error loading Service fees', error);
         }
       );
   }
@@ -104,7 +104,7 @@ export class ServiceFeeSetupComponent implements OnInit {
       productTypeId: [row.productTypeId, Validators.required],
       serviceFee: [row.percentage, Validators.required]
     });
-    console.log('Form value after patch:', this.serviceFeeFormGroup.value);
+   // console.log('Form value after patch:', this.serviceFeeFormGroup.value);
   }
 
 
