@@ -177,6 +177,10 @@ import { StampDutyConditionSetupComponent } from './components/stamp-duty-condit
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
 import { DownPaymentComponent } from './components/down-payment-setup/down-payment-setup.component';
 import { HousingExpenseDebitRatioComponent } from './components/house-expense-debit-ratio-setup/house-expense-debit-ratio-setup.component';
+import { SeasonFeeSetupComponent } from './components/season-fee-setup/season-fee-setup.component';
+import { OriginationFeeSetupComponent } from './components/origination-fee-setup/origination-fee-setup.component';
+import { ServiceFeeSetupComponent } from './components/service-fee-setup/service-fee-setup.component';
+
 
 @NgModule({
     imports: [
@@ -248,7 +252,10 @@ import { HousingExpenseDebitRatioComponent } from './components/house-expense-de
         StampDutyConditionSetupComponent,
         DigitalStampSetupComponent,
         DownPaymentComponent,
-        HousingExpenseDebitRatioComponent
+        HousingExpenseDebitRatioComponent,
+        SeasonFeeSetupComponent,
+        OriginationFeeSetupComponent,
+        ServiceFeeSetupComponent
 
     ],
 
