@@ -558,4 +558,20 @@ deleteDigitalStamp(digitalStampid) {
       catchError((error: any) => observableThrowError(error.error || 'Server error')));
 }
 
+
+deleteDownpayment(downPaymentId) {
+  return this.http.delete(`${AppConstant.API_BASE}setups/delete-down-payment/${downPaymentId}`)
+    .pipe(
+      map((res: any) => res),
+      catchError((error: any) => observableThrowError(error.error || 'Server error')));
+}
+
+
+deleteDebiRatio(debitRatioId) {
+  return this.http.delete(`${AppConstant.API_BASE}setups/delete-debit-ratio/${debitRatioId}`)
+    .pipe(
+      map((res: any) => res),
+      catchError((error: any) => observableThrowError(error.error || 'Server error')));
+}
+
 }

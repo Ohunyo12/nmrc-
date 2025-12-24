@@ -29,7 +29,68 @@ export class GeneralSetupService {
           map((res: any) => res),
         catchError((error: any) => observableThrowError(error.error || 'Server error')),);
     }
+      //Get All Down Payment
+      getAllDownPayment() {
+        return this.http.get(`${AppConstant.API_BASE}admin/get-downpayments`)
+            .pipe(
+          map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+    }
 
+  saveDownPayment(body) {
+    let bodyObj = JSON.stringify(body);
+    return this.http.post(`${AppConstant.API_BASE}admin/add-downpayment`, bodyObj)
+      .pipe(
+        map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+  }
+
+updateDownPayment(body: any, id: number) {
+  return this.http.put(
+    `${AppConstant.API_BASE}admin/update-downpayment?id=${id}`,
+    body
+  ).pipe(
+    map((res: any) => res),
+    catchError((error: any) =>
+      observableThrowError(error.error || 'Server error')
+    )
+  );
+}
+
+  deleteDownpayment(id) {
+    return this.http.delete(`${AppConstant.API_BASE}admin/delete-downpayment/${id}`)
+      .pipe(
+        map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')));
+  }
+
+    
+  saveHousingExpense(body) {
+    let bodyObj = JSON.stringify(body);
+    return this.http.post(`${AppConstant.API_BASE}admin/add-downpayment`, bodyObj)
+      .pipe(
+        map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+  }
+
+  updateHousingExpense(body: any, id: number) {
+  return this.http.put(
+    `${AppConstant.API_BASE}admin/update-downpayment?id=${id}`,
+    body
+  ).pipe(
+    map((res: any) => res),
+    catchError((error: any) =>
+      observableThrowError(error.error || 'Server error')
+    )
+  );
+}
+
+  deleteHousingExpense(id) {
+    return this.http.delete(`${AppConstant.API_BASE}admin/delete-downpayment/${id}`)
+      .pipe(
+        map((res: any) => res),
+        catchError((error: any) => observableThrowError(error.error || 'Server error')));
+  }
     getAllOperations() {
         return this.http.get(`${AppConstant.API_BASE}setups/operation`)
             .pipe(
