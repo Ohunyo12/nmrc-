@@ -48,7 +48,6 @@ import { LoanRecoverySetupService } from './services/loan-recovery-setup.service
 import { FinancialStatementComponent } from './components/fs-caption/view-financial-statement/financial-statement-ratio.component';
 import { AlertInterfaceComponent } from './components/limit-and-monitoring-setting/alert-interface.component';
 import { StaffReliefComponent } from './components/staff-relief/staff-relief.component';
-
 import {
     CustomFieldTestComponent,
     ImageUploadComponent,
@@ -97,6 +96,7 @@ import {
     BusinessRuleComponent,
     DepartmentComponent,
     DepartmentUnitComponent,
+   
     EndOfDayProcessComponent,
     StateComponent,
     TransactionDynamicsComponent,
@@ -175,10 +175,8 @@ import { CollectionsRetailCronSetupComponent } from './components/collections-re
 import { IblChecklistSetupComponent } from './components/ibl-checklist-setup/ibl-checklist-setup.component';
 import { StampDutyConditionSetupComponent } from './components/stamp-duty-condition-setup/stamp-duty-condition-setup.component';
 import { DigitalStampSetupComponent } from './components/digital-stamp-setup/digital-stamp-setup.component';
-import { SeasonFeeSetupComponent } from './components/season-fee-setup/season-fee-setup.component';
-import { OriginationFeeSetupComponent } from './components/origination-fee-setup/origination-fee-setup.component';
-import { ServiceFeeSetupComponent } from './components/service-fee-setup/service-fee-setup.component';
-
+import { DownPaymentComponent } from './components/down-payment-setup/down-payment-setup.component';
+import { HousingExpenseDebitRatioComponent } from './components/house-expense-debit-ratio-setup/house-expense-debit-ratio-setup.component';
 
 @NgModule({
     imports: [
@@ -212,7 +210,8 @@ import { ServiceFeeSetupComponent } from './components/service-fee-setup/service
         ChargeComponent, TaxComponent, RequestJobTypeComponent, ChecklistItemComponent,
         ApprovalLevelComponent, ApprovalWorkflowComponent, 
         ApprovalReliefComponent, BusinessRuleComponent,
-        DepartmentComponent, DepartmentUnitComponent, EndOfDayProcessComponent, 
+        DepartmentComponent, DepartmentUnitComponent,
+        EndOfDayProcessComponent, 
         StateComponent, LoadProductDefinitionComponent, StaffReliefComponent,
         AccreditedPrincipalsComponent, 
         AccreditedSolicitorsComponent, LimitDetailsComponent,
@@ -248,9 +247,8 @@ import { ServiceFeeSetupComponent } from './components/service-fee-setup/service
         IblChecklistSetupComponent,
         StampDutyConditionSetupComponent,
         DigitalStampSetupComponent,
-        SeasonFeeSetupComponent,
-        OriginationFeeSetupComponent,
-        ServiceFeeSetupComponent
+        DownPaymentComponent,
+        HousingExpenseDebitRatioComponent
 
     ],
 
@@ -271,5 +269,7 @@ RegulatoryService,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class SetupModule { }
+export class SetupModule { 
+    
+}
 

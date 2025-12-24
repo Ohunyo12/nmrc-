@@ -35,6 +35,9 @@ export class DepartmentService {
         catchError((error: any) => observableThrowError(error.error || 'Server error')),);
     }
 
+
+    
+
     getJobDepartments(jobTypeId) {
         return this.http.get(`${AppConstant.API_BASE}setup/job-department/${jobTypeId}`)
             .pipe(

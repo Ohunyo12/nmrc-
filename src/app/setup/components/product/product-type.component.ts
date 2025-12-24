@@ -42,6 +42,7 @@ export class ProductTypeComponent implements OnInit {
         this.loadingService.show();
         this.productTypeService.get().subscribe((response: any) => {
             this.productTypes = response.result;
+            console.log(this.productTypes);
             this.loadingService.hide();
         }, (err) => {
             this.loadingService.hide(1000);
