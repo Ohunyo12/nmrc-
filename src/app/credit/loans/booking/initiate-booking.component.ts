@@ -1,7 +1,7 @@
 import { LoadingService } from '../../../shared/services/loading.service';
 import { LoanService } from '../../services/loan.service';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
-import { Component, OnInit, Input, ViewChild, ElementRef} from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ValidationService } from '../../../shared/services/validation.service';
 import swal from 'sweetalert2';
 import { saveAs } from 'file-saver';
@@ -13,12 +13,14 @@ import { JobRequestViewComponent } from '../../job-request';
 import { CasaService } from 'app/customer/services/casa.service';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { ReportService } from 'app/reports/service/report.service';
-import {  DrawdownSubmitionModel } from 'app/credit/models';
+import { DrawdownSubmitionModel } from 'app/credit/models';
 import { LoanApplicationService } from 'app/credit/services';
 import { ProductService, CollateralService, StaffRoleService, StaffRealTimeSearchService } from 'app/setup/services';
-import { Subject ,  fromEvent } from 'rxjs';
+import { Subject, fromEvent } from 'rxjs';
 import { isNullOrUndefined } from 'util';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { IAppraisal } from 'app/shared/models/appraisal.model';
+import { UnifiedUnderwritingStandardService } from 'app/credit/services/underwriting-obligor.service';
 //import { JobRequestViewComponent } from 'app/credit/components';
 // import * as jspdf from 'jspdf';   
 // import html2canvas from 'html2canvas'; 
@@ -51,20 +53,20 @@ export class InitiateLoanBookingComponent implements OnInit {
     file: any;
     files: any;
     loanApplicationDetailId: any;
-    operationId: any; 
-    displayTestReport: boolean=false;
-    allowToAddInsurancePolicy: boolean=false;
+    operationId: any;
+    displayTestReport: boolean = false;
+    allowToAddInsurancePolicy: boolean = false;
     displayInitiationForm: boolean;
     jobSourceId: number;
     secondaryInfocaption: string;
     loanInfoUpdate: any;
     isGroup: boolean;
     pdfFile: any;
-    applicationSelection:any;
+    applicationSelection: any;
     projectRiskRatingss: any[] = [];
     projectRiskRatingComputation: any[] = [];
     customerTier: any;
-    
+
     pdfFileName: string;
     myDocExtention: string;
     displayDocument: boolean;
@@ -73,7 +75,7 @@ export class InitiateLoanBookingComponent implements OnInit {
     display: boolean = false; show: boolean = false; width: string; message: any; title: any; cssClass: any;
     loanApplication: any[];
     initiationForm: FormGroup;
-    cashBackForm:  FormGroup;
+    cashBackForm: FormGroup;
     projectRiskRatingForm: FormGroup;
     inputTitleText = 'Customer Request Document';
     loans: any[] = [];
@@ -85,7 +87,7 @@ export class InitiateLoanBookingComponent implements OnInit {
     customerCode: string;
     feeTypeText: string;
     uploadFileTitle: string = "Customer Request Document";
-    displayReport: boolean=false;
+    displayReport: boolean = false;
     supportingDocuments: any[] = [];
     disableApprovalsAndCommentsTab: boolean = false;
     applicantName: string;
@@ -95,10 +97,10 @@ export class InitiateLoanBookingComponent implements OnInit {
     noDataDiv: string = 'no-data-div';
     casaAccountId: number;
     reload: number = 1;
-    casaAccountText: string ='Customer Account';
-    casaAccountTextProjectRelated: string ='Receiving/APG Account';
+    casaAccountText: string = 'Customer Account';
+    casaAccountTextProjectRelated: string = 'Receiving/APG Account';
     casaAccount2Text: string;
-    productLimit:number;
+    productLimit: number;
     documentations: any[] = [];
     projectRiskRatings: any = null;
     chargeFeeOnce: boolean;
@@ -109,12 +111,12 @@ export class InitiateLoanBookingComponent implements OnInit {
 
     readonly commentTitle: string = "CREDIT APPRAISAL COMMENTS";
     readonly commentTitle2: string = "DRAWDOWN COMMENTS";
-    readonly CREDITAPPRIASALDOC: string ="CREDIT APPRAISAL DOCUMENTS";
-    readonly DRAWDOWNDOC: string ="DRAWDOWN DOCUMENTS";
+    readonly CREDITAPPRIASALDOC: string = "CREDIT APPRAISAL DOCUMENTS";
+    readonly DRAWDOWNDOC: string = "DRAWDOWN DOCUMENTS";
 
-    @ViewChild(CustomerInformationDetailComponent, {static: false}) customerInfo: CustomerInformationDetailComponent;
+    @ViewChild(CustomerInformationDetailComponent, { static: false }) customerInfo: CustomerInformationDetailComponent;
     // @ViewChild(CollateralInformationViewComponent) CollateralInfoObj: CollateralInformationViewComponent;
-    @ViewChild(JobRequestViewComponent, {static: false}) jobRequestViewObj: JobRequestViewComponent;
+    @ViewChild(JobRequestViewComponent, { static: false }) jobRequestViewObj: JobRequestViewComponent;
     casaAccountSelected: boolean;
     customerAccounts: any;
     isForeignExchangeLoan: boolean;
@@ -129,9 +131,9 @@ export class InitiateLoanBookingComponent implements OnInit {
     searchString: string;
     EmployerSearchString: string;
     // @ViewChild(forwardRef(() => ConditionChecklistComponent)) conditionChecklist: ConditionChecklistComponent;
-    @ViewChild('approvalInPut', {static: false}) approvalInPut: ElementRef;
-    @ViewChild('staffInPut', {static: false}) staffInPut: ElementRef;
-    @ViewChild('customerInPut', {static: false}) customerInPut: ElementRef;
+    @ViewChild('approvalInPut', { static: false }) approvalInPut: ElementRef;
+    @ViewChild('staffInPut', { static: false }) staffInPut: ElementRef;
+    @ViewChild('customerInPut', { static: false }) customerInPut: ElementRef;
     numberOfUploadedFiles: number = 0;
     drawdownHtml: any;
     cashBackHtml: any;
@@ -139,13 +141,13 @@ export class InitiateLoanBookingComponent implements OnInit {
     ckEditorContent: any;
     // proposedCollateral:any[] = [];
 
-    racSearchBaseId:any;
-    racCategoryTypeId:any;
+    racSearchBaseId: any;
+    racCategoryTypeId: any;
 
     isLienPlacementForLoan: boolean = false;
     allLiensArePlaced = false;
 
-    userisAnalyst:boolean = false;
+    userisAnalyst: boolean = false;
     userIsRelationshipManager = false;
     userIsAccountOfficer = false;
     staffRoleRecord: any;
@@ -162,7 +164,46 @@ export class InitiateLoanBookingComponent implements OnInit {
     isUserLegal: boolean = false;
     proposedCollateral: any[] = [];
     isRegistrationDoneViaLoanApplication = 1;
-       
+
+    // Obligor Checklist
+    uwsList: any[] = [];
+    isPreviewModalVisible: boolean = false;
+    selectedDocumentUrl: SafeResourceUrl | null = null;
+    fileType: string = '';
+    zoomLevel: number = 1;
+    dragging: boolean = false;
+    startX: number = 0;
+    startY: number = 0;
+    imageList: string[] = [];
+    currentImageIndex: number = 0;
+    maxZoom: number = 3;
+    minZoom: number = 1;
+    selectedLoan: IAppraisal | null = null;
+
+    // checklist dashboard
+    // Checklist summary properties for selected individual loan
+    checklistSummary: {
+        total: number;
+        yes: number;
+        no: number;
+        waived: number;
+        deferred: number;
+        yesPercent: number;
+        noPercent: number;
+        waivedPercent: number;
+        deferredPercent: number;
+    } = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+    isLoadingChecklistSummary: boolean = false;
 
     constructor(private customerService: CustomerService,
         private fb: FormBuilder,
@@ -170,13 +211,15 @@ export class InitiateLoanBookingComponent implements OnInit {
         private loadingSrv: LoadingService,
         private camService: CreditAppraisalService,
         private casaSrv: CasaService,
-        private reportServ: ReportService, 
+        private reportServ: ReportService,
         private productService: ProductService,
         private sanitizer: DomSanitizer,
         private collateralService: CollateralService,
         private _loanApplServ: LoanApplicationService,
         private staffRole: StaffRoleService,
         private realSearchSrv: StaffRealTimeSearchService,
+        private loadingService: LoadingService,
+        private underwritingService: UnifiedUnderwritingStandardService
     ) { }
 
     ngOnInit() {
@@ -187,7 +230,7 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.getReferedDrawdownRequests();
         this.getAllproducts();
         this.getUserRole();
-        
+
     }
 
     refreshCollateral() {
@@ -203,23 +246,23 @@ export class InitiateLoanBookingComponent implements OnInit {
     }
 
     getUserRole() {
-        this.staffRole.getStaffRoleByStaffId().subscribe((res)=>{
+        this.staffRole.getStaffRoleByStaffId().subscribe((res) => {
             this.staffRoleRecord = res.result;
-                if(this.staffRoleRecord.staffRoleCode == 'AO' || this.staffRoleRecord.staffRoleCode == 'AO / RO') { 
-                    this.userIsAccountOfficer = true; 
-                    this.allowToAddInsurancePolicy = true;
-                }
-                if(this.staffRoleRecord.staffRoleCode == 'RM' || this.staffRoleRecord.staffRoleCode == 'RM / BM') { 
-                    this.userIsRelationshipManager = true; 
-                }
+            if (this.staffRoleRecord.staffRoleCode == 'AO' || this.staffRoleRecord.staffRoleCode == 'AO / RO') {
+                this.userIsAccountOfficer = true;
+                this.allowToAddInsurancePolicy = true;
+            }
+            if (this.staffRoleRecord.staffRoleCode == 'RM' || this.staffRoleRecord.staffRoleCode == 'RM / BM') {
+                this.userIsRelationshipManager = true;
+            }
 
-                if(this.staffRoleRecord.staffRoleShortCode == 'LEGAL') {
-                    this.isUserLegal = true;
-                }
-                else {
-                    this.isUserLegal = false;
-                }
-            });
+            if (this.staffRoleRecord.staffRoleShortCode == 'LEGAL') {
+                this.isUserLegal = true;
+            }
+            else {
+                this.isUserLegal = false;
+            }
+        });
     }
 
     getAvailedLoanApplications() {
@@ -227,7 +270,7 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.loanBookingService.getAvailedLoanApplications()
             .subscribe((res) => {
                 this.loanApplication = this.loans = res.result;
-                if(this.loanApplication != null && this.loanApplication != undefined) this.loanApplication.slice;
+                if (this.loanApplication != null && this.loanApplication != undefined) this.loanApplication.slice;
                 this.loadingSrv.hide();
             }, (err) => {
                 this.loadingSrv.hide(1000);
@@ -246,7 +289,7 @@ export class InitiateLoanBookingComponent implements OnInit {
             });
     }
 
-    referedDrawdownItems:any[] = [];
+    referedDrawdownItems: any[] = [];
     getReferedDrawdownRequests() {
         this.loadingSrv.show();
         this.loanBookingService.getInitiatedLoansAwaitingApproval()
@@ -258,20 +301,20 @@ export class InitiateLoanBookingComponent implements OnInit {
                 this.loadingSrv.hide();
             });
     }
-    
+
     products: any;
     getAllproducts() {
         this.loadingSrv.show();
         this.productService.getAllProducts()
             .subscribe((res) => {
-                this.products =  res.result;
+                this.products = res.result;
                 this.products.slice;
                 this.loadingSrv.hide();
             }, (err) => {
                 this.loadingSrv.hide();
             });
     }
- 
+
     getCustomerByCustomerId(id: number) {
         this.customerService.getCustomerByCustomerId(id)
     }
@@ -297,62 +340,62 @@ export class InitiateLoanBookingComponent implements OnInit {
 
     reAssignResultToLoan(data) {
         this.loanSelection = data;
-        
+
     }
 
-    
+
     isMultipleDrawdown: boolean;
     multiplefacilities: any;
-    getApplicationFacilities(){
-        this.multiplefacilities = this.loans.filter(x=>x.applicationReferenceNumber == this.searchString);
+    getApplicationFacilities() {
+        this.multiplefacilities = this.loans.filter(x => x.applicationReferenceNumber == this.searchString);
     }
 
-    setMultipleDrawdown(value){
-        if(value) { 
-            this.isMultipleDrawdown = true; 
+    setMultipleDrawdown(value) {
+        if (value) {
+            this.isMultipleDrawdown = true;
         }
-        else { 
-            this.isMultipleDrawdown = false; 
-            this.multiplefacilities == null; 
+        else {
+            this.isMultipleDrawdown = false;
+            this.multiplefacilities == null;
         }
     }
 
     showProceedButtton: boolean;
     drawdownFacilitiesInformation: any[] = [];
     approvalStatusId: number = 0;
-    pushSelectedLoans(row){ 
+    pushSelectedLoans(row) {
         this.approvalStatusId = row.data.approvalStatusId;
         if (row.data.customerAvailableAmount == 0 && row.data.approvalStatusId != ApprovalStatusEnum.Referred) {
             swal('', 'Available amount is zero. Loan may have been booked and currently undergoing approval', 'info');
             return;
         }
-        if (row.data.expiryDate != null && (row.data.expiryDate <= row.data.systemCurrentDate) 
-            && row.data.productTypeId == ProductTypeEnum.CommercialLoans ){
-                swal('', 'The selected Commercial Loan tenor has expired', 'info');
-                return;
+        if (row.data.expiryDate != null && (row.data.expiryDate <= row.data.systemCurrentDate)
+            && row.data.productTypeId == ProductTypeEnum.CommercialLoans) {
+            swal('', 'The selected Commercial Loan tenor has expired', 'info');
+            return;
         }
-        
+
         this.drawdownFacilitiesInformation.push(row.data);
         this.loanSelection = this.drawdownFacilitiesInformation;
         this.showProceedButtton = true;
         this.loadingSrv.hide();
     }
 
-    GetLoanDataFromMultiple(){
-        
+    GetLoanDataFromMultiple() {
+
     }
 
     popSelectedLoans(row) {
         var record = row.data;
-        var index = this.drawdownFacilitiesInformation.findIndex(x=>x.loanApplicationDetailId == record.loanApplicationDetailId)
-        this.drawdownFacilitiesInformation.splice(index,1);
-        if(this.drawdownFacilitiesInformation.length <= 0){
-            this.showProceedButtton =false;
+        var index = this.drawdownFacilitiesInformation.findIndex(x => x.loanApplicationDetailId == record.loanApplicationDetailId)
+        this.drawdownFacilitiesInformation.splice(index, 1);
+        if (this.drawdownFacilitiesInformation.length <= 0) {
+            this.showProceedButtton = false;
         }
     }
 
-    proceedFirstOfSelectedMultiples() { 
-        var firstRow = this.loanSelection.filter(x=>x.loanApplicationDetailId == this.drawdownFacilitiesInformation[0].loanApplicationDetailId);
+    proceedFirstOfSelectedMultiples() {
+        var firstRow = this.loanSelection.filter(x => x.loanApplicationDetailId == this.drawdownFacilitiesInformation[0].loanApplicationDetailId);
         this.onSelectedLoanChange(firstRow[0]);
     }
 
@@ -365,19 +408,19 @@ export class InitiateLoanBookingComponent implements OnInit {
 
     racProductClassId: number = null;
     racCurrencyId: any = null;
-    searchBasePlaceholder:any; // ="PRODUCTCLASS";
-    productId:any = null;
+    searchBasePlaceholder: any; // ="PRODUCTCLASS";
+    productId: any = null;
     filteredProducts: any;
 
     onSelectedLoanChange(data) {
         this.loanApplicationDetailId = data.loanApplicationDetailId;
-        this.operationId = data.operationId; 
-        this.loanBookingRequestId = data.loanBookingRequestId; 
+        this.operationId = data.operationId;
+        this.loanBookingRequestId = data.loanBookingRequestId;
         this.apiRequestId = data.apiRequestId;
-        
-        this.getAllProjectRiskRating(data.loanApplicationId, data.loanApplicationDetailId,data.loanBookingRequestId);
-        this.getAllProjectRiskRatingComputation(data.loanApplicationId, data.loanApplicationDetailId,data.loanBookingRequestId);
-                
+
+        this.getAllProjectRiskRating(data.loanApplicationId, data.loanApplicationDetailId, data.loanBookingRequestId);
+        this.getAllProjectRiskRatingComputation(data.loanApplicationId, data.loanApplicationDetailId, data.loanBookingRequestId);
+
         //this.customerCode = data.customerCode;
         this.loanSelection = data;
         this.setLienPlacementForLoan(data.loanCollateral);
@@ -387,16 +430,16 @@ export class InitiateLoanBookingComponent implements OnInit {
             this.loadingSrv.hide();
             return;
         }
-       
-        if (this.loanSelection.expiryDate != null && (this.loanSelection.expiryDate <= this.loanSelection.systemCurrentDate) 
-            && this.loanSelection.productTypeId == ProductTypeEnum.CommercialLoans ){
-                swal('', 'The selected Commercial Loan tenor has expired', 'info');
-                this.loadingSrv.hide();
-                return;
+
+        if (this.loanSelection.expiryDate != null && (this.loanSelection.expiryDate <= this.loanSelection.systemCurrentDate)
+            && this.loanSelection.productTypeId == ProductTypeEnum.CommercialLoans) {
+            swal('', 'The selected Commercial Loan tenor has expired', 'info');
+            this.loadingSrv.hide();
+            return;
         }
 
 
-        if(this.loanSelection.productClassId == ProductClassEnum.CREDITCARD) {
+        if (this.loanSelection.productClassId == ProductClassEnum.CREDITCARD) {
             this.searchBasePlaceholder = 'CREDITCARD';
         }
         else {
@@ -409,22 +452,22 @@ export class InitiateLoanBookingComponent implements OnInit {
 
         if (this.loanSelection.customerType != null && this.loanSelection.customerType.toLowerCase() === 'corporate') {
             this.secondaryInfocaption = 'Company Executives';
-        } 
+        }
         else {
             this.secondaryInfocaption = 'Other Information';
         }
 
-        if(this.products != null && this.products != undefined) {
-            if(this.loanSelection.productClassId == ProductLinesClassEnum.IMPORTFINANCEFACILITY || this.loanSelection.productClassId == ProductLinesClassEnum.INVOICEDISCOUNTINGFACILITY){
-                this.filteredProducts = this.products; 
-            }else{ 
-                this.filteredProducts = this.products.filter(x=>x.productClassId == this.loanSelection.productClassId);
+        if (this.products != null && this.products != undefined) {
+            if (this.loanSelection.productClassId == ProductLinesClassEnum.IMPORTFINANCEFACILITY || this.loanSelection.productClassId == ProductLinesClassEnum.INVOICEDISCOUNTINGFACILITY) {
+                this.filteredProducts = this.products;
+            } else {
+                this.filteredProducts = this.products.filter(x => x.productClassId == this.loanSelection.productClassId);
             }
         }
 
         this.initiationForm.controls['productId'].setValue(this.loanSelection.productId);
 
-        if(!this.loanSelection.customerId === null || this.loanSelection.customerId != 0) {  this.customerId = this.loanSelection.customerId }
+        if (!this.loanSelection.customerId === null || this.loanSelection.customerId != 0) { this.customerId = this.loanSelection.customerId }
 
         if (!this.loanSelection.customerGroupId === null || this.loanSelection.customerGroupId != 0) {
             this.isGroup = true;
@@ -433,7 +476,7 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.previewDocumentation(false);
         this.setLoanByProductTypes();
         this.popoverSeeMore();
-        this.customerService.fetchAndAddCustomerAccounts(this.loanSelection.customerId).subscribe((response: any) => {});
+        this.customerService.fetchAndAddCustomerAccounts(this.loanSelection.customerId).subscribe((response: any) => { });
         this.getLoanCustomerAccounts(this.loanSelection.customerId);
         // this.getDrawdownMemoHtml(data.loanApplicationDetailId);
         this.getCashBackMemoHtml(data.appraisalOperationId, data.loanApplicationDetailId);
@@ -448,12 +491,12 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.loanApplId = this.loanSelection.loanApplicationId;
         this.loanApplDetailId = this.loanSelection.loanApplicationDetailId;
 
-        
+
 
         this.initiationForm.controls['approvedAmount'].setValue(ConvertString.ToNumberFormate(this.loanSelection.approvedAmount));
 
         this.disbursableAmount = this.loanSelection.approvedAmount - this.loanSelection.allRequestAmount;
-        if(this.disbursableAmount < 0)this.disbursableAmount = 0;
+        if (this.disbursableAmount < 0) this.disbursableAmount = 0;
 
         this.initiationForm.controls['availableAmount'].setValue(ConvertString.ToNumberFormate(this.disbursableAmount));
 
@@ -480,7 +523,281 @@ export class InitiateLoanBookingComponent implements OnInit {
         else {
             this.isProspective = true;
         }
+
+        // Fetch UUS checklist for the selected loan's reference number
+        if (this.loanSelection.applicationReferenceNumber) {
+            this.fetchCustomerUusItems(this.loanSelection.applicationReferenceNumber);
+        }
+
+        this.fetchChecklistSummaryForLoan(this.loanSelection.applicationReferenceNumber);
     }
+
+    // =========================== Fetch Obligor's Items ===============================
+
+    getRowStyle(rowData: any): any {
+        if (rowData.option === 'Yes') {
+            return { 'background-color': '#28a745', 'color': '#fff' }; // Deep green
+        } else if (rowData.option === 'No') {
+            return { 'background-color': '#dc3545', 'color': '#fff' }; // Deep red
+        } else {
+            return {};
+        }
+    }
+
+    fetchCustomerUusItems(nhfNumber: string): void {
+        console.error('nhf number:', nhfNumber);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+            response => {
+                this.uwsList = (response.result || []).map(uws => ({
+                    ...uws,
+                    option: this.mapOptionToEnum(uws.option),
+                    deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
+                }));
+                console.log('Processed UUS List:', this.uwsList);
+                //this.cdr.detectChanges();
+            },
+            error => {
+                console.error('Error fetching UWS list:', error);
+                this.uwsList = [];
+                this.loadingService.hide();
+            },
+            () => this.loadingService.hide()
+        );
+    }
+
+    mapOptionToEnum(option: number): string {
+        const mapping: { [key: number]: string } = {
+            1: 'Yes',
+            2: 'No',
+            3: 'Waiver',
+            4: 'Deferred'
+        };
+        return mapping[option] || 'No';
+    }
+
+    viewDocuments(uws: any): void {
+        console.log('Selected UWS:', uws);
+        if (!uws.employeeNhfNumber) {
+            swal('Error', 'No Employee NHF Number found!', 'error');
+            return;
+        }
+        if (!uws.itemId) {
+            swal('Error', 'No Item Found!', 'error');
+            return;
+        }
+        console.log('Fetching document for:', uws.employeeNhfNumber, uws.itemId);
+        this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
+    }
+
+    private fetchAndPreviewDocument(employeeNumber: string, itemId: number): void {
+        console.log('Calling API with:', employeeNumber, itemId);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItemDoc(employeeNumber, itemId).subscribe({
+            next: (response) => {
+                console.log('API Response:', response);
+                if (!response.success || !response.result) {
+                    console.error('Invalid document data received');
+                    swal('Error', 'Invalid document data received.', 'error');
+                    this.loadingService.hide();
+                    return;
+                }
+                const base64Data = response.result.split(',')[1];
+                const fileTypeMatch = response.result.match(/data:(.*?);base64/);
+                if (!base64Data || !fileTypeMatch) {
+                    console.error('Invalid Base64 format');
+                    swal('Error', 'Invalid document format.', 'error');
+                    this.loadingService.hide();
+                    return;
+                }
+                const fileType = fileTypeMatch[1];
+                console.log('Detected file type:', fileType);
+                const blob = this.base64ToBlob(base64Data, fileType);
+                const url = URL.createObjectURL(blob);
+                console.log('Generated Blob URL:', url);
+                if (fileType.includes('image') || fileType === 'application/pdf' ||
+                    fileType === 'application/vnd.openxmlformats-officedocument.w ordprocessingml.document' ||
+                    fileType === 'application/msword') {
+                    this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+                    this.fileType = fileType;
+                    this.isPreviewModalVisible = true;
+                } else {
+                    swal('Error', 'Unsupported file type.', 'error');
+                }
+                this.loadingService.hide();
+            },
+            error: (error) => {
+                console.error('Error fetching document:', error);
+                swal('Error', 'Error fetching document.', 'error');
+                this.loadingService.hide();
+            }
+        });
+    }
+
+    private base64ToBlob(base64: string, contentType: string): Blob {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
+        for (let i = 0; i < byteCharacters.length; i += 512) {
+            const slice = byteCharacters.slice(i, i + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let j = 0; j < slice.length; j++) {
+                byteNumbers[j] = slice.charCodeAt(j);
+            }
+            byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        return new Blob(byteArrays, { type: contentType });
+    }
+
+    getModalStyle() {
+        if (this.fileType === 'application/pdf' || this.fileType === 'application/msword' ||
+            this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            return { width: '70%', height: '75vh' };
+        } else {
+            return { width: '55%', height: '70vh' };
+        }
+    }
+
+    zoomIn() {
+        this.zoomLevel += 0.2;
+    }
+
+    zoomOut() {
+        if (this.zoomLevel > 0.5) this.zoomLevel -= 0.2;
+    }
+
+    onScrollZoom(event: WheelEvent) {
+        event.preventDefault();
+        const zoomFactor = event.deltaY < 0 ? 0.1 : -0.1;
+        this.zoomLevel = Math.max(0.5, this.zoomLevel + zoomFactor);
+    }
+
+    startDrag(event: MouseEvent) {
+        event.preventDefault();
+        this.dragging = true;
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+    }
+
+    onDrag = (event: MouseEvent) => {
+        if (!this.dragging) return;
+        const dragSpeed = 2;
+        const deltaX = (event.clientX - this.startX) * dragSpeed;
+        const deltaY = (event.clientY - this.startY) * dragSpeed;
+        const imageElement = document.querySelector('img') as HTMLElement;
+        if (imageElement) {
+            imageElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${this.zoomLevel})`;
+        }
+    };
+
+    toggleZoom() {
+        if (this.zoomLevel >= this.maxZoom) {
+            this.zoomLevel = this.minZoom;
+        } else {
+            this.zoomLevel += 0.5;
+        }
+    }
+
+    stopDrag = () => {
+        this.dragging = false;
+        document.removeEventListener('mousemove', this.onDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
+    };
+
+    closePreviewModal() {
+        this.isPreviewModalVisible = false;
+        this.selectedDocumentUrl = null;
+        this.zoomLevel = 1;
+    }
+    // =========================== END ==============================================
+
+    // ============================ Checklist Dashboard ===============================
+
+    fetchChecklistSummaryForLoan(nhfNumber: string): void {
+        if (!nhfNumber) {
+            return;
+        }
+
+        this.isLoadingChecklistSummary = true;
+        this.checklistSummary = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+            response => {
+                if (response && response.success && Array.isArray(response.result)) {
+                    this.calculateChecklistSummary(response.result);
+                }
+                this.isLoadingChecklistSummary = false;
+            },
+            error => {
+                console.error(`Error fetching checklist for ${nhfNumber}:`, error);
+                this.isLoadingChecklistSummary = false;
+            }
+        );
+    }
+
+    calculateChecklistSummary(checklistItems: any[]): void {
+        const total = checklistItems.length;
+
+        if (total === 0) {
+            this.checklistSummary = {
+                total: 0,
+                yes: 0,
+                no: 0,
+                waived: 0,
+                deferred: 0,
+                yesPercent: 0,
+                noPercent: 0,
+                waivedPercent: 0,
+                deferredPercent: 0
+            };
+            return;
+        }
+
+        // Count items by option
+        const yes = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 1 || option === 'Yes' || option === '1';
+        }).length;
+
+        const no = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 2 || option === 'No' || option === '2';
+        }).length;
+
+        const waived = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 3 || option === 'Waiver' || option === 'Waived' || option === '3';
+        }).length;
+
+        const deferred = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 4 || option === 'Deferred' || option === 'Defer' || option === '4';
+        }).length;
+
+        this.checklistSummary = {
+            total,
+            yes,
+            no,
+            waived,
+            deferred,
+            yesPercent: total > 0 ? Math.round((yes / total) * 100) : 0,
+            noPercent: total > 0 ? Math.round((no / total) * 100) : 0,
+            waivedPercent: total > 0 ? Math.round((waived / total) * 100) : 0,
+            deferredPercent: total > 0 ? Math.round((deferred / total) * 100) : 0
+        };
+    }
+    //============================ END CHECKLIST STATISTICS ===============================================
 
     // validateTenor(tenor) { 
     //             let amt = ConvertString.TO_NUMBER(tenor);
@@ -488,24 +805,23 @@ export class InitiateLoanBookingComponent implements OnInit {
     //             swal(`${GlobalConfig.APPLICATION_NAME}`, 'Inputed tenor must not be greater than the approved tenor ' + this.loanSelection.approvedTenor, 'error');
     //             return;
     //         }
-  
+
     // }
 
     setLienPlacementForLoan(loanCollaterals: any[]) {
         if (loanCollaterals != null && loanCollaterals != undefined) {
             if (loanCollaterals.length > 0) {
-                loanCollaterals.forEach(item => {  
-                    if (item.collateralTypeId == CollateralType.FIXED_DEPOSIT || item.collateralTypeId == CollateralType.CASA)
-                        {
-                            this.isLienPlacementForLoan = true;
-                        }  
-                }); 
-            } 
+                loanCollaterals.forEach(item => {
+                    if (item.collateralTypeId == CollateralType.FIXED_DEPOSIT || item.collateralTypeId == CollateralType.CASA) {
+                        this.isLienPlacementForLoan = true;
+                    }
+                });
+            }
         }
     }
 
-    editCashBack(){
-    this.showCasgBackForm = true;
+    editCashBack() {
+        this.showCasgBackForm = true;
     }
 
     submitCashbackForm(form) {
@@ -515,23 +831,23 @@ export class InitiateLoanBookingComponent implements OnInit {
             issues: form.value.issues,
             request: form.value.request,
             loanApplicationDetailId: this.loanApplicationDetailId,
-            operationId: this.operationId, 
+            operationId: this.operationId,
         };
-    
-            this.loanBookingService.saveCashbackTemplate(body).subscribe((res) => {
-                if (res.success == true) {
-                    this.finishGood(res.message);
-                    this.getCashBackMemoHtml(this.operationId, this.loanApplicationDetailId);
-                    this.showCasgBackForm = false;
-                } else {
-                    this.finishBad(res.message);
-                }
-            }, (err: any) => {
-                this.finishBad(JSON.stringify(err));
-            });
+
+        this.loanBookingService.saveCashbackTemplate(body).subscribe((res) => {
+            if (res.success == true) {
+                this.finishGood(res.message);
+                this.getCashBackMemoHtml(this.operationId, this.loanApplicationDetailId);
+                this.showCasgBackForm = false;
+            } else {
+                this.finishBad(res.message);
+            }
+        }, (err: any) => {
+            this.finishBad(JSON.stringify(err));
+        });
     }
 
-     finishBad(message) {
+    finishBad(message) {
         this.showMessage(message, 'error', "FintrakBanking");
         this.loadingSrv.hide();
     }
@@ -548,23 +864,23 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.show = true;
     }
 
-    setEditableStatus(){
+    setEditableStatus() {
         this.initiationForm.controls['approvalStatusId'].setValue(this.loanSelection.approvalStatusId);
         this.initiationForm.controls['loanBookingRequestId'].setValue(this.loanSelection.loanBookingRequestId);
         this.initiationForm.controls['operationId'].setValue(this.loanSelection.operationId);
-        if(this.loanSelection.approvalStatusId == ApprovalStatusEnum.Referred){
+        if (this.loanSelection.approvalStatusId == ApprovalStatusEnum.Referred) {
             //TODO: Initilize the form fields with values
-            
-            this.filteredProducts = this.products.filter(x=>x.productClassId == this.loanSelection.productClassId);
+
+            this.filteredProducts = this.products.filter(x => x.productClassId == this.loanSelection.productClassId);
 
             this.initiationForm.controls['productId'].setValue(this.loanSelection.productId);
-            this.data.bookingAmount= ConvertString.ToNumberFormate(this.loanSelection.requestedAmount);
+            this.data.bookingAmount = ConvertString.ToNumberFormate(this.loanSelection.requestedAmount);
 
             this.initiationForm.controls['casaAccountId'].setValue(this.loanSelection.casaAccountId);
-            
-            ( this.loanSelection.casaAccountId != null && this.loanSelection.casaAccountId > 0 )  
-                                ? this.casaAccountSelected = true 
-                                : this.casaAccountSelected = false;
+
+            (this.loanSelection.casaAccountId != null && this.loanSelection.casaAccountId > 0)
+                ? this.casaAccountSelected = true
+                : this.casaAccountSelected = false;
         }
     }
 
@@ -576,7 +892,7 @@ export class InitiateLoanBookingComponent implements OnInit {
 
     getSupportingDocuments(applicationNumber: any) {
         this.camService.getSupportingDocumentByApplication(applicationNumber).subscribe((response: any) => {
-           // this.supportingDocuments = response.result;
+            // this.supportingDocuments = response.result;
             this.loadingSrv.hide();
         });
     }
@@ -584,19 +900,19 @@ export class InitiateLoanBookingComponent implements OnInit {
     SaveActiveRecordAmount(form) {
         this.loanSelection.bookingAmountRequested = form.value.amountToBook;
         //this.drawdownFacilitiesInformation.find(x=>x.l)
-        this.drawdownFacilitiesInformation.slice; 
+        this.drawdownFacilitiesInformation.slice;
     }
 
     previewDocumentation(print = false) {
-        this.loadingSrv.show(); 
+        this.loadingSrv.show();
         // this.camService.getDocumentation(6, this.loanSelection.loanApplicationId).subscribe((response: any) => { 
-        this.camService.getDocumentation(this.operationId, this.loanSelection.loanApplicationId).subscribe((response: any) => { 
-            if(response.success){
-            this.documentations = response.result; 
-            this.documentations.slice;
-            this.loadingSrv.hide();
-            if (print == false) this.displayDocumentation = true;
-            else setTimeout(() => this.print(), 5000);
+        this.camService.getDocumentation(this.operationId, this.loanSelection.loanApplicationId).subscribe((response: any) => {
+            if (response.success) {
+                this.documentations = response.result;
+                this.documentations.slice;
+                this.loadingSrv.hide();
+                if (print == false) this.displayDocumentation = true;
+                else setTimeout(() => this.print(), 5000);
             }
         }, (err) => {
             this.loadingSrv.hide(1000);
@@ -611,19 +927,19 @@ export class InitiateLoanBookingComponent implements OnInit {
                 applicationRefNumber: this.loanSelection.applicationReferenceNumber,
 
             }
-           
+
 
             this.reportServ.getGeneratedOfferLetter(data.applicationRefNumber).subscribe((response: any) => {
                 path = response.result;
                 this.reportSrc = this.sanitizer.bypassSecurityTrustResourceUrl(path);
-               console.log(path)
+                console.log(path)
             });
-          
+
             return;
         }
     }
 
-    resetofferLetterChecklist(event){
+    resetofferLetterChecklist(event) {
         this.offerLetterChecklistIndex = 0;
         this.offerLetterChecklistIndex = 0;
         this.offerLetterChecklistIndex = 0;
@@ -631,7 +947,7 @@ export class InitiateLoanBookingComponent implements OnInit {
     }
 
     offerLetterChecklistIndex = 0;
-    offerLetterChecklist() { 
+    offerLetterChecklist() {
         this.offerLetterChecklistIndex = this.loanSelection.loanApplicationId;
         // this.conditionChecklist.viewOfferLetterChecklist(this.loanSelection.loanApplicationId);
     }
@@ -692,7 +1008,7 @@ export class InitiateLoanBookingComponent implements OnInit {
 
 
 
-    setLoanByProductTypes(){
+    setLoanByProductTypes() {
         if (this.loanSelection.productTypeId === ProductTypeEnum.Revolving) {
             this.isContingentLoan = false;
             this.isRevolvingLoan = true;
@@ -700,7 +1016,7 @@ export class InitiateLoanBookingComponent implements OnInit {
             this.isCommercialLoan = false;
             this.isForeignExchangeLoan = false;
         }
-        if (this.loanSelection.productTypeId === ProductTypeEnum.TermLoan 
+        if (this.loanSelection.productTypeId === ProductTypeEnum.TermLoan
             || this.loanSelection.productTypeId === ProductTypeEnum.SelfLiquidating
             || this.loanSelection.productTypeId === ProductTypeEnum.SyndicatedLoan) {
             this.isContingentLoan = false;
@@ -708,12 +1024,11 @@ export class InitiateLoanBookingComponent implements OnInit {
             this.isScheduledLoan = true;
             this.isCommercialLoan = false;
             this.isForeignExchangeLoan = false;
-            if(this.loanSelection.isLocalCurrency && this.loanSelection.productClassId == !ProductClassEnum.INVOICEDISCOUNTINGFACILITY){
+            if (this.loanSelection.isLocalCurrency && this.loanSelection.productClassId == !ProductClassEnum.INVOICEDISCOUNTINGFACILITY) {
                 this.casaAccountText = 'Fee Account';
             }
-            if(this.loanSelection.productClassId == ProductClassEnum.INVOICEDISCOUNTINGFACILITY)
-            {
-                this.isIDF=true;
+            if (this.loanSelection.productClassId == ProductClassEnum.INVOICEDISCOUNTINGFACILITY) {
+                this.isIDF = true;
                 this.casaAccountText = 'Collection Account';
             }
         }
@@ -751,22 +1066,22 @@ export class InitiateLoanBookingComponent implements OnInit {
     onFileChange(event: any) {
         const file = event.target.files[0];
         if (file) {
-          this.initiationForm.patchValue({ fileInput: file });
-          const fileInputControl = this.initiationForm.get('fileInput');
-          if (fileInputControl) {
-            fileInputControl.markAsTouched();
-          }
+            this.initiationForm.patchValue({ fileInput: file });
+            const fileInputControl = this.initiationForm.get('fileInput');
+            if (fileInputControl) {
+                fileInputControl.markAsTouched();
+            }
         }
-      }
-      
+    }
 
-    sendToInitiationPoolForNextLevel(){
+
+    sendToInitiationPoolForNextLevel() {
         this.initiateDrawdownModelsForNextLevel = [];
-        let entries = this.initiationForm.value; 
-        if(this.isMultipleDrawdown){
+        let entries = this.initiationForm.value;
+        if (this.isMultipleDrawdown) {
             this.drawdownFacilitiesInformation.forEach(item => {
-                if(item.bookingAmountRequested <= 0.00 ) {
-                    swal('Fintrak Credit360', 'One or more records has zero request amount.','info');
+                if (item.bookingAmountRequested <= 0.00) {
+                    swal('Fintrak Credit360', 'One or more records has zero request amount.', 'info');
                     return;
                 }
                 let body = {
@@ -776,14 +1091,14 @@ export class InitiateLoanBookingComponent implements OnInit {
                     casaAccountId: entries.casaAccountId,
                     casaAccountId2: entries.casaAccountId2,
                     productId: entries.productId,
-                    approvalStatusId : entries.approvalStatusId,
+                    approvalStatusId: entries.approvalStatusId,
                     loanBookingRequestId: entries.loanBookingRequestId,
                     operationId: entries.operationId,
                     isLienPlacementForLoan: this.isLienPlacementForLoan,
-                    chargeFeeOnce : this.chargeFeeOnce,
+                    chargeFeeOnce: this.chargeFeeOnce,
                     comment: entries.comment,
                     //tenor: entries.tenor,
-                    rac : this.rac
+                    rac: this.rac
                 }
                 this.initiateDrawdownModelsForNextLevel.push(body);
             });
@@ -798,28 +1113,28 @@ export class InitiateLoanBookingComponent implements OnInit {
                 casaAccountId: entries.casaAccountId,
                 casaAccountId2: entries.casaAccountId2,
                 productId: entries.productId,
-                approvalStatusId : entries.approvalStatusId,
+                approvalStatusId: entries.approvalStatusId,
                 loanBookingRequestId: entries.loanBookingRequestId,
                 operationId: entries.operationId,
                 isLienPlacementForLoan: this.isLienPlacementForLoan,
-                chargeFeeOnce : this.chargeFeeOnce,
-                customerId : this.requestCustomerId,
+                chargeFeeOnce: this.chargeFeeOnce,
+                customerId: this.requestCustomerId,
                 comment: entries.comment,
                 //tenor: entries.tenor,
-                rac : this.rac,
+                rac: this.rac,
             }
             this.initiateDrawdownModelsForNextLevel.push(body);
         }
     }
 
-    sendToInitiationPool(){
+    sendToInitiationPool() {
 
         this.initiateDrawdownModels = [];
-        let entries = this.initiationForm.value; 
-        if(this.isMultipleDrawdown){
+        let entries = this.initiationForm.value;
+        if (this.isMultipleDrawdown) {
             this.drawdownFacilitiesInformation.forEach(item => {
-                if(item.bookingAmountRequested <= 0.00 ) {
-                    swal('Fintrak Credit360', 'One or more records has zero request amount.','info');
+                if (item.bookingAmountRequested <= 0.00) {
+                    swal('Fintrak Credit360', 'One or more records has zero request amount.', 'info');
                     return;
                 }
                 let body = {
@@ -829,14 +1144,14 @@ export class InitiateLoanBookingComponent implements OnInit {
                     casaAccountId: entries.casaAccountId,
                     casaAccountId2: entries.casaAccountId2,
                     productId: entries.productId,
-                    approvalStatusId : entries.approvalStatusId,
+                    approvalStatusId: entries.approvalStatusId,
                     loanBookingRequestId: entries.loanBookingRequestId,
                     operationId: entries.operationId,
                     isLienPlacementForLoan: this.isLienPlacementForLoan,
-                    chargeFeeOnce : this.chargeFeeOnce,
+                    chargeFeeOnce: this.chargeFeeOnce,
                     comment: entries.comment,
                     //tenor: entries.tenor,
-                    rac : this.rac,
+                    rac: this.rac,
                     toStaffId: this.toStaffId,
                     isFromPc: true
                 }
@@ -845,16 +1160,16 @@ export class InitiateLoanBookingComponent implements OnInit {
         }
         else {
             let entries = this.initiationForm.value;
-            if(this.initiationForm.value.amountToBook <= 0){
-                swal('Fintrak Credit 360','The approved amount has been fully requested.','info');
+            if (this.initiationForm.value.amountToBook <= 0) {
+                swal('Fintrak Credit 360', 'The approved amount has been fully requested.', 'info');
                 return;
             }
             if (this.initiationForm.value.amountToBook > this.disbursableAmount) {
-                swal('Fintrak Credit360','The requested amount is higher than disbursable amount','info');
+                swal('Fintrak Credit360', 'The requested amount is higher than disbursable amount', 'info');
                 return;
             }
             if (entries.amountToBook < 0) {
-                swal('Fintrak Credit360','Zero amount not allowed','info');
+                swal('Fintrak Credit360', 'Zero amount not allowed', 'info');
                 return;
             }
 
@@ -865,15 +1180,15 @@ export class InitiateLoanBookingComponent implements OnInit {
                 casaAccountId: entries.casaAccountId,
                 casaAccountId2: entries.casaAccountId2,
                 productId: entries.productId,
-                approvalStatusId : entries.approvalStatusId,
+                approvalStatusId: entries.approvalStatusId,
                 loanBookingRequestId: entries.loanBookingRequestId,
                 operationId: entries.operationId,
                 isLienPlacementForLoan: this.isLienPlacementForLoan,
-                chargeFeeOnce : this.chargeFeeOnce,
-                customerId : this.requestCustomerId,
+                chargeFeeOnce: this.chargeFeeOnce,
+                customerId: this.requestCustomerId,
                 comment: entries.comment,
                 //tenor: entries.tenor,
-                rac : this.rac,
+                rac: this.rac,
                 toStaffId: this.toStaffId,
             }
             this.initiateDrawdownModels.push(body);
@@ -901,7 +1216,7 @@ export class InitiateLoanBookingComponent implements OnInit {
     // initiateDrawdown() {
     //     const __this = this;
     //     __this.sendToInitiationPool();
-        
+
     //     swal({
     //         title: 'Are you sure?',
     //         text: 'You won\'t be able to revert this!',
@@ -914,7 +1229,7 @@ export class InitiateLoanBookingComponent implements OnInit {
     //         confirmButtonClass: 'btn btn-success btn-move',
     //         cancelButtonClass: 'btn btn-danger',
     //         buttonsStyling: true,
-            
+
     //     }).then(function () {
     //         __this.loadingSrv.show();
     //         __this._loanApplServ.validatePrecedenceChecklistCompleted(__this.loanSelection.loanApplicationId).subscribe((res) => {
@@ -927,33 +1242,34 @@ export class InitiateLoanBookingComponent implements OnInit {
     //                 return;
     //             }
     //         });
-          
+
     //     }, function (dismiss) {
     //         if (dismiss === 'cancel') {
     //             swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
     //         }
     //     });
-        
+
     // }
 
     fireRequest() {
         this.submitEvent = 0;
         this.loanBookingService.initiateBooking(this.initiateDrawdownModels, this.loanSelection.loanApplicationId)
-        .subscribe((res) => {
-            if (res.success === true) {
-                this.displayInitiationForm = false;
-                //this.getSupportingDocuments(this.loanSelection.applicationReferenceNumber);
-                this.getAvailedLoanApplications();
-                this.initializeControls();
-                swal('Fintrak Credit 360', res.message, 'success');
-                this.loadingSrv.hide();
-                this.closeDialog();
+            .subscribe((res) => {
+                if (res.success === true) {
+                    this.displayInitiationForm = false;
+                    //this.getSupportingDocuments(this.loanSelection.applicationReferenceNumber);
+                    this.getAvailedLoanApplications();
+                    this.initializeControls();
+                    swal('Fintrak Credit 360', res.message, 'success');
+                    this.loadingSrv.hide();
+                    this.closeDialog();
 
-            } else { swal('Fintrak Credit360',res.message,'error');  this.loadingSrv.hide();}
+                } else { swal('Fintrak Credit360', res.message, 'error'); this.loadingSrv.hide(); }
 
-        }, (err) => { this.loadingSrv.hide(); swal('Fintrak Credit360',err.message,'error');
-    })
-    
+            }, (err) => {
+                this.loadingSrv.hide(); swal('Fintrak Credit360', err.message, 'error');
+            })
+
     }
 
     selectApprover() {
@@ -972,27 +1288,27 @@ export class InitiateLoanBookingComponent implements OnInit {
                 this.loadingSrv.hide(); swal('Fintrak Credit360', err.message, 'error');
             });
     }
-    
+
     isChecked: boolean = false;
-      changed = (evt) => {    
+    changed = (evt) => {
         this.isChecked = evt.target.checked;
-        if(this.isChecked && (this.projectRiskRatingss.length == 0 || this.projectRiskRatingss == null || this.projectRiskRatingss == undefined)){
+        if (this.isChecked && (this.projectRiskRatingss.length == 0 || this.projectRiskRatingss == null || this.projectRiskRatingss == undefined)) {
             this.getAllProjectRiskRatingCriteria();
             this.displayProjectRiskRatingModal = true;
         }
     }
 
     initiateDrawdown() {
-        if ((this.projectRiskRatingss == null || this.projectRiskRatingss.length == 0) && this.isChecked == true){
+        if ((this.projectRiskRatingss == null || this.projectRiskRatingss.length == 0) && this.isChecked == true) {
             this.getAllProjectRiskRatingCriteria();
             swal(`${GlobalConfig.APPLICATION_NAME}`, 'Please kindly fill Project Risk Rating form!', 'error');
-            this.displayProjectRiskRatingModal=true;
+            this.displayProjectRiskRatingModal = true;
             return;
         }
 
         const __this = this;
         __this.sendToInitiationPool();
-        
+
         swal({
             title: 'Are you sure?',
             text: 'You won\'t be able to revert this!',
@@ -1005,57 +1321,57 @@ export class InitiateLoanBookingComponent implements OnInit {
             confirmButtonClass: 'btn btn-success btn-move',
             cancelButtonClass: 'btn btn-danger',
             buttonsStyling: true,
-            
+
         }).then(function () {
             __this.loadingSrv.showKeyApiCall();
             __this._loanApplServ.validatePrecedenceChecklistCompleted(__this.loanSelection.loanApplicationId)
-            .subscribe((res) => {
-                if (res.success == true) {
-                    __this.loadingSrv.showKeyApiCall();
-                    __this.loanBookingService.initiateBooking(__this.initiateDrawdownModels, __this.loanSelection.loanApplicationId)
-                        .subscribe((res) => {
-                            if (res.success == true) {
-                                __this.displayInitiationForm = false;
-                                //__this.getSupportingDocuments(__this.loanSelection.applicationReferenceNumber);
-                                __this.getAvailedLoanApplications();
-                                __this.initializeControls();
-                                swal('Fintrak Credit 360', res.message, 'success');
-                                __this.closeDialog();
+                .subscribe((res) => {
+                    if (res.success == true) {
+                        __this.loadingSrv.showKeyApiCall();
+                        __this.loanBookingService.initiateBooking(__this.initiateDrawdownModels, __this.loanSelection.loanApplicationId)
+                            .subscribe((res) => {
+                                if (res.success == true) {
+                                    __this.displayInitiationForm = false;
+                                    //__this.getSupportingDocuments(__this.loanSelection.applicationReferenceNumber);
+                                    __this.getAvailedLoanApplications();
+                                    __this.initializeControls();
+                                    swal('Fintrak Credit 360', res.message, 'success');
+                                    __this.closeDialog();
 
-                            } else { 
-                                swal('Fintrak Credit360',res.message,'error');  
-                            }
-                            __this.loadingSrv.hideKeyApiCall();
-                        }, (err) => { 
-                            __this.loadingSrv.hideKeyApiCall(1000); 
-                            swal('Fintrak Credit360',err.message,'error');
-                    });
-                } else {
-                   // __this.displayLetterAcceptanceModal = false;
-                    swal(`${GlobalConfig.APPLICATION_NAME}`, 'Please complete offer letter checklist to continue', 'error');
-                }
-                __this.loadingSrv.hideKeyApiCall();
-            }, (err) => { 
-                swal('Fintrak Credit360',err.message,'error');
-                __this.loadingSrv.hideKeyApiCall(1000); 
-        });
-          
+                                } else {
+                                    swal('Fintrak Credit360', res.message, 'error');
+                                }
+                                __this.loadingSrv.hideKeyApiCall();
+                            }, (err) => {
+                                __this.loadingSrv.hideKeyApiCall(1000);
+                                swal('Fintrak Credit360', err.message, 'error');
+                            });
+                    } else {
+                        // __this.displayLetterAcceptanceModal = false;
+                        swal(`${GlobalConfig.APPLICATION_NAME}`, 'Please complete offer letter checklist to continue', 'error');
+                    }
+                    __this.loadingSrv.hideKeyApiCall();
+                }, (err) => {
+                    swal('Fintrak Credit360', err.message, 'error');
+                    __this.loadingSrv.hideKeyApiCall(1000);
+                });
+
         }, function (dismiss) {
             if (dismiss === 'cancel') {
                 swal(`${GlobalConfig.APPLICATION_NAME}`, 'Operation cancelled', 'error');
             }
         });
-        
+
     }
 
     //..........DOCUMENT UPLOAD AND MANAGEMENT SECTION...................
-    @ViewChild('fileInput', {static: false}) fileInput: any;
+    @ViewChild('fileInput', { static: false }) fileInput: any;
     @Input() moduleId: number;
     @Input() moduleReferenceNumber: number;
 
     uploadFile(sourceId): boolean {
         if (this.file != undefined || this.uploadFileTitle != null) {
-            
+
             let body = {
 
                 loanApplicationId: this.loanSelection.loanApplicationId,
@@ -1075,7 +1391,7 @@ export class InitiateLoanBookingComponent implements OnInit {
                     return true;
 
                 } else {
-                    
+
                     return false;
                 }
 
@@ -1094,12 +1410,12 @@ export class InitiateLoanBookingComponent implements OnInit {
         return regex.exec(name)[1];
     }
 
-    getLoanCustomerAccounts( customerId:number) {
-        this.loadingSrv.show();        
+    getLoanCustomerAccounts(customerId: number) {
+        this.loadingSrv.show();
         this.casaSrv.getAllCustomerAccountByCustomerId(customerId).subscribe((data) => {
             this.loadingSrv.hide();
             this.customerAccounts = data.result;
-        }, err => { 
+        }, err => {
             this.loadingSrv.hide(1000);
         });
     }
@@ -1107,11 +1423,11 @@ export class InitiateLoanBookingComponent implements OnInit {
     onCustomerAccountChange(id): void {
         let account = this.customerAccounts.filter(x => x.casaAccountId == id);
 
-        if (this.loanSelection.currencyId != account[0].currencyId){
-            swal('Fintrak Credit 360','You need a ' + this.loanSelection.currencyCode + ' account for this transaction.');
+        if (this.loanSelection.currencyId != account[0].currencyId) {
+            swal('Fintrak Credit 360', 'You need a ' + this.loanSelection.currencyCode + ' account for this transaction.');
             this.initiationForm.controls['casaAccountId'].setValue("");
         }
-        else if ((Number(id) > 0 && id != null)){
+        else if ((Number(id) > 0 && id != null)) {
             this.casaAccountSelected = true;
         }
         // else{
@@ -1134,19 +1450,19 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.isCommercialLoan = false;
         this.isForeignExchangeLoan = false;
         this.showBeneficiary = false;
-        this.isIDF=false;
-        this.submitEvent =0;
+        this.isIDF = false;
+        this.submitEvent = 0;
         this.casaAccount2Text = '';
-        if(this.multiplefacilities != null) {
+        if (this.multiplefacilities != null) {
             this.multiplefacilities.splice(0);
         }
-         
-        this.drawdownFacilitiesInformation.splice(0); 
+
+        this.drawdownFacilitiesInformation.splice(0);
         this.isMultipleDrawdown = false;
         this.showProceedButtton = false;
         this.casaAccountText = 'Customer Account';
 
-        
+
     }
 
     initializeControls() {
@@ -1157,22 +1473,22 @@ export class InitiateLoanBookingComponent implements OnInit {
             amountToBook: ['', Validators.compose([ValidationService.isNumber, Validators.required])],
             casaAccountId: ['', Validators.compose([ValidationService.isNumber, Validators.required])],
             casaAccountId2: [''],
-            productId:['', Validators.compose([ValidationService.isNumber, Validators.required])],
-            approvalStatusId : [''],
+            productId: ['', Validators.compose([ValidationService.isNumber, Validators.required])],
+            approvalStatusId: [''],
             loanBookingRequestId: [''],
             operationId: [''],
             racCategoryTypeId: [''],
-            comment:['', Validators.required],
+            comment: ['', Validators.required],
             isProjectRelated: [''],
             // fileInput: [null, Validators.required]
             //tenor: ['', Validators.compose([ValidationService.isNumber, Validators.required])],
-   
+
         });
 
-         this.cashBackForm = this.fb.group({
+        this.cashBackForm = this.fb.group({
             background: ['', Validators.required],
             issues: ['', Validators.required],
-            request: ['', Validators.required],  
+            request: ['', Validators.required],
         });
 
         this.nextLevelId = null;
@@ -1193,7 +1509,7 @@ export class InitiateLoanBookingComponent implements OnInit {
             this.selectedDocument = doc.documentTitle;
             this.displayDocument = true;
         }
-      
+
     }
 
     DownloadDocument(id: number) {
@@ -1208,7 +1524,7 @@ export class InitiateLoanBookingComponent implements OnInit {
             for (var i = 0; i < byteString.length; i++) {
                 ia[i] = byteString.charCodeAt(i);
             }
-            
+
             var bb = new Blob([ab]);
 
             if (this.myDocExtention == 'jpg' || this.myDocExtention == 'jpeg') {
@@ -1277,26 +1593,26 @@ export class InitiateLoanBookingComponent implements OnInit {
         }
     }
 
-   
+
     hideMessage(event) {
         this.show = false;
     }
-    
+
     data: any = {};
     setNumberOfUploads(event) {
         this.numberOfUploadedFiles = event;
     }
 
-    contentChange(updates) { 
-         this.ckEditorContent = updates; 
+    contentChange(updates) {
+        this.ckEditorContent = updates;
     }
-  
+
     getDrawdownMemoHtml(targetId) {
         this.camService.getDrawdownMemoHtml(targetId).subscribe((response: any) => {
             if (response.result == null) return;
             this.drawdownHtml = response.result;
         }, (err) => {
-           
+
         });
     }
 
@@ -1305,7 +1621,7 @@ export class InitiateLoanBookingComponent implements OnInit {
             if (response.result == null) return;
             this.cashBackHtml = response.result;
         }, (err) => {
-           
+
         });
     }
 
@@ -1314,35 +1630,35 @@ export class InitiateLoanBookingComponent implements OnInit {
         this.displayTestReport = true;
         this.displayReport = true;
         let path = '';
-          this.camService.getDrawdownMemoPdf(this.loanSelection.applicationReferenceNumber).subscribe((response: any) => {
-                  path = response.result;
-                  this.reportSrc = this.sanitizer.bypassSecurityTrustResourceUrl(path);
-              });
-          return;
-      }
+        this.camService.getDrawdownMemoPdf(this.loanSelection.applicationReferenceNumber).subscribe((response: any) => {
+            path = response.result;
+            this.reportSrc = this.sanitizer.bypassSecurityTrustResourceUrl(path);
+        });
+        return;
+    }
 
 
-    categoryTeirs:any;
+    categoryTeirs: any;
     getRacCategoryTeirs(productId) {
         this.productService.GetRacCategoryTeirs(productId).subscribe((res) => {
             this.categoryTeirs = res.result;
 
             if (this.categoryTeirs.length == 0) {
-                this.initiationForm .controls['racCategoryTypeId'].clearValidators()
-                this.initiationForm .controls['racCategoryTypeId'].updateValueAndValidity()
+                this.initiationForm.controls['racCategoryTypeId'].clearValidators()
+                this.initiationForm.controls['racCategoryTypeId'].updateValueAndValidity()
             } else {
                 //this.showCategoryTypeInput = true;
-                
-                this.initiationForm .controls['racCategoryTypeId'].setValidators([Validators.required])
-                this.initiationForm .controls['racCategoryTypeId'].updateValueAndValidity()
+
+                this.initiationForm.controls['racCategoryTypeId'].setValidators([Validators.required])
+                this.initiationForm.controls['racCategoryTypeId'].updateValueAndValidity()
             }
-                        
+
         }, (err) => {
         });
     }
 
     getRacForRacCategoryType(id) {
-        this.productService.RacCategoryTypeExist(this.productId,id).subscribe((res) => {
+        this.productService.RacCategoryTypeExist(this.productId, id).subscribe((res) => {
             let exit = res.result;
 
             if (exit == true) {
@@ -1352,46 +1668,46 @@ export class InitiateLoanBookingComponent implements OnInit {
                 this.initiationForm.controls['racCategoryTypeId'].updateValueAndValidity();
 
             } else {
-               // this.proposedProductId = 1223100;
+                // this.proposedProductId = 1223100;
             }
 
 
         }, (err) => {
-            });
-        
-        
-            
-    }
-    
-formatFeeValue() {
-    this.data.bookingAmount = this.initiationForm.value.amountToBook;
+        });
 
-    if (this.data.bookingAmount == '' || this.data.bookingAmount == null || this.data.bookingAmount == undefined) return;
-    var realChar: string = this.data.bookingAmount;
-    var currVal: string = this.data.bookingAmount.substr(-1);
-    if(currVal === 'M' || currVal === 'm' || currVal === 't' || currVal === 'T' || currVal === 'k' || currVal === 'K' || currVal === 'b' || currVal === 'B'){
-        realChar = realChar.substr(0, realChar.length - 1 );
-    }
-    else{
-        realChar = realChar.substr(0, realChar.length );
-    }
-    
-    currVal = currVal.substr(-1);
 
-    if (currVal === 'M' || currVal == 'm') {
-        let result: Number = Number(realChar) * 1000000;
-        this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
-    } else if (currVal === 'T' || currVal == 't' || currVal === 'K' || currVal === 'k') {
-        let result: Number = Number(realChar) * 1000;
-        this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
-    } else if (currVal === 'b' || currVal === 'B') {
-        let result: Number = Number(realChar) * 1000000000;
-        this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
-    } else {
-        let result: Number = Number(realChar);
-        this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+
     }
-}
+
+    formatFeeValue() {
+        this.data.bookingAmount = this.initiationForm.value.amountToBook;
+
+        if (this.data.bookingAmount == '' || this.data.bookingAmount == null || this.data.bookingAmount == undefined) return;
+        var realChar: string = this.data.bookingAmount;
+        var currVal: string = this.data.bookingAmount.substr(-1);
+        if (currVal === 'M' || currVal === 'm' || currVal === 't' || currVal === 'T' || currVal === 'k' || currVal === 'K' || currVal === 'b' || currVal === 'B') {
+            realChar = realChar.substr(0, realChar.length - 1);
+        }
+        else {
+            realChar = realChar.substr(0, realChar.length);
+        }
+
+        currVal = currVal.substr(-1);
+
+        if (currVal === 'M' || currVal == 'm') {
+            let result: Number = Number(realChar) * 1000000;
+            this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        } else if (currVal === 'T' || currVal == 't' || currVal === 'K' || currVal === 'k') {
+            let result: Number = Number(realChar) * 1000;
+            this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        } else if (currVal === 'b' || currVal === 'B') {
+            let result: Number = Number(realChar) * 1000000000;
+            this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        } else {
+            let result: Number = Number(realChar);
+            this.data.bookingAmount = (result.toLocaleString('en-US', { minimumFractionDigits: 2 }));
+        }
+    }
 
 
     timeAgo(time) {
@@ -1447,17 +1763,17 @@ formatFeeValue() {
     }
 
     lienIsSatisfied(event) {
-       
+
         this.allLiensArePlaced = event;
     }
 
     fetchAndAddCustomerAccounts() {
         this.loadingSrv.show();
         this.customerService.fetchAndAddCustomerAccounts(this.loanSelection.customerId).subscribe((response: any) => {
-            if(response.success) {
+            if (response.success) {
                 swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
             }
-            else if (response.errorCode == "99"){
+            else if (response.errorCode == "99") {
                 swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'info');
             }
             else {
@@ -1488,27 +1804,27 @@ formatFeeValue() {
     showBeneficiary: Boolean;
     requestCustomerId: any;
     pickSearchedApprover(data) {
-        if(this.displayApproverSearchForm == true){
-            if (data.secondName == undefined){
+        if (this.displayApproverSearchForm == true) {
+            if (data.secondName == undefined) {
                 this.selectedApprover = data.staffCode + ' -- ' + data.firstName + ' ' + data.lastName;
-            }else{
-            this.selectedApprover = data.staffCode + ' -- ' + data.firstName + ' ' + data.secondName + ' ' + data.lastName;
+            } else {
+                this.selectedApprover = data.staffCode + ' -- ' + data.firstName + ' ' + data.secondName + ' ' + data.lastName;
             }
-        this.toStaffId = data.staffId;
-        this.displayApproverSearchForm = false;
+            this.toStaffId = data.staffId;
+            this.displayApproverSearchForm = false;
 
-        }else if(this.displayMemberSearchForm == true){
-                if(data.lastName == null)data.lastName='';
-                if(data.secondName ==null)data.secondName='';
-                if (data.secondName == undefined)
-                    this.selectedBeneficiary = data.customerCode + ' -- ' + data.firstName + ' ' + data.lastName;
-                else
-                    this.selectedBeneficiary = data.customerCode + ' -- ' + data.firstName + ' ' + data.secondName + ' ' + data.lastName;
-                this.requestCustomerId = data.customerId;
-                this.displayMemberSearchForm = false;
-                this.showBeneficiary = true;
-                this.customerService.fetchAndAddCustomerAccounts(data.customerId).subscribe((response: any) => {});
-        }else if(this.displayCustomerSearchForm == true){
+        } else if (this.displayMemberSearchForm == true) {
+            if (data.lastName == null) data.lastName = '';
+            if (data.secondName == null) data.secondName = '';
+            if (data.secondName == undefined)
+                this.selectedBeneficiary = data.customerCode + ' -- ' + data.firstName + ' ' + data.lastName;
+            else
+                this.selectedBeneficiary = data.customerCode + ' -- ' + data.firstName + ' ' + data.secondName + ' ' + data.lastName;
+            this.requestCustomerId = data.customerId;
+            this.displayMemberSearchForm = false;
+            this.showBeneficiary = true;
+            this.customerService.fetchAndAddCustomerAccounts(data.customerId).subscribe((response: any) => { });
+        } else if (this.displayCustomerSearchForm == true) {
             this.selectedBeneficiary = data.customerCode + ' -- ' + data.customerName;
             this.requestCustomerId = data.customerId;
             this.initiationForm.controls['casaAccountId'].reset();
@@ -1516,11 +1832,11 @@ formatFeeValue() {
             this.displayCustomerSearchForm = false;
             this.showBeneficiary = true;
         }
-        
+
     }
 
-    refreshDoc(event){
-        if(event){
+    refreshDoc(event) {
+        if (event) {
             this.reloadDocs += 1;
         }
     }
@@ -1552,11 +1868,11 @@ formatFeeValue() {
                     });
             });
 
-            fromEvent(this.customerInPut.nativeElement, 'keyup').pipe(
-                debounceTime(150),
-                distinctUntilChanged(),)
-                .subscribe(() => {
-            this.customerService.searchAllCustomerRealtime(this.customerInPut.nativeElement.value).subscribe(results => {
+        fromEvent(this.customerInPut.nativeElement, 'keyup').pipe(
+            debounceTime(150),
+            distinctUntilChanged(),)
+            .subscribe(() => {
+                this.customerService.searchAllCustomerRealtime(this.customerInPut.nativeElement.value).subscribe(results => {
                     if (results != null) {
                         this.customers = results.result;
                     }
@@ -1565,26 +1881,26 @@ formatFeeValue() {
     }
 
     // ========================== project risk rating ========================
-      
+
     getAllProjectRiskRatingCriteria(): void {
         this.camService.getAllProjectriskRatingCriteria().subscribe((response: any) => {
-          this.projectRiskRatings = response.result;
-          this.initializeProjectRiskRatingForm();
+            this.projectRiskRatings = response.result;
+            this.initializeProjectRiskRatingForm();
         });
-     }
-
-      initializeProjectRiskRatingForm() {
-        if (this.projectRiskRatings == null || this.projectRiskRatings == {} || this.projectRiskRatings == undefined) return;
-        let formControls = {}; 
-            for (let f of this.projectRiskRatings) {
-                formControls[f.categoryId] = new FormControl("", Validators.required);
-                formControls["projectLocation"] = new FormControl("", Validators.required);
-                formControls["projectDetails"] = new FormControl("", Validators.required);
-            }
-            this.projectRiskRatingForm = this.fb.group(formControls);
     }
 
-    submitProjectRiskRatingForm(formValues){
+    initializeProjectRiskRatingForm() {
+        if (this.projectRiskRatings == null || this.projectRiskRatings == {} || this.projectRiskRatings == undefined) return;
+        let formControls = {};
+        for (let f of this.projectRiskRatings) {
+            formControls[f.categoryId] = new FormControl("", Validators.required);
+            formControls["projectLocation"] = new FormControl("", Validators.required);
+            formControls["projectDetails"] = new FormControl("", Validators.required);
+        }
+        this.projectRiskRatingForm = this.fb.group(formControls);
+    }
+
+    submitProjectRiskRatingForm(formValues) {
         this.loadingSrv.show();
         let entries = this.initiationForm.value;
         let form = formValues.value;
@@ -1599,54 +1915,54 @@ formatFeeValue() {
         this.camService.forwardProjectRiskRating(body).subscribe((response: any) => {
             if (response.success == true) {
                 this.success(response.message);
-                this.displayProjectRiskRatingModal=false; 
-                this.getAllProjectRiskRating(this.loanSelection.loanApplicationId, this.loanSelection.loanApplicationDetailId,entries.loanBookingRequestId);
-                this.getAllProjectRiskRatingComputation(this.applicationSelection.applicationReferenceNumber, this.applicationSelection.customerId,entries.loanBookingRequestId);
-                
+                this.displayProjectRiskRatingModal = false;
+                this.getAllProjectRiskRating(this.loanSelection.loanApplicationId, this.loanSelection.loanApplicationDetailId, entries.loanBookingRequestId);
+                this.getAllProjectRiskRatingComputation(this.applicationSelection.applicationReferenceNumber, this.applicationSelection.customerId, entries.loanBookingRequestId);
+
             }
         }, (err: any) => {
             this.finishBad(JSON.stringify(err));
-        });  
+        });
     }
 
-    
-    getAllProjectRiskRating(loanApplicationId, loanApplicationDetailId,loanBookingRequestId): void {
-        this.camService.getAllProjectRiskRating(loanApplicationId, loanApplicationDetailId,loanBookingRequestId).subscribe((response: any) => {
-          this.projectRiskRatingss = response.result;
+
+    getAllProjectRiskRating(loanApplicationId, loanApplicationDetailId, loanBookingRequestId): void {
+        this.camService.getAllProjectRiskRating(loanApplicationId, loanApplicationDetailId, loanBookingRequestId).subscribe((response: any) => {
+            this.projectRiskRatingss = response.result;
         });
-      }
+    }
 
-      rating: number = 0;
-      computation: number = 0;
-      riskCategorisation: number = 0;
-      projectLocation: string = "";
-      projectDetails: string = ""; 
+    rating: number = 0;
+    computation: number = 0;
+    riskCategorisation: number = 0;
+    projectLocation: string = "";
+    projectDetails: string = "";
 
-      getAllProjectRiskRatingComputation(loanApplicationId, loanApplicationDetailId,loanBookingRequestId): void {
+    getAllProjectRiskRatingComputation(loanApplicationId, loanApplicationDetailId, loanBookingRequestId): void {
         this.loadingSrv.show();
         this.camService.getAllProjectRiskRatingComputation(loanApplicationId, loanApplicationDetailId).subscribe((response: any) => {
             this.loadingSrv.hide();
             this.projectRiskRatingComputation = response.result;
-            if (!isNullOrUndefined(this.projectRiskRatingComputation) && this.projectRiskRatingComputation.length > 0){
+            if (!isNullOrUndefined(this.projectRiskRatingComputation) && this.projectRiskRatingComputation.length > 0) {
                 this.computation = this.projectRiskRatingComputation[0].computation;
                 this.customerTier = this.projectRiskRatingComputation[0].customerTier;
                 this.riskCategorisation = this.projectRiskRatingComputation[0].riskCategorisation;
                 this.projectLocation = this.projectRiskRatingComputation[0].projectLocation;
                 this.projectDetails = this.projectRiskRatingComputation[0].projectDetails;
-                if(this.customerTier >= 80){
+                if (this.customerTier >= 80) {
                     this.rating = 25;
-                }else if(this.customerTier >= 60 && this.customerTier <=79){
-                this.rating = 20;
-                }else{
-                this.rating = 10;
+                } else if (this.customerTier >= 60 && this.customerTier <= 79) {
+                    this.rating = 20;
+                } else {
+                    this.rating = 10;
                 }
             }
-            
+
         }, (err: any) => {
             this.finishBad(JSON.stringify(err));
-        }); 
-      }
-      
+        });
+    }
+
     success(message) {
         this.loadingSrv.hide();
         this.showMessage(message, 'success', "FintrakBanking");

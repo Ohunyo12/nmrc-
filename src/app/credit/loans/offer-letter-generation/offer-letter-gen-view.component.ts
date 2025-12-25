@@ -114,7 +114,32 @@ export class OfferLetterGenererationReviewComponent implements OnInit {
     maxZoom: number = 3;
     minZoom: number = 1;
     selectedLoan: IAppraisal | null = null;
-    ;
+
+    // checklist dashboard
+    // Checklist summary properties for selected individual loan
+    checklistSummary: {
+        total: number;
+        yes: number;
+        no: number;
+        waived: number;
+        deferred: number;
+        yesPercent: number;
+        noPercent: number;
+        waivedPercent: number;
+        deferredPercent: number;
+    } = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+    isLoadingChecklistSummary: boolean = false;
+
     constructor(
         private loadingService: LoadingService,
         private _loadingService: LoadingService,
@@ -295,11 +320,13 @@ export class OfferLetterGenererationReviewComponent implements OnInit {
         //this.print();
         //this.loadingService.hide(5000)
 
-          
+
         // Fetch UUS checklist for the selected loan's reference number
         if (this.applicationSelection.applicationReferenceNumber) {
-          this.fetchCustomerUusItems(this.applicationSelection.applicationReferenceNumber);
+            this.fetchCustomerUusItems(this.applicationSelection.applicationReferenceNumber);
         }
+
+        this.fetchChecklistSummaryForLoan(this.applicationSelection.applicationReferenceNumber);
     }
 
     // =========================== Fetch Obligor's Items ===============================
@@ -481,7 +508,94 @@ export class OfferLetterGenererationReviewComponent implements OnInit {
         this.zoomLevel = 1;
     }
 
-     // =========================== END ==============================================
+    // =========================== END ==============================================
+
+    // ============================ Checklist Dashboard ===============================
+
+    fetchChecklistSummaryForLoan(nhfNumber: string): void {
+        if (!nhfNumber) {
+            return;
+        }
+
+        this.isLoadingChecklistSummary = true;
+        this.checklistSummary = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+            response => {
+                if (response && response.success && Array.isArray(response.result)) {
+                    this.calculateChecklistSummary(response.result);
+                }
+                this.isLoadingChecklistSummary = false;
+            },
+            error => {
+                console.error(`Error fetching checklist for ${nhfNumber}:`, error);
+                this.isLoadingChecklistSummary = false;
+            }
+        );
+    }
+
+    calculateChecklistSummary(checklistItems: any[]): void {
+        const total = checklistItems.length;
+
+        if (total === 0) {
+            this.checklistSummary = {
+                total: 0,
+                yes: 0,
+                no: 0,
+                waived: 0,
+                deferred: 0,
+                yesPercent: 0,
+                noPercent: 0,
+                waivedPercent: 0,
+                deferredPercent: 0
+            };
+            return;
+        }
+
+        // Count items by option
+        const yes = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 1 || option === 'Yes' || option === '1';
+        }).length;
+
+        const no = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 2 || option === 'No' || option === '2';
+        }).length;
+
+        const waived = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 3 || option === 'Waiver' || option === 'Waived' || option === '3';
+        }).length;
+
+        const deferred = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 4 || option === 'Deferred' || option === 'Defer' || option === '4';
+        }).length;
+
+        this.checklistSummary = {
+            total,
+            yes,
+            no,
+            waived,
+            deferred,
+            yesPercent: total > 0 ? Math.round((yes / total) * 100) : 0,
+            noPercent: total > 0 ? Math.round((no / total) * 100) : 0,
+            waivedPercent: total > 0 ? Math.round((waived / total) * 100) : 0,
+            deferredPercent: total > 0 ? Math.round((deferred / total) * 100) : 0
+        };
+    }
+    //============================ END CHECKLIST STATISTICS ===============================================
 
     closeDetailsPanel(evt) {
         evt.preventDefault();

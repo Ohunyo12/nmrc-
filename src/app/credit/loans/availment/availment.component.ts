@@ -62,9 +62,9 @@ export class LoanAvailmentComponent implements OnInit {
     isSBURouting: boolean;
     isRounRobin: boolean;
     isUserCreditAmin: boolean = false;
-    assignedApplications: any[] =[];
+    assignedApplications: any[] = [];
 
-    loanApprovalData: any[] =[];
+    loanApprovalData: any[] = [];
     LoancrmsModal: boolean = false;
     crmsLoanTypeForm: FormGroup;
     selectedLoanRecord: any = null;
@@ -122,8 +122,8 @@ export class LoanAvailmentComponent implements OnInit {
     disableApprovalBtn: boolean;
     approvedApplicationDetails: any[];
     proposedApplicationDetails: any[];
-    customerId:any;
-    loanApplicationDetailId:any;
+    customerId: any;
+    loanApplicationDetailId: any;
     selectedCollateral: any[] = [];
     totalCollateralAmount: number = 0;
 
@@ -131,7 +131,7 @@ export class LoanAvailmentComponent implements OnInit {
     selectedRecord: any = {}; rmCamDocument: any = {};
     displayOfferLetter = false;
     displayLoanDetails = false; isCAMBased: boolean;
-    fetchingAvailmentUtilizationTicket : boolean = false;
+    fetchingAvailmentUtilizationTicket: boolean = false;
     getAvailmentUtilizationTicketData: any;
 
     collateralTypeId: any;
@@ -147,14 +147,14 @@ export class LoanAvailmentComponent implements OnInit {
     files: FileList;
     file: File;
     supportingDocuments: any[] = [];
-    @ViewChild('fileInput', {static: false}) fileInput: any;
+    @ViewChild('fileInput', { static: false }) fileInput: any;
     binaryFile: string;
     selectedDocument: string;
     displayDocument: boolean = false;
 
     activeIndex = 0;
-    readonly CREDITAPPRIASALDOC: string ="CREDIT APPRAISAL DOCUMENTS";
-    readonly DRAWDOWNDOC: string ="DRAWDOWN DOCUMENTS";
+    readonly CREDITAPPRIASALDOC: string = "CREDIT APPRAISAL DOCUMENTS";
+    readonly DRAWDOWNDOC: string = "DRAWDOWN DOCUMENTS";
     finalApprovalLevel = false; displayApprovalModal = false; firstApprovalLevel = false;
     middleApprovalLevel = false;
 
@@ -205,7 +205,7 @@ export class LoanAvailmentComponent implements OnInit {
     collateralStampToCoverValues: any = [];
     allAreLiensPLaced = false;
 
-    userisAnalyst:boolean = false;
+    userisAnalyst: boolean = false;
     userIsRelationshipManager = false;
     userIsAccountOfficer = false;
     staffRoleRecord: any;
@@ -225,33 +225,58 @@ export class LoanAvailmentComponent implements OnInit {
     maxZoom: number = 3;
     minZoom: number = 1;
     selectedLoan: IAppraisal | null = null;
-    
+
+    // checklist dashboard
+    // Checklist summary properties for selected individual loan
+    checklistSummary: {
+        total: number;
+        yes: number;
+        no: number;
+        waived: number;
+        deferred: number;
+        yesPercent: number;
+        noPercent: number;
+        waivedPercent: number;
+        deferredPercent: number;
+    } = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+    isLoadingChecklistSummary: boolean = false;
+
 
     //     { collateralCode: "12345", collateralTypeName: 'name 1', stampToCover: '2345678909876'},
     //     { collateralCode: "123245", collateralTypeName: 'name 123', stampToCover: '2345678909876'},
     // ];
 
-    @ViewChild(CollateralInformationViewComponent, {static: false}) CollateralInfoObj: CollateralInformationViewComponent;
-    @ViewChild(CustomerInformationDetailComponent, {static: false}) customerInfo: CustomerInformationDetailComponent;
-    @ViewChild(LoanApplicationDetailsViewComponent, {static: false}) loanInfo: LoanApplicationDetailsViewComponent;
+    @ViewChild(CollateralInformationViewComponent, { static: false }) CollateralInfoObj: CollateralInformationViewComponent;
+    @ViewChild(CustomerInformationDetailComponent, { static: false }) customerInfo: CustomerInformationDetailComponent;
+    @ViewChild(LoanApplicationDetailsViewComponent, { static: false }) loanInfo: LoanApplicationDetailsViewComponent;
     // @ViewChild(LoanChecklistComponent) loanCheckList: LoanChecklistComponent;
 
     constructor(
-        private _loadingService: LoadingService, 
+        private _loadingService: LoadingService,
         private _fb: FormBuilder,
-        private _loanApplServ: LoanApplicationService, 
-        private _creditApprServ: CreditAppraisalService, 
+        private _loanApplServ: LoanApplicationService,
+        private _creditApprServ: CreditAppraisalService,
         private _genSetupService: GeneralSetupService,
-        private _loanServ: LoanService, 
+        private _loanServ: LoanService,
         private _customerService: CustomerService,
-        private loanBookingService: LoanService, 
-        private reportServ: ReportService, 
+        private loanBookingService: LoanService,
+        private reportServ: ReportService,
         private sanitizer: DomSanitizer,
         private creditApprovalService: CreditApprovalService,
         private loadingService: LoadingService,
         //private camService: CreditAppraisalService,
         private staffRole: StaffRoleService,
-        private underwritingService: UnifiedUnderwritingStandardService    
+        private underwritingService: UnifiedUnderwritingStandardService
     ) {
 
         this.loanBookingService.searchForCustomer(this.searchTerm$)
@@ -263,7 +288,7 @@ export class LoanAvailmentComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.jobSourceId  = JobSource.LoanApplicationDetail;
+        this.jobSourceId = JobSource.LoanApplicationDetail;
         // this.getApprovedLoanApplicationsDueForAvailment();
         this.getInitiatedLoansAwaitingApproval();
         this.getCRMSRepaymentType();
@@ -287,7 +312,7 @@ export class LoanAvailmentComponent implements OnInit {
             if (response.result == null) return;
             this.cashBackHtml = response.result;
         }, () => {
-           
+
         });
     }
 
@@ -295,34 +320,34 @@ export class LoanAvailmentComponent implements OnInit {
     contentChange(updates) { this.ckeditorChanges = updates; }
 
     getUserRole() {
-        this.staffRole.getStaffRoleByStaffId().subscribe((res)=>{
+        this.staffRole.getStaffRoleByStaffId().subscribe((res) => {
             this.staffRoleRecord = res.result;
-                if(this.staffRoleRecord.staffRoleCode == 'AO' || this.staffRoleRecord.staffRoleCode == 'AO / RO') { 
-                    this.userIsAccountOfficer = true; 
-                }
-                if(this.staffRoleRecord.staffRoleCode == 'RM' || this.staffRoleRecord.staffRoleCode == 'RM / BM') { 
-                    this.userIsRelationshipManager = true; 
-                }
+            if (this.staffRoleRecord.staffRoleCode == 'AO' || this.staffRoleRecord.staffRoleCode == 'AO / RO') {
+                this.userIsAccountOfficer = true;
+            }
+            if (this.staffRoleRecord.staffRoleCode == 'RM' || this.staffRoleRecord.staffRoleCode == 'RM / BM') {
+                this.userIsRelationshipManager = true;
+            }
 
-                if(this.staffRoleRecord.staffRoleShortCode == 'LEGAL') {
-                    this.isUserLegal = true;
-                }
-                else {
-                    this.isUserLegal = false;
-                }
-                if (this.staffRoleRecord.staffRoleShortCode == 'CREDIT ADMIN') {
-                    this.isUserCreditAmin = true;
-                }
-                if(this.staffRoleRecord.allocationTypeId  == JobAllocationStatusEnum.SBUROUTING){ this.isSBURouting = true;}
+            if (this.staffRoleRecord.staffRoleShortCode == 'LEGAL') {
+                this.isUserLegal = true;
+            }
+            else {
+                this.isUserLegal = false;
+            }
+            if (this.staffRoleRecord.staffRoleShortCode == 'CREDIT ADMIN') {
+                this.isUserCreditAmin = true;
+            }
+            if (this.staffRoleRecord.allocationTypeId == JobAllocationStatusEnum.SBUROUTING) { this.isSBURouting = true; }
 
-                if(this.staffRoleRecord.allocationTypeId  == JobAllocationStatusEnum.RoundRobin){ this.isRounRobin = true;}
-    
-                if(this.staffRoleRecord.allocationTypeId  == JobAllocationStatusEnum.POOL){ this.isPoolRequest = true;}
-                
-            });
-           
+            if (this.staffRoleRecord.allocationTypeId == JobAllocationStatusEnum.RoundRobin) { this.isRounRobin = true; }
+
+            if (this.staffRoleRecord.allocationTypeId == JobAllocationStatusEnum.POOL) { this.isPoolRequest = true; }
+
+        });
+
     }
-    
+
 
     validateInsurancePolicy(insurancepolicyRecord) {
         // if (insurancepolicyRecord != null && insurancepolicyRecord != undefined && insurancepolicyRecord.isPolicyInformationConfirmed == true) {
@@ -362,15 +387,15 @@ export class LoanAvailmentComponent implements OnInit {
         this._loadingService.show();
         this._loanServ.getInitiatedLoansAwaitingApproval().subscribe((response: any) => {
             this.loanApprovalData = response.result;
-            if(this.isPoolRequest == true){ 
-                this.assignedApplications = this.loanApprovalData.filter(x=>x.toStaffId != null);   
-                if(this.assignedApplications != null && this.assignedApplications != undefined)this.assignedApplications.slice; 
-            
+            if (this.isPoolRequest == true) {
+                this.assignedApplications = this.loanApprovalData.filter(x => x.toStaffId != null);
+                if (this.assignedApplications != null && this.assignedApplications != undefined) this.assignedApplications.slice;
+
                 // COMMENT IF YOU NEED TO SHOW ASSIGNED JOBS ON GENERAL POOL
-                this.loanApprovalData = this.loanApprovalData.filter(x=>x.toStaffId == null);
+                this.loanApprovalData = this.loanApprovalData.filter(x => x.toStaffId == null);
             }
-            
-            if(this.isPoolRequest == false || this.isPoolRequest == null){
+
+            if (this.isPoolRequest == false || this.isPoolRequest == null) {
                 this.assignedApplications = this.loanApprovalData;
                 this.assignedApplications.slice;
             }
@@ -434,13 +459,13 @@ export class LoanAvailmentComponent implements OnInit {
     getTrancheDetail(id): void {
         this._loadingService.show();
         this._creditApprServ.getTrancheDetail(id).subscribe((response: any) => {
-        this.proposedApplicationDetails = response.result.facilities;
-          this.approvedApplicationDetails = this.proposedApplicationDetails.filter(x => x.statusId == ApprovalStatus.APPROVED);
-          this._loadingService.hide();
+            this.proposedApplicationDetails = response.result.facilities;
+            this.approvedApplicationDetails = this.proposedApplicationDetails.filter(x => x.statusId == ApprovalStatus.APPROVED);
+            this._loadingService.hide();
         }, () => {
-          this._loadingService.hide(1000);
+            this._loadingService.hide(1000);
         });
-      }
+    }
 
     resetCollateralForm() {
         this.collateralForm = this._fb.group({
@@ -606,21 +631,21 @@ export class LoanAvailmentComponent implements OnInit {
         this.applicationSelection = rowData;
         this.getTrancheDetail(this.applicationSelection.loanBookingRequestId);
         this.customerId = rowData.customerId;
-        this.getCollateralStampToCoverValues(); 
+        this.getCollateralStampToCoverValues();
         this.getTotalExposureLimit(rowData);
         this.loanApplicationDetailId = rowData.loanApplicationDetailId;
-        
+
         this.getDrawdownMemoHtml(rowData.loanBookingRequestId);
         this.getCashBackMemoHtml(this.applicationSelection.operationId, this.applicationSelection.loanApplicationDetailId);
         this.OLApplicationReferenceNumber = rowData.applicationReferenceNumber
 
         // Log the entire applicationSelection object to check for nhfNumber
-    console.log('Selected Application Data:', this.applicationSelection);
-    
-    // Specifically check for nhfNumber or employeeNhfNumber
-    console.log('nhfNumber:', this.applicationSelection.nhfNumber);
-    console.log('employeeNhfNumber:', this.applicationSelection.applicationReferenceNumber);
-    
+        console.log('Selected Application Data:', this.applicationSelection);
+
+        // Specifically check for nhfNumber or employeeNhfNumber
+        console.log('nhfNumber:', this.applicationSelection.nhfNumber);
+        console.log('employeeNhfNumber:', this.applicationSelection.applicationReferenceNumber);
+
         if (!rowData.approvalDate == null) {
             let approvalDate = new Date(rowData.approvalDate);
             let todayDate = new Date();
@@ -631,14 +656,14 @@ export class LoanAvailmentComponent implements OnInit {
         this.getAllCRMSCollateralType();
         this.selectedRecord = rowData;
 
-        
+
         this.updateWorkflowTarget();
         this.collateralDataList = this.selectedRecord.loanApplicationCollateral;
         this.productId = this.selectedRecord.productId;
         const target = rowData;
         this._loadingService.show();
         this.displayShowCustInfo = true;
-        
+
         //this.referBack();
         this._loanApplServ.getLoanApplicationDetailsByApplicationId(this.selectedRecord.loanApplicationId)
             .subscribe((response: any) => {
@@ -756,88 +781,90 @@ export class LoanAvailmentComponent implements OnInit {
 
         // Fetch UUS checklist for the selected loan's reference number
         if (this.applicationSelection.applicationReferenceNumber) {
-          this.fetchCustomerUusItems(this.applicationSelection.applicationReferenceNumber);
+            this.fetchCustomerUusItems(this.applicationSelection.applicationReferenceNumber);
         }
+
+        this.fetchChecklistSummaryForLoan(this.applicationSelection.applicationReferenceNumber);
     }
 
 
-     // =========================== Fetch Obligor's Items ===============================
-        
-          getRowStyle(rowData: any): any {
-            if (rowData.option === 'Yes') {
-              return { 'background-color': '#28a745', 'color': '#fff' }; // Deep green
-            } else if (rowData.option === 'No') {
-              return { 'background-color': '#dc3545', 'color': '#fff' }; // Deep red
-            } else {
-              return {};
-            }
-          }     
-          
-          fetchCustomerUusItems(nhfNumber: string): void {
-            console.error('nhf number:', nhfNumber);
-            this.loadingService.show();
-            this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
-              response => {
+    // =========================== Fetch Obligor's Items ===============================
+
+    getRowStyle(rowData: any): any {
+        if (rowData.option === 'Yes') {
+            return { 'background-color': '#28a745', 'color': '#fff' }; // Deep green
+        } else if (rowData.option === 'No') {
+            return { 'background-color': '#dc3545', 'color': '#fff' }; // Deep red
+        } else {
+            return {};
+        }
+    }
+
+    fetchCustomerUusItems(nhfNumber: string): void {
+        console.error('nhf number:', nhfNumber);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+            response => {
                 this.uwsList = (response.result || []).map(uws => ({
-                  ...uws,
-                  option: this.mapOptionToEnum(uws.option),
-                  deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
+                    ...uws,
+                    option: this.mapOptionToEnum(uws.option),
+                    deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
                 }));
                 console.log('Processed UUS List:', this.uwsList);
                 //this.cdr.detectChanges();
-              },
-              error => {
+            },
+            error => {
                 console.error('Error fetching UWS list:', error);
                 this.uwsList = [];
                 this.loadingService.hide();
-              },
-              () => this.loadingService.hide()
-            );
-          }
-        
-          mapOptionToEnum(option: number): string {
-            const mapping: { [key: number]: string } = {
-              1: 'Yes',
-              2: 'No',
-              3: 'Waiver',
-              4: 'Deferred'
-            };
-            return mapping[option] || 'No';
-          }
-        
-          viewDocuments(uws: any): void {
-            console.log('Selected UWS:', uws);
-            if (!uws.employeeNhfNumber) {
-              swal('Error', 'No Employee NHF Number found!', 'error');
-              return;
-            }
-            if (!uws.itemId) {
-              swal('Error', 'No Item Found!', 'error');
-              return;
-            }
-            console.log('Fetching document for:', uws.employeeNhfNumber, uws.itemId);
-            this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
-          }
-        
-          private fetchAndPreviewDocument(employeeNumber: string, itemId: number): void {
-            console.log('Calling API with:', employeeNumber, itemId);
-            this.loadingService.show();
-            this.underwritingService.getCustomerUusItemDoc(employeeNumber, itemId).subscribe({
-              next: (response) => {
+            },
+            () => this.loadingService.hide()
+        );
+    }
+
+    mapOptionToEnum(option: number): string {
+        const mapping: { [key: number]: string } = {
+            1: 'Yes',
+            2: 'No',
+            3: 'Waiver',
+            4: 'Deferred'
+        };
+        return mapping[option] || 'No';
+    }
+
+    viewDocuments(uws: any): void {
+        console.log('Selected UWS:', uws);
+        if (!uws.employeeNhfNumber) {
+            swal('Error', 'No Employee NHF Number found!', 'error');
+            return;
+        }
+        if (!uws.itemId) {
+            swal('Error', 'No Item Found!', 'error');
+            return;
+        }
+        console.log('Fetching document for:', uws.employeeNhfNumber, uws.itemId);
+        this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
+    }
+
+    private fetchAndPreviewDocument(employeeNumber: string, itemId: number): void {
+        console.log('Calling API with:', employeeNumber, itemId);
+        this.loadingService.show();
+        this.underwritingService.getCustomerUusItemDoc(employeeNumber, itemId).subscribe({
+            next: (response) => {
                 console.log('API Response:', response);
                 if (!response.success || !response.result) {
-                  console.error('Invalid document data received');
-                  swal('Error', 'Invalid document data received.', 'error');
-                  this.loadingService.hide();
-                  return;
+                    console.error('Invalid document data received');
+                    swal('Error', 'Invalid document data received.', 'error');
+                    this.loadingService.hide();
+                    return;
                 }
                 const base64Data = response.result.split(',')[1];
                 const fileTypeMatch = response.result.match(/data:(.*?);base64/);
                 if (!base64Data || !fileTypeMatch) {
-                  console.error('Invalid Base64 format');
-                  swal('Error', 'Invalid document format.', 'error');
-                  this.loadingService.hide();
-                  return;
+                    console.error('Invalid Base64 format');
+                    swal('Error', 'Invalid document format.', 'error');
+                    this.loadingService.hide();
+                    return;
                 }
                 const fileType = fileTypeMatch[1];
                 console.log('Detected file type:', fileType);
@@ -847,102 +874,190 @@ export class LoanAvailmentComponent implements OnInit {
                 if (fileType.includes('image') || fileType === 'application/pdf' ||
                     fileType === 'application/vnd.openxmlformats-officedocument.w ordprocessingml.document' ||
                     fileType === 'application/msword') {
-                  this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-                  this.fileType = fileType;
-                  this.isPreviewModalVisible = true;
+                    this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+                    this.fileType = fileType;
+                    this.isPreviewModalVisible = true;
                 } else {
-                  swal('Error', 'Unsupported file type.', 'error');
+                    swal('Error', 'Unsupported file type.', 'error');
                 }
                 this.loadingService.hide();
-              },
-              error: (error) => {
+            },
+            error: (error) => {
                 console.error('Error fetching document:', error);
                 swal('Error', 'Error fetching document.', 'error');
                 this.loadingService.hide();
-              }
-            });
-          }
-        
-          private base64ToBlob(base64: string, contentType: string): Blob {
-            const byteCharacters = atob(base64);
-            const byteArrays = [];
-            for (let i = 0; i < byteCharacters.length; i += 512) {
-              const slice = byteCharacters.slice(i, i + 512);
-              const byteNumbers = new Array(slice.length);
-              for (let j = 0; j < slice.length; j++) {
+            }
+        });
+    }
+
+    private base64ToBlob(base64: string, contentType: string): Blob {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
+        for (let i = 0; i < byteCharacters.length; i += 512) {
+            const slice = byteCharacters.slice(i, i + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let j = 0; j < slice.length; j++) {
                 byteNumbers[j] = slice.charCodeAt(j);
-              }
-              byteArrays.push(new Uint8Array(byteNumbers));
             }
-            return new Blob(byteArrays, { type: contentType });
-          }
-        
-          getModalStyle() {
-            if (this.fileType === 'application/pdf' || this.fileType === 'application/msword' ||
-                this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-              return { width: '70%', height: '75vh' };
-            } else {
-              return { width: '55%', height: '70vh' };
+            byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        return new Blob(byteArrays, { type: contentType });
+    }
+
+    getModalStyle() {
+        if (this.fileType === 'application/pdf' || this.fileType === 'application/msword' ||
+            this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            return { width: '70%', height: '75vh' };
+        } else {
+            return { width: '55%', height: '70vh' };
+        }
+    }
+
+    zoomIn() {
+        this.zoomLevel += 0.2;
+    }
+
+    zoomOut() {
+        if (this.zoomLevel > 0.5) this.zoomLevel -= 0.2;
+    }
+
+    onScrollZoom(event: WheelEvent) {
+        event.preventDefault();
+        const zoomFactor = event.deltaY < 0 ? 0.1 : -0.1;
+        this.zoomLevel = Math.max(0.5, this.zoomLevel + zoomFactor);
+    }
+
+    startDrag(event: MouseEvent) {
+        event.preventDefault();
+        this.dragging = true;
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+        document.addEventListener('mousemove', this.onDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+    }
+
+    onDrag = (event: MouseEvent) => {
+        if (!this.dragging) return;
+        const dragSpeed = 2;
+        const deltaX = (event.clientX - this.startX) * dragSpeed;
+        const deltaY = (event.clientY - this.startY) * dragSpeed;
+        const imageElement = document.querySelector('img') as HTMLElement;
+        if (imageElement) {
+            imageElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${this.zoomLevel})`;
+        }
+    };
+
+    toggleZoom() {
+        if (this.zoomLevel >= this.maxZoom) {
+            this.zoomLevel = this.minZoom;
+        } else {
+            this.zoomLevel += 0.5;
+        }
+    }
+
+    stopDrag = () => {
+        this.dragging = false;
+        document.removeEventListener('mousemove', this.onDrag);
+        document.removeEventListener('mouseup', this.stopDrag);
+    };
+
+    closePreviewModal() {
+        this.isPreviewModalVisible = false;
+        this.selectedDocumentUrl = null;
+        this.zoomLevel = 1;
+    }
+    // =========================== END ==============================================
+
+    // ============================ Checklist Dashboard ===============================
+
+    fetchChecklistSummaryForLoan(nhfNumber: string): void {
+        if (!nhfNumber) {
+            return;
+        }
+
+        this.isLoadingChecklistSummary = true;
+        this.checklistSummary = {
+            total: 0,
+            yes: 0,
+            no: 0,
+            waived: 0,
+            deferred: 0,
+            yesPercent: 0,
+            noPercent: 0,
+            waivedPercent: 0,
+            deferredPercent: 0
+        };
+
+        this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+            response => {
+                if (response && response.success && Array.isArray(response.result)) {
+                    this.calculateChecklistSummary(response.result);
+                }
+                this.isLoadingChecklistSummary = false;
+            },
+            error => {
+                console.error(`Error fetching checklist for ${nhfNumber}:`, error);
+                this.isLoadingChecklistSummary = false;
             }
-          }
-        
-          zoomIn() {
-            this.zoomLevel += 0.2;
-          }
-        
-          zoomOut() {
-            if (this.zoomLevel > 0.5) this.zoomLevel -= 0.2;
-          }
-        
-          onScrollZoom(event: WheelEvent) {
-            event.preventDefault();
-            const zoomFactor = event.deltaY < 0 ? 0.1 : -0.1;
-            this.zoomLevel = Math.max(0.5, this.zoomLevel + zoomFactor);
-          }
-        
-          startDrag(event: MouseEvent) {
-            event.preventDefault();
-            this.dragging = true;
-            this.startX = event.clientX;
-            this.startY = event.clientY;
-            document.addEventListener('mousemove', this.onDrag);
-            document.addEventListener('mouseup', this.stopDrag);
-          }
-        
-          onDrag = (event: MouseEvent) => {
-            if (!this.dragging) return;
-            const dragSpeed = 2;
-            const deltaX = (event.clientX - this.startX) * dragSpeed;
-            const deltaY = (event.clientY - this.startY) * dragSpeed;
-            const imageElement = document.querySelector('img') as HTMLElement;
-            if (imageElement) {
-              imageElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${this.zoomLevel})`;
-            }
-          };
-        
-          toggleZoom() {
-            if (this.zoomLevel >= this.maxZoom) {
-              this.zoomLevel = this.minZoom;
-            } else {
-              this.zoomLevel += 0.5;
-            }
-          }
-        
-          stopDrag = () => {
-            this.dragging = false;
-            document.removeEventListener('mousemove', this.onDrag);
-            document.removeEventListener('mouseup', this.stopDrag);
-          };
-        
-          closePreviewModal() {
-            this.isPreviewModalVisible = false;
-            this.selectedDocumentUrl = null;
-            this.zoomLevel = 1;
-          }
-         // =========================== END ==============================================
+        );
+    }
+
+    calculateChecklistSummary(checklistItems: any[]): void {
+        const total = checklistItems.length;
+
+        if (total === 0) {
+            this.checklistSummary = {
+                total: 0,
+                yes: 0,
+                no: 0,
+                waived: 0,
+                deferred: 0,
+                yesPercent: 0,
+                noPercent: 0,
+                waivedPercent: 0,
+                deferredPercent: 0
+            };
+            return;
+        }
+
+        // Count items by option
+        const yes = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 1 || option === 'Yes' || option === '1';
+        }).length;
+
+        const no = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 2 || option === 'No' || option === '2';
+        }).length;
+
+        const waived = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 3 || option === 'Waiver' || option === 'Waived' || option === '3';
+        }).length;
+
+        const deferred = checklistItems.filter(item => {
+            const option = item.option;
+            return option === 4 || option === 'Deferred' || option === 'Defer' || option === '4';
+        }).length;
+
+        this.checklistSummary = {
+            total,
+            yes,
+            no,
+            waived,
+            deferred,
+            yesPercent: total > 0 ? Math.round((yes / total) * 100) : 0,
+            noPercent: total > 0 ? Math.round((no / total) * 100) : 0,
+            waivedPercent: total > 0 ? Math.round((waived / total) * 100) : 0,
+            deferredPercent: total > 0 ? Math.round((deferred / total) * 100) : 0
+        };
+    }
+    //============================ END CHECKLIST STATISTICS ===============================================
 
 
-    
+
+
     insurancePolicyInformation(appDetailId) {
         this.loadingService.show();
         this._creditApprServ.getInsurancePolicyConfirmationStatusByAppDetailId(appDetailId).subscribe((res) => {
@@ -1007,7 +1122,7 @@ export class LoanAvailmentComponent implements OnInit {
         return regex.exec(name)[1];
     }
 
-    
+
 
     uploadFile() {
 
@@ -1038,7 +1153,7 @@ export class LoanAvailmentComponent implements OnInit {
     getSupportingDocuments(applicationNumber: any) { //getDocumentsByTarget
         this._loadingService.show();
         // this._creditApprServ.getSupportingDocumentByApplication(applicationNumber).subscribe((response: any) => {
-            this._creditApprServ.getSupportingDocumentByApplication(applicationNumber).subscribe((response: any) => {
+        this._creditApprServ.getSupportingDocumentByApplication(applicationNumber).subscribe((response: any) => {
             this.supportingDocuments = response.result;
             this._loadingService.hide();
         }, () => {
@@ -1224,7 +1339,7 @@ export class LoanAvailmentComponent implements OnInit {
     // }
 
     displayStatus(event) {
-        if(event == true) {
+        if (event == true) {
             this.displayCommentForm = false;
         }
     }
@@ -1237,7 +1352,7 @@ export class LoanAvailmentComponent implements OnInit {
         //this.getApprovedLoanApplicationsDueForAvailment();
         this.resetPage();
     }
-    
+
 
     // returnBackToPrevious(form) {
     //     const __this = this;
@@ -1249,7 +1364,7 @@ export class LoanAvailmentComponent implements OnInit {
 
     //     this.testdata = target;
 
-     
+
     //         __this._loadingService.show();
 
     //         __this._loanApplServ.returnBackToPrevious(target).subscribe((res) => {
@@ -1265,7 +1380,7 @@ export class LoanAvailmentComponent implements OnInit {
     //             __this._loadingService.hide();
     //             swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
     //         });
-       
+
     // }
 
     // looking for
@@ -1288,9 +1403,9 @@ export class LoanAvailmentComponent implements OnInit {
         };
 
         // if(this.selectedRecord.productTypeId == ProductTypeEnum.ContingentLiability){ this.selectedRecord.isForceApproval == true; }
-        
-        
-        this.creditApprovalService.approveInitiatedLoanBookingRequest(bodyObj,this.selectedRecord.loanBookingRequestId).subscribe((response: any) => {
+
+
+        this.creditApprovalService.approveInitiatedLoanBookingRequest(bodyObj, this.selectedRecord.loanBookingRequestId).subscribe((response: any) => {
             if (response.success === true) {
                 swal(`${GlobalConfig.APPLICATION_NAME}`, response.message, 'success');
                 this.displayLoanDetails = false;
@@ -1535,14 +1650,14 @@ export class LoanAvailmentComponent implements OnInit {
         this.customerRate_Limit = {};
         this._customerService.getCustomerRatingAndLimit(customerId)
             .subscribe((res) => {
-               // console.log("res: ", res);
+                // console.log("res: ", res);
 
                 if (res.result != undefined) {
                     this.lcustomerLimit = res.result.limit;
                     this.customerRating = res.result.rating;
                     this.investmentGrade = res.result.isInvestment;
                 }
-               
+
                 // this.loanApplication.controls["isInvestmentGrade"].setValue(this.investmentGrade);
             }, () => {
             });
@@ -1586,7 +1701,7 @@ export class LoanAvailmentComponent implements OnInit {
                 this._loadingService.hide();
             });
     }
-    
+
     getSectorLimit(appl) {
         const cust = appl;
         this._loanApplServ.getSectorLimit(cust.subSectorId)
@@ -1628,7 +1743,7 @@ export class LoanAvailmentComponent implements OnInit {
     }
     //#endregion Limits
 
-    
+
 
 
     CallRequestClose() { this.displayJobrequest = false; }
@@ -1680,7 +1795,7 @@ export class LoanAvailmentComponent implements OnInit {
         this.selectedLoanRecord = item;
         this.crmsCollateralTypeId = item.crmsCollateralTypeId;
         this.crmsRepaymentTypeId = item.crmsRepaymentTypeId,
-        this.securedByCollateral = item.securedByCollateral;
+            this.securedByCollateral = item.securedByCollateral;
         this.isSpecialised = item.isSpecialised;
         this.moratoriumPeriod = item.moratoriumPeriod;
 
@@ -1697,11 +1812,11 @@ export class LoanAvailmentComponent implements OnInit {
         ////console.log("value", value);
         if (value == true) {
             this.getCRMSSecuredCollateralType();
-            this.crmsCollateralTypeId="";
+            this.crmsCollateralTypeId = "";
         }
         else {
             this.getCRMSUnsecuredCollateralType();
-            this.crmsCollateralTypeId="";
+            this.crmsCollateralTypeId = "";
         }
     }
     getCRMSSecuredCollateralType() {
@@ -1794,9 +1909,9 @@ export class LoanAvailmentComponent implements OnInit {
         this.LoancrmsModal = false;
         this.securedByCollateral = false;
         this.crmsCollateralTypeId = null;
-                this.crmsRepaymentTypeId = null;
+        this.crmsRepaymentTypeId = null;
         this.isSpecialised = null;
-                this.moratoriumPeriod = null;
+        this.moratoriumPeriod = null;
 
     }
 
@@ -1833,7 +1948,7 @@ export class LoanAvailmentComponent implements OnInit {
             //this.displayReport = true;
             return;
         }
-       
+
     }
 
     getCollateralStampToCoverValues(): void {
@@ -1863,15 +1978,15 @@ export class LoanAvailmentComponent implements OnInit {
         this.commentForm = this._fb.group({
             comment: ['', Validators.required],
             approvalLevelId: ['', Validators.required],
-            
+
         });
         if (init == false) this.displayCommentForm = true;
     }
 
     saveComment(form) {
         // todo
-    }  
-    
+    }
+
     getDrawdownMemoHtml(targetId) {
         this._creditApprServ.getDrawdownMemoHtml(targetId).subscribe((response: any) => {
             if (response.result == null) return;
@@ -1886,26 +2001,26 @@ export class LoanAvailmentComponent implements OnInit {
     }
 
     getApplicationStatus(approvalStatus) {
-            let processLabel = 'PROCESSING';
-            // if (this.privilege.groupRoleId != ApprovalGroupRole.BU) { processLabel = 'FAM PROCESS'; }
-            if (approvalStatus == ApprovalStatus.PROCESSING)
-                return '<span class="label label-info">' + processLabel + '</span>';
-            if (approvalStatus == ApprovalStatus.AUTHORISED)
-                return '<span class="label label-info">' + processLabel + '</span>';
-            if (approvalStatus == ApprovalStatus.REFERRED)
-                return '<span class="label label-danger">REFERRED BACK</span>';
-            if (approvalStatus == ApprovalStatus.APPROVED)
-                return '<span class="label label-success">APPROVED</span>';
-            if (approvalStatus == ApprovalStatus.DISAPPROVED)
-                return '<span class="label label-danger">REJECTED</span>';
-                
+        let processLabel = 'PROCESSING';
+        // if (this.privilege.groupRoleId != ApprovalGroupRole.BU) { processLabel = 'FAM PROCESS'; }
+        if (approvalStatus == ApprovalStatus.PROCESSING)
+            return '<span class="label label-info">' + processLabel + '</span>';
+        if (approvalStatus == ApprovalStatus.AUTHORISED)
+            return '<span class="label label-info">' + processLabel + '</span>';
+        if (approvalStatus == ApprovalStatus.REFERRED)
+            return '<span class="label label-danger">REFERRED BACK</span>';
+        if (approvalStatus == ApprovalStatus.APPROVED)
+            return '<span class="label label-success">APPROVED</span>';
+        if (approvalStatus == ApprovalStatus.DISAPPROVED)
+            return '<span class="label label-danger">REJECTED</span>';
+
         return '<span class="label label-warning">NEW APPLICATION</span>';
     }
 
     enableReroute: boolean;
-    pushSelectedPendingLoanRequests(row){
+    pushSelectedPendingLoanRequests(row) {
         this.workflowTarget = new WorkflowTarget;
-        var record = row.data; 
+        var record = row.data;
         this.workflowTarget.targetId = record.loanApplicationDetailId;
         this.workflowTarget.operationId = record.operationId;
         this.workflowTarget.trailId = record.approvalTrailId;
@@ -1916,27 +2031,27 @@ export class LoanAvailmentComponent implements OnInit {
 
     popSelectedPendingLoanRequests(row) {
         var record = row.data;
-        var index = this.workflowTargets.findIndex(x=>x.targetId == record.loanApplicationDetailId);
-        this.workflowTargets.splice(index,1);
+        var index = this.workflowTargets.findIndex(x => x.targetId == record.loanApplicationDetailId);
+        this.workflowTargets.splice(index, 1);
 
     }
 
-    
-    updatePendingData(){
+
+    updatePendingData() {
         this.loanApprovalData.forEach((item) => {
-            var assignedItem = this.workflowTargets.filter(x=>x.targetId == item.loanApplicationDetailId);
-            if(assignedItem.length > 0 ){
+            var assignedItem = this.workflowTargets.filter(x => x.targetId == item.loanApplicationDetailId);
+            if (assignedItem.length > 0) {
                 item.toStaffId = this.staffRoleRecord.staffId;
             }
         });
-        var assignedList = this.loanApprovalData.filter(x=>x.toStaffId >0 ); 
+        var assignedList = this.loanApprovalData.filter(x => x.toStaffId > 0);
 
         var x = this.assignedApplications;
-        x.push(assignedList); 
+        x.push(assignedList);
         this.assignedApplications = x;
-        this.assignedApplications.slice; 
+        this.assignedApplications.slice;
 
-        this.loanApprovalData = this.loanApprovalData.filter(x=>x.toStaffId == null);
+        this.loanApprovalData = this.loanApprovalData.filter(x => x.toStaffId == null);
         this.loanApprovalData.slice;
     }
 
@@ -1963,7 +2078,7 @@ export class LoanAvailmentComponent implements OnInit {
                     swal(`${GlobalConfig.APPLICATION_NAME}`, result.message, 'success');
                     __this.getInitiatedLoansAwaitingApproval();
                     __this.updatePendingData();
-                   //__this.displayApproverSearchForm = false;
+                    //__this.displayApproverSearchForm = false;
                     __this.workflowTargets = [];
                 }
             }, () => {
@@ -1975,9 +2090,9 @@ export class LoanAvailmentComponent implements OnInit {
             }
         });
     }
-  
-    onReturnToPool(data){
-        
+
+    onReturnToPool(data) {
+
         ///console.log('data',data); 
         const __this = this;
         swal({
@@ -1994,7 +2109,7 @@ export class LoanAvailmentComponent implements OnInit {
             buttonsStyling: true,
         }).then(function () {
             __this.loadingService.show();
-            __this._creditApprServ.ReturnTransactionToPool(__this.workflowTargets,data.approvalTrailId).subscribe((result) => {
+            __this._creditApprServ.ReturnTransactionToPool(__this.workflowTargets, data.approvalTrailId).subscribe((result) => {
                 __this.loadingService.hide();
                 if (result.success == true) {
                     swal(`${GlobalConfig.APPLICATION_NAME}`, result.message, 'success');
