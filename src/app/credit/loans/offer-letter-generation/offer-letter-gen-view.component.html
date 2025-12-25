@@ -183,15 +183,12 @@
                                     </div>
                                 </p-tabPanel> -->
                                 <p-tabPanel header="Other Supporting Documentation">
-                                    <document-upload 
-                                        [reload]="applicationSelection?.loanApplicationId" 
-                                        [operationId]="applicationSelection?.appraisalOperationId" 
+                                    <document-upload [reload]="applicationSelection?.loanApplicationId"
+                                        [operationId]="applicationSelection?.appraisalOperationId"
                                         [targetId]="applicationSelection?.loanApplicationId"
-                                        [targetReferenceNumber]="applicationSelection?.applicationReferenceNumber" 
-                                        [deleteLink]="false" 
-                                        [panelTitle]="'Committee Minutes'"
-                                        [isOperationSpecific]="false"
-                                        [showUploadForm]="false">
+                                        [targetReferenceNumber]="applicationSelection?.applicationReferenceNumber"
+                                        [deleteLink]="false" [panelTitle]="'Committee Minutes'"
+                                        [isOperationSpecific]="false" [showUploadForm]="false">
                                     </document-upload>
                                     <!-- <div class="form-horizontal">
                                         <div class="form-group">
@@ -263,124 +260,216 @@
                                     </div>
                                 </p-tabPanel>
 
-                                  <!-- Obligor UUS Checklist Tab -->
+                                <!-- Obligor UUS Checklist Tab -->
                                 <p-tabPanel i18n-header header="Obligor UUS Checklist">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h2 class="panel-title">Obligor UUS Checklist Review</h2>
+                                    <!-- Checklist Summary Dashboard for Selected Individual Loan -->
+                                    <div *ngIf="applicationSelection"
+                                        style="margin: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <h2 class="panel-title"
+                                            style="margin-top: 0; margin-bottom: 15px; text-align: center;">
+                                            Checklist Summary Dashboard - {{ applicationSelection.customerName }}
+                                            ({{ applicationSelection.applicationReferenceNumber }})
+                                        </h2>
+
+                                        <div *ngIf="isLoadingChecklistSummary"
+                                            style="text-align: center; padding: 20px;">
+                                            <span>Loading checklist summary...</span>
+                                        </div>
+
+                                        <div *ngIf="!isLoadingChecklistSummary && checklistSummary.total > 0"
+                                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+
+                                            <!-- Yes Percentage Card -->
+                                            <div
+                                                style="background-color: #28a745; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.yesPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Met
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.yes }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- No Percentage Card -->
+                                            <div
+                                                style="background-color: #dc3545; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.noPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Not Met
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.no }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- Waived Percentage Card -->
+                                            <div
+                                                style="background-color: #ffc107; color: #212529; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.waivedPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Waived
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.waived }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- Deferred Percentage Card -->
+                                            <div
+                                                style="background-color: #17a2b8; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.deferredPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Deferred
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.deferred }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="!isLoadingChecklistSummary && checklistSummary.total === 0"
+                                            style="text-align: center; padding: 20px; color: #6c757d;">
+                                            No checklist items found for this loan.
+                                        </div>
                                     </div>
+                                    <!-- End Checklist Summary Dashboard -->
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">Obligor UUS Checklist Review</h2>
+                                        </div>
                                         <div class="panel-body">
-                                            <p-dataTable [value]="uwsList"
-                                            [responsive]="true"
-                                            [paginator]="true"
-                                            [rows]="5"
-                                            [rowsPerPageOptions]="[5,10,20,30]"
-                                            [totalRecords]="uwsList?.length || 0">
-                        
-                                            <p-column i18n-header field="item" header="Item" [style]="{'width':'15%'}">
-                                            <ng-template let-uws="rowData" pTemplate="body">
-                                                {{ uws.item }}
-                                            </ng-template>
-                                            </p-column>
-                                        
-                                            <p-column i18n-header field="description" header="Description">
-                                            <ng-template let-uws="rowData" pTemplate="body">
-                                                {{ uws.description }}
-                                            </ng-template>
-                                            </p-column>
-                                        
-                                            <p-column i18n-header header="Option" [style]="{'width':'20%','text-align':'center'}">
-                                            <ng-template let-uws="rowData" pTemplate="body">
-                                                <div [ngStyle]="getRowStyle(uws)"
-                                                    style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
-                                                <label style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="radio" [(ngModel)]="uws.option" value="Yes" [name]="'option' + uws.id" disabled> Met
-                                                </label>
-                                                <label style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="radio" [(ngModel)]="uws.option" value="No" [name]="'option' + uws.id" disabled> Not Met
-                                                </label>
-                                                <label style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="radio" [(ngModel)]="uws.option" value="Waiver" [name]="'option' + uws.id" disabled> Waiver
-                                                </label>
-                                                <label style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="radio" [(ngModel)]="uws.option" value="Deferred" [name]="'option' + uws.id" disabled> Deferred
-                                                </label>
-                                                </div>
-                                            </ng-template>
-                                            </p-column>
-                                        
-                                            <p-column i18n-header header="Defer Date" [style]="{'width':'15%','text-align':'center'}">
-                                            <ng-template let-uws="rowData" pTemplate="body">
-                                                <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
-                                                <input type="date" [(ngModel)]="uws.deferredDate"
-                                                        [name]="'deferredDate' + uws.id"
-                                                        class="form-control" readonly disabled
-                                                        style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
-                                                </ng-container>
-                                                <ng-template #showNA>N/A</ng-template>
-                                            </ng-template>
-                                            </p-column>
-                                        
-                                            <p-column i18n-header header="View Document" [style]="{'width':'15%','text-align':'center'}">
-                                            <ng-template let-uws="rowData" pTemplate="body">
-                                                <div style="display: flex; justify-content: center; align-items: center;">
-                                                <button *ngIf="uws.option !== 'Deferred'" type="button" class="ui-button ui-button-primary"
-                                                        (click)="viewDocuments(uws)">
-                                                    Preview
-                                                </button>
-                                                </div>
-                                            </ng-template>
-                                            </p-column>                      
-                                        </p-dataTable>     
-                                        </div>             
+                                            <p-dataTable [value]="uwsList" [responsive]="true" [paginator]="true"
+                                                [rows]="5" [rowsPerPageOptions]="[5,10,20,30]"
+                                                [totalRecords]="uwsList?.length || 0">
+
+                                                <p-column i18n-header field="item" header="Item"
+                                                    [style]="{'width':'15%'}">
+                                                    <ng-template let-uws="rowData" pTemplate="body">
+                                                        {{ uws.item }}
+                                                    </ng-template>
+                                                </p-column>
+
+                                                <p-column i18n-header field="description" header="Description">
+                                                    <ng-template let-uws="rowData" pTemplate="body">
+                                                        {{ uws.description }}
+                                                    </ng-template>
+                                                </p-column>
+
+                                                <p-column i18n-header header="Option"
+                                                    [style]="{'width':'20%','text-align':'center'}">
+                                                    <ng-template let-uws="rowData" pTemplate="body">
+                                                        <div [ngStyle]="getRowStyle(uws)"
+                                                            style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
+                                                            <label
+                                                                style="display: flex; align-items: center; gap: 5px;">
+                                                                <input type="radio" [(ngModel)]="uws.option" value="Yes"
+                                                                    [name]="'option' + uws.id" disabled> Met
+                                                            </label>
+                                                            <label
+                                                                style="display: flex; align-items: center; gap: 5px;">
+                                                                <input type="radio" [(ngModel)]="uws.option" value="No"
+                                                                    [name]="'option' + uws.id" disabled> Not Met
+                                                            </label>
+                                                            <label
+                                                                style="display: flex; align-items: center; gap: 5px;">
+                                                                <input type="radio" [(ngModel)]="uws.option"
+                                                                    value="Waiver" [name]="'option' + uws.id" disabled>
+                                                                Waiver
+                                                            </label>
+                                                            <label
+                                                                style="display: flex; align-items: center; gap: 5px;">
+                                                                <input type="radio" [(ngModel)]="uws.option"
+                                                                    value="Deferred" [name]="'option' + uws.id"
+                                                                    disabled> Deferred
+                                                            </label>
+                                                        </div>
+                                                    </ng-template>
+                                                </p-column>
+
+                                                <p-column i18n-header header="Defer Date"
+                                                    [style]="{'width':'15%','text-align':'center'}">
+                                                    <ng-template let-uws="rowData" pTemplate="body">
+                                                        <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
+                                                            <input type="date" [(ngModel)]="uws.deferredDate"
+                                                                [name]="'deferredDate' + uws.id" class="form-control"
+                                                                readonly disabled
+                                                                style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
+                                                        </ng-container>
+                                                        <ng-template #showNA>N/A</ng-template>
+                                                    </ng-template>
+                                                </p-column>
+
+                                                <p-column i18n-header header="View Document"
+                                                    [style]="{'width':'15%','text-align':'center'}">
+                                                    <ng-template let-uws="rowData" pTemplate="body">
+                                                        <div
+                                                            style="display: flex; justify-content: center; align-items: center;">
+                                                            <button *ngIf="uws.option !== 'Deferred'" type="button"
+                                                                class="ui-button ui-button-primary"
+                                                                (click)="viewDocuments(uws)">
+                                                                Preview
+                                                            </button>
+                                                        </div>
+                                                    </ng-template>
+                                                </p-column>
+                                            </p-dataTable>
+                                        </div>
                                     </div>
                                 </p-tabPanel>
                                 <!-- END -->
 
                                 <!-- Document Preview Modal -->
                                 <p-dialog [(visible)]="isPreviewModalVisible" [modal]="true" [style]="getModalStyle()"
-                                [closable]="true" (onHide)="closePreviewModal()" [draggable]="false">
-                                <div style="display: flex; justify-content: center; align-items: center; padding: 10px; position: relative;">
-                                    <h3 style="margin: 0; flex: 1; text-align: center;">
-                                        Document Preview for {{ selectedLoan?.customerName }}
-                                    </h3>
-                                    <div style="cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center;
+                                    [closable]="true" (onHide)="closePreviewModal()" [draggable]="false">
+                                    <div
+                                        style="display: flex; justify-content: center; align-items: center; padding: 10px; position: relative;">
+                                        <h3 style="margin: 0; flex: 1; text-align: center;">
+                                            Document Preview for {{ applicationSelection?.customerName }}
+                                        </h3>
+                                        <div style="cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center;
                                                 justify-content: center; border: 2px solid red; border-radius: 5px; background-color: white;
-                                                position: absolute; right: 10px;"
-                                        (click)="closePreviewModal()">
-                                        <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
+                                                position: absolute; right: 10px;" (click)="closePreviewModal()">
+                                            <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <hr style="margin: 0 10px; border-top: 1px solid gray;">
-                                <div style="padding: 15px; width: 100%; text-align: center;">
-                                    <div *ngIf="fileType?.includes('image')"
-                                        style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                                        <img [src]="selectedDocumentUrl"
-                                            [style.transform]="'scale(' + zoomLevel + ')'"
-                                            style="max-height: 500px; object-fit: contain; transition: transform 0.3s ease-in-out; cursor: grab;"
-                                            (wheel)="onScrollZoom($event)"
-                                            (mousedown)="startDrag($event)"
-                                            (click)="toggleZoom()" />
-                                    </div>
-                                    <div *ngIf="fileType === 'application/pdf'" style="overflow: hidden; position: relative;">
-                                        <iframe #pdfFrame [src]="selectedDocumentUrl" width="100%" height="550px"
-                                            (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
-                                    </div>
-                                    <div *ngIf="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                    <hr style="margin: 0 10px; border-top: 1px solid gray;">
+                                    <div style="padding: 15px; width: 100%; text-align: center;">
+                                        <div *ngIf="fileType?.includes('image')"
+                                            style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                            <img [src]="selectedDocumentUrl"
+                                                [style.transform]="'scale(' + zoomLevel + ')'"
+                                                style="max-height: 500px; object-fit: contain; transition: transform 0.3s ease-in-out; cursor: grab;"
+                                                (wheel)="onScrollZoom($event)" (mousedown)="startDrag($event)"
+                                                (click)="toggleZoom()" />
+                                        </div>
+                                        <div *ngIf="fileType === 'application/pdf'"
+                                            style="overflow: hidden; position: relative;">
+                                            <iframe #pdfFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                                (wheel)="onScrollZoom($event)"
+                                                style="cursor: grab; transform-origin: center;"></iframe>
+                                        </div>
+                                        <div *ngIf="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                                                 || fileType === 'application/msword'"
-                                        style="overflow: hidden; position: relative;">
-                                        <iframe #docFrame [src]="selectedDocumentUrl" width="100%" height="550px"
-                                            (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
-                                    </div>
-                                    <div *ngIf="!fileType?.includes('image') && fileType !== 'application/pdf'
+                                            style="overflow: hidden; position: relative;">
+                                            <iframe #docFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                                (wheel)="onScrollZoom($event)"
+                                                style="cursor: grab; transform-origin: center;"></iframe>
+                                        </div>
+                                        <div *ngIf="!fileType?.includes('image') && fileType !== 'application/pdf'
                                                 && fileType !== 'application/msword'
                                                 && fileType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
-                                        style="color: red; font-weight: bold;">
-                                        Unsupported file type.
+                                            style="color: red; font-weight: bold;">
+                                            Unsupported file type.
+                                        </div>
                                     </div>
-                                </div>
                                 </p-dialog>
-                            <!-- END -->
+                                <!-- END -->
                             </p-tabView>
                         </div>
                     </div>
@@ -403,11 +492,9 @@
 
 <p-dialog [responsive]=true [(visible)]="displayValidationModal" modal="modal" showEffect="fade" width="550">
 
-    <app-refer-back 
-        [getAllReferTrail]="false"
-        [currentLevelId]="applicationSelection?.currentApprovalLevelId"
-        [referBackTargetId]="targetId" [referBackOperationId]="operationId"
-        (notify)="displayValidationModal=false" (notifyAfterReferBack)="referBackResultControl($event)">
+    <app-refer-back [getAllReferTrail]="false" [currentLevelId]="applicationSelection?.currentApprovalLevelId"
+        [referBackTargetId]="targetId" [referBackOperationId]="operationId" (notify)="displayValidationModal=false"
+        (notifyAfterReferBack)="referBackResultControl($event)">
     </app-refer-back>
 
 </p-dialog>
