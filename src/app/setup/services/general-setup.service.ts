@@ -1,5 +1,5 @@
 
-import { throwError as observableThrowError, Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthHttp } from '../../admin/services/token.service';
 // import { AppConstant } from './../../shared/constant/app.constant';
@@ -57,12 +57,22 @@ updateDownPayment(body: any, id: number) {
   );
 }
 
+  // deleteDownpayment(id: number): Observable<any> {
+  //   return this.http
+  //     .delete(`${AppConstant.API_BASE}admin/delete-downpayment/${id}`)
+  //     .pipe(
+  //       catchError(error =>
+  //         throwError(error?.error || 'Server error')
+  //       )
+  //     );
+  // }
   deleteDownpayment(id) {
-    return this.http.delete(`${AppConstant.API_BASE}admin/delete-downpayment/${id}`)
-      .pipe(
-        map((res: any) => res),
-        catchError((error: any) => observableThrowError(error.error || 'Server error')));
+    return this.http.delete(`${AppConstant.API_BASE}admin/delete-downpayment/${id}`).pipe(
+      map((res: any) => res),
+      catchError((error: any) => observableThrowError(error.error || 'Server error')),);
   }
+
+
 
     
   saveHousingExpense(body) {
