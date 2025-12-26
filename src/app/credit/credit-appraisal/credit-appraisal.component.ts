@@ -271,6 +271,31 @@ export class CreditAppraisalComponent implements OnInit {
   minZoom: number = 1;
   selectedLoan: IAppraisal | null = null;
 
+  // checklist dashboard
+  // Checklist summary properties for selected individual loan
+  checklistSummary: {
+    total: number;
+    yes: number;
+    no: number;
+    waived: number;
+    deferred: number;
+    yesPercent: number;
+    noPercent: number;
+    waivedPercent: number;
+    deferredPercent: number;
+  } = {
+      total: 0,
+      yes: 0,
+      no: 0,
+      waived: 0,
+      deferred: 0,
+      yesPercent: 0,
+      noPercent: 0,
+      waivedPercent: 0,
+      deferredPercent: 0
+    };
+  isLoadingChecklistSummary: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -324,7 +349,7 @@ export class CreditAppraisalComponent implements OnInit {
       issues: ["", Validators.required],
       request: ["", Validators.required],
     });
-    
+
     this.stampDutySharingForm = this.fb.group({
       tillAccountNumber: ["", Validators.required],
       customerPercentage: [100, Validators.required],
@@ -360,7 +385,7 @@ export class CreditAppraisalComponent implements OnInit {
     // this.getUserPrivileges(this.applicationSelection.currentApprovalLevelId);
   }
   showSubsidiary() {
-    
+
     this.vissibleAssignedSub = this.assignedApplicationsSub
       .filter((application) => application.countryId != 1)
       .slice();
@@ -379,7 +404,7 @@ export class CreditAppraisalComponent implements OnInit {
   showAllAppraisal() {
     this.vissibleAssigned = this.assignedApplications.slice();
     this.visibleAppraisals = this.applications.slice();
-    
+
     this.vissibleAssignedSub = this.assignedApplicationsSub.slice();
     this.visibleAppraisalsSub = this.applicationsSub.slice();
   }
@@ -430,30 +455,28 @@ export class CreditAppraisalComponent implements OnInit {
   userIsAccountOfficer = false;
   userIsPMU = false;
   staffRoleRecord: any;
-  
 
-  getFacilitySpecificConditions(facilityId) {}
+
+  getFacilitySpecificConditions(facilityId) { }
 
   getUserRole() {
     this.staffRole.getStaffRoleByStaffId().subscribe((res) => {
       this.staffRoleRecord = res.result;
       if (res.success) {
-       
-         if (
-         this.staffRoleRecord.staffRoleCode == "AO" ||
+
+        if (
+          this.staffRoleRecord.staffRoleCode == "AO" ||
           this.staffRoleRecord.staffRoleCode == "RMO" ||
           this.staffRoleRecord.staffRoleCode == "CP" ||
           this.staffRoleRecord.staffRoleCode == "RO"
-       ) 
-        {
+        ) {
           this.userIsAccountOfficer = true;
           this.AcceptButtonText = "Submit";
         }
         if (this.staffRoleRecord.staffRoleCode == "AO" ||
           this.staffRoleRecord.staffRoleShortCode == "CRM" ||
           this.staffRoleRecord.staffRoleCode == "CR MGR" ||
-          this.staffRoleRecord.staffRoleCode == "CA")
-        {
+          this.staffRoleRecord.staffRoleCode == "CA") {
           this.enabled = true;
           this.enabledCreditGrade = true;
         }
@@ -833,7 +856,7 @@ export class CreditAppraisalComponent implements OnInit {
   loadData(event: LazyLoadEvent) {
     this.countryCode = "NG";
     this.authHttp.setCountryCode("NG");
-   // this.authHttp.setIsLMS(false);
+    // this.authHttp.setIsLMS(false);
     this.camService.setCountryCode("NG");
     this.visibleAppraisals = [];
     this.allAppraisals = [];
@@ -845,11 +868,11 @@ export class CreditAppraisalComponent implements OnInit {
     this.itemTotal = 0;
     //this.getSubsediaryApplications(event.first, event.rows);
     this.getLoanApplications(event.first, event.rows);
-    
+
     this.currentLazyLoadEvent = event;
   }
 
- 
+
   viewCustomerFinancialStatement: boolean = false;
   canDoFinancialStatementEntry: boolean = false;
 
@@ -928,16 +951,16 @@ export class CreditAppraisalComponent implements OnInit {
 
   onSelectedApplicationChange(): void {
     if (!this.applicationSelection) return;
-    
+
     // // Log the entire applicationSelection object to check for nhfNumber
     // console.log('Selected Application Data:', this.applicationSelection);
-    
+
     // // Specifically check for nhfNumber or employeeNhfNumber
     // console.log('nhfNumber:', this.applicationSelection.nhfNumber);
     // console.log('employeeNhfNumber:', this.applicationSelection.applicationReferenceNumber);
 
     this.selectedLoan = this.applicationSelection;
-   
+
     this.isIblRequest = false;
     this.subTransId = this.applicationSelection.subBasicId;
     this.disableApplicationInformationTab = false;
@@ -974,7 +997,7 @@ export class CreditAppraisalComponent implements OnInit {
     );
     this.recommendedItems = [];
     this.selectedCustomerRating = null;
-    if(countryCode != "NG"){
+    if (countryCode != "NG") {
       this.getDocumentationSections();
       this.reload = this.applicationSelection.loanApplicationId;
     }
@@ -1027,8 +1050,8 @@ export class CreditAppraisalComponent implements OnInit {
     // this.getObligorExposure();
     this.getCustomerbyApplication(this.applicationId);
     this.getTotalExposureLimit(this.applicationId);
-    if(countryCode == "NG"){
-    this.getProposedCollateral(this.applicationId);
+    if (countryCode == "NG") {
+      this.getProposedCollateral(this.applicationId);
     }
     //this.getProposedCollateral(this.applicationId);
     let roleRec = this.staffRoleRecord;
@@ -1068,6 +1091,8 @@ export class CreditAppraisalComponent implements OnInit {
     if (this.applicationSelection.applicationReferenceNumber) {
       this.fetchCustomerUusItems(this.applicationSelection.applicationReferenceNumber);
     }
+
+    this.fetchChecklistSummaryForLoan(this.applicationSelection.applicationReferenceNumber);
   }
 
   // =========================== Fetch Obligor's Items ===============================
@@ -1080,8 +1105,8 @@ export class CreditAppraisalComponent implements OnInit {
     } else {
       return {};
     }
-  }     
-  
+  }
+
   fetchCustomerUusItems(nhfNumber: string): void {
     console.error('nhf number:', nhfNumber);
     this.loadingService.show();
@@ -1154,8 +1179,8 @@ export class CreditAppraisalComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         console.log('Generated Blob URL:', url);
         if (fileType.includes('image') || fileType === 'application/pdf' ||
-            fileType === 'application/vnd.openxmlformats-officedocument.w ordprocessingml.document' ||
-            fileType === 'application/msword') {
+          fileType === 'application/vnd.openxmlformats-officedocument.w ordprocessingml.document' ||
+          fileType === 'application/msword') {
           this.selectedDocumentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
           this.fileType = fileType;
           this.isPreviewModalVisible = true;
@@ -1188,7 +1213,7 @@ export class CreditAppraisalComponent implements OnInit {
 
   getModalStyle() {
     if (this.fileType === 'application/pdf' || this.fileType === 'application/msword' ||
-        this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      this.fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       return { width: '70%', height: '75vh' };
     } else {
       return { width: '55%', height: '70vh' };
@@ -1248,10 +1273,97 @@ export class CreditAppraisalComponent implements OnInit {
     this.selectedDocumentUrl = null;
     this.zoomLevel = 1;
   }
- // =========================== END ==============================================
-  
+  // =========================== END ==============================================
+
+  // ============================ Checklist Dashboard ===============================
+
+  fetchChecklistSummaryForLoan(nhfNumber: string): void {
+    if (!nhfNumber) {
+      return;
+    }
+
+    this.isLoadingChecklistSummary = true;
+    this.checklistSummary = {
+      total: 0,
+      yes: 0,
+      no: 0,
+      waived: 0,
+      deferred: 0,
+      yesPercent: 0,
+      noPercent: 0,
+      waivedPercent: 0,
+      deferredPercent: 0
+    };
+
+    this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
+      response => {
+        if (response && response.success && Array.isArray(response.result)) {
+          this.calculateChecklistSummary(response.result);
+        }
+        this.isLoadingChecklistSummary = false;
+      },
+      error => {
+        console.error(`Error fetching checklist for ${nhfNumber}:`, error);
+        this.isLoadingChecklistSummary = false;
+      }
+    );
+  }
+
+  calculateChecklistSummary(checklistItems: any[]): void {
+    const total = checklistItems.length;
+
+    if (total === 0) {
+      this.checklistSummary = {
+        total: 0,
+        yes: 0,
+        no: 0,
+        waived: 0,
+        deferred: 0,
+        yesPercent: 0,
+        noPercent: 0,
+        waivedPercent: 0,
+        deferredPercent: 0
+      };
+      return;
+    }
+
+    // Count items by option
+    const yes = checklistItems.filter(item => {
+      const option = item.option;
+      return option === 1 || option === 'Yes' || option === '1';
+    }).length;
+
+    const no = checklistItems.filter(item => {
+      const option = item.option;
+      return option === 2 || option === 'No' || option === '2';
+    }).length;
+
+    const waived = checklistItems.filter(item => {
+      const option = item.option;
+      return option === 3 || option === 'Waiver' || option === 'Waived' || option === '3';
+    }).length;
+
+    const deferred = checklistItems.filter(item => {
+      const option = item.option;
+      return option === 4 || option === 'Deferred' || option === 'Defer' || option === '4';
+    }).length;
+
+    this.checklistSummary = {
+      total,
+      yes,
+      no,
+      waived,
+      deferred,
+      yesPercent: total > 0 ? Math.round((yes / total) * 100) : 0,
+      noPercent: total > 0 ? Math.round((no / total) * 100) : 0,
+      waivedPercent: total > 0 ? Math.round((waived / total) * 100) : 0,
+      deferredPercent: total > 0 ? Math.round((deferred / total) * 100) : 0
+    };
+  }
+  //============================ END CHECKLIST STATISTICS ===============================================
+
   untenored: boolean = false;
-  
+
 
   resolveUntenored() {
     if (
@@ -1313,7 +1425,7 @@ export class CreditAppraisalComponent implements OnInit {
         if (response.result == null) return;
         this.cashBackHtml = response.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -1347,57 +1459,57 @@ export class CreditAppraisalComponent implements OnInit {
   }
 
   updateInputFields() {
-const inputField1 = document.getElementById('input1') as HTMLInputElement;
-const inputField2 = document.getElementById('input2') as HTMLInputElement;
+    const inputField1 = document.getElementById('input1') as HTMLInputElement;
+    const inputField2 = document.getElementById('input2') as HTMLInputElement;
 
-let value1 = parseFloat(inputField1.value);
-let value2 = parseFloat(inputField2.value);
+    let value1 = parseFloat(inputField1.value);
+    let value2 = parseFloat(inputField2.value);
 
-// Check for negative numbers
-value1 = Math.max(0, value1);
-value2 = Math.max(0, value2);
+    // Check for negative numbers
+    value1 = Math.max(0, value1);
+    value2 = Math.max(0, value2);
 
-// Ensure that the sum is always 100
-const sum = value1 + value2;
-if (sum !== 100) {
-    // Adjust the values to maintain the sum of 100
-    const diff =  100  - value1;
-    value1 = value1;
-    value2 = diff;
-}
-
-// Update the input field values
-inputField1.value = value1.toString();
-inputField2.value = value2.toString();
-this.customerPercentage = inputField1.value;
-this.bankPercentage = inputField2.value;
-}
-
-updateInputFields2() {
-  const inputField1 = document.getElementById('input1') as HTMLInputElement;
-  const inputField2 = document.getElementById('input2') as HTMLInputElement;
-  
-  let value1 = parseFloat(inputField1.value);
-  let value2 = parseFloat(inputField2.value);
-  
-  // Check for negative numbers
-  value1 = Math.max(0, value1);
-  value2 = Math.max(0, value2);
-  
-  // Ensure that the sum is always 100
-  const sum = value1 + value2;
-  if (sum !== 100) {
+    // Ensure that the sum is always 100
+    const sum = value1 + value2;
+    if (sum !== 100) {
       // Adjust the values to maintain the sum of 100
-      const diff =  100  - value2;
+      const diff = 100 - value1;
+      value1 = value1;
+      value2 = diff;
+    }
+
+    // Update the input field values
+    inputField1.value = value1.toString();
+    inputField2.value = value2.toString();
+    this.customerPercentage = inputField1.value;
+    this.bankPercentage = inputField2.value;
+  }
+
+  updateInputFields2() {
+    const inputField1 = document.getElementById('input1') as HTMLInputElement;
+    const inputField2 = document.getElementById('input2') as HTMLInputElement;
+
+    let value1 = parseFloat(inputField1.value);
+    let value2 = parseFloat(inputField2.value);
+
+    // Check for negative numbers
+    value1 = Math.max(0, value1);
+    value2 = Math.max(0, value2);
+
+    // Ensure that the sum is always 100
+    const sum = value1 + value2;
+    if (sum !== 100) {
+      // Adjust the values to maintain the sum of 100
+      const diff = 100 - value2;
       value1 = diff;
       value2 = value2;
-  }
-  
-  // Update the input field values
-  inputField1.value = value1.toString();
-  inputField2.value = value2.toString();
-  this.customerPercentage = inputField1.value;
-this.bankPercentage = inputField2.value;
+    }
+
+    // Update the input field values
+    inputField1.value = value1.toString();
+    inputField2.value = value2.toString();
+    this.customerPercentage = inputField1.value;
+    this.bankPercentage = inputField2.value;
   }
 
   finishGood2(message) {
@@ -1420,8 +1532,8 @@ this.bankPercentage = inputField2.value;
         this.searchSubString,
         this.isSubPoolRequest)
       .subscribe((response: { result: IAppraisalSub[]; count: number }) => {
-      this.subsidiaryApplications = response;
-             this.setLoanSubApplications(response);
+        this.subsidiaryApplications = response;
+        this.setLoanSubApplications(response);
       });
     if (this.isSubPoolRequest == true) {
       this.getSubsediaryLoanApplicationsPool(classId, search);
@@ -1452,7 +1564,7 @@ this.bankPercentage = inputField2.value;
       )
       .subscribe(
         (response: { result: IAppraisal[]; count: number }) => {
-       this.hqApplications = response;
+          this.hqApplications = response;
           this.setLoanApplications(response);
         },
         (err) => {
@@ -1474,7 +1586,7 @@ this.bankPercentage = inputField2.value;
     if (this.isSubPoolRequest == true) {
       // COMMENT IF YOU NEED TO SHOW ASSIGNED JOBS ON GENERAL POOL
       this.applicationsSub = this.applicationsSub.filter((x) => x.toStaffId == null);
-      
+
     }
     if (this.isSubPoolRequest == false || this.isSubPoolRequest == null) {
       this.assignedApplicationsSub = [
@@ -1482,7 +1594,7 @@ this.bankPercentage = inputField2.value;
         ...this.applicationsSub,
       ];
       this.vissibleAssignedSub = [...this.applicationsSub];
-      
+
     }
 
     if (this.applicationsSub.length > 0) {
@@ -1516,7 +1628,7 @@ this.bankPercentage = inputField2.value;
       this.vissibleAssigned = [...this.applications];
     }
 
-    if (this.applications.length > 0 ) {
+    if (this.applications.length > 0) {
       this.applications.slice;
       this.visibleAppraisals.slice();
       this.assignedApplications.slice();
@@ -1536,11 +1648,11 @@ this.bankPercentage = inputField2.value;
       ...this.assignedApplications,
       ...response.result,
     ];
-    
+
     this.vissibleAssigned = [...this.assignedApplications];
     if (
       !isNullOrUndefined(this.assignedApplications) &&
-      this.assignedApplications.length > 0 
+      this.assignedApplications.length > 0
     ) {
       this.assignedApplications.slice();
       this.vissibleAssigned.slice();
@@ -1651,14 +1763,14 @@ this.bankPercentage = inputField2.value;
     if (
       this.applicationSelection.currentApprovalLevelId > 0 &&
       this.applicationSelection.currentApprovalLevelId ==
-        this.privilege.approvalLevelId
+      this.privilege.approvalLevelId
     ) {
       return true;
     }
     if (
       this.privilege.currentApprovalLevelId < 1 ||
       this.privilege.currentApprovalLevelId ==
-        this.applicationSelection.currentApprovalLevel
+      this.applicationSelection.currentApprovalLevel
     ) {
       return true;
     }
@@ -1738,14 +1850,14 @@ this.bankPercentage = inputField2.value;
       productClassId: this.applicationSelection.productClassId,
       productId: null,
     };
-    
+
     let getPrivileges = this.camService.getPrivilege(body);
 
-   if(countryCode && countryCode !== 'NG'){
-    getPrivileges = this.camService.getPrivilegeByCode(body);
-   }
+    if (countryCode && countryCode !== 'NG') {
+      getPrivileges = this.camService.getPrivilegeByCode(body);
+    }
 
-   getPrivileges.subscribe((response: any) => {
+    getPrivileges.subscribe((response: any) => {
       this.privilege = response.result;
       // this.privilege.currentApprovalLevelId = this.obligor.currentApprovalLevelId;
       this.privilege.currentApprovalLevel =
@@ -2026,7 +2138,7 @@ this.bankPercentage = inputField2.value;
       return;
     }
 
-    if( this.isIblRequest == true && this.proposedCollateral == null || this.proposedCollateral == undefined){
+    if (this.isIblRequest == true && this.proposedCollateral == null || this.proposedCollateral == undefined) {
       swal(
         `${GlobalConfig.APPLICATION_NAME}`,
         "Kindly propose a valued collateral for this IBL request!",
@@ -2246,7 +2358,7 @@ this.bankPercentage = inputField2.value;
         if (response.success == true) {
           __this.nextLevelId = response.result.nextLevelId;
           __this.displayApproverSearchForm = true;
-          
+
         } else {
           __this.finishBad(response.message);
           __this.errorMessage = response.message;
@@ -2258,11 +2370,11 @@ this.bankPercentage = inputField2.value;
       }
     );
   }
-  
+
 
   forwardCam(form) {
     // this.showMessage('Specify', 'error', "FintrakBanking");
-   
+
     const __this = this;
     let body = {
       forwardAction: __this.forwardAction,
@@ -2291,7 +2403,7 @@ this.bankPercentage = inputField2.value;
     };
     if (__this.forwardAction == 5) {
       body.isFlowTest = false;
-     
+
     }
 
     __this.errorMessage = "";
@@ -2314,7 +2426,7 @@ this.bankPercentage = inputField2.value;
             __this.reset();
             __this.displayCommentForm = false;
             __this.clearRequestControls();
-            
+
             if (response.result.isFinal == true) {
               __this.reportServ
                 .generateOoutPutDocument(__this.loanApplicationId)
@@ -2333,7 +2445,7 @@ this.bankPercentage = inputField2.value;
             }
             return;
           }
-          
+
           var promptMessage;
           if (response.stateId == 3)
             promptMessage =
@@ -2487,8 +2599,8 @@ this.bankPercentage = inputField2.value;
           this.facilityCount = response.result.facilities.length;
           // this.reload++;
           // console.log("proposedItems1: ", this.proposedItems);
-          
-          if(response.result.facilities[0].iblRequest == true){
+
+          if (response.result.facilities[0].iblRequest == true) {
             this.isIblRequest = true;
           }
           this.loadingService.hide();
@@ -2801,7 +2913,7 @@ this.bankPercentage = inputField2.value;
     //this.getSubsediaryApplications(0, this.currentLazyLoadEvent.rows);
     this.filteredProductClass = null;
     this.filteredProductClassId = null; // MUST RUN BEFORE getLoanApplications()
-    console.log("this is me "+ this.currentLazyLoadEvent.rows);
+    console.log("this is me " + this.currentLazyLoadEvent.rows);
     this.vissibleAssigned = [];
     this.getLoanApplications(0, this.currentLazyLoadEvent.rows); // refresh list
     this.getSubsediaryApplications(0, this.currentLazyLoadEventSub.rows);
@@ -2842,7 +2954,7 @@ this.bankPercentage = inputField2.value;
   //     //this.enabledCreditGrade = false;
   //     this.proposedItems = null;
   //     this.setLoanSubApplications(this.subsidiaryApplications);
-      
+
   //   }
   //   // if (e.index == 1) { this.getDocumentationSections(); this.getTrail(); }
   //   if (e.index == 2) {
@@ -2870,14 +2982,14 @@ this.bankPercentage = inputField2.value;
       this.reset();
     }
     if (e.index == 1) {
-      this.getTrail();    
+      this.getTrail();
     }
     if (e.index == 3) {
       this.conditionsSeen = true;
     }
     if (e.index == 4) {
       this.dynamicsSeen = true;
-    } 
+    }
   }
   // trail & comment
 
@@ -3268,8 +3380,8 @@ this.bankPercentage = inputField2.value;
           this.limitValidation.limit == 0
             ? true
             : this.applicationSelection.approvedAmount +
-                this.limitValidation.outstandingBalance <=
-              this.limitValidation.outstandingBalance;
+            this.limitValidation.outstandingBalance <=
+            this.limitValidation.outstandingBalance;
         // this.obligorLimitValid();
       },
       (err) => {
@@ -3693,7 +3805,7 @@ this.bankPercentage = inputField2.value;
     });
   }
   // appendStamp(alert = false) {
-       
+
   //   this.sectionContent = this.ckeditorChanges; // on save click
   //   const body = {
   //     templateDocument: this.sectionContent,
@@ -3712,7 +3824,7 @@ this.bankPercentage = inputField2.value;
   // }
 
   // removeStamp(alert = false) {
-       
+
   //   this.sectionContent = this.ckeditorChanges; // on save click
   //   const body = {
   //     templateDocument: null,
@@ -3778,7 +3890,7 @@ this.bankPercentage = inputField2.value;
           this.documentations = response.result;
           this.loadingService.hide();
           this.displayDocumentation = true;
-          
+
         },
         (err) => {
           this.loadingService.hide(1000);
@@ -3800,7 +3912,7 @@ this.bankPercentage = inputField2.value;
           this.documentations = response.result;
           this.loadingService.hide();
           this.displayDocumentation = true;
-          
+
         },
         (err) => {
           this.loadingService.hide(1000);
@@ -3939,11 +4051,11 @@ this.bankPercentage = inputField2.value;
         this.finishBad(response.message);
       }
     },
-    (err: any) => {
-      this.loadingService.hide(1000);
-      this.finishBad(JSON.stringify(err));
-    }
-      );
+      (err: any) => {
+        this.loadingService.hide(1000);
+        this.finishBad(JSON.stringify(err));
+      }
+    );
   }
 
   getObligorExposure() {
@@ -4038,10 +4150,10 @@ this.bankPercentage = inputField2.value;
       .getLoanApplicationTags(this.loanApplicationId)
       .subscribe((response: any) => {
         this.loanApplicationTags = response.result;
-        if(this.loanApplicationTags.iblRenewal == true){
+        if (this.loanApplicationTags.iblRenewal == true) {
           this.iblRenewalStatus = "Yes"
         }
-        else{
+        else {
           this.iblRenewalStatus = "No"
         }
         this.loanApplicationTagsForm.controls["isProjectRelated"].setValue(
@@ -4057,7 +4169,7 @@ this.bankPercentage = inputField2.value;
           this.loanApplicationTags.withInstruction
         );
         this.loanApplicationTagsForm.controls["domiciliationNotInPlace"].setValue(
-            this.loanApplicationTags.domiciliationNotInPlace);
+          this.loanApplicationTags.domiciliationNotInPlace);
         this.loanApplicationTagsForm.controls["isAgricRelated"].setValue(
           this.loanApplicationTags.isAgricRelated
         );
@@ -4072,7 +4184,7 @@ this.bankPercentage = inputField2.value;
 
   setrequiredUploadValue(value: boolean) {
     this.allRequiredDocumentsAreUploaded = value;
-    
+
   }
 
   reloadGrid() {
@@ -4158,7 +4270,7 @@ this.bankPercentage = inputField2.value;
   }
 
   submitIBLChecklistForm(formValues) {
-    
+
     this.loadingService.show();
     let form = formValues.value;
     let body = {
@@ -4235,7 +4347,7 @@ this.bankPercentage = inputField2.value;
       (data) => {
         this.loanCollateral = data.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -4293,7 +4405,7 @@ this.bankPercentage = inputField2.value;
         this.faciliies = data.result;
         this.loanApplicationDetails = data.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -4318,12 +4430,12 @@ this.bankPercentage = inputField2.value;
       .getProposedCustomerCollateral(loanApplicationId, this.currencyId)
       .subscribe((response: any) => {
         this.proposedCollateral = response.result;
-        
+
       });
 
-      this.getFacilityStampDuty(this.applicationSelection.loanApplicationId);
-      this.onSelectedApplicationChange();
-     
+    this.getFacilityStampDuty(this.applicationSelection.loanApplicationId);
+    this.onSelectedApplicationChange();
+
   }
 
   getCollateralCoverageStatus(): string {
@@ -4331,8 +4443,7 @@ this.bankPercentage = inputField2.value;
       this.proposedCollateral == null ||
       this.proposedCollateral == undefined ||
       this.proposedCollateral.length == 0
-    ) 
-    {
+    ) {
       return "";
     }
     var totalPercentageCoverage = this.proposedCollateral[0].totalCoverage;
@@ -4428,7 +4539,7 @@ this.bankPercentage = inputField2.value;
       (res) => {
         this.currencies = res.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -4441,7 +4552,7 @@ this.bankPercentage = inputField2.value;
       (res) => {
         this.facilities = res.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -4450,7 +4561,7 @@ this.bankPercentage = inputField2.value;
       (res) => {
         this.exposureSave = res.result;
       },
-      (err) => {}
+      (err) => { }
     );
   }
 
@@ -4461,7 +4572,7 @@ this.bankPercentage = inputField2.value;
   }
 
   editIBLChecklistDetail(value) {
-    
+
     this.iblChecklistDetailId = value;
     this.getIBLChecklistDetailForEdit(value);
     this.displayEditIBLChecklistDetail = true;
@@ -4569,7 +4680,7 @@ this.bankPercentage = inputField2.value;
   pushSelectedLoans(row) {
     this.workflowTarget = new WorkflowTarget();
     var record = row.data;
-    
+
     this.getTermSheets(record.termSheetCode);
     this.workflowTarget.targetId = record.loanApplicationId;
     this.workflowTarget.operationId = record.operationId;
@@ -4582,8 +4693,8 @@ this.bankPercentage = inputField2.value;
       record.customerId
     );
     this.applicationSelection = null;
-    
-    
+
+
   }
 
   popSelectedLoans(row) {
@@ -4631,7 +4742,7 @@ this.bankPercentage = inputField2.value;
     }).then(
       function () {
         __this.loadingService.show();
-        
+
         __this.camService.assignRequestToSelf(__this.workflowTargets).subscribe(
           (result) => {
             __this.loadingService.hide();
@@ -4647,7 +4758,7 @@ this.bankPercentage = inputField2.value;
               // __this.countryId();
               //__this.refresh();
               __this.displayApproverSearchForm = false;
-              
+
             }
           },
           (err) => {
@@ -4805,23 +4916,23 @@ this.bankPercentage = inputField2.value;
 
   getCustomerIBLEligibility(customerId) {
     this.customerService.getCustomerIBLEligibility(customerId).subscribe((response) => {
-      
-        this.iblEligibility = response.result;
-        
-       
+
+      this.iblEligibility = response.result;
+
+
     });
-}
-getFacilityStampDuty(loanApplicationId){
-  this.collateralService.getFacilityStampDuty(loanApplicationId).subscribe((response) => {
-    this.facilityStampDuty = response.result;
-    if(response.success){
-      if(this.facilityStampDuty[0].isShared == true){
-        this.sharingLabel = "Edit Sharing";
+  }
+  getFacilityStampDuty(loanApplicationId) {
+    this.collateralService.getFacilityStampDuty(loanApplicationId).subscribe((response) => {
+      this.facilityStampDuty = response.result;
+      if (response.success) {
+        if (this.facilityStampDuty[0].isShared == true) {
+          this.sharingLabel = "Edit Sharing";
+        }
       }
-    }
-   
-});
-}
+
+    });
+  }
 
 
   viewTermSheetDetails(row) {
@@ -4832,7 +4943,7 @@ getFacilityStampDuty(loanApplicationId){
   applyStampDutySharing(row) {
     this.facilityStampDutyDetail = row;
     this.displayfacilityStampDutyDetail = true;
-    this.facilityStampDutyId =  row.facilityStampDutyId
+    this.facilityStampDutyId = row.facilityStampDutyId
 
     this.stampDutySharingForm = this.fb.group({
       tillAccountNumber: ["250061014", Validators.required],
@@ -4841,9 +4952,9 @@ getFacilityStampDuty(loanApplicationId){
     });
   }
 
-  
 
-  toggleAppraisal() {}
+
+  toggleAppraisal() { }
 }
 
 /*{

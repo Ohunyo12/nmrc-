@@ -7,30 +7,35 @@
                         <div class="col-md-12">
                             <h2 class="panel-title pull-left">
                                 Drawdown Approvals
-                                <!-- Tranche Disbursement Booking Approval -->  
+                                <!-- Tranche Disbursement Booking Approval -->
                             </h2>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body" *ngIf="displayLoanToApproveModal2">
-                    <p-accordion *ngIf="isPoolRequest == true"  #accordion1>
-                        <p-accordionTab [selected]="true" header="DRAWDOWN REQUEST - GENERAL POOL" >
+                    <p-accordion *ngIf="isPoolRequest == true" #accordion1>
+                        <p-accordionTab [selected]="true" header="DRAWDOWN REQUEST - GENERAL POOL">
                             <!-- Add general Datatable here (onRowSelect)="onSelectedLoanChange($event)"-->
                             <p-dataTable [paginator]="true" resizableColumns="true" [responsive]="true"
-                                [value]="loanApprovalData" [rows]="5" 
-                                 (onRowSelect)="pushSelectedPendingLoanRequests($event)" (onRowUnselect)="popSelectedPendingLoanRequests($event)">
-                                <p-column [style]="{'width':'37px'}" [selection]=true selectionMode="multiple" (onRowSelect)="pushSelectedPendingLoanRequests($event)" (onRowUnselect)="popSelectedPendingLoanRequests($event)" ></p-column>
-                                <p-column [style]="{'width':'70px'}" field="divisionCode" header="Unit" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                [value]="loanApprovalData" [rows]="5"
+                                (onRowSelect)="pushSelectedPendingLoanRequests($event)"
+                                (onRowUnselect)="popSelectedPendingLoanRequests($event)">
+                                <p-column [style]="{'width':'37px'}" [selection]=true selectionMode="multiple"
+                                    (onRowSelect)="pushSelectedPendingLoanRequests($event)"
+                                    (onRowUnselect)="popSelectedPendingLoanRequests($event)"></p-column>
+                                <p-column [style]="{'width':'70px'}" field="divisionCode" header="Unit" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
 
-                                <p-column field="systemArrivalDateTime" [style]="{'width':'90px'}" header="Arrival Date" sortable="true" [filter]="true" filterMatchMode="contains">
-                                <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
-                                    {{ row.systemArrivalDateTime | date: 'medium' }}
-                                </ng-template>
-                            </p-column>
+                                <p-column field="systemArrivalDateTime" [style]="{'width':'90px'}" header="Arrival Date"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
+                                        {{ row.systemArrivalDateTime | date: 'medium' }}
+                                    </ng-template>
+                                </p-column>
                                 <p-column field="loanTypeName" [style]="{'width':'100px'}" header="Type" sortable="true"
                                     [filter]="true" filterMatchMode="contains"></p-column>
-                                <p-column field="productClassName" [style]="{'width':'100px'}" header="Class" sortable="true"
-                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="productClassName" [style]="{'width':'100px'}" header="Class"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
                                 <p-column field="productTypeName" [style]="{'width':'145px'}" header="Facility Type"
                                     sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
                                 <p-column field="applicationReferenceNumber" [style]="{'width':'100px'}" header="Ref No"
@@ -38,8 +43,8 @@
                                 <p-column [style]="{'width':'50px'}" field="isLineFacilityString" header="Is A Line"
                                     sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
 
-                                <p-column field="customerName" [style]="{'width':'150px'}" header="Obligor Name" sortable="true"
-                                    [filter]="true" filterMatchMode="contains">
+                                <p-column field="customerName" [style]="{'width':'150px'}" header="Obligor Name"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
                                     <ng-template pTemplate="body" let-item="rowData">
                                         <span *ngIf="item.loanTypeId == 3">{{item.applicantName}}</span>
                                         <span *ngIf="item.loanTypeId != 3">{{item.customerName}}</span>
@@ -52,154 +57,159 @@
                                     </ng-template>
                                 </p-column>
                                 <p-column [style]="{'text-align':'right','width':'135px'}" field="requestedAmount"
-                                    header="Amount Requested" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    header="Amount Requested" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
                                     <ng-template pTemplate="body" let-item="rowData">
                                         {{item.requestedAmount | currency:item.currencyCode:true:'1.2-2'}}
                                     </ng-template>
                                 </p-column>
-                                <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest" [filter]="true"
-                                    filterMatchMode="contains"></p-column>
-                                <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor" sortable="true"
-                                    [filter]="true" filterMatchMode="contains">
+                                <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
                                     <ng-template pTemplate="body" let-item="rowData">
                                         {{item.approvedTenorString}}
                                     </ng-template>
                                 </p-column>
                                 <p-column [style]="{'width':'9%'}">
                                     <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
-                                        <div class="btn-group"
-                                            [innerHtml]="getApplicationStatus(row.approvalStatusId)">
+                                        <div class="btn-group" [innerHtml]="getApplicationStatus(row.approvalStatusId)">
                                         </div>
                                     </ng-template>
                                 </p-column>
-                            </p-dataTable>                            
+                            </p-dataTable>
                             <div *ngIf="workflowTargets.length > 0" class="row">
                                 <div></div>
                                 <div class="form-group" class="col-md-12 ">
-                                    <div class="col-md-12" >
+                                    <div class="col-md-12">
                                         <button (click)="AddToMyDesk()" class="btn btn-primary pull-right">
                                             <span class="glyphicon glyphicon-plus"></span>
                                             Add To My Desk
                                         </button>
                                     </div>
                                 </div>
-                            </div>  
-                        </p-accordionTab>                
+                            </div>
+                        </p-accordionTab>
                     </p-accordion>
-                    <p-accordion  #accordion2>
-                        <p-accordionTab [selected]="true" header="MY DESK" >
-                                <p-dataTable [paginator]="true" resizableColumns="true" [responsive]="true"
-                                    [value]="assignedApplications" [rows]="5" selectionMode="single" [(selection)]="loanSelection"
-                                    (onRowSelect)="onSelectedLoanChange($event)">
-                                    <p-column [style]="{'width':'37px'}" selectionMode="single"></p-column>
-                                    <p-column [style]="{'width':'70px'}" field="divisionCode" header="Unit" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-    
-                                    <p-column field="systemArrivalDateTime" [style]="{'width':'90px'}" header="Arrival Date" sortable="true" [filter]="true" filterMatchMode="contains">
+                    <p-accordion #accordion2>
+                        <p-accordionTab [selected]="true" header="MY DESK">
+                            <p-dataTable [paginator]="true" resizableColumns="true" [responsive]="true"
+                                [value]="assignedApplications" [rows]="5" selectionMode="single"
+                                [(selection)]="loanSelection" (onRowSelect)="onSelectedLoanChange($event)">
+                                <p-column [style]="{'width':'37px'}" selectionMode="single"></p-column>
+                                <p-column [style]="{'width':'70px'}" field="divisionCode" header="Unit" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column field="systemArrivalDateTime" [style]="{'width':'90px'}" header="Arrival Date"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
                                     <ng-template let-i="rowIndex" let-row="rowData" pTemplate type="body">
                                         {{ row.systemArrivalDateTime | date: 'medium' }}
                                     </ng-template>
                                 </p-column>
-                                    <p-column field="loanTypeName" [style]="{'width':'100px'}" header="Type" sortable="true"
-                                        [filter]="true" filterMatchMode="contains"></p-column>
-                                    <p-column field="productClassName" [style]="{'width':'100px'}" header="Class" sortable="true"
-                                        [filter]="true" filterMatchMode="contains"></p-column>
-                                    <p-column field="productTypeName" [style]="{'width':'145px'}" header="Facility Type"
-                                        sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                                    <p-column field="applicationReferenceNumber" [style]="{'width':'100px'}" header="Ref No"
-                                        sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                                    <p-column [style]="{'width':'50px'}" field="isLineFacilityString" header="Is A Line"
-                                        sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-    
-                                    <p-column field="customerName" [style]="{'width':'150px'}" header="Obligor Name" sortable="true"
-                                        [filter]="true" filterMatchMode="contains">
-                                        <ng-template pTemplate="body" let-item="rowData">
-                                            <span *ngIf="item.loanTypeId == 3">{{item.applicantName}}</span>
-                                            <span *ngIf="item.loanTypeId != 3">{{item.customerName}}</span>
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column [style]="{'text-align':'right','width':'135px'}" field="approvedAmount"
-                                        header="Approved Amount" sortable="true" [filter]="true" filterMatchMode="contains">
-                                        <ng-template pTemplate="body" let-item="rowData">
-                                            {{item.approvedAmount | currency:item.currencyCode:true:'1.2-2'}}
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column [style]="{'text-align':'right','width':'135px'}" field="requestedAmount"
-                                        header="Amount Requested" sortable="true" [filter]="true" filterMatchMode="contains">
-                                        <ng-template pTemplate="body" let-item="rowData">
-                                            {{item.requestedAmount | currency:item.currencyCode:true:'1.2-2'}}
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest" [filter]="true"
-                                        filterMatchMode="contains"></p-column>
-                                    <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor" sortable="true"
-                                        [filter]="true" filterMatchMode="contains">
-                                        <ng-template pTemplate="body" let-item="rowData">
-                                            {{item.approvedTenorString}}
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column   header="My Desk">
-                                        <ng-template let-assignedApplications="rowData" let-i="rowIndex" pTemplate="body">
-                                            <a (click)="onReturnToPool(assignedApplications)" style="display: block" href="javascript:void(0)">
-                                                <i class="fa fa-undo" aria-hidden="true"></i>Undo
-                                            </a>
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column [style]="{'width':'9%'}">
-                                        <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
-                                            <div class="btn-group"
-                                                [innerHtml]="getApplicationStatus(row.approvalStatusId)">
-                                            </div>
-                                        </ng-template>
-                                    </p-column>
-                                </p-dataTable>                            
-                                                          
+                                <p-column field="loanTypeName" [style]="{'width':'100px'}" header="Type" sortable="true"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="productClassName" [style]="{'width':'100px'}" header="Class"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="productTypeName" [style]="{'width':'145px'}" header="Facility Type"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column field="applicationReferenceNumber" [style]="{'width':'100px'}" header="Ref No"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'50px'}" field="isLineFacilityString" header="Is A Line"
+                                    sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+
+                                <p-column field="customerName" [style]="{'width':'150px'}" header="Obligor Name"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        <span *ngIf="item.loanTypeId == 3">{{item.applicantName}}</span>
+                                        <span *ngIf="item.loanTypeId != 3">{{item.customerName}}</span>
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'text-align':'right','width':'135px'}" field="approvedAmount"
+                                    header="Approved Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.approvedAmount | currency:item.currencyCode:true:'1.2-2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'text-align':'right','width':'135px'}" field="requestedAmount"
+                                    header="Amount Requested" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.requestedAmount | currency:item.currencyCode:true:'1.2-2'}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest"
+                                    [filter]="true" filterMatchMode="contains"></p-column>
+                                <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor"
+                                    sortable="true" [filter]="true" filterMatchMode="contains">
+                                    <ng-template pTemplate="body" let-item="rowData">
+                                        {{item.approvedTenorString}}
+                                    </ng-template>
+                                </p-column>
+                                <p-column header="My Desk">
+                                    <ng-template let-assignedApplications="rowData" let-i="rowIndex" pTemplate="body">
+                                        <a (click)="onReturnToPool(assignedApplications)" style="display: block"
+                                            href="javascript:void(0)">
+                                            <i class="fa fa-undo" aria-hidden="true"></i>Undo
+                                        </a>
+                                    </ng-template>
+                                </p-column>
+                                <p-column [style]="{'width':'9%'}">
+                                    <ng-template let-row="rowData" let-i="rowIndex" pTemplate="body">
+                                        <div class="btn-group" [innerHtml]="getApplicationStatus(row.approvalStatusId)">
+                                        </div>
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
+
                         </p-accordionTab>
                     </p-accordion>
                 </div>
-            
 
-<p-tabView *ngIf="displayLoanToApproveModal">
-<!-- <p-dialog [responsive]=true [(visible)]="displayLoanToApproveModal" [draggable]="false" 
+
+                <p-tabView *ngIf="displayLoanToApproveModal">
+                    <!-- <p-dialog [responsive]=true [(visible)]="displayLoanToApproveModal" [draggable]="false" 
     modal="modal" width="1200" [contentStyle]="{'overflow':'auto','max-height':'700px'}"> -->
-    <div class="panel-heading">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 class="panel-title">
-                    DrawDown Booking Approval :: {{loanSelectedData.customerName}}
-                    <!-- Tranche Disbursement Booking Approval :: {{loanSelectedData.customerName}} -->
-                </h2>
-                <div class="pull-right">
-                    <a class="close" (click)="closeDrawdown()">&times;</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel-body">
-
-        <p-tabView>
-             <p-tabPanel *ngIf="!userIsAccountOfficer" header="Drawdown Memo">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h2 class="panel-title pull-left">
-                                        Drawdown Memo
-                                    </h2>
-                                    <button  (click)="printMemo()" style="margin-left:25px" >Generate Drawdown Memo</button>
-                                           
-                                     <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="panel-title">
+                                    DrawDown Booking Approval :: {{loanSelectedData.customerName}}
+                                    <!-- Tranche Disbursement Booking Approval :: {{loanSelectedData.customerName}} -->
+                                </h2>
+                                <div class="pull-right">
+                                    <a class="close" (click)="closeDrawdown()">&times;</a>
                                 </div>
                             </div>
                         </div>
-                        <!-- <div *ngIf="drawdownHtml != null" class="panel-body" style="min-height:450px;">
+                    </div>
+                    <div class="panel-body">
+
+                        <p-tabView>
+                            <p-tabPanel *ngIf="!userIsAccountOfficer" header="Drawdown Memo">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Drawdown Memo
+                                                </h2>
+                                                <button (click)="printMemo()" style="margin-left:25px">Generate Drawdown
+                                                    Memo</button>
+
+                                                <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div *ngIf="drawdownHtml != null" class="panel-body" style="min-height:450px;">
                             <CKEDITOR [content]="drawdownHtml" [height]="400"
                                 (contentChange)="contentChange($event)"></CKEDITOR>
                         </div> -->
-                        <div id="print-section" *ngIf="!userIsAccountOfficer" class="panel-body" [innerHtml]="drawdownHtml">
-                        </div>
-                    </div>
-            </p-tabPanel>
-            <!-- <p-tabPanel header="Deferral Memo">
+                                    <div id="print-section" *ngIf="!userIsAccountOfficer" class="panel-body"
+                                        [innerHtml]="drawdownHtml">
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <!-- <p-tabPanel header="Deferral Memo">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="row">
@@ -219,86 +229,95 @@
                         </div>
                     </div>
             </p-tabPanel> -->
-            <p-tabPanel header="Loan Disbursement Approval">
-                <div class="panel-body" style="overflow:scroll; height:300px">
-                    <h5>
-                        <b>Source: </b>{{ loanSource }}
-                    </h5>
-                    <div class="col-md-8">
-                        <span *ngIf="isLienPlacementForLoan" style="color: red; font-weight: bold;">NOTE: LIEN HAS BEEN PLACED FOR THIS LOAN!</span>
-                    </div>
-                    <form novalidate [formGroup]="generalInputForm" autocomplete="off">
-                    <table class="table table-customer-information">
-                        <tbody>
-                            <tr>
-                                <td><strong>Application Reference Number</strong></td>
-                                <td>{{ loanSelectedData.applicationReferenceNumber }}</td>
-                                <td><strong>Loan Type</strong></td>
-                                <td>{{ loanSelectedData.loanTypeName }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Product Name</strong></td>
-                                <td>{{ loanSelectedData.productName }}</td>
-                                <td><strong>Product Type</strong></td>
-                                <td>{{ loanSelectedData.productTypeName}}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Approved Tenor</strong></td>
-                                <td>{{ loanSelectedData.approvedTenorString }}</td>
-                                <td><strong>Interest Rate</strong></td>
-                                <td>{{ loanSelectedData.interestRate }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Approved Amount</strong></td>
-                                <td>{{loanSelectedData.approvedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                                <td><strong>Disbursed Amount</strong></td>
-                                <td>{{ loanSelectedData.amountDisbursed | number: '1.2'}}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Previous Request</strong></td>
-                                <td>{{ loanSelectedData.allRequestAmount - loanSelectedData.requestedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2' }}
-                                </td>
-                                <td><strong>New Request</strong></td>
-                                <td>{{ loanSelectedData.requestedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Unapproved Request</strong></td>
-                                <td>{{ loanSelectedData.pendingRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                                <td><strong>Approved Request</strong></td>
-                                <td>{{ loanSelectedData.approveRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total Request</strong></td>
-                                <td>{{ loanSelectedData.allRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                                <td><strong>Available Balance</strong></td>
-                                <td>{{ loanSelectedData.approvedAmount - loanSelectedData.allRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Receiving Account</strong></td>
-                                <td>{{ loanSelectedData.accountNumber ? loanSelectedData.accountNumber : 'n/a'}}</td>
-                                <td><strong>Paying Account</strong></td>
-                                <td>{{ loanSelectedData.accountNumber2 ? loanSelectedData.accountNumber2 : 'n/a'}}</td>
-                            </tr>
-                            <tr>
-                                <td *ngIf="loanSelectedData.isLineMaintained == true && staffRoleRecord.staffRoleCode == 'LEGAL'">
-                                    <input type="checkbox" [(ngModel)]="documentProvided" class="form-control" name="documentProvided" id="documentProvided" formControlName="documentProvided"
-                                    class="form-control" (click)="setLegalDocumentStatusForLineFacility($event)"
-                                     value="{{loanSelectedData?.documentProvided}}"> Document is provided?
-                                </td>
-                                <td>
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            
+                            <p-tabPanel header="Loan Disbursement Approval">
+                                <div class="panel-body" style="overflow:scroll; height:300px">
+                                    <h5>
+                                        <b>Source: </b>{{ loanSource }}
+                                    </h5>
+                                    <div class="col-md-8">
+                                        <span *ngIf="isLienPlacementForLoan"
+                                            style="color: red; font-weight: bold;">NOTE: LIEN HAS BEEN PLACED FOR THIS
+                                            LOAN!</span>
+                                    </div>
+                                    <form novalidate [formGroup]="generalInputForm" autocomplete="off">
+                                        <table class="table table-customer-information">
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Application Reference Number</strong></td>
+                                                    <td>{{ loanSelectedData.applicationReferenceNumber }}</td>
+                                                    <td><strong>Loan Type</strong></td>
+                                                    <td>{{ loanSelectedData.loanTypeName }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Product Name</strong></td>
+                                                    <td>{{ loanSelectedData.productName }}</td>
+                                                    <td><strong>Product Type</strong></td>
+                                                    <td>{{ loanSelectedData.productTypeName}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Approved Tenor</strong></td>
+                                                    <td>{{ loanSelectedData.approvedTenorString }}</td>
+                                                    <td><strong>Interest Rate</strong></td>
+                                                    <td>{{ loanSelectedData.interestRate }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Approved Amount</strong></td>
+                                                    <td>{{loanSelectedData.approvedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                    <td><strong>Disbursed Amount</strong></td>
+                                                    <td>{{ loanSelectedData.amountDisbursed | number: '1.2'}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Previous Request</strong></td>
+                                                    <td>{{ loanSelectedData.allRequestAmount - loanSelectedData.requestedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2' }}
+                                                    </td>
+                                                    <td><strong>New Request</strong></td>
+                                                    <td>{{ loanSelectedData.requestedAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Unapproved Request</strong></td>
+                                                    <td>{{ loanSelectedData.pendingRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                    <td><strong>Approved Request</strong></td>
+                                                    <td>{{ loanSelectedData.approveRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Total Request</strong></td>
+                                                    <td>{{ loanSelectedData.allRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                    <td><strong>Available Balance</strong></td>
+                                                    <td>{{ loanSelectedData.approvedAmount - loanSelectedData.allRequestAmount | currency:loanSelectedData.currencyCode:true: '1.2-2'}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Receiving Account</strong></td>
+                                                    <td>{{ loanSelectedData.accountNumber ? loanSelectedData.accountNumber : 'n/a'}}
+                                                    </td>
+                                                    <td><strong>Paying Account</strong></td>
+                                                    <td>{{ loanSelectedData.accountNumber2 ? loanSelectedData.accountNumber2 : 'n/a'}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td
+                                                        *ngIf="loanSelectedData.isLineMaintained == true && staffRoleRecord.staffRoleCode == 'LEGAL'">
+                                                        <input type="checkbox" [(ngModel)]="documentProvided"
+                                                            class="form-control" name="documentProvided"
+                                                            id="documentProvided" formControlName="documentProvided"
+                                                            class="form-control"
+                                                            (click)="setLegalDocumentStatusForLineFacility($event)"
+                                                            value="{{loanSelectedData?.documentProvided}}"> Document is
+                                                        provided?
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
 
-                            <!-- <tr>
+
+                                                <!-- <tr>
                                 <td><strong>Comment</strong></td>
                                 <td><textarea [ngClass]="!loanSelectedData.comment ? 'required-input' : 'valid-input'" class="form-control" [(ngModel)]="loanSelectedData.comment" name="comment" cols="15" rows="3"></textarea></td>
                                 <td><strong>Status</strong></td>
@@ -309,88 +328,96 @@
                                         </select>
                                 </td>
                             </tr> -->
-                        </tbody>
-                    </table>
-                    </form>
+                                            </tbody>
+                                        </table>
+                                    </form>
 
-                </div>
-            </p-tabPanel>
-            <p-tabPanel header="Appraisal Memorandum">
-                <div *ngIf="isMultipleDrawdown" class="panel-body">
-                    <p-dataTable [paginator]="false" resizableColumns="true" [responsive]="true"
-                        [value]="drawdownFacilitiesInformation" selectionMode="single"
-                        (onRowSelect)="pushSelectedLoans($event)" (onRowUnselect)="popSelectedLoans($event)">
-                        <p-header>Multiple Facility Drawdown</p-header>
-                        <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column> -->
-                        <p-column [style]="{'width':'150px'}" field="productTypeName" header="Facility Type"
-                            sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                        <p-column [style]="{'width':'150px'}" field="productName" header="Facility Name" sortable="true"
-                            [filter]="true" filterMatchMode="contains"></p-column>
-                        <p-column field="applicationReferenceNumber" header="Ref No" sortable="true" [filter]="true"
-                            filterMatchMode="contains"></p-column>
-                        <p-column [style]="{'width':'150px'}" field="customerName" header="Obligor Name" sortable="true"
-                            [filter]="true" filterMatchMode="contains">
-                            <ng-template pTemplate="body" let-item="rowData">
-                                <span *ngIf="item.loanTypeId == 3">{{item.applicantName}}</span>
-                                <span *ngIf="item.loanTypeId != 3">{{item.customerName}}</span>
-                            </ng-template>
-                        </p-column>
-                        <p-column [style]="{'text-align':'right','width':'115px'}" field="approvedAmount"
-                            header="Approved Amount" sortable="true" [filter]="true" filterMatchMode="contains">
-                            <ng-template pTemplate="body" let-item="rowData">
-                                {{item.approvedAmount | currency:item.currencyCode:true: '1.2-2'}}
-                            </ng-template>
-                        </p-column>
-                        <p-column [style]="{'text-align':'right','width':'115px'}" field="amountDisbursed"
-                            header="Disbursed Amount" sortable="true" [filter]="true" filterMatchMode="contains">
-                            <ng-template pTemplate="body" let-item="rowData">
-                                {{item.amountDisbursed | currency:item.currencyCode:true: '1.2-2'}}
-                            </ng-template>
-                        </p-column>
-                        <p-column [style]="{'text-align':'right','width':'115px'}" field="allRequestAmount"
-                            header="Requested Amount" sortable="true" [filter]="true" filterMatchMode="contains">
-                            <ng-template pTemplate="body" let-item="rowData">
-                                {{item.allRequestAmount | currency:item.currencyCode:true: '1.2-2'}}
-                            </ng-template>
-                        </p-column>
-                        <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest" [filter]="true"
-                            filterMatchMode="contains"></p-column>
-                        <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor" sortable="true"
-                            [filter]="true" filterMatchMode="contains">
-                            <ng-template pTemplate="body" let-item="rowData">
-                                {{item.approvedTenorString}}
-                            </ng-template>
-                        </p-column>
-                    </p-dataTable>
-                </div>
-                <!-- [disabled]="disableAppraisalMemorandumTab || applicationSelection.productClassProcessId == 2"> -->
-
-                <!-- cam document -->
-                <div class="card no-padding">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-md-9">
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="pull-right">
-                                        <!-- <button *ngIf="displayDocumentation == false" (click)="previewDocumentation()" style="padding: 3px 6px 3px 6px;">
+                            </p-tabPanel>
+                            <p-tabPanel header="Appraisal Memorandum">
+                                <div *ngIf="isMultipleDrawdown" class="panel-body">
+                                    <p-dataTable [paginator]="false" resizableColumns="true" [responsive]="true"
+                                        [value]="drawdownFacilitiesInformation" selectionMode="single"
+                                        (onRowSelect)="pushSelectedLoans($event)"
+                                        (onRowUnselect)="popSelectedLoans($event)">
+                                        <p-header>Multiple Facility Drawdown</p-header>
+                                        <!-- <p-column [style]="{'width':'38px'}" selectionMode="multiple"></p-column> -->
+                                        <p-column [style]="{'width':'150px'}" field="productTypeName"
+                                            header="Facility Type" sortable="true" [filter]="true"
+                                            filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'150px'}" field="productName" header="Facility Name"
+                                            sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column field="applicationReferenceNumber" header="Ref No" sortable="true"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'150px'}" field="customerName" header="Obligor Name"
+                                            sortable="true" [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                <span *ngIf="item.loanTypeId == 3">{{item.applicantName}}</span>
+                                                <span *ngIf="item.loanTypeId != 3">{{item.customerName}}</span>
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'text-align':'right','width':'115px'}"
+                                            field="approvedAmount" header="Approved Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                {{item.approvedAmount | currency:item.currencyCode:true: '1.2-2'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'text-align':'right','width':'115px'}"
+                                            field="amountDisbursed" header="Disbursed Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                {{item.amountDisbursed | currency:item.currencyCode:true: '1.2-2'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'text-align':'right','width':'115px'}"
+                                            field="allRequestAmount" header="Requested Amount" sortable="true"
+                                            [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                {{item.allRequestAmount | currency:item.currencyCode:true: '1.2-2'}}
+                                            </ng-template>
+                                        </p-column>
+                                        <p-column [style]="{'width':'50px'}" field="interestRate" header="Interest"
+                                            [filter]="true" filterMatchMode="contains"></p-column>
+                                        <p-column [style]="{'width':'80px'}" field="approvedTenor" header="Tenor"
+                                            sortable="true" [filter]="true" filterMatchMode="contains">
+                                            <ng-template pTemplate="body" let-item="rowData">
+                                                {{item.approvedTenorString}}
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </div>
+                                <!-- [disabled]="disableAppraisalMemorandumTab || applicationSelection.productClassProcessId == 2"> -->
+
+                                <!-- cam document -->
+                                <div class="card no-padding">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-md-9">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="pull-right">
+                                                        <!-- <button *ngIf="displayDocumentation == false" (click)="previewDocumentation()" style="padding: 3px 6px 3px 6px;">
                                         <span class="glyphicon glyphicon-file"></span> Preview</button> -->
-                                        <button (click)="previewDocumentation(true)" style="padding: 3px 6px 3px 6px;">
-                                            <span class="glyphicon glyphicon-print"></span> Print</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <h2 *ngIf="documentations?.length > 0" class="panel-title">
-                                Appraisal Documentation for REFERENCE:
-                                <strong>{{ loanSelection?.applicationReferenceNumber }}</strong> of OBLIGOR:
-                                <strong>{{ loanSelection?.customerName }}</strong>
-                            </h2>
-                        </div>
+                                                        <button (click)="previewDocumentation(true)"
+                                                            style="padding: 3px 6px 3px 6px;">
+                                                            <span class="glyphicon glyphicon-print"></span>
+                                                            Print</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h2 *ngIf="documentations?.length > 0" class="panel-title">
+                                                Appraisal Documentation for REFERENCE:
+                                                <strong>{{ loanSelection?.applicationReferenceNumber }}</strong> of
+                                                OBLIGOR:
+                                                <strong>{{ loanSelection?.customerName }}</strong>
+                                            </h2>
+                                        </div>
 
-                        <!-- Default FAM Preview -->
-                        <div class="panel panel-default">
-                            <!-- <div class="panel-heading">
+                                        <!-- Default FAM Preview -->
+                                        <div class="panel panel-default">
+                                            <!-- <div class="panel-heading">
                             <h2 *ngIf="documentations != null && documentations != undefined && documentations.length > 0" class="panel-title">
                                 Appraisal Documentation for REFERENCE:
                                 <strong>{{ loanSelection?.applicationReferenceNumber }}</strong> of OBLIGOR:
@@ -401,46 +428,50 @@
                             </div>
                         </div> -->
 
-                            <div class="panel-body" style="overflow:auto;height:400px">
-                                <div *ngFor="let x of documentations">
-                                    <!-- <p><strong>{{x.title}}</strong></p> -->
-                                    <p><span [innerHtml]="x.templateDocument"></span></p>
+                                            <div class="panel-body" style="overflow:auto;height:400px">
+                                                <div *ngFor="let x of documentations">
+                                                    <!-- <p><strong>{{x.title}}</strong></p> -->
+                                                    <p><span [innerHtml]="x.templateDocument"></span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- endof cam document 1 -->
-            </p-tabPanel>
-            <p-tabPanel header="Offer Letter">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h2 class="panel-title pull-left">
-                                    Generated Offer Letter
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <div class="panel-body" style="height: calc(100vh - 200px); overflow: hidden; padding: 0 15px;">
-                        <div style="margin-bottom: 10px;">
-                            <button class="btn btn-primary" (click)="printOfferLetter()">Print Offer Letter</button>
-                        </div>
-                        <iframe [src]="reportSrc" id="report" name="report" frameborder="0" width="100%" height="100%"
-                            style="border: none; display: block;">
-                        </iframe>
-            
-                    </div>
-                </div>
-            </p-tabPanel>
+                                <!-- endof cam document 1 -->
+                            </p-tabPanel>
+                            <p-tabPanel header="Offer Letter">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Generated Offer Letter
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
 
-            <p-tabPanel header="Approval Comments">
-                <div class="panel panel-default" *ngIf="loanSelectedData">
-                        <app-approval-comments [all]="true" [tableLabel]="'Approval Process Comments'" [operationId]="loanSelectedData?.appraisalOperationId" [applicationId]="loanSelectedData?.loanApplicationId"></app-approval-comments>
-                           
-                        <!-- <app-approval-comments [operationId]="loanSelectedData?.appraisalOperationId" 
+                                    <div class="panel-body"
+                                        style="height: calc(100vh - 200px); overflow: hidden; padding: 0 15px;">
+                                        <div style="margin-bottom: 10px;">
+                                            <button class="btn btn-primary" (click)="printOfferLetter()">Print Offer
+                                                Letter</button>
+                                        </div>
+                                        <iframe [src]="reportSrc" id="report" name="report" frameborder="0" width="100%"
+                                            height="100%" style="border: none; display: block;">
+                                        </iframe>
+
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Approval Comments">
+                                <div class="panel panel-default" *ngIf="loanSelectedData">
+                                    <app-approval-comments [all]="true" [tableLabel]="'Approval Process Comments'"
+                                        [operationId]="loanSelectedData?.appraisalOperationId"
+                                        [applicationId]="loanSelectedData?.loanApplicationId"></app-approval-comments>
+
+                                    <!-- <app-approval-comments [operationId]="loanSelectedData?.appraisalOperationId" 
                         [applicationId]="loanSelectedData?.loanApplicationId"  [tableLabel]="creditAppraisalComment">
                     </app-approval-comments>
 
@@ -448,8 +479,8 @@
                         [tableLabel]="drawdownComment"
                         [applicationId]="loanSelectedData.loanBookingRequestId">
                     </app-approval-comments> -->
-                </div>
-                <!-- <p-dataTable [value]="approvalWorkflowData" [paginator]="true" [rows]="5" [responsive]="true">
+                                </div>
+                                <!-- <p-dataTable [value]="approvalWorkflowData" [paginator]="true" [rows]="5" [responsive]="true">
                     <p-column field="requestStaffName" header="Intiated By"></p-column>
                     <p-column field="requestApprovalLevel" header="Initiator Approval Level"></p-column>
                     <p-column field="responseStaffName" header="Directed To"></p-column>
@@ -467,206 +498,234 @@
                         </ng-template>
                     </p-column>
                 </p-dataTable> -->
-            </p-tabPanel>
-            <!-- <p-tabPanel header="Customer Information">
+                            </p-tabPanel>
+                            <!-- <p-tabPanel header="Customer Information">
                     <app-customer-information-detail [loanApplicationId]="loanApplId">
                     </app-customer-information-detail>
                 </p-tabPanel> -->
-            <p-tabPanel header="Other Information">
-                <div class="panel-body">
-                    <p-accordion #accordion>
-                        <p-accordionTab [selected]="true" header="Customer Information">
-                            <div class="panel-body" style="overflow:auto; height:300px">
-                                <app-customer-information-detail [loanApplicationId]="loanApplId">
-                                </app-customer-information-detail>
-                            </div>
-                        </p-accordionTab>
-                        <p-accordionTab header="Loan Details">
+                            <p-tabPanel header="Other Information">
+                                <div class="panel-body">
+                                    <p-accordion #accordion>
+                                        <p-accordionTab [selected]="true" header="Customer Information">
+                                            <div class="panel-body" style="overflow:auto; height:300px">
+                                                <app-customer-information-detail [loanApplicationId]="loanApplId">
+                                                </app-customer-information-detail>
+                                            </div>
+                                        </p-accordionTab>
+                                        <p-accordionTab header="Loan Details">
 
-                            <button type="button" class="btn btn-primary"
-                                (click)="showLoanInformation()" style="margin-right:5px">
-                                <i class="glyphicon glyphicon-info"></i> Show Loan Information</button>
+                                            <button type="button" class="btn btn-primary"
+                                                (click)="showLoanInformation()" style="margin-right:5px">
+                                                <i class="glyphicon glyphicon-info"></i> Show Loan Information</button>
 
-                            <app-loan-application-details-view [isRecommendedInfo]="true">
-                            </app-loan-application-details-view>
-                        </p-accordionTab>
-                        <p-accordionTab header="Loan Collateral(s)">
-                            <div class="panel-body" style="overflow:auto; height:200px">
-                                <div>
-                                    <app-collaterals-proposed *ngIf="loanData?.loanApplicationId>0"
-                                        [loanApplicationId]="loanData?.loanApplicationId"
-                                        [currencyId]="loanData?.currencyId"
-                                        [reload]="loanData?.loanApplicationId"
-                                        [isForSwap]="false"
-                                        [reload]="loanData?.loanApplicationId" 
-                                        [currentApprovalStatusId]="approvalStatusId" 
-                                        [loanApplicationDetailId]="loanApplicationDetailId"
-                                        >
-                                    </app-collaterals-proposed>
-                                </div>
-                                <p-dataTable *ngIf="loanSelection != null" id="loanCollateralList"
-                                    [value]="loanSelection.loanCollateral" [responsive]="true" [paginator]="true"
-                                    [rows]="5">
-                                    <p-column field="collateralTypeName" header="Type" [style]="{'width':'280px'}"
-                                        sortable="true" filterMatchMode="contains"></p-column>
-                                    <p-column field="currencyCode" header=""
-                                        [style]="{'text-align':'right','width':'40px'}" sortable="true"
-                                        filterMatchMode="contains"></p-column>
-                                    <p-column field="collateralValue" header="Value" sortable="true"
-                                        filterMatchMode="contains">
-                                        <ng-template pTemplate="body" let-item="rowData">
-                                            {{item.collateralValue | number:'1.2'}}
-                                        </ng-template>
-                                    </p-column>
-                                    <p-column field="haircut" header="Haircut" sortable="true"
-                                        filterMatchMode="contains"></p-column>
-                                    <p-column field="valuationCycle" header="Valuation Cycle" sortable="true"
-                                        filterMatchMode="contains"></p-column>
-                                    <p-column [style]="{'width':'60px'}" field="allowSharing" header="share Allowed"
-                                        sortable="true" filterMatchMode="contains">
-                                        <ng-template pTemplate="header">Can Share?</ng-template>
-                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                            <span *ngIf="d.allowSharing">Yes</span>
-                                            <span *ngIf="!d.allowSharing">No</span>
-                                        </ng-template>
-                                    </p-column>
-                                    <!-- <p-column [style]="{'width':'40px'}">
+                                            <app-loan-application-details-view [isRecommendedInfo]="true">
+                                            </app-loan-application-details-view>
+                                        </p-accordionTab>
+                                        <p-accordionTab header="Loan Collateral(s)">
+                                            <div class="panel-body" style="overflow:auto; height:200px">
+                                                <div>
+                                                    <app-collaterals-proposed *ngIf="loanData?.loanApplicationId>0"
+                                                        [loanApplicationId]="loanData?.loanApplicationId"
+                                                        [currencyId]="loanData?.currencyId"
+                                                        [reload]="loanData?.loanApplicationId" [isForSwap]="false"
+                                                        [reload]="loanData?.loanApplicationId"
+                                                        [currentApprovalStatusId]="approvalStatusId"
+                                                        [loanApplicationDetailId]="loanApplicationDetailId">
+                                                    </app-collaterals-proposed>
+                                                </div>
+                                                <p-dataTable *ngIf="loanSelection != null" id="loanCollateralList"
+                                                    [value]="loanSelection.loanCollateral" [responsive]="true"
+                                                    [paginator]="true" [rows]="5">
+                                                    <p-column field="collateralTypeName" header="Type"
+                                                        [style]="{'width':'280px'}" sortable="true"
+                                                        filterMatchMode="contains"></p-column>
+                                                    <p-column field="currencyCode" header=""
+                                                        [style]="{'text-align':'right','width':'40px'}" sortable="true"
+                                                        filterMatchMode="contains"></p-column>
+                                                    <p-column field="collateralValue" header="Value" sortable="true"
+                                                        filterMatchMode="contains">
+                                                        <ng-template pTemplate="body" let-item="rowData">
+                                                            {{item.collateralValue | number:'1.2'}}
+                                                        </ng-template>
+                                                    </p-column>
+                                                    <p-column field="haircut" header="Haircut" sortable="true"
+                                                        filterMatchMode="contains"></p-column>
+                                                    <p-column field="valuationCycle" header="Valuation Cycle"
+                                                        sortable="true" filterMatchMode="contains"></p-column>
+                                                    <p-column [style]="{'width':'60px'}" field="allowSharing"
+                                                        header="share Allowed" sortable="true"
+                                                        filterMatchMode="contains">
+                                                        <ng-template pTemplate="header">Can Share?</ng-template>
+                                                        <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                            <span *ngIf="d.allowSharing">Yes</span>
+                                                            <span *ngIf="!d.allowSharing">No</span>
+                                                        </ng-template>
+                                                    </p-column>
+                                                    <!-- <p-column [style]="{'width':'40px'}">
                                         <ng-template pTemplate="header"></ng-template>
                                         <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
                                             <a (click)="ViewCollateralDetails(d)" href="javascript:void(0)">View</a>
                                         </ng-template>
                                     </p-column> -->
-                                </p-dataTable>
-                            </div>
+                                                </p-dataTable>
+                                            </div>
 
-                        </p-accordionTab>
+                                        </p-accordionTab>
 
-                        <p-accordionTab header="Loan Monitoring Trigger">
-                            <div class="panel-body" style="overflow:auto; height:300px">
-                                <p-dataTable [value]="loanSelectedData.monitoringTriggers" [responsive]="true"
-                                    [paginator]="false" [rows]="5">
-                                    <p-column field="monitoringTrigger" header="monitoringTrigger"></p-column>
-                                    <!-- <p-footer> Number of Guarantors: {{loanSelectedData.monitoringTriggers.count}}</p-footer> -->
-                                </p-dataTable>
-                            </div>
-                        </p-accordionTab>
+                                        <p-accordionTab header="Loan Monitoring Trigger">
+                                            <div class="panel-body" style="overflow:auto; height:300px">
+                                                <p-dataTable [value]="loanSelectedData.monitoringTriggers"
+                                                    [responsive]="true" [paginator]="false" [rows]="5">
+                                                    <p-column field="monitoringTrigger" header="monitoringTrigger">
+                                                    </p-column>
+                                                    <!-- <p-footer> Number of Guarantors: {{loanSelectedData.monitoringTriggers.count}}</p-footer> -->
+                                                </p-dataTable>
+                                            </div>
+                                        </p-accordionTab>
 
-                    </p-accordion>
-                </div>
-            </p-tabPanel>
-            <p-tabPanel header="Checklist">
-                    <div class="panel-body">
-                        <app-condition-checklist  [isLMSChecklist]="false"  [showOrHideList]='false'></app-condition-checklist>
-                    </div>
-                </p-tabPanel>
+                                    </p-accordion>
+                                </div>
+                            </p-tabPanel>
+                            <p-tabPanel header="Checklist">
+                                <div class="panel-body">
+                                    <app-condition-checklist [isLMSChecklist]="false" [showOrHideList]='false'>
+                                    </app-condition-checklist>
+                                </div>
+                            </p-tabPanel>
 
-            <!-- ========================================================================================= -->
-            <p-tabPanel header="Supporting Documents">
-               
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Documents For Upload
-                    </div>
-                    <div class="panel-body">
-                
-                        <p-dataTable [value]="requiredDocumentTypes" [responsive]="true" [paginator]="true" [rows]="5">
-                            <p-column field="productClassName" [filter]="true" header="Product Class Name" sortable="true" filterMatchMode="contains"></p-column>
-                            <p-column field="productName" [filter]="true" header="Product Name" sortable="true" filterMatchMode="contains"></p-column>
-                            <p-column field="documentCategoryName" header="Document Category" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                            <p-column field="documentType" header="Document Type Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                            <p-column field="sectorName" header="Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                            <p-column field="subSectorName" header="Sub-Sector Name" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                            <p-column field="required" header="Is Required" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                            <p-column [style]="{'width':'100px'}">
-                                <ng-template pTemplate="header">Is uploaded</ng-template>
-                                <ng-template pTemplate="body" let-col let-i="rowData">
-                                    <b [innerHTML]="documentIsUploaded(i.documentTypeId)"></b>
-                                        {{checkIfRequiredDocumentsAreUploaded()}}
-                                </ng-template>
-                            </p-column>
-                        </p-dataTable>
-                
-                    </div>
-            </div>
-            
-            <div class="panel-heading">
-                <h2 class="panel-title">
-                    {{ panelTitle }}
-                </h2>
-            </div>
-            
-            <div class="panel panel-default" *ngIf="showUploadForm">
-                <form novalidate [formGroup]="documentUploadForm" autocomplete="off">
-                    <div class="panel-body">
-                        <div class="form-horizontal">
-            
-                            <div class="form-group">
-                                <label for="fileName" class="control-label col-md-3">Document Category</label>
-                                <label for="fileName" class="control-label col-md-3">Document Type</label>
-                                <label for="fileData" class="control-label col-md-6">Select Document</label>
-                                <div class="col-md-3">
-                                    <select (change)="getDocumentTypesByCategory($event.target.value)" name="documentCategoryId" id="documentCategoryId"
-                                        formControlName="documentCategoryId" class="form-control"
-                                        [ngClass]="!documentUploadForm.controls['documentCategoryId'].valid ? 'required-input' : 'valid-input'">
-                                        <option value="">-- Select Document Category --</option>
-                                        <option *ngFor=" let x of documentCategories" [value]="x.documentCategoryId">{{x.documentCategoryName }}</option>
-                                    </select>
+                            <!-- ========================================================================================= -->
+                            <p-tabPanel header="Supporting Documents">
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Documents For Upload
+                                    </div>
+                                    <div class="panel-body">
+
+                                        <p-dataTable [value]="requiredDocumentTypes" [responsive]="true"
+                                            [paginator]="true" [rows]="5">
+                                            <p-column field="productClassName" [filter]="true"
+                                                header="Product Class Name" sortable="true" filterMatchMode="contains">
+                                            </p-column>
+                                            <p-column field="productName" [filter]="true" header="Product Name"
+                                                sortable="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="documentCategoryName" header="Document Category"
+                                                sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="documentType" header="Document Type Name" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="sectorName" header="Sector Name" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="subSectorName" header="Sub-Sector Name" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column field="required" header="Is Required" sortable="true"
+                                                [filter]="true" filterMatchMode="contains"></p-column>
+                                            <p-column [style]="{'width':'100px'}">
+                                                <ng-template pTemplate="header">Is uploaded</ng-template>
+                                                <ng-template pTemplate="body" let-col let-i="rowData">
+                                                    <b [innerHTML]="documentIsUploaded(i.documentTypeId)"></b>
+                                                    {{checkIfRequiredDocumentsAreUploaded()}}
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <select name="documentTypeId" formControlName="documentTypeId"
-                                        [ngClass]="!documentUploadForm.controls['documentTypeId'].valid ? 'required-input' : 'valid-input'"
-                                        id="documentTypeId" class="form-control">
-                                        <option value="">Select Document Type</option>
-                                        <option *ngFor="let x of documentTypes" value="{{x.documentTypeId}}">{{x.documentTypeName}}
-                                        </option>
-                                    </select>
+
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">
+                                        {{ panelTitle }}
+                                    </h2>
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="file" (change)="onFileChange($event)" formControlName="fileData"
-                                        [ngClass]="!documentUploadForm.controls['fileData'].valid ? 'required-input' : 'valid-input'"
-                                        placeholder="Upload file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png" #fileInput
-                                        name="fileInput" style="padding-top:2px;" class="form-control">
+
+                                <div class="panel panel-default" *ngIf="showUploadForm">
+                                    <form novalidate [formGroup]="documentUploadForm" autocomplete="off">
+                                        <div class="panel-body">
+                                            <div class="form-horizontal">
+
+                                                <div class="form-group">
+                                                    <label for="fileName" class="control-label col-md-3">Document
+                                                        Category</label>
+                                                    <label for="fileName" class="control-label col-md-3">Document
+                                                        Type</label>
+                                                    <label for="fileData" class="control-label col-md-6">Select
+                                                        Document</label>
+                                                    <div class="col-md-3">
+                                                        <select
+                                                            (change)="getDocumentTypesByCategory($event.target.value)"
+                                                            name="documentCategoryId" id="documentCategoryId"
+                                                            formControlName="documentCategoryId" class="form-control"
+                                                            [ngClass]="!documentUploadForm.controls['documentCategoryId'].valid ? 'required-input' : 'valid-input'">
+                                                            <option value="">-- Select Document Category --</option>
+                                                            <option *ngFor=" let x of documentCategories"
+                                                                [value]="x.documentCategoryId">
+                                                                {{x.documentCategoryName }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <select name="documentTypeId" formControlName="documentTypeId"
+                                                            [ngClass]="!documentUploadForm.controls['documentTypeId'].valid ? 'required-input' : 'valid-input'"
+                                                            id="documentTypeId" class="form-control">
+                                                            <option value="">Select Document Type</option>
+                                                            <option *ngFor="let x of documentTypes"
+                                                                value="{{x.documentTypeId}}">{{x.documentTypeName}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="file" (change)="onFileChange($event)"
+                                                            formControlName="fileData"
+                                                            [ngClass]="!documentUploadForm.controls['fileData'].valid ? 'required-input' : 'valid-input'"
+                                                            placeholder="Upload file"
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.xls,.xlsx,.png"
+                                                            #fileInput name="fileInput" style="padding-top:2px;"
+                                                            class="form-control">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" *ngIf="documentDates">
+                                                    <label for="issueDate" class="control-label col-md-6">Issue
+                                                        Date</label>
+                                                    <label for="expiryDate" class="control-label col-md-6">Expiry
+                                                        Date</label>
+                                                    <div class="col-md-6">
+                                                        <p-calendar id="issueDate" formControlName="issueDate"
+                                                            [monthNavigator]="true" [yearNavigator]="true"
+                                                            yearRange="1900:2030" [showIcon]="true"
+                                                            [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                            [style]="{'width': '100%', 'z-index': '999'}"
+                                                            [ngClass]="!documentUploadForm.controls['issueDate'].valid ? 'required-input' : 'valid-input'">
+                                                        </p-calendar>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p-calendar id="expiryDate" formControlName="expiryDate"
+                                                            [monthNavigator]="true" [yearNavigator]="true"
+                                                            yearRange="1900:2030" [showIcon]="true"
+                                                            [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
+                                                            [style]="{'width': '100%', 'z-index': '999'}"
+                                                            [ngClass]="!documentUploadForm.controls['expiryDate'].valid ? 'required-input' : 'valid-input'">
+                                                        </p-calendar>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </form>
+
+                                    <div class="panel-footer">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="button" (click)="saveDocumentUpload(documentUploadForm)"
+                                                    [disabled]="documentUploadForm.invalid"
+                                                    class="btn btn-success pull-right"><span
+                                                        class="glyphicon glyphicon-upload"></span> Upload</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-            
-                            <div class="form-group" *ngIf="documentDates">
-                                <label for="issueDate" class="control-label col-md-6">Issue Date</label>
-                                <label for="expiryDate" class="control-label col-md-6">Expiry Date</label>
-                                <div class="col-md-6">
-                                    <p-calendar id="issueDate" formControlName="issueDate" [monthNavigator]="true"
-                                        [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
-                                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
-                                        [style]="{'width': '100%', 'z-index': '999'}"
-                                        [ngClass]="!documentUploadForm.controls['issueDate'].valid ? 'required-input' : 'valid-input'">
-                                    </p-calendar>
-                                </div>
-                                <div class="col-md-6">
-                                    <p-calendar id="expiryDate" formControlName="expiryDate" [monthNavigator]="true"
-                                        [yearNavigator]="true" yearRange="1900:2030" [showIcon]="true"
-                                        [inputStyle]="{'width': '100%','border-left':'3px solid #3cd225'}"
-                                        [style]="{'width': '100%', 'z-index': '999'}"
-                                        [ngClass]="!documentUploadForm.controls['expiryDate'].valid ? 'required-input' : 'valid-input'">
-                                    </p-calendar> 
-                                </div>
-                            </div>
-            
-                        </div>
-                       
-            
-                    </div>
-                </form>
-            
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button type="button" (click)="saveDocumentUpload(documentUploadForm)"
-                                [disabled]="documentUploadForm.invalid" class="btn btn-success pull-right"><span class="glyphicon glyphicon-upload"></span> Upload</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- <div class="panel panel-default">
+
+                                <!-- <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="panel-heading">
                         <h2 class="panel-title">
@@ -714,96 +773,130 @@
                 </div>
             </div> -->
 
-            <div class="panel panel-default" *ngIf="showUploadGrid">
-                <div class="panel-body">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">
-                            DRAWDOWN DOCUMENTS
-                        </h2>
-                    </div>
-                    <p-dataTable [value]="documentUploads" [responsive]="true" [paginator]="true" [rows]="5">
-                        <p-column header="DateTime Uploaded">
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
-                            </ng-template>
-                        </p-column>
-                        <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column>
-                        <p-column header="File Name">
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
-                                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
-                                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
-                                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
-                                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
-                                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
-                                {{d.fileName}}
-                            </ng-template>
-                        </p-column>
-                        <!-- <p-column field="fileName" header="File Name" sortable="true" filterMatchMode="contains"></p-column> -->
-                        <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
-                        <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
-                        <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
-                        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
-                        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains"></p-column>
-                        <p-column  [style]="{'width':'120px'}">
-                            <ng-template pTemplate="header"> </ng-template>
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <div style="text-align:center" >
-                                    <span *ngIf="deleteLink && d.owner"><a (click)="deleteDocumentUpload(d)" href="javascript:void(0)">Delete</a>
-                                        <span style="padding:3px;"> | </span>
-                                    </span>
-                                    <a *ngIf="['jpg','jpeg', 'png','JPG','JPEG', 'PNG'].indexOf(d.fileExtension.toLowerCase()) > -1" (click)="downloadDocument(d,true)" href="javascript:void(0)">View</a>
-                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'" (click)="downloadDocument(d)" href="javascript:void(0)">Download</a>
-                                    <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'" (click)="downloadDocumentCreditBereau(d)" href="javascript:void(0)">Download</a>
+                                <div class="panel panel-default" *ngIf="showUploadGrid">
+                                    <div class="panel-body">
+                                        <div class="panel-heading">
+                                            <h2 class="panel-title">
+                                                DRAWDOWN DOCUMENTS
+                                            </h2>
+                                        </div>
+                                        <p-dataTable [value]="documentUploads" [responsive]="true" [paginator]="true"
+                                            [rows]="5">
+                                            <p-column header="DateTime Uploaded">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    {{ d.dateTimeCreated | date : 'MMM d, y, h:mm a' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column field="uploadedBy" header="Uploaded By" sortable="true"
+                                                filterMatchMode="contains"></p-column>
+                                            <p-column header="File Name">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <span *ngIf="d.fileExtension == 'doc'"
+                                                        class="icon-file-word"></span>
+                                                    <span *ngIf="d.fileExtension == 'docx'"
+                                                        class="icon-file-word"></span>
+                                                    <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                                                    <span *ngIf="d.fileExtension == 'jpg'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'jpeg'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'png'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'txt'"
+                                                        class="icon-file-text"></span>
+                                                    <span *ngIf="d.fileExtension == 'xls'"
+                                                        class="icon-file-excel"></span>
+                                                    <span *ngIf="d.fileExtension == 'xlsx'"
+                                                        class="icon-file-excel"></span>
+                                                    {{d.fileName}}
+                                                </ng-template>
+                                            </p-column>
+                                            <!-- <p-column field="fileName" header="File Name" sortable="true" filterMatchMode="contains"></p-column> -->
+                                            <!-- <p-column field="fileExtension" header="File Extension" sortable="true" filterMatchMode="contains"></p-column> -->
+                                            <p-column field="fileSizeString" header="File Size" sortable="true"
+                                                filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+                                            <!-- <p-column field="expiryDate" header="Expiry Date" sortable="true" filterMatchMode="contains"></p-column> -->
+                                            <p-column field="documentTypeName" header="Document Type" sortable="true"
+                                                filterMatchMode="contains"></p-column>
+                                            <p-column field="documentCategoryName" header="Document Category"
+                                                sortable="true" filterMatchMode="contains"></p-column>
+                                            <p-column [style]="{'width':'120px'}">
+                                                <ng-template pTemplate="header"> </ng-template>
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <div style="text-align:center">
+                                                        <span *ngIf="deleteLink && d.owner"><a
+                                                                (click)="deleteDocumentUpload(d)"
+                                                                href="javascript:void(0)">Delete</a>
+                                                            <span style="padding:3px;"> | </span>
+                                                        </span>
+                                                        <a *ngIf="['jpg','jpeg', 'png','JPG','JPEG', 'PNG'].indexOf(d.fileExtension.toLowerCase()) > -1"
+                                                            (click)="downloadDocument(d,true)"
+                                                            href="javascript:void(0)">View</a>
+                                                        <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName !='CREDIT BUREAU'"
+                                                            (click)="downloadDocument(d)"
+                                                            href="javascript:void(0)">Download</a>
+                                                        <a *ngIf="['doc','docx', 'pdf','xls', 'xlsx'].indexOf(d.fileExtension.toLowerCase()) > -1 && d.documentTypeName =='CREDIT BUREAU'"
+                                                            (click)="downloadDocumentCreditBereau(d)"
+                                                            href="javascript:void(0)">Download</a>
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+                                            <!-- <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column> -->
+
+                                        </p-dataTable>
+
+                                    </div>
                                 </div>
-                            </ng-template>
-                        </p-column>
-                        <!-- <p-column field="uploadedBy" header="Uploaded By" sortable="true" filterMatchMode="contains"></p-column> -->
-            
-                    </p-dataTable>
-            
-                </div>
-            </div>
-            
-            <div class="panel panel-default" *ngIf="showUploadGrid">
-                <div class="panel-body">
-            
-                    <p-dataTable [value]="documentDeleted" [responsive]="true" [paginator]="true" [rows]="5">
-                        <p-column header="DateTime Deleted">
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                {{ d.dateTimeDeleted | date : 'MMM d, y, h:mm a' }}
-                            </ng-template>
-                        </p-column>
-                        <p-column field="uploadedBy" header="Deleted By" sortable="true" filterMatchMode="contains"></p-column>
-                        <p-column header="File Name">
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <span *ngIf="d.fileExtension == 'doc'" class="icon-file-word"></span>
-                                <span *ngIf="d.fileExtension == 'docx'" class="icon-file-word"></span>
-                                <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
-                                <span *ngIf="d.fileExtension == 'jpg'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'jpeg'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'png'" class="icon-file-picture"></span>
-                                <span *ngIf="d.fileExtension == 'txt'" class="icon-file-text"></span>
-                                <span *ngIf="d.fileExtension == 'xls'" class="icon-file-excel"></span>
-                                <span *ngIf="d.fileExtension == 'xlsx'" class="icon-file-excel"></span>
-                                {{d.fileName}}
-                            </ng-template>
-                        </p-column>
-                        
-                        <p-column field="fileSizeString" header="File Size" sortable="true" filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>        
-                        <p-column field="documentTypeName" header="Document Type" sortable="true" filterMatchMode="contains"></p-column>
-                        <p-column field="documentCategoryName" header="Document Category" sortable="true" filterMatchMode="contains"></p-column>                   
-            
-                    </p-dataTable>
-            
-                </div>
-            </div>
-            
-           
-                <!-- <div *ngIf="loanSelectedData">
+
+                                <div class="panel panel-default" *ngIf="showUploadGrid">
+                                    <div class="panel-body">
+
+                                        <p-dataTable [value]="documentDeleted" [responsive]="true" [paginator]="true"
+                                            [rows]="5">
+                                            <p-column header="DateTime Deleted">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    {{ d.dateTimeDeleted | date : 'MMM d, y, h:mm a' }}
+                                                </ng-template>
+                                            </p-column>
+                                            <p-column field="uploadedBy" header="Deleted By" sortable="true"
+                                                filterMatchMode="contains"></p-column>
+                                            <p-column header="File Name">
+                                                <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                                    <span *ngIf="d.fileExtension == 'doc'"
+                                                        class="icon-file-word"></span>
+                                                    <span *ngIf="d.fileExtension == 'docx'"
+                                                        class="icon-file-word"></span>
+                                                    <span *ngIf="d.fileExtension == 'pdf'" class="icon-file-pdf"></span>
+                                                    <span *ngIf="d.fileExtension == 'jpg'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'jpeg'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'png'"
+                                                        class="icon-file-picture"></span>
+                                                    <span *ngIf="d.fileExtension == 'txt'"
+                                                        class="icon-file-text"></span>
+                                                    <span *ngIf="d.fileExtension == 'xls'"
+                                                        class="icon-file-excel"></span>
+                                                    <span *ngIf="d.fileExtension == 'xlsx'"
+                                                        class="icon-file-excel"></span>
+                                                    {{d.fileName}}
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column field="fileSizeString" header="File Size" sortable="true"
+                                                filterMatchMode="contains" [style]="{'width':'100px'}"></p-column>
+                                            <p-column field="documentTypeName" header="Document Type" sortable="true"
+                                                filterMatchMode="contains"></p-column>
+                                            <p-column field="documentCategoryName" header="Document Category"
+                                                sortable="true" filterMatchMode="contains"></p-column>
+
+                                        </p-dataTable>
+
+                                    </div>
+                                </div>
+
+
+                                <!-- <div *ngIf="loanSelectedData">
                     <document-upload *ngIf="loanSelectedData.loanApplicationId>0" [reload]="loanSelectedData.loanApplicationDetailId"
                         [showUploadForm]="true" [operationId]="loanSelectedData.operationId" 
                         [customerId]="loanSelectedData.customerId"
@@ -815,220 +908,303 @@
                 </div> -->
 
 
-                <!-- ========================================================================================= -->
-                <!-- </div> -->
-            </p-tabPanel>
-            <p-tabPanel *ngIf="userIsAccountOfficer" header="Drawdown Memo">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h2 class="panel-title pull-left">
-                                        Drawdown Memo
-                                    </h2>
-                                     <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
-                                </div>
-                            </div>
-                        </div>
-                        <!-- <div *ngIf="drawdownHtml != null" class="panel-body" style="min-height:450px;">
-                            <CKEDITOR [content]="drawdownHtml" [height]="400"
-                                (contentChange)="contentChange($event)"></CKEDITOR>
-                        </div> -->
-                        <div class="panel-body" [innerHtml]="drawdownHtml">
-                        </div>
-                    </div>
-            </p-tabPanel>
-            <!-- *ngIf="operationId==202 || operationId==146" -->
-            <p-tabPanel  header="Approval Memo" *ngIf="loanSelection?.appraisalOperationId == 202 || loanSelection?.appraisalOperationId == 146">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h2 class="panel-title pull-left">
-                                        Approval Memo
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-body" [innerHtml]="cashBackMemoHtml">
-                        </div>
-                    </div>
-            </p-tabPanel>
-                
-            <p-tabPanel header="CRMS Regulatory" *ngIf="isCRMSstaff">
-                <crms-regulatories [loanSystemTypeId]="loanSystemTypeId" [loanId]="loanId" [isLms]="isLms">
-                </crms-regulatories>
-            </p-tabPanel>
-
-            <p-tabPanel header="Lien Placement">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h2 class="panel-title pull-left">
-                                        Cash Collateral Lien Placement
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel-body">
-                            <app-lien-on-investment *ngIf="loanId>0"
-                                [loanApplicationId]="loanData?.loanApplicationId"
-                                [applicationDetailId]="loanData?.loanApplicationDetailId"
-                                [currencyId]="loanData?.currencyId"
-                                [reload]="loanData?.loanApplicationId"
-                                [isUserLegal]="isUserLegal"
-                                (allLiensArePlaced)=lienIsSatisfied($event)>
-                            </app-lien-on-investment>
-                        </div>
-                    </div>
-            </p-tabPanel>
-
-              <!-- Obligor UUS Checklist Tab -->
-                <p-tabPanel i18n-header header="Obligor UUS Checklist">
-                <div class="panel panel-default" *ngIf="loanSelection">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">Obligor UUS Checklist Review</h2>
-                    </div>
-                        <div class="panel-body">
-                            <p-dataTable [value]="uwsList"
-                            [responsive]="true"
-                            [paginator]="true"
-                            [rows]="5"
-                            [rowsPerPageOptions]="[5,10,20,30]"
-                            [totalRecords]="uwsList?.length || 0">
-        
-                            <p-column i18n-header field="item" header="Item" [style]="{'width':'15%'}">
-                            <ng-template let-uws="rowData" pTemplate="body">
-                                {{ uws.item }}
-                            </ng-template>
-                            </p-column>
-                        
-                            <p-column i18n-header field="description" header="Description">
-                            <ng-template let-uws="rowData" pTemplate="body">
-                                {{ uws.description }}
-                            </ng-template>
-                            </p-column>
-                        
-                            <p-column i18n-header header="Option" [style]="{'width':'20%','text-align':'center'}">
-                            <ng-template let-uws="rowData" pTemplate="body">
-                                <div [ngStyle]="getRowStyle(uws)"
-                                    style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
-                                <label style="display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" [(ngModel)]="uws.option" value="Yes" [name]="'option' + uws.id" disabled> Met
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" [(ngModel)]="uws.option" value="No" [name]="'option' + uws.id" disabled> Not Met
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" [(ngModel)]="uws.option" value="Waiver" [name]="'option' + uws.id" disabled> Waiver
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 5px;">
-                                    <input type="radio" [(ngModel)]="uws.option" value="Deferred" [name]="'option' + uws.id" disabled> Deferred
-                                </label>
-                                </div>
-                            </ng-template>
-                            </p-column>
-                        
-                            <p-column i18n-header header="Defer Date" [style]="{'width':'15%','text-align':'center'}">
-                            <ng-template let-uws="rowData" pTemplate="body">
-                                <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
-                                <input type="date" [(ngModel)]="uws.deferredDate"
-                                        [name]="'deferredDate' + uws.id"
-                                        class="form-control" readonly disabled
-                                        style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
-                                </ng-container>
-                                <ng-template #showNA>N/A</ng-template>
-                            </ng-template>
-                            </p-column>
-                        
-                            <p-column i18n-header header="View Document" [style]="{'width':'15%','text-align':'center'}">
-                            <ng-template let-uws="rowData" pTemplate="body">
-                                <div style="display: flex; justify-content: center; align-items: center;">
-                                <button *ngIf="uws.option !== 'Deferred'" type="button" class="ui-button ui-button-primary"
-                                        (click)="viewDocuments(uws)">
-                                    Preview
-                                </button>
-                                </div>
-                            </ng-template>
-                            </p-column>                      
-                        </p-dataTable>     
-                        </div>             
-                    </div>
-                </p-tabPanel>
-                <!-- END -->
-
-                <!-- Document Preview Modal -->
-                <p-dialog [(visible)]="isPreviewModalVisible" [modal]="true" [style]="getModalStyle()"
-                [closable]="true" (onHide)="closePreviewModal()" [draggable]="false">
-                <div style="display: flex; justify-content: center; align-items: center; padding: 10px; position: relative;">
-                    <h3 style="margin: 0; flex: 1; text-align: center;">
-                        Document Preview for {{ selectedLoan?.customerName }}
-                    </h3>
-                    <div style="cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center;
-                                justify-content: center; border: 2px solid red; border-radius: 5px; background-color: white;
-                                position: absolute; right: 10px;"
-                        (click)="closePreviewModal()">
-                        <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
-                    </div>
-                </div>
-                <hr style="margin: 0 10px; border-top: 1px solid gray;">
-                <div style="padding: 15px; width: 100%; text-align: center;">
-                    <div *ngIf="fileType?.includes('image')"
-                        style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                        <img [src]="selectedDocumentUrl"
-                            [style.transform]="'scale(' + zoomLevel + ')'"
-                            style="max-height: 500px; object-fit: contain; transition: transform 0.3s ease-in-out; cursor: grab;"
-                            (wheel)="onScrollZoom($event)"
-                            (mousedown)="startDrag($event)"
-                            (click)="toggleZoom()" />
-                    </div>
-                    <div *ngIf="fileType === 'application/pdf'" style="overflow: hidden; position: relative;">
-                        <iframe #pdfFrame [src]="selectedDocumentUrl" width="100%" height="550px"
-                            (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
-                    </div>
-                    <div *ngIf="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                                || fileType === 'application/msword'"
-                        style="overflow: hidden; position: relative;">
-                        <iframe #docFrame [src]="selectedDocumentUrl" width="100%" height="550px"
-                            (wheel)="onScrollZoom($event)" style="cursor: grab; transform-origin: center;"></iframe>
-                    </div>
-                    <div *ngIf="!fileType?.includes('image') && fileType !== 'application/pdf'
-                                && fileType !== 'application/msword'
-                                && fileType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
-                        style="color: red; font-weight: bold;">
-                        Unsupported file type.
-                    </div>
-                </div>
-            </p-dialog>
-             <!-- END -->
-            
-            <p-tabPanel header="Project Risk Rating" *ngIf="(loanSelectedData != null && loanSelectedData.isProjectRelate == true)">
-                            <div class="panel panel-default">
-        
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h2 class="panel-title pull-left">
-                                                Project Risk Rating
-                                            </h2>
-                                            <div class="pull-right">
+                                <!-- ========================================================================================= -->
+                                <!-- </div> -->
+                            </p-tabPanel>
+                            <p-tabPanel *ngIf="userIsAccountOfficer" header="Drawdown Memo">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Drawdown Memo
+                                                </h2>
+                                                <!-- <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button> -->
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- <div *ngIf="drawdownHtml != null" class="panel-body" style="min-height:450px;">
+                            <CKEDITOR [content]="drawdownHtml" [height]="400"
+                                (contentChange)="contentChange($event)"></CKEDITOR>
+                        </div> -->
+                                    <div class="panel-body" [innerHtml]="drawdownHtml">
+                                    </div>
                                 </div>
-                            
-                                <div class="panel-body">
-                            
-                                     <table class="table table-bordered table-hover">
-                            
+                            </p-tabPanel>
+                            <!-- *ngIf="operationId==202 || operationId==146" -->
+                            <p-tabPanel header="Approval Memo"
+                                *ngIf="loanSelection?.appraisalOperationId == 202 || loanSelection?.appraisalOperationId == 146">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Approval Memo
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" [innerHtml]="cashBackMemoHtml">
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="CRMS Regulatory" *ngIf="isCRMSstaff">
+                                <crms-regulatories [loanSystemTypeId]="loanSystemTypeId" [loanId]="loanId"
+                                    [isLms]="isLms">
+                                </crms-regulatories>
+                            </p-tabPanel>
+
+                            <p-tabPanel header="Lien Placement">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Cash Collateral Lien Placement
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <app-lien-on-investment *ngIf="loanId>0"
+                                            [loanApplicationId]="loanData?.loanApplicationId"
+                                            [applicationDetailId]="loanData?.loanApplicationDetailId"
+                                            [currencyId]="loanData?.currencyId" [reload]="loanData?.loanApplicationId"
+                                            [isUserLegal]="isUserLegal" (allLiensArePlaced)=lienIsSatisfied($event)>
+                                        </app-lien-on-investment>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- Obligor UUS Checklist Tab -->
+                            <p-tabPanel i18n-header header="Obligor UUS Checklist">
+                                <div class="panel panel-default" *ngIf="loanSelection">
+                                    <!-- Checklist Summary Dashboard for Selected Individual Loan -->
+                                    <div *ngIf="loanSelection"
+                                        style="margin: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <h2 class="panel-title"
+                                            style="margin-top: 0; margin-bottom: 15px; text-align: center;">
+                                            Checklist Summary Dashboard - {{ loanSelection.customerName }}
+                                            ({{ loanSelection.applicationReferenceNumber }})
+                                        </h2>
+
+                                        <div *ngIf="isLoadingChecklistSummary"
+                                            style="text-align: center; padding: 20px;">
+                                            <span>Loading checklist summary...</span>
+                                        </div>
+
+                                        <div *ngIf="!isLoadingChecklistSummary && checklistSummary.total > 0"
+                                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+
+                                            <!-- Yes Percentage Card -->
+                                            <div
+                                                style="background-color: #28a745; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.yesPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Met
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.yes }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- No Percentage Card -->
+                                            <div
+                                                style="background-color: #dc3545; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.noPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Not Met
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.no }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- Waived Percentage Card -->
+                                            <div
+                                                style="background-color: #ffc107; color: #212529; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.waivedPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Waived
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.waived }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+
+                                            <!-- Deferred Percentage Card -->
+                                            <div
+                                                style="background-color: #17a2b8; color: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <div style="font-size: 28px; font-weight: bold; margin-bottom: 5px;">
+                                                    {{ checklistSummary.deferredPercent }}%
+                                                </div>
+                                                <div style="font-size: 16px; opacity: 0.9; margin-bottom: 5px;">Deferred
+                                                </div>
+                                                <div style="font-size: 12px; opacity: 0.8;">
+                                                    ({{ checklistSummary.deferred }} of {{ checklistSummary.total }})
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="!isLoadingChecklistSummary && checklistSummary.total === 0"
+                                            style="text-align: center; padding: 20px; color: #6c757d;">
+                                            No checklist items found for this loan.
+                                        </div>
+                                    </div>
+                                    <!-- End Checklist Summary Dashboard -->
+                                    <div class="panel-heading">
+                                        <h2 class="panel-title">Obligor UUS Checklist Review</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p-dataTable [value]="uwsList" [responsive]="true" [paginator]="true" [rows]="5"
+                                            [rowsPerPageOptions]="[5,10,20,30]" [totalRecords]="uwsList?.length || 0">
+
+                                            <p-column i18n-header field="item" header="Item" [style]="{'width':'15%'}">
+                                                <ng-template let-uws="rowData" pTemplate="body">
+                                                    {{ uws.item }}
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column i18n-header field="description" header="Description">
+                                                <ng-template let-uws="rowData" pTemplate="body">
+                                                    {{ uws.description }}
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column i18n-header header="Option"
+                                                [style]="{'width':'20%','text-align':'center'}">
+                                                <ng-template let-uws="rowData" pTemplate="body">
+                                                    <div [ngStyle]="getRowStyle(uws)"
+                                                        style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
+                                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                                            <input type="radio" [(ngModel)]="uws.option" value="Yes"
+                                                                [name]="'option' + uws.id" disabled> Met
+                                                        </label>
+                                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                                            <input type="radio" [(ngModel)]="uws.option" value="No"
+                                                                [name]="'option' + uws.id" disabled> Not Met
+                                                        </label>
+                                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                                            <input type="radio" [(ngModel)]="uws.option" value="Waiver"
+                                                                [name]="'option' + uws.id" disabled> Waiver
+                                                        </label>
+                                                        <label style="display: flex; align-items: center; gap: 5px;">
+                                                            <input type="radio" [(ngModel)]="uws.option"
+                                                                value="Deferred" [name]="'option' + uws.id" disabled>
+                                                            Deferred
+                                                        </label>
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column i18n-header header="Defer Date"
+                                                [style]="{'width':'15%','text-align':'center'}">
+                                                <ng-template let-uws="rowData" pTemplate="body">
+                                                    <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
+                                                        <input type="date" [(ngModel)]="uws.deferredDate"
+                                                            [name]="'deferredDate' + uws.id" class="form-control"
+                                                            readonly disabled
+                                                            style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
+                                                    </ng-container>
+                                                    <ng-template #showNA>N/A</ng-template>
+                                                </ng-template>
+                                            </p-column>
+
+                                            <p-column i18n-header header="View Document"
+                                                [style]="{'width':'15%','text-align':'center'}">
+                                                <ng-template let-uws="rowData" pTemplate="body">
+                                                    <div
+                                                        style="display: flex; justify-content: center; align-items: center;">
+                                                        <button *ngIf="uws.option !== 'Deferred'" type="button"
+                                                            class="ui-button ui-button-primary"
+                                                            (click)="viewDocuments(uws)">
+                                                            Preview
+                                                        </button>
+                                                    </div>
+                                                </ng-template>
+                                            </p-column>
+                                        </p-dataTable>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                            <!-- END -->
+
+                            <!-- Document Preview Modal -->
+                            <p-dialog [(visible)]="isPreviewModalVisible" [modal]="true" [style]="getModalStyle()"
+                                [closable]="true" (onHide)="closePreviewModal()" [draggable]="false">
+                                <div
+                                    style="display: flex; justify-content: center; align-items: center; padding: 10px; position: relative;">
+                                    <h3 style="margin: 0; flex: 1; text-align: center;">
+                                        Document Preview for {{ selectedLoan?.customerName }}
+                                    </h3>
+                                    <div style="cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center;
+                                justify-content: center; border: 2px solid red; border-radius: 5px; background-color: white;
+                                position: absolute; right: 10px;" (click)="closePreviewModal()">
+                                        <span style="font-size: 20px; color: red; font-weight: bold;">×</span>
+                                    </div>
+                                </div>
+                                <hr style="margin: 0 10px; border-top: 1px solid gray;">
+                                <div style="padding: 15px; width: 100%; text-align: center;">
+                                    <div *ngIf="fileType?.includes('image')"
+                                        style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                        <img [src]="selectedDocumentUrl" [style.transform]="'scale(' + zoomLevel + ')'"
+                                            style="max-height: 500px; object-fit: contain; transition: transform 0.3s ease-in-out; cursor: grab;"
+                                            (wheel)="onScrollZoom($event)" (mousedown)="startDrag($event)"
+                                            (click)="toggleZoom()" />
+                                    </div>
+                                    <div *ngIf="fileType === 'application/pdf'"
+                                        style="overflow: hidden; position: relative;">
+                                        <iframe #pdfFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                            (wheel)="onScrollZoom($event)"
+                                            style="cursor: grab; transform-origin: center;"></iframe>
+                                    </div>
+                                    <div *ngIf="fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                || fileType === 'application/msword'" style="overflow: hidden; position: relative;">
+                                        <iframe #docFrame [src]="selectedDocumentUrl" width="100%" height="550px"
+                                            (wheel)="onScrollZoom($event)"
+                                            style="cursor: grab; transform-origin: center;"></iframe>
+                                    </div>
+                                    <div *ngIf="!fileType?.includes('image') && fileType !== 'application/pdf'
+                                && fileType !== 'application/msword'
+                                && fileType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+                                        style="color: red; font-weight: bold;">
+                                        Unsupported file type.
+                                    </div>
+                                </div>
+                            </p-dialog>
+                            <!-- END -->
+
+                            <p-tabPanel header="Project Risk Rating"
+                                *ngIf="(loanSelectedData != null && loanSelectedData.isProjectRelate == true)">
+                                <div class="panel panel-default">
+
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h2 class="panel-title pull-left">
+                                                    Project Risk Rating
+                                                </h2>
+                                                <div class="pull-right">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel-body">
+
+                                        <table class="table table-bordered table-hover">
+
                                             <tr>
                                                 <th>SN</th>
                                                 <th>Criteria</th>
                                                 <th>Value</th>
                                             </tr>
                                             <tbody>
-                            
+
                                                 <tr *ngFor="let field of projectRiskRatingComputation; let i = index;">
                                                     <td>{{i + 1}}</td>
                                                     <td>{{field.categoryName}}</td>
@@ -1036,28 +1212,28 @@
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2"><strong>OBLIGOR/ CONTRACTOR
-                                                    </strong></td>
-                                                    <td><strong>{{rating}}</strong></td>                                        
+                                                        </strong></td>
+                                                    <td><strong>{{rating}}</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2"><strong>Rating
-                                                    </strong></td>
-                                                    <td><strong>{{computation}}</strong></td>                                        
+                                                        </strong></td>
+                                                    <td><strong>{{computation}}</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2"><strong>Risk Categorisation
-                                                    </strong></td>
-                                                    <td><strong>{{riskCategorisation}}</strong></td>                                        
+                                                        </strong></td>
+                                                    <td><strong>{{riskCategorisation}}</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2"><strong>Project Location
-                                                    </strong></td>
-                                                    <td><strong>{{projectLocation}}</strong></td>                                        
+                                                        </strong></td>
+                                                    <td><strong>{{projectLocation}}</strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2"><strong>Project Details
-                                                    </strong></td>
-                                                    <td><strong>{{projectDetails}}</strong></td>                                        
+                                                        </strong></td>
+                                                    <td><strong>{{projectDetails}}</strong></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1067,48 +1243,49 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="btn-group pull-right">
+                                    <button (click)="closeDrawdown()" type="button" class="btn btn-danger"
+                                        style="margin-right:5px">Close</button>
+                                    <!-- <button (click)="!loanSelectedData.comment || !loanSelectedData.loanApprovalStatusId" type="button" (click)="showConfirmDialog()" class="btn btn-success">Submit For Approval</button> -->
+                                    <button (click)="showApprovalForm(false)" type="button" class="btn btn-success"
+                                        style="margin-right:5px">Submit For Approval</button>
+
+                                </div>
+                                <div class="btn-group pull-left">
+                                    <button (click)="showReferBackForm()" type="button" class="btn btn-danger"
+                                        style="margin-right:5px">Refer Back</button>
+                                    <!-- <button *ngIf="apiRequestId == null" (click)="showReferBackForm()" type="button" class="btn btn-danger"
+                        style="margin-right:5px">Refer Back</button> -->
                                 </div>
                             </div>
-                        </p-tabPanel> 
-        </p-tabView>
-    </div>
-    <div class="panel-footer">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="btn-group pull-right">
-                    <button (click)="closeDrawdown()" type="button" class="btn btn-danger"
-                        style="margin-right:5px">Close</button>
-                    <!-- <button (click)="!loanSelectedData.comment || !loanSelectedData.loanApprovalStatusId" type="button" (click)="showConfirmDialog()" class="btn btn-success">Submit For Approval</button> -->
-                    <button (click)="showApprovalForm(false)" type="button" class="btn btn-success"
-                        style="margin-right:5px">Submit For Approval</button>
-                                  
-                </div>
-                <div class="btn-group pull-left">
-                    <button (click)="showReferBackForm()" type="button" class="btn btn-danger"
-                        style="margin-right:5px">Refer Back</button>
-                    <!-- <button *ngIf="apiRequestId == null" (click)="showReferBackForm()" type="button" class="btn btn-danger"
-                        style="margin-right:5px">Refer Back</button> -->
-                </div>
+                        </div>
+                    </div>
+                    <!-- </p-dialog> -->
+                </p-tabView>
+
             </div>
         </div>
     </div>
-<!-- </p-dialog> -->
-</p-tabView>
-
-</div>
-</div>
-</div>
 </div>
 
-<p-dialog  [responsive]=true [(visible)]="displayReferBackForm" modal="modal" showEffect="fade" width="700">
+<p-dialog [responsive]=true [(visible)]="displayReferBackForm" modal="modal" showEffect="fade" width="700">
     <div style="margin-bottom:0" class="panel panel-default">
         <div class="panel-heading">
             <h2 class="panel-title">Refer back</h2>
         </div>
-        <app-refer-back [referBackOperationId]="operationId" [forbidExternalNotification]="true" [referBackTargetId]="targetId" (notify)="displayStatus($event)" 
-        (notifyAfterReferBack)="referBackResultControl($event)"></app-refer-back>
+        <app-refer-back [referBackOperationId]="operationId" [forbidExternalNotification]="true"
+            [referBackTargetId]="targetId" (notify)="displayStatus($event)"
+            (notifyAfterReferBack)="referBackResultControl($event)"></app-refer-back>
     </div>
-</p-dialog> 
+</p-dialog>
 <!-- <p-dialog [responsive]=true [(visible)]="displayReferBackForm" id="reccol-modal" modal="modal" showEffect="fade" width="450">
     <div style="margin-bottom:0" class="panel panel-default">
         <div class="panel-heading">
@@ -1193,9 +1370,9 @@
                         <!-- <div class="col-md-12">
                             <label>Document is provided?</label>
                         </div> -->
-                        
+
                     </div>
-                    
+
                 </div>
             </div>
             <div class="panel-footer">
@@ -1213,56 +1390,59 @@
 
 
 <p-dialog [responsive]=true [(visible)]="displayReport" width="1200" modal="modal" showEffect="fade">
-  <div class="panel panel-default">
-      <div class="panel-heading">
-          <div class="row">
-              <div class="col-md-12">
-                  <h2 class="panel-title pull-left">
-                     Drawdown Memo
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="panel-title pull-left">
+                        Drawdown Memo
 
-                  </h2>
-                        
-                  <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
+                    </h2>
+
+                    <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                        class="btn btn-danger pull-right">Cancel</button>
 
 
-              </div>
-          </div>
-      </div>
-      <div class="panel-body">
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
 
-          <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;" >
-              <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1200px" style="overflow:auto"></iframe>
-          </div>
-      </div>
-  </div>
-  <div class="panel-footer">
-      <div class="row">
-          <div class="col-md-12">
-              <button type="button" (click)="displayReport=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
-          </div>
-      </div>
-  </div>
+            <div class="col-md-12" *ngIf="displayTestReport" style=" width:1200px; overflow:auto;">
+                <iframe [src]="reportSrc" id="report" name="report" frameborder="2" height="500px" width="1200px"
+                    style="overflow:auto"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" (click)="displayReport=false" style="margin-right:5px"
+                    class="btn btn-danger pull-right">Cancel</button>
+            </div>
+        </div>
+    </div>
 </p-dialog>
 
- <!-- [autoZIndex]="autoZIndex" [style]="{'z-index': 10}" -->
- <p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
+<!-- [autoZIndex]="autoZIndex" [style]="{'z-index': 10}" -->
+<p-dialog [responsive]=true [(visible)]="displayDocument" modal="modal" [contentStyle]="{'overflow-y': 'auto', 'overflow-x': 'hidden', 
  'max-height': '80vh','min-height':'500px'}" width="1000" [style]="{'z-index': 10}">
-     <div style="margin-bottom:0" class="panel panel-default">
- 
-         <div class="panel-heading">
-             <h2 class="panel-title">
-                 Document Title:
-                 <strong>{{selectedDocument}}</strong>
-             </h2>
-             <div class="pull-right">
-                 <a class="close" (click)="displayDocument=false">&times;</a>
-             </div>
-         </div>
- 
-         <div class="panel-body" style="overflow:auto;height:1500;">
-             <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
-             [src]="'data:image/jpg;base64,'+binaryFile" alt="">
- 
-         </div>
-     </div>
- </p-dialog>
+    <div style="margin-bottom:0" class="panel panel-default">
+
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                Document Title:
+                <strong>{{selectedDocument}}</strong>
+            </h2>
+            <div class="pull-right">
+                <a class="close" (click)="displayDocument=false">&times;</a>
+            </div>
+        </div>
+
+        <div class="panel-body" style="overflow:auto;height:1500;">
+            <img *ngIf="binaryFile" style="max-width: 100%; display: block 2px black;"
+                [src]="'data:image/jpg;base64,'+binaryFile" alt="">
+
+        </div>
+    </div>
+</p-dialog>
