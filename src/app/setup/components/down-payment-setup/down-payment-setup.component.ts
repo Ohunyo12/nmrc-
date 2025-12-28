@@ -69,13 +69,14 @@ export class DownPaymentComponent implements OnInit {
     this.productService.getProductTypes().pipe(
       finalize(() => this.loadingService.hide())).subscribe((response: any) => {
         this.products = response.result;
-
+      this.productMap.clear();
         this.products.forEach(p => {
-          this.productMap.set(p.productId, p.productName);
+          this.productMap.set(Number(p.productId), p.productName);
         });
 
 
-
+     // ✅ NOW load down payments
+      this.getAllDownPayment();
        
       });
   }
@@ -173,21 +174,58 @@ export class DownPaymentComponent implements OnInit {
     );
   }
 
+
+
   submitForm(form) {
-    this.loadingService.show();
-    let bodyObj = {
-      
-      PRODUCTID: form.value.productId,
-   EMPLOYMENTTYPEID: Number(form.value.employmentTypeId),
-      MINAMOUNT: form.value.MINAMOUNT,
-      MAXAMOUNT: form.value.MAXAMOUNT,
-      PERCENTAGE: form.value.PERCENTAGE
-    };
+  const productId = form.value.productId;
+  const minAmount = form.value.MINAMOUNT;
+  const maxAmount = form.value.MAXAMOUNT;
+  const percentage = form.value.PERCENTAGE;
 
-    const selectedId = form.value.downPaymentId;
 
-    if (!selectedId) { // creating a new group
-      this.generalSetupService.saveDownPayment(bodyObj).subscribe((res) => {
+
+    if (!productId) {
+    swal(
+      `${GlobalConfig.APPLICATION_NAME}`,
+      'Product is required.',
+      'warning'
+    );
+    return;
+  }
+
+if (maxAmount <= minAmount) {
+    swal(
+      `${GlobalConfig.APPLICATION_NAME}`,
+      'Maximum amount must be greater than minimum amount.',
+      'warning'
+    );
+    return; // ⛔ stop submission
+  }
+
+      if (!percentage) {
+    swal(
+      `${GlobalConfig.APPLICATION_NAME}`,
+      'Percentage is required.',
+      'warning'
+    );
+    return;
+  }
+
+  this.loadingService.show();
+
+  let bodyObj = {
+    PRODUCTID: form.value.productId,
+    EMPLOYMENTTYPEID: Number(form.value.employmentTypeId),
+    MINAMOUNT: minAmount,
+    MAXAMOUNT: maxAmount,
+    PERCENTAGE: form.value.PERCENTAGE
+  };
+
+  const selectedId = form.value.downPaymentId;
+
+  if (!selectedId) {
+    this.generalSetupService.saveDownPayment(bodyObj).subscribe(
+      (res) => {
         this.loadingService.hide();
         if (res.success === true) {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'success');
@@ -196,12 +234,15 @@ export class DownPaymentComponent implements OnInit {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
         }
         this.getAllDownPayment();
-      }, (err) => {
+      },
+      (err) => {
         swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
         this.loadingService.hide();
-      });
-    } else { // updating an existing group
-       this.generalSetupService.updateDownPayment(bodyObj, selectedId).subscribe((res) => {
+      }
+    );
+  } else {
+    this.generalSetupService.updateDownPayment(bodyObj, selectedId).subscribe(
+      (res) => {
         this.loadingService.hide();
         this.displayCreateEditModal = false;
         if (res.success === true) {
@@ -210,14 +251,103 @@ export class DownPaymentComponent implements OnInit {
           swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'error');
         }
         this.getAllDownPayment();
-      }, (err) => {
+      },
+      (err) => {
         swal(`${GlobalConfig.APPLICATION_NAME}`, JSON.stringify(err), 'error');
         this.loadingService.hide();
-      });
-    }
-    this.loadForms();
-
+      }
+    );
   }
+
+  this.loadForms();
+}
+// submitForm(form) {
+//   const productId = Number(form.value.productId);
+//   const employmentTypeId = Number(form.value.employmentTypeId);
+//   const minAmount = form.value.MINAMOUNT;
+//   const maxAmount = form.value.MAXAMOUNT;
+//   const percentage = Number(form.value.PERCENTAGE);
+//   const selectedId = form.value.downPaymentId;
+
+
+//   if (!productId) {
+//     swal(`${GlobalConfig.APPLICATION_NAME}`, 'Product is required.', 'warning');
+//     return;
+//   }
+
+
+
+//   if (maxAmount <= minAmount) {
+//     swal(
+//       `${GlobalConfig.APPLICATION_NAME}`,
+//       'Maximum amount must be greater than minimum amount.',
+//       'warning'
+//     );
+//     return;
+//   }
+
+//   if (!percentage || percentage <= 0) {
+//     swal(`${GlobalConfig.APPLICATION_NAME}`, 'Percentage is required.', 'warning');
+//     return;
+//   }
+
+//   const bodyObj = {
+//     PRODUCTID: productId,
+//     EMPLOYMENTTYPEID: employmentTypeId,
+//     MINAMOUNT: minAmount,
+//     MAXAMOUNT: maxAmount,
+//     PERCENTAGE: percentage
+//   };
+
+//   this.loadingService.show();
+
+//   const request$ = !selectedId
+//     ? this.generalSetupService.saveDownPayment(bodyObj)
+//     : this.generalSetupService.updateDownPayment(bodyObj, selectedId);
+
+//   request$.subscribe(
+//     (res) => {
+     
+
+//       if (res.success) {
+//         swal(`${GlobalConfig.APPLICATION_NAME}`, res.message, 'success');
+//         this.displayCreateEditModal = false;
+
+//         // ✅ Reload forms ONLY on success
+//         this.loadForms();
+//         this.getAllDownPayment();
+//          this.loadingService.hide();
+//       } else {
+//         swal(`${GlobalConfig.APPLICATION_NAME}`, res.message || 'Operation failed', 'error');
+//       }
+//     },
+// (err) => {
+//   this.loadingService.hide();
+
+//   let errorMessage = 'Down payment already setup for this product and employment type';
+
+//   if (err.error) {
+//     if (typeof err.error === 'string') {
+//       errorMessage = err.error;
+//     } else if (err.error.message) {
+//       errorMessage = err.error.message;
+//     }
+//   } else if (err.message) {
+//     errorMessage = err.message;
+//   }
+
+//   swal(
+//     `${GlobalConfig.APPLICATION_NAME}`,
+//     errorMessage,
+//     'error'
+//   );
+// }
+
+
+
+//   );
+//    this.loadForms();
+// }
 }
 
 
