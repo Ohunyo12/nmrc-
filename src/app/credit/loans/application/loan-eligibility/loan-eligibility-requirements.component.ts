@@ -17,11 +17,18 @@ import { UnifiedUnderwritingStandardService } from 'app/credit/services/underwri
 import { ChangeDetectorRef } from '@angular/core';
 
 export enum Options {
-  Yes = 1,
-  No,
-  Waived,
-  Defer
+  NotMet = 0,
+  Met = 1,
+  Waiver = 2,
+  Deferred = 3
 }
+
+// export enum ChecklistType {
+//   NotMet = 0,
+//   Met = 1,
+//   Waiver = 2,
+//   Deferred = 3
+// }
 
 @Component({
     selector: 'app-eligibility-requirements',
@@ -141,6 +148,7 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
     uwsList: any[] = [];
     selectedFiles: { [loanId: number]: File[] } = {};
     today: string;
+    nhfNumber: any;
 
     constructor(
         private route: ActivatedRoute,
@@ -172,7 +180,7 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
         this.getState();
         this.getLoanApplicationDetails();
         this.getAllCurrencies();
-        this.fetchDisbursedObligors();
+        this.fetchDisbursedObligors(this.nhfNumber);
     const now = new Date();
   this.today = now.toISOString().split('T')[0];
     }
@@ -729,28 +737,171 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
     }
 
     // UWS Modal Methods
-    fetchDisbursedObligors(): void {
-        this.underwritingService.getDisbursedObligorUus().subscribe(
-            response => {
-                this.uwsList = response.result || [];
-                console.log('Fetched UUS List:', response);
-            },
-            error => console.error('Error fetching UUS list:', error)
-        );
+    // fetchDisbursedObligors(nhfNumber: any) {
+    //     debugger;
+    //     console.log('Fetching UUS List for NHF Number:', this.selectedApplicationDetail.applicationReferenceNumber);
+ 
+    //     this.underwritingService.getDisbursedObligorUus(nhfNumber).subscribe(
+    //         response => {
+    //             this.uwsList = response.result || [];
+    //             console.log('Fetched UUS List:', response);
+    //         },
+    //         error => console.error('Error fetching UUS list:', error)
+    //     );
+    // }
+
+// fetchDisbursedObligors(nhfNumber: string | number) {
+//     this.loadingService.show();
+//     if (nhfNumber === null || nhfNumber === undefined) {
+//         console.warn('NHF Number is missing. API call aborted.');
+//         return;
+//     }
+
+//     console.log('Fetching UUS List for NHF Number:', nhfNumber);
+
+//     this.underwritingService.getDisbursedObligorUus(nhfNumber.toString()).subscribe(
+//         (response) => {
+//             this.loadingService.hide();
+//             this.uwsList = response.result || [];
+//             console.log('Fetched UUS List:', this.uwsList);
+//         },
+//         (error) => {
+//             console.error('Error fetching UUS list:', error);
+//         }
+//     );
+// }
+
+// fetchDisbursedObligors(nhfNumber: string | number) {
+//     this.loadingService.show();
+
+//     if (nhfNumber === null || nhfNumber === undefined) {
+//         console.warn('NHF Number is missing. API call aborted.');
+//         this.loadingService.hide();
+//         return;
+//     }
+
+//     console.log('Fetching UUS List for NHF Number:', nhfNumber);
+
+//     this.underwritingService
+//         .getDisbursedObligorUus(nhfNumber.toString())
+//         .subscribe(
+//             (response) => {
+//                 this.loadingService.hide();
+
+//                 this.uwsList = (response.result || []).map((uws: any) => ({
+//                     ...uws,
+//                     // convert backend checkListType to number so it matches radio value
+//                     option: uws.
+//                         checkTypes !== null && uws.
+//                             checkTypes !== undefined
+//                         ? Number(uws.
+//                             checkTypes)
+//                         : null,
+//                         id: uws.ChecklistId ??uws.checklistId ?? uws.id,
+
+//                     // keep deferredDate only if option is Deferred
+//                     deferredDate:
+//                         Number(uws.systemOption) === 3
+//                             ? uws.deferredDate
+//                             : null
+//                 }));
+
+//                 console.log('Fetched UUS List:', this.uwsList);
+//             },
+//             (error) => {
+//                 this.loadingService.hide();
+//                 console.error('Error fetching UUS list:', error);
+//             }
+//         );
+// }
+
+fetchDisbursedObligors(nhfNumber: string | number) {
+    this.loadingService.show();
+
+    if (nhfNumber === null || nhfNumber === undefined) {
+        console.warn('NHF Number is missing. API call aborted.');
+        this.loadingService.hide();
+        return;
     }
 
-    openUWSModal(): void {
-        console.log('Fetched Loan List:', this.selectedApplicationDetail);
-        if (!this.selectedApplicationDetail) {
-            swal('FinTrak Credit 360', 'Please select a loan application to view the UUS checklist.', 'warning');
-            return;
-        }
-        this.loadingService.show();
-        setTimeout(() => {
-            this.isUWSModalVisible = true;
-            this.loadingService.hide();
-        }, 50);
+    console.log('Fetching UUS List for NHF Number:', nhfNumber);
+
+    this.underwritingService
+        .getDisbursedObligorUus(nhfNumber.toString())
+        .subscribe(
+            (response) => {
+                this.loadingService.hide();
+
+                this.uwsList = (response.result || []).map((uws: any) => {
+                    // Determine ID without using ?? (for older Angular versions)
+                    let resolvedId = null;
+                    if (uws.ChecklistId !== undefined && uws.ChecklistId !== null) {
+                        resolvedId = uws.ChecklistId;
+                    } else if (uws.checklistId !== undefined && uws.checklistId !== null) {
+                        resolvedId = uws.checklistId;
+                    } else if (uws.id !== undefined && uws.id !== null) {
+                        resolvedId = uws.id;
+                    }
+
+                    return {
+                        ...uws,
+                        id: resolvedId, // normalized ID
+                        // Convert backend checkTypes to number to match radio values
+                        option: uws.checkTypes !== null && uws.checkTypes !== undefined
+                            ? Number(uws.checkTypes)
+                            : null,
+                        // Keep deferredDate only if option is Deferred (3)
+                        deferredDate: Number(uws.checkTypes) === 3
+                            ? uws.deferredDate
+                            : null,
+                        files: [] // initialize empty files array
+                    };
+                });
+
+                console.log('Fetched UUS List:', this.uwsList);
+            },
+            (error) => {
+                this.loadingService.hide();
+                console.error('Error fetching UUS list:', error);
+            }
+        );
+}
+
+
+
+
+
+
+
+    // openUWSModal(): void {
+    //     console.log('Fetched Loan List:', this.selectedApplicationDetail.applicationReferenceNumber);
+    //     if (!this.selectedApplicationDetail) {
+    //         swal('FinTrak Credit 360', 'Please select a loan application to view the UUS checklist.', 'warning');
+    //         return;
+    //     }
+    //     this.loadingService.show();
+    //     setTimeout(() => {
+    //         this.isUWSModalVisible = true;
+    //         this.loadingService.hide();
+    //     }, 50);
+        
+    // }
+
+    openUWSModal(applicationDetail: any): void {
+    if (!applicationDetail.applicationReferenceNumber) {
+        swal('FinTrak Credit 360', 'Please select a valid loan application.', 'warning');
+        return;
     }
+
+    this.selectedApplicationDetail = applicationDetail;
+    console.log('Opening UWS Modal for Application Reference Number:', applicationDetail);
+
+    // Pass the NHF number explicitly
+    this.fetchDisbursedObligors(applicationDetail.applicationReferenceNumber);
+
+    this.isUWSModalVisible = true;
+}
+
 
     closeUWSModal(): void {
         this.clearForm();
@@ -806,13 +957,16 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
                 itemId: uws.id,
                 description: uws.description,
                 pmbId: 1,
-                deferDate: uws.option === 'Deferred' ? uws.deferredDate : null,
-                option: this.mapOptionToEnum(uws.option),
-                fileName: firstFile ? firstFile.fileName : null,
-                fileType: firstFile ? firstFile.fileType : null,
-                fileContentBase64: firstFile ? firstFile.fileContentBase64 : null
+                comment: uws.comment || '',
+                deferDate: uws.option === 3 ? uws.deferredDate : '',
+                checkListType: uws.option || '',
+                fileName: firstFile ? firstFile.fileName : '',
+                fileType: firstFile ? firstFile.fileType : '',
+                fileContentBase64: firstFile ? firstFile.fileContentBase64 : ''
             };
         });
+         console.log('Prepared UUS Submission Body:', body);
+        // return; 
 
         swal({
             title: 'Confirm UUS Checklist Submission',
@@ -857,10 +1011,16 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
     }
 
     onOptionChange(uws: any): void {
-        if (uws.option !== 'Deferred') {
+ 
+        if (uws.option !== '3') {
             uws.deferredDate = null;
         }
+            if (uws.option !== 1) {
+        uws.comment = null;
     }
+    }
+
+
 
     onDeferredDateChange(uws: any): void {
         // Optional: Add logic if needed for deferred date changes
@@ -911,11 +1071,11 @@ export class LoanEligibilityRequirementsComponent implements OnInit {
 
     mapOptionToEnum(option: string): Options {
         const mapping: { [key: string]: Options } = {
-            'Yes': Options.Yes,
-            'No': Options.No,
-            'Waiver': Options.Waived,
-            'Deferred': Options.Defer
+            '1': Options.Met,
+            '0': Options.NotMet,
+            '2': Options.Waiver,
+            '3': Options.Deferred
         };
-        return mapping[option] !== undefined ? mapping[option] : Options.Defer;
+        return mapping[option] !== undefined ? mapping[option] : Options.Deferred;
     }
 }

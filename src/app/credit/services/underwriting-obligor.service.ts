@@ -26,12 +26,12 @@ export class UnifiedUnderwritingStandardService {
       return this.http.get(`${AppConstant.API_BASE}loan/get-applied-loans-refinance?RefinanceNumbr=${refinanceNumber}`);
     }
 
-    // approveChecklistLoan(RefinanceNumber: string): Observable<any> { 
+    // approveChecklistLoan(RefinanceNumber: string): Observable<any> {
     //   return this.http.get(`${AppConstant.API_BASE}loan/Approve-pmb-customer-checklist`, {RefinanceNumber}) // Send the array directly
 
     // }
 
-    approveChecklistLoan(RefinanceNumber: string): Observable<any> { 
+    approveChecklistLoan(RefinanceNumber: string): Observable<any> {
       return this.http.get(`${AppConstant.API_BASE}loan/Approve-pmb-customer-checklist/?RefinanceNumber=${RefinanceNumber}`) // Send the array directly
         .pipe(
           map((res: any) => res),
@@ -48,12 +48,24 @@ export class UnifiedUnderwritingStandardService {
 
   // ================================= PMB Underwriting Checklist =======================================
 
-  getDisbursedObligorUus() {
-      return this.http.get(`${AppConstant.API_BASE}loan/get-obligor-uus`)
-          .pipe(
-        map((res: any) => res),
-      catchError((error: any) => observableThrowError(error.error || 'Server error')),);
-  }
+  // getDisbursedObligorUus() {
+  //     return this.http.get(`${AppConstant.API_BASE}loan/get-obligor-uus`)
+  //         .pipe(
+  //       map((res: any) => res),
+  //     catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+  // }
+
+getDisbursedObligorUus(NhfNumber: string) {
+
+  return this.http
+    .get(`${AppConstant.API_BASE}loan/get-obligor-uus/${NhfNumber}`)
+    .pipe(
+      map(res => res),
+      catchError((error) => {
+        return throwError(() => error);
+      })
+    );
+}
 
   postCustomerUus(body: any) : Observable<any> {
     return this.http.post(`${AppConstant.API_BASE}loan/Post-Customer-uus`, body)
@@ -74,7 +86,7 @@ getCustomerUusItemDoc(nhfNumber: string, itemId: number): Observable<any> {
   }
 
   const url = `${AppConstant.API_BASE}loan/get-customer-uus-items-doc?NhfNumber=${nhfNumber}&ItemId=${itemId}`;
-  console.log("API URL:", url); 
+  console.log("API URL:", url);
 
   return this.http.post(url, null);
 }
@@ -88,8 +100,8 @@ getCustomerUusItems(nhfNumber: string) {
 }
 
 // ========================== PMB Approval for Refinancing =============================
-  
-// approvePmbRefinancing(body: number): Observable<any> { 
+
+// approvePmbRefinancing(body: number): Observable<any> {
 //   return this.http.post(`${AppConstant.API_BASE}loan/Approve-pmb-refinance`, body) // Send the array directly
 //     .pipe(
 //       map((res: any) => res),
@@ -97,7 +109,7 @@ getCustomerUusItems(nhfNumber: string) {
 //     );
 // }
 
-approvePmbRefinancing(body: number): Observable<any> { 
+approvePmbRefinancing(body: number): Observable<any> {
   return this.http.post(`${AppConstant.API_BASE}loan/Approve-pmb-refinance/?Model=${body}`,{})
       .pipe(
       map((res: any) => res),
@@ -170,7 +182,7 @@ catchError((error: any) => observableThrowError(error.error || 'Server error')),
 
 // ============================ NMRC Reviewer =====================================
 
-approveReviewLoan(body: number[]): Observable<any> { 
+approveReviewLoan(body: number[]): Observable<any> {
   return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-reviewal-approval`, body) // Send the array directly
     .pipe(
       map((res: any) => res),
@@ -178,7 +190,7 @@ approveReviewLoan(body: number[]): Observable<any> {
     );
 }
 
-SendReviewForFinalApproval(refinanceNumber: string): Observable<any> { 
+SendReviewForFinalApproval(refinanceNumber: string): Observable<any> {
   debugger
   return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-send-reviewed-batch?RefinanceNumber=${refinanceNumber}`, null) // Send the array directly
     .pipe(
@@ -187,7 +199,7 @@ SendReviewForFinalApproval(refinanceNumber: string): Observable<any> {
     );
 }
 
-approveReviewLoanFinal(body: number[]): Observable<any> { 
+approveReviewLoanFinal(body: number[]): Observable<any> {
   return this.http.post(`${AppConstant.API_BASE}loan/subloan-approval`, body) // Send the array directly
     .pipe(
       map((res: any) => res),
@@ -195,8 +207,8 @@ approveReviewLoanFinal(body: number[]): Observable<any> {
     );
 }
 
-disapproveReviewLoan(body: number[]): Observable<any> { 
-  return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-reviewal-disapproval`, body) 
+disapproveReviewLoan(body: number[]): Observable<any> {
+  return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-reviewal-disapproval`, body)
     .pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error'))
@@ -207,14 +219,14 @@ reviewCustomersUUSItems(body: any) : Observable<any> {
   return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-customer-uusiems-reviewal`, body)
       .pipe(
           map((res: any) => res),
-          catchError((error: any) => observableThrowError(error.error || 'Server error'))    
+          catchError((error: any) => observableThrowError(error.error || 'Server error'))
       );
   }
 
 
 
   getAppliedLoanForNmrcReviewal(): Observable<any> {
-    return this.http.get(`${AppConstant.API_BASE}loan/get-loan-summary-nmrcreviewal`) 
+    return this.http.get(`${AppConstant.API_BASE}loan/get-loan-summary-nmrcreviewal`)
       .pipe(
         map((res: any) => res),
         catchError((error: any) => observableThrowError(error.error || 'Server error'))
@@ -227,21 +239,21 @@ reviewCustomersUUSItems(body: any) : Observable<any> {
       map((res: any) => res),
     catchError((error: any) => observableThrowError(error.error || 'Server error')),);
   }
-  
+
   // ============================ Final NMRC Approval for Loan(s) Refinancing =================================
 
 
 
-approveReviewedLoan(body: number[]): Observable<any> { 
-  return this.http.post(`${AppConstant.API_BASE}loan/subloan-approval`, body) 
+approveReviewedLoan(body: number[]): Observable<any> {
+  return this.http.post(`${AppConstant.API_BASE}loan/subloan-approval`, body)
     .pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error'))
     );
 }
 
-disapproveReviewedLoan(body: number[]): Observable<any> { 
-  return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-reviewal-disapproval`, body) 
+disapproveReviewedLoan(body: number[]): Observable<any> {
+  return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-reviewal-disapproval`, body)
     .pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error'))
@@ -376,7 +388,7 @@ postLoanTerms(body: any): Observable<any> {
     );
 }
 
-  sendReviewForFinalApproval(refinanceNumber: string): Observable<any> { 
+  sendReviewForFinalApproval(refinanceNumber: string): Observable<any> {
     debugger
     return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-send-reviewed-batch?RefinanceNumber=${refinanceNumber}`, null) // Send the array directly
       .pipe(
@@ -385,23 +397,23 @@ postLoanTerms(body: any): Observable<any> {
       );
   }
 
-  approveFinalReviewedLoan(body: number[]): Observable<any> { 
-    return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-approve-reviewed`, body) 
+  approveFinalReviewedLoan(body: number[]): Observable<any> {
+    return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-approve-reviewed`, body)
       .pipe(
         map((res: any) => res),
         catchError((error: any) => observableThrowError(error.error || 'Server error'))
       );
   }
 
-  disapproveFinalReviewedLoan(body: number[]): Observable<any> { 
-    return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-disapprove-reviewed`, body) 
+  disapproveFinalReviewedLoan(body: number[]): Observable<any> {
+    return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-disapprove-reviewed`, body)
       .pipe(
         map((res: any) => res),
         catchError((error: any) => observableThrowError(error.error || 'Server error'))
       );
   }
 
-  sendLoanForTranch(refinanceNumber: string): Observable<any> { 
+  sendLoanForTranch(refinanceNumber: string): Observable<any> {
     debugger
     return this.http.post(`${AppConstant.API_BASE}loan/Nmrc-send-approved-batch?RefinanceNumber=${refinanceNumber}`, null) // Send the array directly
       .pipe(
