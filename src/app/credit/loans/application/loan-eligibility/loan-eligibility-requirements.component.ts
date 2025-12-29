@@ -17,10 +17,10 @@ import { UnifiedUnderwritingStandardService } from 'app/credit/services/underwri
 import { ChangeDetectorRef } from '@angular/core';
 
 export enum Options {
-  NotMet = 0,
+  NotMet = 2,
   Met = 1,
-  Waiver = 2,
-  Deferred = 3
+  Waiver = 3,
+  Deferred = 4
 }
 
 // export enum ChecklistType {
@@ -832,8 +832,33 @@ fetchDisbursedObligors(nhfNumber: string | number) {
             (response) => {
                 this.loadingService.hide();
             console.log('Fetching UUS List for NHF Number:', response.result);
+                // this.uwsList = (response.result || []).map((uws: any) => {
+                //     // Determine ID without using ?? (for older Angular versions)
+                //     let resolvedId = null;
+                //     if (uws.ChecklistId !== undefined && uws.ChecklistId !== null) {
+                //         resolvedId = uws.ChecklistId;
+                //     } else if (uws.checklistId !== undefined && uws.checklistId !== null) {
+                //         resolvedId = uws.checklistId;
+                //     } else if (uws.id !== undefined && uws.id !== null) {
+                //         resolvedId = uws.id;
+                //     }
+
+                //     return {
+                //         ...uws,
+                //         id: resolvedId, // normalized ID
+                //         // Convert backend systemOption to number to match radio values
+                //         option: uws.systemOption !== null && uws.systemOption !== undefined
+                //             ? Number(uws.systemOption)
+                //             : null,
+                //         // Keep deferredDate only if option is Deferred (3)
+                //         deferredDate: Number(uws.systemOption) === 3
+                //             ? uws.deferredDate
+                //             : null,
+                //         files: [] // initialize empty files array
+                //     };
+                // });
                 this.uwsList = (response.result || []).map((uws: any) => {
-                    // Determine ID without using ?? (for older Angular versions)
+
                     let resolvedId = null;
                     if (uws.ChecklistId !== undefined && uws.ChecklistId !== null) {
                         resolvedId = uws.ChecklistId;
@@ -843,18 +868,24 @@ fetchDisbursedObligors(nhfNumber: string | number) {
                         resolvedId = uws.id;
                     }
 
+                    const hasSystemOption =
+                        uws.systemOption !== null && uws.systemOption !== undefined;
+
                     return {
                         ...uws,
-                        id: resolvedId, // normalized ID
-                        // Convert backend systemOption to number to match radio values
-                        option: uws.systemOption !== null && uws.systemOption !== undefined
-                            ? Number(uws.systemOption)
-                            : null,
-                        // Keep deferredDate only if option is Deferred (3)
-                        deferredDate: Number(uws.systemOption) === 3
+                        id: resolvedId,
+
+                        // radio value
+                        option: hasSystemOption ? Number(uws.systemOption) : null,
+
+                        // lock row if systemOption exists
+                        isLocked: hasSystemOption,
+
+                        deferredDate: Number(uws.systemOption) === 4
                             ? uws.deferredDate
                             : null,
-                        files: [] // initialize empty files array
+
+                        files: []
                     };
                 });
 
@@ -1023,12 +1054,12 @@ fetchDisbursedObligors(nhfNumber: string | number) {
     onOptionChange(uws: any): void {
 
     // Clear deferred date unless Deferred (3)
-    if (uws.option !== 3) {
+    if (uws.option !== 4) {
         uws.deferredDate = '';
     }
 
     // Clear comment ONLY when Not Met (0)
-    if (uws.option === 0) {
+    if (uws.option === 2) {
         uws.comment = '';
     }
 }

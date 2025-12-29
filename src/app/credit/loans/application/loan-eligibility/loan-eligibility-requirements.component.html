@@ -375,16 +375,16 @@
                         <td style="padding: 8px; text-align: center;">
                             <div style="display: flex; flex-direction: column; gap: 5px; align-items: start;">
                                 <label>
-                                    <input type="radio" [(ngModel)]="uws.option" [value]="1"  [name]="'option_' + i"  [ngModelOptions]="{ standalone: true }"> Met
+                                    <input type="radio" [(ngModel)]="uws.option" [value]="1"  [name]="'option_' + i"   [disabled]="uws.isLocked" [ngModelOptions]="{ standalone: true }"> Met
                                 </label>
                                 <label>
-                                    <input type="radio" [(ngModel)]="uws.option" [value]="0"  [name]="'option_' + i"    [ngModelOptions]="{ standalone: true }"> Not Met
+                                    <input type="radio" [(ngModel)]="uws.option" [value]="2"  [name]="'option_' + i"   [disabled]="uws.isLocked"   [ngModelOptions]="{ standalone: true }"> Not Met
                                 </label>
                                 <label>
-                                    <input type="radio" [(ngModel)]="uws.option" [value]="2" [name]="'option_' + i"   [ngModelOptions]="{ standalone: true }"> Waiver
+                                    <input type="radio" [(ngModel)]="uws.option" [value]="3" [name]="'option_' + i"   [disabled]="uws.isLocked"  [ngModelOptions]="{ standalone: true }"> Waiver
                                 </label>
                                 <label>
-                                    <input type="radio" [(ngModel)]="uws.option" [value]="3"   [name]="'option_' + i"    [ngModelOptions]="{ standalone: true }"
+                                    <input type="radio" [(ngModel)]="uws.option" [value]="4"   [name]="'option_' + i"    [disabled]="uws.isLocked"  [ngModelOptions]="{ standalone: true }"
                                         (change)="onOptionChange(uws)"> Defer
                                 </label>
 
@@ -403,15 +403,15 @@
 
                             <td style="padding: 8px;">{{ uws.systemComment }}</td>
                             <td>
-                                <ng-container *ngIf="uws.option === 3; else showNA">
+                                <ng-container *ngIf="uws.option === 4; else showNA">
                                     <input type="date" [(ngModel)]="uws.deferredDate" [name]="'deferredDate' + uws.id" [min]="today" class="form-control" (change)="onDeferredDateChange(uws)" style="appearance: none; background-color: #fff; border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; font-size: 14px; cursor: pointer; width: 100%;">
                                 </ng-container>
                                 <ng-template #showNA>N/A</ng-template>
                             </td>
                             <td style="padding: 8px; text-align: center;">
                                 <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
-                                    <input type="file" id="fileInput-{{uws.id}}" (change)="onFileSelect($event, uws.id)" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx" multiple   [disabled]=" uws.option === 3"  style="display: none;">
-                                    <label for="fileInput-{{uws.id}}" [style.background-color]="uws.option === 3  ? '#ccc' : '#007bff'" [style.cursor]="uws.option === 3  ? 'not-allowed' : 'pointer'" style="display: inline-block; color: white; padding: 8px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; text-align: center; min-width: 130px;">
+                                    <input type="file" id="fileInput-{{uws.id}}" (change)="onFileSelect($event, uws.id)" accept=".jpeg,.jpg,.png,.pdf,.doc,.docx" multiple   [disabled]=" uws.option === 4"  style="display: none;">
+                                    <label for="fileInput-{{uws.id}}" [style.background-color]="uws.option === 4  ? '#ccc' : '#007bff'" [style.cursor]="uws.option === 4  ? 'not-allowed' : 'pointer'" style="display: inline-block; color: white; padding: 8px 15px; border-radius: 5px; font-size: 14px; font-weight: bold; text-align: center; min-width: 130px;">
                                         📁 Choose File
                                     </label>
                                     <span id="fileNameDisplay-{{uws.id}}" style="font-size: 12px; color: #555; min-height: 16px; display: block;">
