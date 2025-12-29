@@ -10,7 +10,7 @@
                                 Down Payment
                             </h2>
                             <div class="pull-right">
-                                <button (click)="showAddModal()" pButton type="button" label="Add New" icon="fa-plus"></button>
+                                <button (click)="showModalForm()" pButton type="button" label="Add New" icon="fa-plus"></button>
                             </div>
                         </div>
                     </div>
@@ -18,16 +18,26 @@
 
                 <div class="panel-body">
                     <p-dataTable [value]="downPayments" [responsive]="true" [paginator]="true" [rows]="15">
-                        <p-column field="employmenttypeid" header="Employment Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                        <p-column field="productid" header="Products" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                        <p-column field="minamount" header="Minimum Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
-                        <p-column field="maxamount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="employmentTypeName" header="Employment Type" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                        <p-column field="productName" header="Products" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
+                    <p-column field="minAmount" header="Minimum Amount" sortable="true" [filter]="true"
+                    filterMatchMode="contains">
+                    <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                        {{ d.minAmount | number : '1.2' }}
+                    </ng-template>
+                </p-column>
+                        <!-- <p-column field="maxAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains"></p-column> -->
+                        <p-column field="maxAmount" header="Maximum Amount" sortable="true" [filter]="true" filterMatchMode="contains">
+                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                {{ d.maxAmount | number : '1.2' }}
+                            </ng-template>
+                        </p-column>
                         <p-column field="percentage" header="Percentage (%)" sortable="true" [filter]="true" filterMatchMode="contains"></p-column>
 
                         <p-column [style]="{'width':'100px'}">
                             <ng-template pTemplate="header"></ng-template>
-                            <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
-                                <a (click)="editDownPayment(i)" href="javascript:void(0)">Edit</a>
+                          <ng-template let-d="rowData" let-i="rowIndex" pTemplate="body">
+                                <a (click)="editDownPayment(d)" href="javascript:void(0)">Edit</a>
                             </ng-template>
                         </p-column>
 
@@ -52,7 +62,7 @@
 </div>
 
 <!--form modal-->
-<p-dialog [responsive]=true [(visible)]="displayAddModal" id="add-modal" modal="modal" showEffect="fade" width="900">
+<p-dialog [responsive]=true [(visible)]="displayCreateEditModal" id="create-edit-modal" modal="modal" showEffect="fade" width="900">
     <div style="margin-bottom:0" class="panel panel-default">
         <div class="panel-heading">
             <h2 class="panel-title">
@@ -72,10 +82,10 @@
                             <select type="text" name="employmentTypeId" formControlName="employmentTypeId" id="employmentTypeId"
                                 class="form-control"
                                 [ngClass]="!downPaymentForm.controls['employmentTypeId'].valid ? 'required-input' : 'valid-input'">
-                                <option value="">-- Select Employment Status --</option>
-                                <option value="0">Self Employed</option>
-                                <option value="1">Employed</option>
-                                <option value="2">Unemployed</option>
+                                <option [ngValue]="null">-- Select Employment Status --</option>
+                                <option [ngValue]="0">Self Employed</option>
+                                <option [ngValue]="1">Employed</option>
+                                <option [ngValue]="2">Unemployed</option>
                             </select>
                         </div>
                         <label for="productId" class="control-label col-md-2">Products</label>
@@ -114,8 +124,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <button type="button" (click)="submitForm(downPaymentForm)" [disabled]="downPaymentForm.invalid" class="btn btn-success pull-right">Save</button>
-                        <button type="button" (click)="displayAddModal=false" style="margin-right:5px" class="btn btn-danger pull-right">Cancel</button>
-                    </div>
+                        <button type="button" (click)="displayCreateEditModal=false" style="margin-right:5px"
+                            class="btn btn-danger pull-right" i18n>Close</button>                    </div>
                 </div>
             </div>
 
@@ -126,4 +136,3 @@
 <!--end of form modal-->
 
 
-<fintrakbanking-message [title]="title" [message]="message" [show]="show" [cssClass]="cssClass" (closeEvent)="hideMessage($event)"></fintrakbanking-message>
