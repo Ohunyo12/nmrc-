@@ -831,7 +831,7 @@ fetchDisbursedObligors(nhfNumber: string | number) {
         .subscribe(
             (response) => {
                 this.loadingService.hide();
-
+            console.log('Fetching UUS List for NHF Number:', response.result);
                 this.uwsList = (response.result || []).map((uws: any) => {
                     // Determine ID without using ?? (for older Angular versions)
                     let resolvedId = null;
@@ -846,12 +846,12 @@ fetchDisbursedObligors(nhfNumber: string | number) {
                     return {
                         ...uws,
                         id: resolvedId, // normalized ID
-                        // Convert backend checkTypes to number to match radio values
-                        option: uws.checkTypes !== null && uws.checkTypes !== undefined
-                            ? Number(uws.checkTypes)
+                        // Convert backend systemOption to number to match radio values
+                        option: uws.systemOption !== null && uws.systemOption !== undefined
+                            ? Number(uws.systemOption)
                             : null,
                         // Keep deferredDate only if option is Deferred (3)
-                        deferredDate: Number(uws.checkTypes) === 3
+                        deferredDate: Number(uws.systemOption) === 3
                             ? uws.deferredDate
                             : null,
                         files: [] // initialize empty files array
@@ -1010,15 +1010,29 @@ fetchDisbursedObligors(nhfNumber: string | number) {
         });
     }
 
-    onOptionChange(uws: any): void {
+    // onOptionChange(uws: any): void {
  
-        if (uws.option !== '3') {
-            uws.deferredDate = null;
-        }
-            if (uws.option !== 1) {
-        uws.comment = null;
+    //     if (uws.option !== '3') {
+    //         uws.deferredDate = null;
+    //     }
+    //         if (uws.option !== 1) {
+    //     uws.comment = null;
+    // }
+    // }
+
+    onOptionChange(uws: any): void {
+
+    // Clear deferred date unless Deferred (3)
+    if (uws.option !== 3) {
+        uws.deferredDate = '';
     }
+
+    // Clear comment ONLY when Not Met (0)
+    if (uws.option === 0) {
+        uws.comment = '';
     }
+}
+
 
 
 

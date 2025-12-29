@@ -56,7 +56,8 @@ export class UnderwritingObligorComponent implements OnInit {
 
   ngOnInit() {
     this.fetchDisbursedLoans();
-    this.fetchDisbursedObligors();
+    // this.fetchDisbursedObligors();
+    this.fetchDisbursedObligors(this.nhfNumber);
     const now = new Date();
   this.today = now.toISOString().split('T')[0];
   }
@@ -223,15 +224,67 @@ loadLoansLazy(event: any) {
 
 
 
-  fetchDisbursedObligors(): void {
-    this.underwritingService.getDisbursedObligorUus().subscribe(
-      response => {
-        this.uwsList = response.result || [];
-        console.log('Fetched UUS List:', response);
-      },
-      error => console.error('Error fetching UUS list:', error)
-    );
-  }
+  // fetchDisbursedObligors(): void {
+  //   this.underwritingService.getDisbursedObligorUus().subscribe(
+  //     response => {
+  //       this.uwsList = response.result || [];
+  //       console.log('Fetched UUS List:', response);
+  //     },
+  //     error => console.error('Error fetching UUS list:', error)
+  //   );
+  // }
+
+  fetchDisbursedObligors(nhfNumber: string | number) {
+    this.loadingService.show();
+
+    if (nhfNumber === null || nhfNumber === undefined) {
+        console.warn('NHF Number is missing. API call aborted.');
+        this.loadingService.hide();
+        return;
+    }
+
+    console.log('Fetching UUS List for NHF Number:', nhfNumber);
+
+    this.underwritingService
+        .getDisbursedObligorUus(nhfNumber.toString())
+        .subscribe(
+            (response) => {
+                this.loadingService.hide();
+
+                this.uwsList = (response.result || []).map((uws: any) => {
+                    // Determine ID without using ?? (for older Angular versions)
+                    let resolvedId = null;
+                    if (uws.ChecklistId !== undefined && uws.ChecklistId !== null) {
+                        resolvedId = uws.ChecklistId;
+                    } else if (uws.checklistId !== undefined && uws.checklistId !== null) {
+                        resolvedId = uws.checklistId;
+                    } else if (uws.id !== undefined && uws.id !== null) {
+                        resolvedId = uws.id;
+                    }
+
+                    return {
+                        ...uws,
+                        id: resolvedId, // normalized ID
+                        // Convert backend checkTypes to number to match radio values
+                        option: uws.checkTypes !== null && uws.checkTypes !== undefined
+                            ? Number(uws.checkTypes)
+                            : null,
+                        // Keep deferredDate only if option is Deferred (3)
+                        deferredDate: Number(uws.checkTypes) === 3
+                            ? uws.deferredDate
+                            : null,
+                        files: [] // initialize empty files array
+                    };
+                });
+
+                console.log('Fetched UUS List:', this.uwsList);
+            },
+            (error) => {
+                this.loadingService.hide();
+                console.error('Error fetching UUS list:', error);
+            }
+        );
+}
 
   onOptionChange(uws: any) {
     if (uws.option !== 'Deferred') {
@@ -245,7 +298,7 @@ loadLoansLazy(event: any) {
       this.selectedLoanDetail = detail;
       this.isUWSModalVisible = true;
       this.loadingService.hide();
-    },50);
+    },50 );
   }
 
   updatePagination() {
