@@ -298,7 +298,7 @@ loadLoansLazy(event: any) {
       this.selectedLoanDetail = detail;
       this.isUWSModalVisible = true;
       this.loadingService.hide();
-    },50);
+    },50 );
   }
 
   updatePagination() {
