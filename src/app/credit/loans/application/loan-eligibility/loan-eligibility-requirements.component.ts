@@ -988,16 +988,16 @@ fetchDisbursedObligors(nhfNumber: string | number) {
                 itemId: uws.id,
                 description: uws.description,
                 pmbId: 1,
-                comment: uws.comment || '',
+                officerComment: uws.comment || '',
                 deferDate: uws.option === 3 ? uws.deferredDate : '',
-                checkListType: uws.option || '',
+                option: uws.option || '',
                 fileName: firstFile ? firstFile.fileName : '',
                 fileType: firstFile ? firstFile.fileType : '',
                 fileContentBase64: firstFile ? firstFile.fileContentBase64 : ''
             };
         });
          console.log('Prepared UUS Submission Body:', body);
-        // return; 
+     
 
         swal({
             title: 'Confirm UUS Checklist Submission',
