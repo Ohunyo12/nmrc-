@@ -186,7 +186,7 @@ export class RefinancingLoanReviewComponent implements OnInit {
       response => {
         this.uwsList = (response.result || []).map(uws => ({
           ...uws,
-          option: this.mapOptionToEnum(uws.option),
+          option: this.mapOptionToEnum(uws.finalOption),
           deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
         }));
 
@@ -333,8 +333,8 @@ export class RefinancingLoanReviewComponent implements OnInit {
       return;
     }
 
-    console.log("Fetching document for:", uws.employeeNhfNumber, uws.itemId); // Debugging
-    this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
+    console.log("Fetching document for:", uws.employeeNhfNumber, uws.checklistId); // Debugging
+    this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.checklistId);
   }
 
 

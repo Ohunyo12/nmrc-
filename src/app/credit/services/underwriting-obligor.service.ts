@@ -93,11 +93,25 @@ getCustomerUusItemDoc(nhfNumber: string, itemId: number): Observable<any> {
 
 
 getCustomerUusItems(nhfNumber: string) {
-  return this.http.get(`${AppConstant.API_BASE}loan/get-customer-uus-items/?nhfNumber=${nhfNumber}`)
+  return this.http.get(`${AppConstant.API_BASE}loan/get-customer-uus-items/?NhfNumber=${nhfNumber}`)
       .pipe(
     map((res: any) => res),
   catchError((error: any) => observableThrowError(error.error || 'Server error')),);
 }
+
+
+// getCustomerUusItems(nhfNumber: string) {
+//   const params = new HttpParams().set('NhfNumber', nhfNumber);
+
+//   return this.http.get(`${AppConstant.API_BASE}loan/get-customer-uus-items`, { params })
+//       .pipe(
+//     map((res: any) => res),
+//   catchError((error: any) => observableThrowError(error.error || 'Server error')),);
+// }
+
+
+
+
 
 // ========================== PMB Approval for Refinancing =============================
 
