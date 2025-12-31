@@ -1114,7 +1114,7 @@ export class CreditAppraisalComponent implements OnInit {
       response => {
         this.uwsList = (response.result || []).map(uws => ({
           ...uws,
-          option: this.mapOptionToEnum(uws.option),
+          option: this.mapOptionToEnum(uws.finalOption),
           deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
         }));
         console.log('Processed UUS List:', this.uwsList);
@@ -1145,12 +1145,12 @@ export class CreditAppraisalComponent implements OnInit {
       swal('Error', 'No Employee NHF Number found!', 'error');
       return;
     }
-    if (!uws.itemId) {
+    if (!uws.checklistId) {
       swal('Error', 'No Item Found!', 'error');
       return;
     }
-    console.log('Fetching document for:', uws.employeeNhfNumber, uws.itemId);
-    this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.itemId);
+    console.log('Fetching document for:', uws.employeeNhfNumber, uws.checklistId);
+    this.fetchAndPreviewDocument(uws.employeeNhfNumber, uws.checklistId);
   }
 
   private fetchAndPreviewDocument(employeeNumber: string, itemId: number): void {
@@ -1298,6 +1298,7 @@ export class CreditAppraisalComponent implements OnInit {
     this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
       response => {
         if (response && response.success && Array.isArray(response.result)) {
+          console.log("stats result:", response.result)
           this.calculateChecklistSummary(response.result);
         }
         this.isLoadingChecklistSummary = false;
@@ -1329,22 +1330,22 @@ export class CreditAppraisalComponent implements OnInit {
 
     // Count items by option
     const yes = checklistItems.filter(item => {
-      const option = item.option;
+      const option = item.finalOption;
       return option === 1 || option === 'Yes' || option === '1';
     }).length;
 
     const no = checklistItems.filter(item => {
-      const option = item.option;
+      const option = item.finalOption;
       return option === 2 || option === 'No' || option === '2';
     }).length;
 
     const waived = checklistItems.filter(item => {
-      const option = item.option;
+      const option = item.finalOption;
       return option === 3 || option === 'Waiver' || option === 'Waived' || option === '3';
     }).length;
 
     const deferred = checklistItems.filter(item => {
-      const option = item.option;
+      const option = item.finalOption;
       return option === 4 || option === 'Deferred' || option === 'Defer' || option === '4';
     }).length;
 
