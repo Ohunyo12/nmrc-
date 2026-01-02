@@ -989,7 +989,7 @@ fetchDisbursedObligors(nhfNumber: string | number) {
                 description: uws.description,
                 pmbId: 1,
                 officerComment: uws.comment || '',
-                deferDate: uws.option === 3 ? uws.deferredDate : '',
+                deferDate: uws.option === 4 ? uws.deferredDate : '',
                 option: uws.option || '',
                 fileName: firstFile ? firstFile.fileName : '',
                 fileType: firstFile ? firstFile.fileType : '',
