@@ -436,4 +436,12 @@ postLoanTerms(body: any): Observable<any> {
       );
   }
 
+   getApprovalGroup(productId: number, productClassId: number, operationId: number): Observable<any> {
+    return this.http.get(`${AppConstant.API_BASE}loan/approval-group-mapping-flow/${productId}/${productClassId}/${operationId}`)
+      .pipe(
+        map((res: any) => res),
+        catchError((error) => observableThrowError(() => error.error || 'Server error'))
+      );
+  }
+
 }

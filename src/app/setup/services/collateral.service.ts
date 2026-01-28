@@ -1692,7 +1692,5 @@ export class CollateralService {
             map((res: any) => res),
           catchError((error: any) => observableThrowError(error.error || 'Server error')),);
         }
-
-
 }
 //

@@ -295,6 +295,7 @@ export class CreditAppraisalComponent implements OnInit {
       deferredPercent: 0
     };
   isLoadingChecklistSummary: boolean = false;
+   approvalGroup: any[] = [];
 
 
   constructor(
@@ -1006,6 +1007,8 @@ export class CreditAppraisalComponent implements OnInit {
     this.productClassProcessId =
       this.applicationSelection.productClassProcessId;
     this.operationId = this.applicationSelection.operationId;
+    this.productId = this.applicationSelection.productId;
+    console.log('application selection info', this.applicationSelection);
     this.apiRequestId = this.applicationSelection.apiRequestId;
     this.creditGradeId = this.applicationSelection.creditGradeId;
     this.loanApplicationDetail = this.applicationSelection;
@@ -1020,6 +1023,8 @@ export class CreditAppraisalComponent implements OnInit {
     this.isProductProgram = this.productPrograms.some(
       (x) => x.productClassId == this.applicationSelection.productClassId
     );
+
+    this.getApprovalGroup(this.productId, this.applicationSelection.productClassId, this.operationId);
 
     this.resolveUntenored();
     this.getUserPrivileges(this.applicationSelection.currentApprovalLevelId, countryCode); // call this inside getObligorInformation
@@ -4436,6 +4441,15 @@ export class CreditAppraisalComponent implements OnInit {
 
     this.getFacilityStampDuty(this.applicationSelection.loanApplicationId);
     this.onSelectedApplicationChange();
+
+  }
+
+   getApprovalGroup(productId, productClassId, operationId): void {
+    this.underwritingService.getApprovalGroup(productId, productClassId, operationId).subscribe((response: any) => {
+        this.approvalGroup = response.result;
+
+        console.log('approvalGroup', this.approvalGroup);
+      });
 
   }
 
