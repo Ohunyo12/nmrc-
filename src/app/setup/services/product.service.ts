@@ -40,18 +40,18 @@ export class ProductService {
         catchError((error: any) => observableThrowError(error.error || 'Server error')),);
   }
 
-      getAllProducts1() {
-        return this.http.get(`${AppConstant.API_BASE}setups/all-products`)
-            .pipe(
-          map((res: any) => res),
+  getAllProducts1() {
+    return this.http.get(`${AppConstant.API_BASE}setups/all-products`)
+      .pipe(
+        map((res: any) => res),
         catchError((error: any) => observableThrowError(error.error || 'Server error')),);
-    }
+  }
 
-    // searchForProducts(terms: Observable<any>) {
-    //     return terms.debounceTime(400)
-    //         .distinctUntilChanged()
-    //         .switchMap(term => this.searchProductRealtime(term));
-    // }
+  // searchForProducts(terms: Observable<any>) {
+  //     return terms.debounceTime(400)
+  //         .distinctUntilChanged()
+  //         .switchMap(term => this.searchProductRealtime(term));
+  // }
 
   searchProductRealtime(search) {
     return this.http.get(`${AppConstant.API_BASE}setups/product/?searchQuery=${search}`)
@@ -489,7 +489,7 @@ export class ProductService {
   }
 
   updateOriginationFeeSetup(fsCaptionObj: any, originationId: number) {
-    return this.http.put(`${AppConstant.API_BASE}admin/update-originationfee?id=${originationId}`,fsCaptionObj).pipe(
+    return this.http.put(`${AppConstant.API_BASE}admin/update-originationfee?id=${originationId}`, fsCaptionObj).pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error')
       )
@@ -516,7 +516,7 @@ export class ProductService {
   }
 
   updateServiceFeeSetup(fsCaptionObj: any, serviceId: number) {
-    return this.http.put(`${AppConstant.API_BASE}admin/update-servicefee?id=${serviceId}`,fsCaptionObj).pipe(
+    return this.http.put(`${AppConstant.API_BASE}admin/update-servicefee?id=${serviceId}`, fsCaptionObj).pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error')
       )
@@ -543,7 +543,7 @@ export class ProductService {
   }
 
   updateSeasonFeeSetup(fsCaptionObj: any, seasonId: number) {
-    return this.http.put(`${AppConstant.API_BASE}admin/update-refinanceperiod?id=${seasonId}`,fsCaptionObj).pipe(
+    return this.http.put(`${AppConstant.API_BASE}admin/update-refinanceperiod?id=${seasonId}`, fsCaptionObj).pipe(
       map((res: any) => res),
       catchError((error: any) => observableThrowError(error.error || 'Server error')
       )

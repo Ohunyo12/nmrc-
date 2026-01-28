@@ -10,7 +10,7 @@ import { ReportService } from '../../../reports/service/report.service';
 
 import swal from 'sweetalert2';
 import { GlobalConfig, LoanApplicationStatus, ApprovalStatus, AppConstant, ProductProcessEnum, LMSOperationEnum, JobSource } from '../../../shared/constant/app.constant';
-import { ApprovalService } from '../../../setup/services';
+import { ApprovalService, ProductService } from '../../../setup/services';
 import { PrintService } from '../../../shared/services/print.service';
 import { PrintModel } from '../../../shared/models/print-model';
 import { IAppraisal } from 'app/shared/models/appraisal.model';
@@ -155,6 +155,8 @@ export class OfferLetterGenerationComponent implements OnInit {
             deferredPercent: 0
         };
     isLoadingChecklistSummary: boolean = false;
+    approvalGroup: any[] = [];
+
 
 
     constructor(
@@ -167,7 +169,8 @@ export class OfferLetterGenerationComponent implements OnInit {
         private reportServ: ReportService,
         private sanitizer: DomSanitizer,
         private camService: CreditAppraisalService,
-        private underwritingService: UnifiedUnderwritingStandardService
+        private underwritingService: UnifiedUnderwritingStandardService,
+        private productService: ProductService
     ) {
 
     }
@@ -323,6 +326,7 @@ export class OfferLetterGenerationComponent implements OnInit {
 
         this.displayLoanDetails = true;
         this.applicationSelection = row;
+        console.log('Selected Application:', this.applicationSelection);
         this.applicationRefNo = row.applicationReferenceNumber;
         this.loanApplicationId = row.loanApplicationId;
         this.getTrail();
@@ -384,6 +388,7 @@ export class OfferLetterGenerationComponent implements OnInit {
         }
 
         this.fetchChecklistSummaryForLoan(this.applicationSelection.applicationReferenceNumber);
+        this.getApprovalGroup(this.applicationSelection.productId, this.applicationSelection.productClassId, this.applicationSelection.operationId);
     }
 
     // =========================== Fetch Obligor's Items ===============================
@@ -652,6 +657,19 @@ export class OfferLetterGenerationComponent implements OnInit {
         };
     }
     //============================ END CHECKLIST STATISTICS ===============================================
+
+    // =========================== Get Approval Group ===============================
+
+     getApprovalGroup(productId, productClassId, operationId): void {
+    this.underwritingService
+      .getApprovalGroup(productId, productClassId, operationId)
+      .subscribe((response: any) => {
+        this.approvalGroup = response.result;
+
+        console.log('approvalGroup', this.approvalGroup);
+      });
+
+  }
 
 
     CallRequestClose() { this.displayJobRequest = false; }
