@@ -544,6 +544,8 @@ export class InitiateLoanBookingComponent implements OnInit {
         }
     }
 
+    riskSummary: any[] = [];
+
     buildRiskSummary() {
         const groups = {
             No: { label: 'Red Warning Signal', color: '#dc3545', items: [] },
