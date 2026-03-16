@@ -403,22 +403,50 @@ export class OfferLetterGenerationComponent implements OnInit {
         }
     }
 
+    riskSummary: any[] = [];
+
+    buildRiskSummary() {
+        const groups = {
+            No: { label: 'Red Warning Signal', color: '#dc3545', items: [] },
+            Deferred: { label: 'Yellow Warning Signal', color: '#17a2b8', items: [] },
+            Waiver: { label: 'Blue Warning Signal', color: '#ffc107', items: [] },
+            Yes: { label: 'Green Warning Signal', color: '#28a745', items: [] }
+        };
+
+        this.uwsList.forEach(item => {
+            if (groups[item.option]) {
+                groups[item.option].items.push(item);
+            }
+        });
+
+        this.riskSummary = Object.keys(groups).map(key => ({
+            label: groups[key].label,
+            color: groups[key].color,
+            count: groups[key].items.length,
+            items: groups[key].items
+        }));
+    }
+
     fetchCustomerUusItems(nhfNumber: string): void {
-        console.error('nhf number:', nhfNumber);
         this.loadingService.show();
+
         this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
             response => {
                 this.uwsList = (response.result || []).map(uws => ({
                     ...uws,
                     option: this.mapOptionToEnum(uws.finalOption),
-                    deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
+                    deferredDate: uws.deferDate
+                        ? new Date(uws.deferDate).toISOString().split('T')[0]
+                        : null
                 }));
-                console.log('Processed UUS List:', this.uwsList);
-                //this.cdr.detectChanges();
+                // console.log('Processed UUS List:', this.uwsList);
+
+                this.buildRiskSummary();
             },
             error => {
-                console.error('Error fetching UWS list:', error);
+                console.error(error);
                 this.uwsList = [];
+                this.riskSummary = [];
                 this.loadingService.hide();
             },
             () => this.loadingService.hide()
@@ -660,16 +688,16 @@ export class OfferLetterGenerationComponent implements OnInit {
 
     // =========================== Get Approval Group ===============================
 
-     getApprovalGroup(productId, productClassId, operationId): void {
-    this.underwritingService
-      .getApprovalGroup(productId, productClassId, operationId)
-      .subscribe((response: any) => {
-        this.approvalGroup = response.result;
+    getApprovalGroup(productId, productClassId, operationId): void {
+        this.underwritingService
+            .getApprovalGroup(productId, productClassId, operationId)
+            .subscribe((response: any) => {
+                this.approvalGroup = response.result;
 
-        console.log('approvalGroup', this.approvalGroup);
-      });
+                console.log('approvalGroup', this.approvalGroup);
+            });
 
-  }
+    }
 
 
     CallRequestClose() { this.displayJobRequest = false; }

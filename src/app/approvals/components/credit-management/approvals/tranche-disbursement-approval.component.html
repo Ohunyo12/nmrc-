@@ -1060,99 +1060,54 @@
                                         <h2 class="panel-title">Obligor UUS Checklist Review</h2>
                                     </div>
                                     <div class="panel-body">
-                                        <p-dataTable [value]="uwsList" [responsive]="true" [paginator]="true" [rows]="5"
-                                            [rowsPerPageOptions]="[5,10,20,30]" [totalRecords]="uwsList?.length || 0">
+                                    <p-dataTable [value]="riskSummary" [responsive]="true">
+                                        <!-- Risk Assessment -->
+                                        <p-column header="Risk Assessment" [style]="{'width':'25%'}">
+                                            <ng-template let-row="rowData" pTemplate="body">
 
-                                            <p-column i18n-header field="item" header="Item" [style]="{'width':'15%'}">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.item }}
-                                                </ng-template>
-                                            </p-column>
+                                                <div style="display:flex; align-items:center; gap:10px;">
 
-                                            <p-column i18n-header field="description" header="Description">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.description }}
-                                                </ng-template>
-                                            </p-column>
+                                                    <span [style.background]="row.color"
+                                                        style="width:18px;height:18px;border-radius:50%;display:inline-block;">
+                                                    </span>
 
-                                            <p-column i18n-header header="Option"
-                                                [style]="{'width':'20%','text-align':'center'}">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    <div [ngStyle]="getRowStyle(uws)"
-                                                        style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 8px;">
-                                                        <label style="display: flex; align-items: center; gap: 5px;">
-                                                            <input type="radio" [(ngModel)]="uws.option" value="Yes"
-                                                                [name]="'option' + uws.id" disabled> Met
-                                                        </label>
-                                                        <label style="display: flex; align-items: center; gap: 5px;">
-                                                            <input type="radio" [(ngModel)]="uws.option" value="No"
-                                                                [name]="'option' + uws.id" disabled> Not Met
-                                                        </label>
-                                                        <label style="display: flex; align-items: center; gap: 5px;">
-                                                            <input type="radio" [(ngModel)]="uws.option" value="Waiver"
-                                                                [name]="'option' + uws.id" disabled> Waiver
-                                                        </label>
-                                                        <label style="display: flex; align-items: center; gap: 5px;">
-                                                            <input type="radio" [(ngModel)]="uws.option"
-                                                                value="Deferred" [name]="'option' + uws.id" disabled>
-                                                            Deferred
-                                                        </label>
-                                                    </div>
-                                                </ng-template>
-                                            </p-column>
+                                                    <strong>{{row.label}}</strong>
 
-                                            <p-column i18n-header header="Defer Date"
-                                                [style]="{'width':'15%','text-align':'center'}">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    <ng-container *ngIf="uws.option === 'Deferred'; else showNA">
-                                                        <input type="date" [(ngModel)]="uws.deferredDate"
-                                                            [name]="'deferredDate' + uws.id" class="form-control"
-                                                            readonly disabled
-                                                            style="border: 1px solid #ccc; padding: 8px 12px; border-radius: 5px; width: 100%;">
-                                                    </ng-container>
-                                                    <ng-template #showNA>N/A</ng-template>
-                                                </ng-template>
-                                            </p-column>
+                                                    <span [style.background]="row.color"
+                                                        style="color:white;padding:4px 8px;border-radius:50%;font-size:12px;">
+                                                        {{row.count}}
+                                                    </span>
 
-                                            <p-column i18n-header field="checkType" header="Check Type">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.checkTypes === "1" ? "Manual" : uws.checkTypes === "0" ? "Automatic" : uws.checkTypes }}
-                                                </ng-template>
-                                            </p-column>
+                                                </div>
 
-                                            <p-column i18n-header field="finalComment" header="Comment">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.finalComment }}
-                                                </ng-template>
-                                            </p-column>
+                                            </ng-template>
+                                        </p-column>
+                                        <!-- Item Column -->
+                                        <p-column header="Item">
+                                            <ng-template let-row="rowData" pTemplate="body">
 
-                                            <p-column i18n-header field="reviewedAt" header="Reviewed Date">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.reviewedAt | date:'yyyy-MM-dd' }}
-                                                </ng-template>
-                                            </p-column>
+                                                <ul style="margin:0;padding-left:18px;">
+                                                    <li *ngFor="let item of row.items">
+                                                        {{item.item}}
+                                                    </li>
+                                                </ul>
 
-                                            <p-column i18n-header field="reviewedBy" header="Reviewed By">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    {{ uws.reviewersName || 'SYS' }}
-                                                </ng-template>
-                                            </p-column>
+                                            </ng-template>
+                                        </p-column>
+                                        <!-- Result Column -->
+                                        <p-column header="Result">
+                                            <ng-template let-row="rowData" pTemplate="body">
 
-                                            <p-column i18n-header header="View Document"
-                                                [style]="{'width':'15%','text-align':'center'}">
-                                                <ng-template let-uws="rowData" pTemplate="body">
-                                                    <div
-                                                        style="display: flex; justify-content: center; align-items: center;">
-                                                        <button *ngIf="uws.option !== 'Deferred'" type="button"
-                                                            class="ui-button ui-button-primary"
-                                                            (click)="viewDocuments(uws)">
-                                                            Preview
-                                                        </button>
-                                                    </div>
-                                                </ng-template>
-                                            </p-column>
-                                        </p-dataTable>
-                                    </div>
+                                                <ul style="margin:0;padding-left:18px;">
+                                                    <li *ngFor="let item of row.items">
+                                                        {{item.finalComment}}
+                                                    </li>
+                                                </ul>
+
+                                            </ng-template>
+                                        </p-column>
+                                    </p-dataTable>
+                                </div>
                                 </div>
                             </p-tabPanel>
                             <!-- END -->
