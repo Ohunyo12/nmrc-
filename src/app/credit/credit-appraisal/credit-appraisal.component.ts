@@ -295,7 +295,7 @@ export class CreditAppraisalComponent implements OnInit {
       deferredPercent: 0
     };
   isLoadingChecklistSummary: boolean = false;
-   approvalGroup: any[] = [];
+  approvalGroup: any[] = [];
 
 
   constructor(
@@ -962,6 +962,8 @@ export class CreditAppraisalComponent implements OnInit {
 
     this.selectedLoan = this.applicationSelection;
 
+    console.log('Selected Loan Application:', this.applicationSelection);
+
     this.isIblRequest = false;
     this.subTransId = this.applicationSelection.subBasicId;
     this.disableApplicationInformationTab = false;
@@ -1008,7 +1010,6 @@ export class CreditAppraisalComponent implements OnInit {
       this.applicationSelection.productClassProcessId;
     this.operationId = this.applicationSelection.operationId;
     this.productId = this.applicationSelection.productId;
-    console.log('application selection info', this.applicationSelection);
     this.apiRequestId = this.applicationSelection.apiRequestId;
     this.creditGradeId = this.applicationSelection.creditGradeId;
     this.loanApplicationDetail = this.applicationSelection;
@@ -1112,22 +1113,50 @@ export class CreditAppraisalComponent implements OnInit {
     }
   }
 
+  riskSummary: any[] = [];
+
+  buildRiskSummary() {
+    const groups = {
+      No: { label: 'Red Warning Signal', color: '#dc3545', items: [] },
+      Deferred: { label: 'Yellow Warning Signal', color: '#17a2b8', items: [] },
+      Waiver: { label: 'Blue Warning Signal', color: '#ffc107', items: [] },
+      Yes: { label: 'Green Warning Signal', color: '#28a745', items: [] }
+    };
+
+    this.uwsList.forEach(item => {
+      if (groups[item.option]) {
+        groups[item.option].items.push(item);
+      }
+    });
+
+    this.riskSummary = Object.keys(groups).map(key => ({
+      label: groups[key].label,
+      color: groups[key].color,
+      count: groups[key].items.length,
+      items: groups[key].items
+    }));
+  }
+
   fetchCustomerUusItems(nhfNumber: string): void {
-    console.error('nhf number:', nhfNumber);
     this.loadingService.show();
+
     this.underwritingService.getCustomerUusItems(nhfNumber).subscribe(
       response => {
         this.uwsList = (response.result || []).map(uws => ({
           ...uws,
           option: this.mapOptionToEnum(uws.finalOption),
-          deferredDate: uws.deferDate ? new Date(uws.deferDate).toISOString().split('T')[0] : null
+          deferredDate: uws.deferDate
+            ? new Date(uws.deferDate).toISOString().split('T')[0]
+            : null
         }));
-        console.log('Processed UUS List:', this.uwsList);
-        //this.cdr.detectChanges();
+        // console.log('Processed UUS List:', this.uwsList);
+
+        this.buildRiskSummary();
       },
       error => {
-        console.error('Error fetching UWS list:', error);
+        console.error(error);
         this.uwsList = [];
+        this.riskSummary = [];
         this.loadingService.hide();
       },
       () => this.loadingService.hide()
@@ -2591,6 +2620,10 @@ export class CreditAppraisalComponent implements OnInit {
   displayChangeLog: boolean = false;
   showSpinnerChangeLog: boolean = false;
   enebleFacilityChange: boolean = false;
+  propertyDetails: any[] = [];
+  additionalLiability: any[] = [];
+  additionalIncome: any[] = [];
+
 
   getLoanDetail(): void {
     this.reload = 0;
@@ -2599,10 +2632,13 @@ export class CreditAppraisalComponent implements OnInit {
       .getLoanDetail(this.applicationSelection.loanApplicationId)
       .subscribe(
         (response: any) => {
-          // console.log();
+          console.log('loan detail response: ', response);
           this.duplications = response.result.duplications;
           this.proposedItems = response.result.facilities;
           this.facilityCount = response.result.facilities.length;
+          this.additionalIncome = response.result.additionalIncome || [];
+          this.additionalLiability = response.result.additionalLiability || [];
+          this.propertyDetails = response.result.propertyDetails ? [response.result.propertyDetails] : [];
           // this.reload++;
           // console.log("proposedItems1: ", this.proposedItems);
 
@@ -4444,12 +4480,12 @@ export class CreditAppraisalComponent implements OnInit {
 
   }
 
-   getApprovalGroup(productId, productClassId, operationId): void {
+  getApprovalGroup(productId, productClassId, operationId): void {
     this.underwritingService.getApprovalGroup(productId, productClassId, operationId).subscribe((response: any) => {
-        this.approvalGroup = response.result;
+      this.approvalGroup = response.result;
 
-        console.log('approvalGroup', this.approvalGroup);
-      });
+      console.log('approvalGroup', this.approvalGroup);
+    });
 
   }
 
