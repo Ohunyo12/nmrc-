@@ -1152,6 +1152,64 @@
                             </div>
                         </div>
 
+                         <div *ngIf="additionalIncome != null" class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title" i18n>Additional Income</h2>
+                            </div>
+                            <div class="panel-body" style="overflow-x: scroll; max-width: width auto;">
+                                <p-dataTable [value]="additionalIncome" [responsive]="true" [paginator]="false" [rows]="8">
+                                    <p-column i18n-header field="amount" header="Amount" sortable="true"
+                                        filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="employer" header="Employer"
+                                        sortable="true" filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="source" header="Source"
+                                        sortable="true" filterMatchMode="contains" [style]="{'width':'25%'}">
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </div>
+
+                        <div *ngIf="additionalLiability != null" class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title" i18n>Additional Liability</h2>
+                            </div>
+                            <div class="panel-body" style="overflow-x: scroll; max-width: width auto;">
+                                <p-dataTable [value]="additionalLiability" [responsive]="true" [paginator]="false" [rows]="8">
+                                    <p-column i18n-header field="loanType" header="Loan Type" sortable="true"
+                                        filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="monthlyRepayment" header="Monthly Repayment"
+                                        sortable="true" filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="outstanding" header="Outstanding Amount"
+                                        sortable="true" filterMatchMode="contains" [style]="{'width':'25%'}">
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+
+                        </div>
+
+                        <div *ngIf="propertyDetails != null" class="panel panel-default">
+                            <div class="panel-heading">
+                                <h2 class="panel-title" i18n>Property Details</h2>
+                            </div>
+                            <div class="panel-body" style="overflow-x: scroll; max-width: width auto;">
+                                <p-dataTable [value]="propertyDetails" [responsive]="true" [paginator]="false" [rows]="8">
+                                    <p-column i18n-header field="downPayment" header="Down Payment" sortable="true"
+                                        filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="propertyPrice" header="Property Price" sortable="true"
+                                        filterMatchMode="contains" [style]="{'width':'10%'}">
+                                    </p-column>
+                                    <p-column i18n-header field="propertyTitle" header="Property Title" sortable="true"
+                                        filterMatchMode="contains" [style]="{'width':'25%'}">
+                                    </p-column>
+                                </p-dataTable>
+                            </div>
+                        </div>
+
                         <div *ngIf="trailRecent != null" class="panel panel-default">
                             <div class="panel-heading">
                                 <h2 class="panel-title" i18n>Term Sheet Details</h2>
@@ -2368,7 +2426,7 @@
                         <div class="panel-heading">
                             <h2 class="panel-title">Obligor UUS Checklist Review</h2>
                         </div>
-                        <div class="panel-body">
+                        <!-- <div class="panel-body">
                             <p-dataTable [value]="uwsList" [responsive]="true" [paginator]="true" [rows]="5"
                                 [rowsPerPageOptions]="[5,10,20,30]" [totalRecords]="uwsList?.length || 0">
 
@@ -2456,6 +2514,55 @@
                                     </ng-template>
                                 </p-column>
                             </p-dataTable>
+                        </div> -->
+                        <div class="panel-body">
+                            <p-dataTable [value]="riskSummary" [responsive]="true">
+                                <!-- Risk Assessment -->
+                                <p-column header="Risk Assessment" [style]="{'width':'25%'}">
+                                    <ng-template let-row="rowData" pTemplate="body">
+
+                                        <div style="display:flex; align-items:center; gap:10px;">
+
+                                            <span [style.background]="row.color"
+                                                style="width:18px;height:18px;border-radius:50%;display:inline-block;">
+                                            </span>
+
+                                            <strong>{{row.label}}</strong>
+
+                                            <span [style.background]="row.color"
+                                                style="color:white;padding:4px 8px;border-radius:50%;font-size:12px;">
+                                                {{row.count}}
+                                            </span>
+
+                                        </div>
+
+                                    </ng-template>
+                                </p-column>
+                                <!-- Item Column -->
+                                <p-column header="Item">
+                                    <ng-template let-row="rowData" pTemplate="body">
+
+                                        <ul style="margin:0;padding-left:18px;">
+                                            <li *ngFor="let item of row.items">
+                                                {{item.item}}
+                                            </li>
+                                        </ul>
+
+                                    </ng-template>
+                                </p-column>
+                                <!-- Result Column -->
+                                <p-column header="Result">
+                                    <ng-template let-row="rowData" pTemplate="body">
+
+                                        <ul style="margin:0;padding-left:18px;">
+                                            <li *ngFor="let item of row.items">
+                                                {{item.finalComment}}
+                                            </li>
+                                        </ul>
+
+                                    </ng-template>
+                                </p-column>
+                            </p-dataTable>
                         </div>
                     </div>
                 </p-tabPanel>
@@ -2520,13 +2627,13 @@
                         <div class="panel-body coll-list">
                             <p-dataTable [value]="approvalGroup" [paginator]="true" [rows]="5">
                                 <p-column i18n-header field="operation" header="Operation" sortable="true"
-                                   [filter]="true" filterMatchMode="contains">
+                                    [filter]="true" filterMatchMode="contains">
                                 </p-column>
                                 <p-column i18n-header field="operationName" header="Operation Name" sortable="true"
                                     [filter]="true" filterMatchMode="contains">
                                 </p-column>
-                                <p-column i18n-header field="position" header="Position" sortable="true"
-                                    [filter]="true" filterMatchMode="contains">
+                                <p-column i18n-header field="position" header="Position" sortable="true" [filter]="true"
+                                    filterMatchMode="contains">
                                 </p-column>
                                 <p-column i18n-header field="productName" header="Product Name" sortable="true"
                                     [filter]="true" filterMatchMode="contains">
@@ -2538,8 +2645,8 @@
                         </div>
                     </div>
                 </p-tabPanel>
-               <!-- END  Approving Officers Tab -->
-                
+                <!-- END  Approving Officers Tab -->
+
                 <p-tabPanel *ngIf="isIblRequest" [disabled]="!proposedCollateral" i18n-header header="IBL Summary">
                     <div class="panel panel-default">
 
