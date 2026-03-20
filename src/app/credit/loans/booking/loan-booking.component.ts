@@ -1374,8 +1374,8 @@ export class LoanBookingComponent implements OnInit {
     buildRiskSummary() {
         const groups = {
             No: { label: 'Red Warning Signal', color: '#dc3545', items: [] },
-            Deferred: { label: 'Yellow Warning Signal', color: '#17a2b8', items: [] },
-            Waiver: { label: 'Blue Warning Signal', color: '#ffc107', items: [] },
+            Deferred: { label: 'Yellow Warning Signal', color: '#ffc107', items: [] },
+            Waiver: { label: 'Blue Warning Signal', color: '#17a2b8', items: [] },
             Yes: { label: 'Green Warning Signal', color: '#28a745', items: [] }
         };
 
@@ -1389,9 +1389,16 @@ export class LoanBookingComponent implements OnInit {
             label: groups[key].label,
             color: groups[key].color,
             count: groups[key].items.length,
-            items: groups[key].items
-        }));
-    }
+            items: groups[key].items,
+            isClicked: false,
+            isHovered: false // <--- Add this property
+    }));
+  }
+
+  // Add this helper function to toggle the blink
+toggleBlink(row: any) {
+  row.isClicked = !row.isClicked;
+}
 
     fetchCustomerUusItems(nhfNumber: string): void {
         this.loadingService.show();
