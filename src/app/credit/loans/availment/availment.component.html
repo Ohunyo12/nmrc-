@@ -878,53 +878,80 @@
                                             <h2 class="panel-title">Obligor UUS Checklist Review</h2>
                                         </div>
                                         <div class="panel-body">
-                                            <p-dataTable [value]="riskSummary" [responsive]="true">
-                                                <!-- Risk Assessment -->
-                                                <p-column header="Risk Assessment" [style]="{'width':'25%'}">
-                                                    <ng-template let-row="rowData" pTemplate="body">
+                        <style>
+                            @keyframes blink-row {
+                                0% {
+                                    opacity: 1;
+                                }
+                        
+                                50% {
+                                    opacity: 0.6;
+                                }
+                        
+                                100% {
+                                    opacity: 1;
+                                }
+                            }
+                        </style>
+                        <p-dataTable [value]="riskSummary" [responsive]="true" (mouseleave)="hoveredId = null">
+    
+                            <p-column header="Risk Assessment" [style]="{'width':'30%', 'padding':'0'}">
+                                <ng-template let-row="rowData" pTemplate="body">
+                                    <div (click)="toggleBlink(row)"
+                                        (mouseenter)="row.isHovered = true"
+                                        (mouseleave)="row.isHovered = false"
+                                        [style.background-color]="row.color" 
+                                        [style.animation]="row.isClicked ? 'blink-row 1.5s infinite' : 'none'"
+                                        [style.color]="row.color === '#ffc107' ? 'black' : 'white'"
+                                        style="display:flex; flex-direction:column; gap:5px; padding:15px; min-height:85px; cursor:pointer;">
+                
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span style="width:12px; height:12px; border-radius:50%; background: currentColor; border: 1px solid rgba(0,0,0,0.1);"></span>
+                                        <strong style="flex-grow: 1;">{{row.label}}</strong>
+                                        <span style="background: rgba(0,0,0,0.15); padding:2px 8px; border-radius:12px; font-size: 11px;">{{row.count}}</span>
+                                    </div>
 
-                                                        <div style="display:flex; align-items:center; gap:10px;">
+                                    <div *ngIf="row.label === 'Red Warning Signal'" 
+                                        style="margin-top: 8px; font-size: 11px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 8px; font-weight: bold;">
+                                        ⚠️ CRITICAL: Red Warning Signal Detected. <br> FAILED.
+                                    </div>
+                                 </div>
+                                </ng-template>
+                            </p-column>
 
-                                                            <span [style.background]="row.color"
-                                                                style="width:18px;height:18px;border-radius:50%;display:inline-block;">
-                                                            </span>
+                            <p-column header="Item" [style]="{'padding':'0'}">
+                                <ng-template let-row="rowData" pTemplate="body">
+                                    <div (mouseenter)="row.isHovered = true" 
+                                        (mouseleave)="row.isHovered = false"
+                                        (click)="toggleBlink(row)"
+                                        [style.background-color]="row.isHovered ? row.color : 'transparent'"
+                                        [style.animation]="(row.isHovered && row.isClicked) ? 'blink-row 1.5s infinite' : 'none'"
+                                        [style.color]="row.isHovered ? (row.color === '#ffc107' ? 'black' : 'white') : '#333'"
+                                         style="padding:15px; min-height:85px; cursor:pointer; transition: background-color 0.2s ease;">
+                                            <ul style="margin:0; padding-left:18px;">
+                                                 <li *ngFor="let item of row.items">{{item.item}}</li>
+                                            </ul>
+                                    </div>
+                                </ng-template>
+                            </p-column>
 
-                                                            <strong>{{row.label}}</strong>
+                            <p-column header="Result" [style]="{'padding':'0'}">
+                                <ng-template let-row="rowData" pTemplate="body">
+                                    <div (mouseenter)="row.isHovered = true" 
+                                        (mouseleave)="row.isHovered = false"
+                                        (click)="toggleBlink(row)"
+                                        [style.background-color]="row.isHovered ? row.color : 'transparent'"
+                                        [style.animation]="(row.isHovered && row.isClicked) ? 'blink-row 1.5s infinite' : 'none'"
+                                        [style.color]="row.isHovered ? (row.color === '#ffc107' ? 'black' : 'white') : '#333'"
+                                        style="padding:15px; min-height:85px; cursor:pointer; transition: background-color 0.2s ease;">
+                                            <ul style="margin:0; padding-left:18px;">
+                                                <li *ngFor="let item of row.items">{{item.finalComment}}</li>
+                                            </ul>
+                                    </div>
+                                 </ng-template>
+                            </p-column>
 
-                                                            <span [style.background]="row.color"
-                                                                style="color:white;padding:4px 8px;border-radius:50%;font-size:12px;">
-                                                                {{row.count}}
-                                                            </span>
-
-                                                        </div>
-
-                                                    </ng-template>
-                                                </p-column>
-                                                <!-- Item Column -->
-                                                <p-column header="Item">
-                                                    <ng-template let-row="rowData" pTemplate="body">
-
-                                                        <ul style="margin:0;padding-left:18px;">
-                                                            <li *ngFor="let item of row.items">
-                                                                {{item.item}}
-                                                            </li>
-                                                        </ul>
-
-                                                    </ng-template>
-                                                </p-column>
-                                                <!-- Result Column -->
-                                                <p-column header="Result">
-                                                    <ng-template let-row="rowData" pTemplate="body">
-
-                                                        <ul style="margin:0;padding-left:18px;">
-                                                            <li *ngFor="let item of row.items">
-                                                                {{item.finalComment}}
-                                                            </li>
-                                                        </ul>
-
-                                                    </ng-template>
-                                                </p-column>
-                                            </p-dataTable>
+                        </p-dataTable>  
                                         </div>
                                     </div>
                                 </p-tabPanel>
